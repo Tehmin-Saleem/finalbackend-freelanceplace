@@ -1,6 +1,6 @@
 import React from "react";
 
-function freelancerFrame() {
+function FreelancerFrame() {
   return (
     <div>
       <svg
@@ -119,4 +119,4 @@ function freelancerFrame() {
   );
 }
 
-export default freelancerFrame;
+export default FreelancerFrame;
