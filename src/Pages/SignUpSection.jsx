@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import ClientFrame from "../svg coponents/ClientFrame"; // Assume this is the SVG component for the client
-import FreelancerFrame from "../svg coponents/FreelancerFrame";
+// import FreelancerFrame from "../svg coponents/FreelancerFrame";
 // import ProjectName from "../svg coponents/ProjectName";
 
 const SignUpSection = () => {
@@ -18,7 +18,7 @@ const SignUpSection = () => {
         <div
           className="text-center mb-4 text-gradient font-[Poppins] text-[32px] "
           style={{
-             fontFamily: "kodchasan",
+            fontFamily: "kodchasan",
             fontSize: "32px",
             fontWeight: 700,
             lineHeight: "41.6px",
@@ -86,7 +86,7 @@ const SignUpSection = () => {
                 required
               />
               <div className="flex items-center md:items-start">
-                <FreelancerFrame className="mr-2 md:mr-4" />
+                {/* <FreelancerFrame className="mr-2 md:mr-4" /> */}
                 <label
                   htmlFor="freelancer"
                   className="text-xs md:text-lg font-medium ml-2"
