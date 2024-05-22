@@ -1,0 +1,148 @@
+/* Card.module.scss */
+
+.card {
+    background-color:#EEEDF2;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
+    border-radius: 0.3rem;
+    padding: 1rem;
+    margin: 1rem 0;
+    width: 90%;
+    margin-left:8%;
+  }
+  
+  .cardContent {
+    display: flex;
+    margin-bottom: 1.5rem;
+    width: 100%;
+  }
+  .flex{
+    display:flex;
+  }
+  .imageWrapper {
+    width: 20%;
+    
+  }
+  
+  .image {
+    margin-top: 1rem;
+    width: 8.75rem; /* 35 * 0.25rem */
+    height: 11.5rem; /* 30 * 0.25rem */
+  }
+  
+  .details {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 100%;
+  }
+  
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+  }
+  
+  .profile {
+    display: flex;
+    align-items: center;
+  }
+  
+  .profileImage {
+    border-radius: 11px;
+    width: 3.5rem;
+    height: 3.5rem;
+    margin-right: 0.5rem;
+    
+  }
+  
+  .name {
+    font-weight: 500;
+    font-family: Poppins;
+    color: #4BCBEB;
+  }
+  
+  .locationField {
+    color:#000000;
+   font-family: Poppins;
+   margin-left: 1rem;
+  }
+  .FreelancerField{
+    color:#2C3E50;
+    font-family: Poppins;
+    font-weight: 500;
+   
+  }
+  
+  .skills {
+    color: #000000;
+    margin-top: 0.25rem;
+    font-family: Poppins;
+  }
+  
+  .inviteButton {
+    background-color: #4BCBEB;
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 1rem;
+    font-family: Poppins;
+    border-radius: 12px;
+    margin-bottom: 5%;
+  }
+  
+  .rateSuccessEarned {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1rem;
+    margin-left: 4rem;
+    color: #94A3B8;
+    font-family: Poppins;
+    
+  }
+  .svg{
+    margin-left: 4rem;
+  }
+  
+  .rate {
+    font-weight: 20px;
+  }
+  
+  .success {
+    margin-left: 0.5rem;
+    color: #94A3B8;
+  }
+  
+  .earned {
+    margin-left: 0.5rem;
+  }
+  
+  .skillTags {
+    display: flex;
+    flex-wrap: wrap;
+    margin-bottom: 0.25rem;
+    margin-left: 4rem;
+  }
+  
+  .skillTag {
+    background-color: #ECF0F1;
+    color: #94A3B8;
+    border-radius: 16px;
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    margin-right: 0.5rem;
+    margin-bottom: 0.25rem;
+    font-family: 'Poppins';
+    border: 1px solid #d5dce6 ;
+  }
+  
+  
+  .description {
+    color:#2C3E50;
+    margin-bottom: 3rem;
+    margin-left: 4rem;
+    font-family: Poppins;
+    margin-top: 1rem;
+    font-weight: 400;
+  }
+  
