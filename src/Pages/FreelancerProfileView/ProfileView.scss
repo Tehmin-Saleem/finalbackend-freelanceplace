@@ -1,0 +1,54 @@
+:root{
+    font: Poppins;
+    color: #2C3E50;
+}
+
+.Outer {
+    width: 75%;
+    border-bottom: 1px solid #d1d5db;
+    border-radius: 0.375rem; 
+    padding: 1rem;
+  }
+  
+  .Profiletitle {
+    font-size: 24px;
+    margin-bottom: 2%;
+    font-weight: 500;
+  }
+  
+  .ProfileDescription {
+    font-size: 18px;
+    margin-bottom: 4%;
+  }
+  
+  .PortfolioSection {
+    margin-top: 4%; /* Margin after description */
+  }
+  
+  .PortfolioTitle {
+    font-size: 24px;
+    margin-bottom: 1rem; /* Adjust as needed */
+  }
+  
+  .Carousel {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+  }
+  
+  /* Individual portfolio card */
+  .PortfolioCard {
+    flex: 0 0 auto;
+    margin-right: 1rem; /* Adjust as needed */
+    scroll-snap-align: start;
+  }
+  
+  .PortfolioCardImage {
+    width: 100%;
+    cursor: pointer;
+  }
+  
+  .PortfolioCardText {
+    font-size: 16px;
+    margin-top: 0.5rem;
+  }

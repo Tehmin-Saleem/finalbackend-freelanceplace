@@ -1,15 +1,62 @@
-import React from "react";
-import Header from "../../components/Header";
+import React, { useState } from "react";
 import NewHeader from "../../components/NewHeader";
 import Profile from "/images/Profile.png";
-import Edit from "../../svg/ProfileView/Edit";
+import "./ProfileView.scss"; // Import the Sass file
+import CommonButton from "../../components/CommonButton";
+import JobSucces from "../../svg/ProfileView/JobSucces";
+import Star from "../../svg/ProfileView/Star";
+import Chat from "../../svg/ProfileView/Chat";
+import Port1 from "/images/Port1.png";
+import Carousel from "../../components/Carousel";
 
 function ProfileView() {
+  // Define state variables
+  // Define state variables
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  const handleNext = () => {
+    setCurrentIndex((prevIndex) =>
+      prevIndex === portfolioItems.length - 1 ? 0 : prevIndex + 1
+    );
+  };
+
+  const handlePrev = () => {
+    setCurrentIndex((prevIndex) =>
+      prevIndex === 0 ? portfolioItems.length - 1 : prevIndex - 1
+    );
+  };
+
+  // Define portfolio items
+  const portfolioItems = [
+    {
+      id: 1,
+      image: Port1,
+      title: "Enable Life Care",
+      description: "Figma UX/UI Design",
+    },
+    // Add more portfolio items as needed
+  ];
+  // Define state variables
+  const [profileData, setProfileData] = useState({
+    name: "Sammar Zahra",
+    location: "Lahore, Punjab, Pakistan",
+    jobSuccess: 96,
+    rate: "Top Rated",
+    skills: ["Mobile App Design", "Wireframe", "Mockup", "Figma", "New Skill"],
+    totalJobs: 10,
+    totalHours: 200,
+    experience: {
+      title: "UI/UX Designer| Figma Expert| Graphic Designer",
+      description:
+        "Are you looking to create memorable and user-centric digital experiences? Your search ends here! I am a highly skilled and innovative UX UI designer, Graphic designer, and WordPress designer from Bangladesh, ready to revolutionize your projects. With a deep passion for creating outstanding user experiences and effective visuals, I guarantee top-notch results that will leave a lasting impression.",
+    },
+  });
+
   return (
     <div>
       <NewHeader />
 
-      <div className=" m-20 px-8 py-8">
+      <div className=" m-20 p-8">
         <div className="border border-[#94A3B8] rounded-md p-4 mb-8">
           {/* Upper Part */}
           <div className="flex items-center mb-16 pl-8 ">
@@ -20,7 +67,7 @@ function ProfileView() {
             />
             <div className="flex flex-col">
               <div className="font-Poppins text-[#4BCBEB] text-[32px]">
-                Sammar Zahra
+                {profileData.name}
               </div>
               <div className="flex items-center">
                 <svg
@@ -40,14 +87,42 @@ function ProfileView() {
                     clipRule="evenodd"
                   />
                 </svg>
-                <span className="text-[#2C3E50] text-[20px] font-Poppins">
-                  Lahore, Punjab, Pakistan
+                <span className="text-[#2C3E50] text-[20px] font-Poppins mb-5">
+                  {profileData.location}
                 </span>
               </div>
+
+              <div className="flex">
+                {/* SVG icon and text for Job Success */}
+                <div className="flex items-center ">
+                  <JobSucces className=" h-3 w-3" />
+                  <div className="text-[#2C3E50] text-[14px] font-Poppins ml-4 w-32">
+                    {profileData.jobSuccess}% Job Success
+                  </div>
+                </div>
+                {/* SVG icon and text for Top Rated */}
+                <div className="flex items-center">
+                  <Star className="h-3 w-3" />
+                  <div className="text-[#2C3E50] text-[14px] font-Poppins ml-4 w-32">
+                    {profileData.rate}
+                  </div>
+                </div>
+              </div>
             </div>
-            <button className=" ml-[69%] flex items-center bg-[#4BCBEB] text-white py-1 px-2 rounded-lg">
-              <Edit width="10" />
-            </button>
+
+            <div className="flex items-center justify-between  ml-[50%] pr-5">
+              <CommonButton
+                text={<Chat />}
+                className=" bg-[#FFFFFF] border border-[#4BCBEB] text-[18px] font-Poppins text-[#FFFFFF] rounded-lg font-semibold font-Poppins py-1 px-6 w-full focus:outline-none focus:shadow-outline"
+              />
+            </div>
+
+            <div className="flex items-center justify-between  ">
+              <CommonButton
+                text="  Hire"
+                className=" bg-[#4BCBEB] text-[18px] font-Poppins text-[#FFFFFF] rounded-lg font-semibold font-Poppins py-2 px-6 w-full focus:outline-none focus:shadow-outline"
+              />
+            </div>
           </div>
 
           {/* Border between upper and lower part */}
@@ -65,18 +140,14 @@ function ProfileView() {
                 Skills:
               </h2>
               <div className="flex flex-wrap mb-6">
-                <div className="border border-[#94A3B8] rounded-2xl p-2 mr-2 mb-2 text-[14px] text-[#94A3B8] font-Poppins">
-                  Mobile App Design
-                </div>
-                <div className="border border-[#94A3B8] rounded-2xl p-2 mr-2 mb-2 text-[14px] text-[#94A3B8] font-Poppins">
-                  Wireframe
-                </div>
-                <div className="border border-[#94A3B8] rounded-2xl p-2 mr-2 mb-2 text-[14px] text-[#94A3B8] font-Poppins">
-                  Mockup
-                </div>
-                <div className="border border-[#94A3B8] rounded-2xl p-2 mr-2 mb-2 text-[14px] text-[#94A3B8] font-Poppins">
-                  Figma
-                </div>
+                {profileData.skills.map((skill, index) => (
+                  <div
+                    key={index}
+                    className="border border-[#94A3B8] rounded-2xl p-2 mr-2 mb-2 text-[14px] text-[#94A3B8] font-Poppins"
+                  >
+                    {skill}
+                  </div>
+                ))}
               </div>
 
               <div>
@@ -86,7 +157,7 @@ function ProfileView() {
                 <div className="mb-2 flex flex-row  text-center">
                   <div className="mr-6 flex flex-col">
                     <span className="text-[24px] text-[#2C3E50] font-Poppins">
-                      10
+                      {profileData.totalJobs}
                     </span>
                     <span className="font-Poppins text-[#94A3B8] text-[16px]">
                       Total Jobs
@@ -94,7 +165,7 @@ function ProfileView() {
                   </div>
                   <div className="flex flex-col">
                     <span className="text-[24px] text-[#2C3E50] font-Poppins">
-                      200
+                      {profileData.totalHours}
                     </span>
                     <span className="font-Poppins text-[#94A3B8] text-[16px]">
                       Total Hours
@@ -105,15 +176,26 @@ function ProfileView() {
             </div>
 
             {/* Right Side */}
-            <div className="w-3/10 border-b border-gray-300 rounded-md p-4 mb-4">
-              <h2 className="font-bold mb-4">Experience</h2>
+            <div className="Outer">
+              <h2 className="Profiletitle">{profileData.experience.title}</h2>
               <div>
-                <h3 className="font-bold mb-2">UI/UX Designer, Figma Expert</h3>
-                <p>
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                  Vivamus convallis metus nec sagittis mattis. Fusce vulputate
-                  mi sed nunc malesuada, non ullamcorper leo ultricies.
+                <p className="ProfileDescription">
+                  {profileData.experience.description}
                 </p>
+              </div>
+
+              {/* Portfolio Section */}
+              <div className="PortfolioSection">
+                <h2 className="PortfolioTitle">Portfolio</h2>
+                <Carousel
+                  cards={portfolioItems}
+                  currentIndex={currentIndex}
+                  handleNext={handleNext}
+                  handlePrev={handlePrev}
+                />
+                <div className="Carousel">
+                  {/* Individual portfolio cards go here */}
+                </div>
               </div>
             </div>
           </div>
