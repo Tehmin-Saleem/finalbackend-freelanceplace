@@ -1,17 +1,37 @@
+@mixin common-style($margin_top : 40px , $margin_right: 20px , $margin_left: 20px , $padding : 1rem  ){
+  margin-top: $margin_top;
+  margin-right: $margin_right;
+  margin-left: $margin_left;
+  padding: $padding;
+}
+
+
+
+
+
+
 .container {
     // margin: 60px;
-    margin-top: 40px;
-    margin-right: 20px;
-    margin-left: 20px;
-    padding: 1rem;
-    border: 3px solid black;
-    border-style: round($number: 4); /* Added border */
-    display: flex;
-    flex-direction: column;
+   @include common-style();
+   border: 3px solid black;
+   border-style: round($number: 4); /* Added border */
+   display: flex;
+   flex-direction: column;
+   @media (min-width: 1024px) {
+     flex-direction: row;
+   }
+
+  }
+
+
+
+  .container2 {
+    @include common-style("red");
+  }
+
+  .container3 {
+    @include common-style("blue");
   
-    @media (min-width: 1024px) {
-      flex-direction: row;
-    }
 
   }
   
@@ -28,7 +48,7 @@
     @media (min-width: 1024px) {
       width: 33.333333%;
     }
-    margin-bottom: 7rem; /* Added margin-bottom */
+    margin-bottom: 1rem; /* Added margin-bottom */
   }
   
   
@@ -66,17 +86,16 @@
     
 //   }
   
-  .skill-badge, .skill-option {
+.skill-badge, .skill-option {
     display: flex;
-     align-items: center;
+    align-items: center;
     background-color: #ebf8ff;
     color: #2c5282;
     border-radius: 0.5rem;
-     padding: 0.5rem;
+    padding: 0.5rem;
     margin: 0.5rem;
-    width:10%;
-    
-  }
+    flex-grow: 1; /* Use flex-grow to allow the items to grow and fill the available space */
+}
   
   .skill-badge {
     margin-right: 0.5rem;
