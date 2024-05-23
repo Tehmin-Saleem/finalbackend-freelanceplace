@@ -1,0 +1,60 @@
+.user-review {
+    
+    margin-bottom: 6%;
+    
+  }
+  
+  .user-info {
+    display: flex;
+    align-items: center;
+    font-size: 16px;
+    font-weight: 500;
+  }
+  
+  .user-details {
+    padding-left: 3%;
+    // flex-grow: 1;
+    display: flex;
+    // align-items: center; /* Align items vertically */
+    flex-direction: column;
+  }
+  
+  .user-name {
+    font-weight: bold;
+    margin-right: 0.5rem;
+  }
+  
+  .user-location {
+    color: #94A3B8;
+    margin-left: 0.5rem;
+    font-size: 12px;
+    font-weight: 500;
+    
+  }
+  
+  .user-image {
+    width: 50px; /* Adjust as needed */
+    height: 50px; /* Adjust as needed */
+    border-radius: 50%; /* To make the image round */
+    margin-left: 16px; /* Adjust the spacing between image and text */
+  }
+  
+  .user-description {
+    margin-top: 16px; /* Adjust as needed */
+    padding-right: 9%;
+    font-size: 18px;
+    font-weight: 400;
+    color: #64748B;
+    
+  }
+ 
+
+
+  
+  .name-info,
+  .location-info {
+    display: flex;
+    align-items: center;
+  }
+  
+  

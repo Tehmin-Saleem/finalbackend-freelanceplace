@@ -9,8 +9,8 @@ import Password from "../../svg/Login/Password";
 import PassEye from "../../svg/Login/PassEye";
 import Google from "../../svg/Login/Google";
 import Apple from "../../svg/Login/Apple";
-import CommonButton from "../../components/CommonButton";
-import TextField from "../../components/TextField";
+import CommonButton from "../../components/common/CommonButton";
+import TextField from "../../components/common/TextField";
 
 function Login() {
   const [password, setPassword] = useState("");

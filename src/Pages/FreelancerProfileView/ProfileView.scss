@@ -5,9 +5,12 @@
 
 .Outer {
     width: 75%;
+    
+  }
+  .top{
     border-bottom: 1px solid #d1d5db;
     border-radius: 0.375rem; 
-    padding: 1rem;
+    padding-bottom: 2rem;
   }
   
   .Profiletitle {
@@ -23,11 +26,15 @@
   
   .PortfolioSection {
     margin-top: 4%; /* Margin after description */
+    border-bottom: 1px solid #d1d5db;
+    border-radius: 0.375rem; 
+    padding-bottom: 2rem;
   }
   
   .PortfolioTitle {
+    font-weight: 500;
     font-size: 24px;
-    margin-bottom: 1rem; /* Adjust as needed */
+    margin-bottom: 2rem; /* Adjust as needed */
   }
   
   .Carousel {
@@ -49,6 +56,205 @@
   }
   
   .PortfolioCardText {
-    font-size: 16px;
+    font-size: 18px;
+    font-weight: 500;
     margin-top: 0.5rem;
   }
+  .PortfolioCard {
+    flex: 0 0 calc(33.33% - 1rem); /* Adjust as needed */
+    margin-right: 1rem; /* Adjust as needed */
+  }
+
+  .PortfolioCardsubtext{
+    font-size: 16px;
+    font-weight: 400;
+    color: #94A3B8;
+
+  }
+  .reviewtitle{
+    font-size: 24px;
+    font-weight: 500;
+    margin-bottom: 5%;
+    
+  }
+
+  .review{
+
+    margin-top: 5%;
+    margin-left: 4%;
+  }
+
+
+  .border-line {
+    border-top: 1px solid #94A3B8;
+    margin-bottom: 4px;
+  }
+
+
+  .left-side {
+    width: calc(100% / 3);
+    border-right: 1px solid #94A3B8;
+    border-radius: 0.375rem; // Rounded to 6px
+    padding: 1rem; // 16px
+    margin-bottom: 1rem; // 16px
+    margin-right: 1rem; // 16px
+  }
+
+
+  
+
+
+
+
+
+
+  // Responsiveness==================================
+
+
+
+ 
+
+
+
+
+
+  .upper-part {
+
+    
+      border: 1px solid #94A3B8;
+      border-radius: 0.375rem; // Equivalent to rounded-md
+      padding: 1rem; // Equivalent to p-4
+      margin-bottom: 2rem; // Equivalent to mb-8
+    
+    
+
+    @media (max-width: 768px) {
+      /* Adjust font size for smaller screens */
+      .name {
+        font-size: 24px;
+      }
+  
+      .location {
+        font-size: 18px;
+      }
+  
+      /* Adjust margin and padding for smaller screens */
+      .container {
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+       
+        
+      }
+  
+      /* Adjust button margins for smaller screens */
+      .buttons {
+        margin-left: 10px;
+      }
+      .buttons {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+  
+      .buttons .CommonButton {
+        margin-top: 1rem;
+      }
+  
+      .name,
+      .location {
+        font-size: 24px; /* Adjust the font size as needed */
+      }
+    }
+  
+    @media (max-width: 480px) {
+      /* Further adjust font size for smaller screens */
+      .name {
+        font-size: 20px;
+      }
+  
+      .location {
+        font-size: 16px;
+      }
+  
+      /* Further adjust margin and padding for smaller screens */
+      .container {
+        margin-bottom: 5px;
+        display: flex;
+        align-items: center;
+      }
+  
+      /* Further adjust button margins for smaller screens */
+      .buttons {
+        margin-left: 5px;
+      }
+
+      .buttons {
+        flex-direction: column;
+        align-items: center;
+      }
+  
+      .buttons .CommonButton {
+        margin-top: 1rem;
+      }
+  
+      .name,
+      .location {
+        font-size: 24px; /* Adjust the font size as needed */
+      }
+    }
+  }
+
+
+
+
+
+
+
+
+  // ======================================responsiveness for lower portion
+
+
+
+  // Define a mixin for common styles
+@mixin common-styles {
+  margin-bottom: 16px; // Adjust as needed
+}
+
+// Define a mixin for responsive layout changes
+@mixin responsive-layout {
+  @media (max-width: 768px) {
+    flex-direction: column; // Change flex direction to column for smaller screens
+  }
+}
+
+// Apply common styles to both sides
+.left-side, .RightSide {
+  @include common-styles;
+}
+
+// Apply responsive layout to the main flex container
+.flex-container {
+  @include responsive-layout;
+}
+
+// Apply specific styles for the left side
+.left-side {
+  width: 100%;
+  
+}
+
+// Apply specific styles for the right side
+.RightSide {
+  width: 100%; // Take full width on smaller screens
+}
+
+// Adjust text size for smaller screens
+.text-responsive {
+  @media (max-width: 768px) {
+    font-size: 14px; // Adjust as needed
+  }
+}
+
+  
+  

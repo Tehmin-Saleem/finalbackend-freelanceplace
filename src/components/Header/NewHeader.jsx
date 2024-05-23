@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react";
-import JobDropdown from "../svg/Header/JobDropdwon";
-import IconSearchBar from "../svg/Header/IconSearchBar";
-import Notification from "../svg/Header/Notification";
-import GreaterThan from "../svg/Header/GreaterThan";
-import ProfileIcon from "../svg/Header/ClientFrame";
-import Logo from "../svg/Header/Logo";
+import JobDropdown from "../../svg/Header/JobDropdwon";
+import IconSearchBar from "../../svg/Header/IconSearchBar";
+import Notification from "../../svg/Header/Notification";
+import GreaterThan from "../../svg/Header/GreaterThan";
+import ProfileIcon from "../../svg/Header/ClientFrame";
+import Logo from "../../svg/Header/Logo";
+import "./Header.scss";
 
 const Header = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
