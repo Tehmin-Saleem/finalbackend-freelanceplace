@@ -33,6 +33,11 @@ const FreelancerCards = ({ freelancers }) => {
         {freelancers.map((freelancer) => (
           <div key={freelancer.id} className={styles.cardWrapper}>
             <Card freelancer={freelancer} />
+            <Card freelancer={freelancer} />
+            <Card freelancer={freelancer} />
+            <Card freelancer={freelancer} />
+            <Card freelancer={freelancer} />
+            <Card freelancer={freelancer} />
           </div>
         ))}
       </div>

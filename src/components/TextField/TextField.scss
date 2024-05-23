@@ -1,0 +1,31 @@
+// styles.scss
+
+$input-background-color: #ECF0F1;
+
+.textfield-container {
+  label {
+    // Add any label-specific styles here
+  }
+
+  .input-wrapper {
+    display: flex;
+
+    .icon {
+        fill: red !important;
+        margin-top: 20px;
+      // Add any icon-specific styles here
+    }
+
+    input {
+      background-color: $input-background-color;
+      &:focus {
+        outline: none;
+        // border-style: rounded;
+      }
+    }
+  }
+
+  .error-message {
+    // Add any error-message-specific styles here
+  }
+}

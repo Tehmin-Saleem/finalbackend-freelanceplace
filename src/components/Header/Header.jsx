@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import JobDropdown from "../svg coponents/JobDropdwon";
-import IconSearchBar from "../svg coponents/IconSearchBar";
-import Notification from "../svg coponents/Notification";
-import GreaterThan from "../svg coponents/GreaterThan";
-import ProfileIcon from "../svg coponents/ClientFrame";
+import React, { useState, useEffect } from "react";
+import JobDropdown from "../../svg coponents/JobDropdwon";
+import IconSearchBar from "../../svg coponents/IconSearchBar";
+import Notification from "../../svg coponents/Notification";
+import GreaterThan from "../../svg coponents/GreaterThan";
+import ProfileIcon from "../../svg coponents/ClientFrame";
 
 const Header = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -26,20 +26,22 @@ const Header = () => {
     };
 
     if (dropdownOpen) {
-      window.addEventListener('click', handleClickOutside);
+      window.addEventListener("click", handleClickOutside);
     } else {
-      window.removeEventListener('click', handleClickOutside);
+      window.removeEventListener("click", handleClickOutside);
     }
 
     return () => {
-      window.removeEventListener('click', handleClickOutside);
+      window.removeEventListener("click", handleClickOutside);
     };
   }, [dropdownOpen]);
 
   return (
     <header className="bg-white shadow-md p-4 flex flex-col md:flex-row items-center justify-between">
       <div className="flex items-center space-x-4 relative">
-        <div className="text-gradient font-poppins font-bold text-3xl ml-8 md:ml-32">L o g o</div>
+        <div className="text-gradient font-poppins font-bold text-3xl ml-8 md:ml-32">
+          L o g o
+        </div>
         <div className="relative flex items-center ml-8 md:ml-28">
           <h2 className="text-lg font-bold cursor-pointer ml-12">Jobs</h2>
           <div onClick={toggleDropdown} className="cursor-pointer ml-2">
@@ -48,14 +50,25 @@ const Header = () => {
           {dropdownOpen && (
             <div className="absolute left-0 mt-28 bg-white shadow-lg rounded-lg z-10 w-28 max-h-36 overflow-y-auto origin-top-left">
               <ul>
-                {["Post a Job", "All Jobs Post", "Add Payment", "Privacy Policy"].map((option) => (
+                {[
+                  "Post a Job",
+                  "All Jobs Post",
+                  "Add Payment",
+                  "Privacy Policy",
+                ].map((option) => (
                   <li
                     key={option}
-                    className={`px-2 py-1 text-xs cursor-pointer ${selectedOption === option ? "bg-white text-[#4BCBEB]" : "text-gray-800 hover:bg-white"}`}
+                    className={`px-2 py-1 text-xs cursor-pointer ${
+                      selectedOption === option
+                        ? "bg-white text-[#4BCBEB]"
+                        : "text-gray-800 hover:bg-white"
+                    }`}
                     onClick={() => handleSelect(option)}
                     onMouseEnter={() => setHoveredOption(option)}
                     onMouseLeave={() => setHoveredOption("")}
-                    style={{ color: hoveredOption === option ? "#4BCBEB" : "black" }}
+                    style={{
+                      color: hoveredOption === option ? "#4BCBEB" : "black",
+                    }}
                   >
                     {option}
                   </li>
@@ -81,7 +94,8 @@ const Header = () => {
           <div className="font-bold">Sammar Zahra</div>
           <div className="text-sm text-gray-500">Status 200</div>
         </div>
-        <GreaterThan className="ml-4 self-center" /> {/* Positioned GreaterThan icon */}
+        <GreaterThan className="ml-4 self-center" />{" "}
+        {/* Positioned GreaterThan icon */}
       </div>
     </header>
   );

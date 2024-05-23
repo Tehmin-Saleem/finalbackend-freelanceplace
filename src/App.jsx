@@ -1,13 +1,7 @@
 import "./App.css";
-// import SignUpSection from "./Pages/SignUpSection";
-// import Dummy2 from "./Pages/SignUpSection";
-// import ClientDashboard from "./Pages/ClientDashboard";
-// import SignUpForm from "./Pages/SignUp";
 import React from "react";
-import Card from "./components/FreelancerCards/Card";
-import FreelancerCards from "./components/FreelanceCardDropdown/FreelancerCards";
 import SendOffer from "./components/FormProposal/SendOffer";
-
+import FreelancerCards from "./components/FreelanceCardDropdown/FreelancerCards";
 const freelancers = [
   {
     id: 1,
@@ -52,6 +46,7 @@ function App() {
       {/* <SignUpForm /> */}
       {/* <App /> */}
       <SendOffer />
+      {/* <Textfield /> */}
     </>
   );
 }

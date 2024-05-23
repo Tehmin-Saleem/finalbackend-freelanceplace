@@ -1,136 +1,171 @@
-/* SendOffer.scss */
-
-// Container styles
-.send-offer {
+.container {
+    // margin: 60px;
+    margin-top: 40px;
+    margin-right: 20px;
+    margin-left: 20px;
+    padding: 1rem;
+    border: 3px solid black;
+    border-style: round($number: 4); /* Added border */
     display: flex;
     flex-direction: column;
+  
+    @media (min-width: 1024px) {
+      flex-direction: row;
+    }
+
+  }
+  
+  .form-container {
+    width: 70%;
+    @media (min-width: 1024px) {
+      width: 66.666667%;
+    }
+    margin-bottom: 1rem; /* Added margin-bottom */
+  }
+  
+  .profile-container {
+    width: 20%;
+    @media (min-width: 1024px) {
+      width: 33.333333%;
+    }
+    margin-bottom: 7rem; /* Added margin-bottom */
+  }
+  
+  
+  .input-fieldes {
+    width: 40%;
+    height:20%;
+    //  border-radius: 12px;
+    margin-bottom: 1rem;
+    // font-family: Roboto;
+    // border-radius: 70px;
+    border: 1px solid #cbd5e0;
+    padding: 8px;
+  border-radius: 1rem; 
+//   margin-left: 12px;
+    
+    
+  }
+  .input-fieldes InputFieldsIcon{
+    margin-left: 120px;
+    background: #000;
+  }
+
+//   .input-fieldesIcon {
+//     // width: 40%;
+//     // height:20%;
+//     // //  border-radius: 12px;
+//     // margin-bottom: 1rem;
+//     // // font-family: Roboto;
+//     // // border-radius: 70px;
+//     // border: 1px solid #cbd5e0;
+//     // padding: 8px;
+// //   border-radius: 1rem; 
+//   margin-left: 12px;
+    
+    
+//   }
+  
+  .skill-badge, .skill-option {
+    display: flex;
+     align-items: center;
+    background-color: #ebf8ff;
+    color: #2c5282;
+    border-radius: 0.5rem;
+     padding: 0.5rem;
+    margin: 0.5rem;
+    width:10%;
+    
+  }
+  
+  .skill-badge {
+    margin-right: 0.5rem;
+  }
+  
+  .popular-skills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+  }
+  
+  .rate-selection {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+  
+    .rate-type {
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      padding: 1rem;
+      border-radius: 0.5rem;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  
+      &.selected {
+        font-weight: 200;
+        background-color: #ebf8ff;
+      }
+    }
+  }
+  
+  .attach-file-button {
+    display: flex;
     align-items: center;
+    background-color: #4BCBEB;
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 0.25rem;
+  }
   
-    // Skill badge styles
-    .skill-badge {
-      background-color: #e2e8f0;
-      color: #2d3748;
-      padding: 4px 8px;
-      border-radius: 9999px;
-      margin-right: 8px;
-      margin-bottom: 8px;
-      display: inline-flex;
+  .submit-buttons {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 1rem;
+  }
+  
+  .profile-info {
+    background-color: #f7fafc;
+    border-radius: 0.5rem;
+    padding: 1rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  
+    .profile-header {
+      display: flex;
       align-items: center;
+      margin-bottom: 1rem;
   
-      .cross-icon {
-        cursor: pointer;
+      .w-12 {
+        width: 3rem;
+      }
+  
+      .h-12 {
+        height: 3rem;
+      }
+  
+      .mr-4 {
+        margin-right: 1rem;
       }
     }
   
-    // Skill option styles
-    .skill-option {
-      background-color: #cbd5e0;
-      color: #2d3748;
-      padding: 4px 8px;
-      border-radius: 9999px;
-      margin-right: 8px;
-      margin-bottom: 8px;
-      display: inline-flex;
-      align-items: center;
-      cursor: pointer;
+    .experience {
+      margin-top: 1rem;
   
-      .plus-icon {
-        margin-left: 4px;
-      }
-    }
-  
-    // Rate selection styles
-    .rate-selection {
-      margin-bottom: 16px;
-  
-      .rate-type {
-        display: inline-flex;
-        align-items: center;
-        cursor: pointer;
-        margin-right: 16px;
-  
-        &.selected {
-          font-weight: bold;
-        }
-      }
-    }
-  
-    // Attach file button styles
-    .attach-file-button {
-      background-color: #4bcbec;
-      color: #fff;
-      padding: 8px 16px;
-      border-radius: 4px;
-      display: inline-flex;
-      align-items: center;
-      cursor: pointer;
-    }
-  
-    // Submit buttons styles
-    .submit-buttons {
-      margin-top: 16px;
-  
-      button {
-        padding: 8px 16px;
-        border-radius: 4px;
-        cursor: pointer;
-  
-        &:first-child {
-          background-color: #718096;
-          color: #fff;
-          margin-right: 8px;
-        }
-  
-        &:last-child {
-          background-color: #4299e1;
-          color: #fff;
-          display: flex;
-          align-items: center;
-  
-          svg {
-            margin-left: 4px;
-          }
-        }
-      }
-    }
-  
-    // Profile info styles
-    .profile-info {
-      background-color: #f7fafc;
-      padding: 16px;
-      border-radius: 8px;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-      margin-top: 16px;
-  
-      .profile-header {
+      .flex {
         display: flex;
-        align-items: center;
-        margin-bottom: 16px;
+        justify-content: space-between;
   
-        img {
-          width: 64px;
-          height: 64px;
-          border-radius: 50%;
-          margin-right: 16px;
-        }
+        .text-center {
+          text-align: center;
   
-        h3 {
-          margin: 0;
-        }
-      }
+          .text-xl {
+            font-size: 1.25rem;
+            font-weight: 700;
+          }
   
-      .experience {
-        margin-top: 16px;
-  
-        h4 {
-          font-weight: bold;
-          margin-bottom: 8px;
-        }
-  
-        div {
-          display: flex;
-          justify-content: space-between;
-          margin-bottom: 8px;
+          .font-bold {
+            font-weight: 700;
+          }
         }
       }
     }

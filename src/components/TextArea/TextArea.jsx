@@ -1,7 +1,7 @@
 import React from "react";
-import PropTypes from "prop-types";
-import "./TextField.scss"; // Import the Sass file
-const Textfield = ({
+// import PropTypes from "prop-types";
+import "../TextArea/TextArea.scss"; // Import the Sass file
+const TextArea = ({
   label,
   icon,
   value,
@@ -22,7 +22,7 @@ const Textfield = ({
           </div>
         )}{" "}
         {/* Render the icon */}
-        <input
+        <textarea
           type="text"
           value={value}
           placeholder={placeholder}
@@ -49,4 +49,4 @@ const Textfield = ({
 //   className: PropTypes.string,
 // };
 
-export default Textfield;
+export default TextArea;

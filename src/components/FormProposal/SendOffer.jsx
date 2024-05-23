@@ -1,15 +1,15 @@
-// SendOffer.js
-
 import React, { useState } from "react";
-import TextField from "../TextField"; // Assuming you have already created this component
+import TextField from "../TextField/TextField";
 import CrossIcon from "../../svg coponents/CrossIcon";
 import PlusIcon from "../../svg coponents/PlusIcon";
 import RateIcon from "../../svg coponents/RateIcon";
-
 import ProfileIcon from "../../svg coponents/ProfileIcon";
+import "./SendOffer.scss"; // Import the Sass file
+import SearchIcon from "../../svg coponents/SearchIcon";
+import TextArea from "../TextArea/TextArea";
 
 const SkillBadge = ({ skill, onRemove }) => (
-  <span className="bg-blue-100 text-blue-800 rounded-full px-2 py-1 text-xs font-semibold mr-2 mb-2 flex items-center skill-badge">
+  <span className="skill-badge">
     {skill}
     <CrossIcon
       className="ml-1 cursor-pointer"
@@ -19,17 +19,14 @@ const SkillBadge = ({ skill, onRemove }) => (
 );
 
 const SkillOption = ({ skill, onAdd }) => (
-  <button
-    onClick={() => onAdd(skill)}
-    className="bg-gray-200 text-gray-700 rounded-full px-2 py-1 text-xs font-semibold mr-2 mb-2 flex items-center skill-option"
-  >
+  <button onClick={() => onAdd(skill)} className="skill-option">
     {skill}
     <PlusIcon className="ml-1" />
   </button>
 );
 
 const RateSelection = ({ selectedRate, onSelectRate }) => (
-  <div className="flex items-center mb-4 rate-selection">
+  <div className="rate-selection">
     <div
       className={`rate-type ${selectedRate === "hourly" ? "selected" : ""}`}
       onClick={() => onSelectRate("hourly")}
@@ -48,7 +45,7 @@ const RateSelection = ({ selectedRate, onSelectRate }) => (
 );
 
 const AttachFileButton = () => (
-  <button className="bg-[#4BCBEB] text-white px-4 py-2 rounded flex items-center attach-file-button">
+  <button className="attach-file-button">
     Attach File
     <svg className="ml-2" width="16" height="16" viewBox="0 0 24 24">
       {/* SVG Path for attachment icon */}
@@ -57,7 +54,7 @@ const AttachFileButton = () => (
 );
 
 const SubmitButtons = () => (
-  <div className="flex justify-between mt-4 submit-buttons">
+  <div className="submit-buttons">
     <button className="bg-gray-500 text-white px-4 py-2 rounded">Back</button>
     <button className="bg-blue-500 text-white px-4 py-2 rounded flex items-center">
       Send Invite
@@ -69,8 +66,8 @@ const SubmitButtons = () => (
 );
 
 const ProfileInfo = ({ profile }) => (
-  <div className="w-full lg:w-1/3 p-4 bg-gray-100 rounded-lg shadow-md profile-info">
-    <div className="flex items-center mb-4 profile-header">
+  <div className="profile-info">
+    <div className="profile-header">
       <ProfileIcon className="w-12 h-12 mr-4" />
       <div>
         <h3 className="text-xl font-bold">{profile.name}</h3>
@@ -81,7 +78,7 @@ const ProfileInfo = ({ profile }) => (
       <span className="text-green-500">{profile.successRate}% Success</span> |
       Top Rated
     </p>
-    <div className="mt-4 experience">
+    <div className="experience">
       <h4 className="font-bold">Experience:</h4>
       <div className="flex justify-between">
         <div className="text-center">
@@ -101,6 +98,7 @@ const SendOffer = () => {
   const [selectedSkills, setSelectedSkills] = useState([]);
   const [rateType, setRateType] = useState("hourly");
   const [searchTerm, setSearchTerm] = useState("");
+  const [description, setDescription] = useState("");
   const profile = {
     picture: "https://picsum.photos/200/300",
     name: "Jane Doe",
@@ -131,23 +129,30 @@ const SendOffer = () => {
   };
 
   return (
-    <div className="container mx-auto p-4 flex flex-col lg:flex-row send-offer">
-      <div className="w-full  p-4">
+    <div className="container send-offer">
+      <div className="w-full w-2-3 p-4 form-container">
         <h2 className="text-2xl font-bold mb-4 font-poppins">Send an offer</h2>
         <TextField
-          className={StyleSheet.Inputfield}
-          // label="Enter job title:"
-          // placeholder="UI/UX Designer"
-          // className="font-Roboto"
+          label="Enter job title: "
+          placeholder="UI/UX Designer"
+          className="input-fieldes  "
         />
-        <TextField label="Description" placeholder="Enter job description" />
+        <TextArea
+          label="Description"
+          placeholder="Enter About Your Project Details"
+          className="input-fieldes"
+          // value={description}
+          // onChange={(e) => setDescription(e.target.value)}
+        />
         <TextField
-          label="Search Skills"
+          label="Search Skills or add you own"
           value={searchTerm}
           onChange={setSearchTerm}
+          icon={<SearchIcon className="InputFieldsIcon" />}
+          className="input-fieldes "
         />
-
-        <div className="flex flex-wrap mb-2 selected-skills">
+        <h3 className="text-xl font-semibold mb-2">Selected Skills</h3>
+        <div className="selected-skills">
           {selectedSkills.map((skill) => (
             <SkillBadge
               key={skill}
@@ -157,20 +162,26 @@ const SendOffer = () => {
           ))}
         </div>
 
-        <h3 className="text-xl font-semibold mb-2">Popular Skills</h3>
-        <div className="flex flex-wrap mb-4 popular-skills">
+        <h3 className="text-xl font-semibold mb-2">
+          Popular skills for UI/UX Designs
+        </h3>
+        <div className="popular-skills">
           {popularSkills.map((skill) => (
             <SkillOption key={skill} skill={skill} onAdd={handleAddSkill} />
           ))}
         </div>
 
         <RateSelection selectedRate={rateType} onSelectRate={setRateType} />
-        <TextField label="Amount" placeholder="Enter amount" />
+        <TextField
+          label="Amount"
+          placeholder="Enter amount"
+          className="input-field"
+        />
         <AttachFileButton />
         <SubmitButtons />
       </div>
 
-      <ProfileInfo profile={profile} />
+      <ProfileInfo profile={profile} className="profile-container" />
     </div>
   );
 };
