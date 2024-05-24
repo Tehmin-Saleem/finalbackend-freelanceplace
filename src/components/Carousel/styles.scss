@@ -1,0 +1,44 @@
+
+  
+  .PortfolioCard {
+    flex-shrink: 0;
+  }
+  
+  .carousel-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 90%;
+  
+
+  .carousel {
+    display: flex;
+    overflow: hidden;
+
+    .slide {
+      width: 100%;
+      transition: transform 0.5s ease;
+
+      &.active {
+        transform: translateX(0);
+      }
+    }
+  }
+
+  .carousel-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    font-size: 24px;
+
+    &.left {
+      left: 0;
+      
+    }
+
+    &.right {
+      right: 0;
+    }
+  }
+}

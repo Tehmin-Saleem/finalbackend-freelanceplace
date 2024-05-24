@@ -1,0 +1,16 @@
+.star-rating {
+  font-size: 24px; /* Adjust as needed */
+  cursor: pointer;
+
+  .star {
+    color: #ccc; /* Default star color */
+    transition: color 0.2s;
+
+    &:hover,
+    &.checked {
+      color: #FFE61C;
+     
+    //   color: #FFA929 /* Color of selected stars */
+    }
+  }
+}

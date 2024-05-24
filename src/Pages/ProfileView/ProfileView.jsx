@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import NewHeader from "../../components/Header/NewHeader";
 import Profile from "/images/Profile.png";
-import "./ProfileView.scss"; // Import the Sass file
+import "./styles.scss"; // Import the Sass file
 import CommonButton from "../../components/common/CommonButton";
 import JobSucces from "../../svg/ProfileView/JobSucces";
 import Star from "../../svg/ProfileView/Star";
@@ -10,27 +10,13 @@ import Port1 from "/images/Port1.png";
 import Port2 from "/images/Port2.png";
 import Port3 from "/images/Port3.png";
 import Carousel from "../../components/Carousel/Carousel";
-import UserReview from "../../components/ProfileView/UserReview"; // Import the UserReview component
+import UserReview from "../../components/ProfileView/UserReviews/UserReview"; // Import the UserReview component
 import Australia from "../../svg/ProfileView/Australia";
 import UStates from "../../svg/ProfileView/UStates";
 import SArabia from "../../svg/ProfileView/SArabia";
 
 function ProfileView() {
   const [currentIndex, setCurrentIndex] = useState(0);
-
-  const handleNext = () => {
-    setCurrentIndex((prevIndex) =>
-      prevIndex + 1 === portfolioItems.length ? 0 : prevIndex + 1
-    );
-  };
-  const handlePrevious = () => {
-    setCurrentIndex((prevIndex) =>
-      prevIndex - 1 < 0 ? portfolioItems.length - 1 : prevIndex - 1
-    );
-  };
-  const handleDotClick = (index) => {
-    setCurrentIndex(index);
-  };
 
   // Define portfolio items
   const portfolioItems = [
@@ -89,7 +75,7 @@ function ProfileView() {
       location: "Australia",
       description:
         "Lorem ipsum dolor sit amet consectetur. Dictum blandit turpis hac elit nunc vitae quis adipiscing. Eu pellentesque a curabitur facilisi velit est vestibulum laoreet diam.",
-      nameIcon: <Australia />,
+      rating: 3,
       locationIcon: <Australia />,
     },
     {
@@ -98,7 +84,7 @@ function ProfileView() {
       location: "United States",
       description:
         "Lorem ipsum dolor sit amet consectetur. Dictum blandit turpis hac elit nunc vitae quis adipiscing. Eu pellentesque a curabitur facilisi velit est vestibulum laoreet diam.",
-      nameIcon: <UStates />,
+      rating: 5,
       locationIcon: <UStates />,
     },
     {
@@ -107,7 +93,7 @@ function ProfileView() {
       location: "Saudi Arabia",
       description:
         "Lorem ipsum dolor sit amet consectetur. Dictum blandit turpis hac elit nunc vitae quis adipiscing. Eu pellentesque a curabitur facilisi velit est vestibulum laoreet diam.",
-      nameIcon: <SArabia />,
+      rating: 4,
       locationIcon: <SArabia />,
     },
     // Add more user reviews as needed
@@ -251,13 +237,7 @@ function ProfileView() {
               {/* Portfolio Section */}
               <div className="PortfolioSection">
                 <h2 className="PortfolioTitle">Portfolio</h2>
-                <Carousel
-                  cards={portfolioItems}
-                  currentIndex={currentIndex}
-                  handleNext={handleNext}
-                  handlePrevious={handlePrevious}
-                  handleDotClick={handleDotClick}
-                />
+                <Carousel cards={portfolioItems} />
               </div>
 
               {/* Reviews Section */}
@@ -265,14 +245,13 @@ function ProfileView() {
                 <div className="review">
                   <h2 className="reviewtitle">Reviews</h2>
                   {/* Map through user reviews and render each one */}
-                  {/* Map through user reviews and render each one */}
                   {userReviews.map((review) => (
                     <UserReview
                       key={review.id}
                       name={review.name}
                       location={review.location}
                       description={review.description}
-                      nameIcon={review.nameIcon}
+                      rating={review.rating}
                       locationIcon={review.locationIcon}
                     />
                   ))}

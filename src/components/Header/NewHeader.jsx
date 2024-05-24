@@ -5,7 +5,7 @@ import Notification from "../../svg/Header/Notification";
 import GreaterThan from "../../svg/Header/GreaterThan";
 import ProfileIcon from "../../svg/Header/ClientFrame";
 import Logo from "../../svg/Header/Logo";
-import "./Header.scss";
+import "./styles.scss";
 
 const Header = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);

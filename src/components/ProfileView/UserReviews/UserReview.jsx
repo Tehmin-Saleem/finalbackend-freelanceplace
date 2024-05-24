@@ -1,14 +1,9 @@
 import React from "react";
 import UserImage from "/images/Profile.png";
-import "./UserReview.scss";
+import "./styles.scss";
+import StarRating from "../starrating/StarRating";
 
-const UserReview = ({
-  name,
-  location,
-  description,
-  nameIcon,
-  locationIcon,
-}) => {
+const UserReview = ({ name, location, description, rating, locationIcon }) => {
   return (
     <div className="user-review">
       <div className="user-info">
@@ -16,7 +11,7 @@ const UserReview = ({
         <div className="user-details">
           <div className="name-info">
             <h3 className="user-name">{name}</h3>
-            {nameIcon}
+            <StarRating rating={rating} />
           </div>
           <div className="location-info">
             {locationIcon}
