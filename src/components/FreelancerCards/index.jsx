@@ -1,5 +1,5 @@
 import React from "react";
-import styles from "./Card.module.scss";
+// import styles from "./style.scss";
 import SuccessSvg from "../../svg coponents/SuccessSvg";
 
 const Card = ({ freelancer }) => {

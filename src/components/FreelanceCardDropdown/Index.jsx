@@ -1,7 +1,7 @@
 import React from "react";
-import Card from "../FreelancerCards/Card"; // Adjust the path as necessary
+// import Card from "../FreelancerCards"; // Adjust the path as necessary
 import JobDropdwon from "../../svg coponents/JobDropdwon";
-import styles from "./FreelancerCards.module.scss"; // Import the SCSS module
+// import styles from "./style.scss"; // Import the SCSS module
 
 const FreelancerCards = ({ freelancers }) => {
   return (

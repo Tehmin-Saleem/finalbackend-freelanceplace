@@ -1,7 +1,8 @@
 import "./App.css";
 import React from "react";
-import SendOffer from "./components/FormProposal/SendOffer";
-import FreelancerCards from "./components/FreelanceCardDropdown/FreelancerCards";
+import SendOffer from "./components/FormProposal/OfferForm";
+import FreelancerCards from "./components/FreelanceCardDropdown/Index";
+import OfferForm from "./components/FormProposal/OfferForm";
 const freelancers = [
   {
     id: 1,
@@ -35,18 +36,15 @@ function App() {
           <Card key={index} freelancer={freelancer} />
         ))}
       </div> */}
-
       {/* <div>
         <FreelancerCards freelancers={freelancers} />
       </div> */}
-
       {/* <SignUpSection/> */}
       {/* <Dummy2/>   */}
       {/* <ClientDashboard/>  */}
       {/* <SignUpForm /> */}
-      {/* <App /> */}
-      <SendOffer />
-      {/* <Textfield /> */}
+      {/* <App /> */}?{/* <Textfield /> */}
+      <OfferForm />
     </>
   );
 }

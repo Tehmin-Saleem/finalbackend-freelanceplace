@@ -1,0 +1,154 @@
+.container {
+  display: flex;
+  border: 1px solid #ccc;
+  margin: 60px;
+  padding: 10px;
+  justify-content: space-between;
+  border-radius: 10px;
+  @media (max-width: 768px) {
+      flex-direction: column;
+      background: #94A3B8;
+  }
+}
+.h2{
+  font-family: Poppins;
+  color: #2C3E50;
+  font: 500;
+  size: 32px;
+  margin-left: 2px;
+  margin-bottom: 8px;
+}
+
+.left {
+  width: 70%;
+  padding: 10px;
+}
+
+.right {
+  width: 30%;
+  padding: 10px;
+}
+
+.field {
+  margin-bottom: 12px;
+  font-family: Poppins;
+  color: #37474F;
+  // margin-bottom: 6px;
+  
+}
+
+.roundedInput {
+  width: calc(40% - 40px); // Adjust the width as needed
+  padding: 5px;
+  border-radius: 12px;
+  border: 1px solid #ccc;  
+  margin-top: 12px;
+}
+
+.textArea {
+  width: 300px;
+   height: 100px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  font-family: Poppins;
+  color:#9A9EA5
+}
+
+.inputWithIcon {
+  // position: relative;
+  border: 1px solid #ccc;
+  border-radius: 20px;
+  width: calc(40% - 10px); // Adjust the width as needed
+  padding: 5px;
+  margin-top: 8px;
+  
+  }
+  .searchIcon{
+    margin-bottom: 12px;
+  }
+
+.inputWithIcon input {
+  width: 10%;
+  padding-left: 25px;
+}
+
+.icon {
+  // position: absolute;
+  left: 5px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.skills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  color: #94A3B8;
+  font-family: Poppins;
+}
+.skill {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  color: #2C3E50;
+  font-family: Poppins;
+}
+
+
+.skillButton {
+  display: flex;
+  align-items: center;
+  border: 1px solid #ccc;
+  border-radius: 20px;
+  padding: 5px 10px;
+  cursor: pointer;
+}
+
+.crossIcon, .addIcon {
+  margin-left: 5px;
+}
+
+.options {
+  display: flex;
+  flex-direction: row; /* Arrange options vertically */
+  gap: 12px;
+}
+
+.option {
+  margin-top: 18px;
+  position: relative; /* Relative positioning for the container */
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  height: 100px; /* Adjust the height as needed */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Apply shadow effect */
+}
+
+.Radio {
+  position: absolute; /* Absolute positioning for the radio button */
+  top: 0;
+  right: 0;
+  margin: 10px; /* Adjust the margin as needed */
+}
+
+.optionText {
+  flex-grow: 1; /* Allow the text to occupy remaining space */
+  text-align: center;
+  font-family: Poppins;
+  font-weight: 500;
+
+}
+
+.option.selected {
+  background-color: #f0f0f0;
+}
+
+.attachButton, .buttonWithIcon {
+  position: relative;
+  display: flex;
+  align-items: center;
+  padding: 10px;
+}
