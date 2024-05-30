@@ -1,16 +1,18 @@
 import { useState, useEffect } from "react";
 import React from "react";
 import CHARACTER from "/images/CHARACTER.png";
-import LogoName from "../../svg/Login/LogoName";
 import Group from "/images/Group.png";
-import Fname from "../../svg/Login/Fname";
-import Mail from "../../svg/Login/Mail";
-import Password from "../../svg/Login/Password";
-import PassEye from "../../svg/Login/PassEye";
-import Google from "../../svg/Login/Google";
-import Apple from "../../svg/Login/Apple";
-import CommonButton from "../../components/common/CommonButton";
-import TextField from "../../components/common/TextField";
+
+import { CommonButton, TextField } from "../../components/index";
+import {
+  LogoName,
+  Fname,
+  Mail,
+  Password,
+  PassEye,
+  Google,
+  Apple,
+} from "../../svg/index";
 
 function Login() {
   const [password, setPassword] = useState("");

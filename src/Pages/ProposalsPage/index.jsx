@@ -1,6 +1,5 @@
 import React from "react";
-import NewHeader from "../../components/Header/NewHeader";
-import Card from "../../components/Proposals/Proposalcard";
+import { NewHeader, Proposalscard } from "../../components/index";
 
 function Proposal() {
   const freelancerData = {
@@ -21,7 +20,7 @@ function Proposal() {
       <NewHeader />
       <h1>Proposals</h1>
       {/* Render the Card component and pass the freelancer data as props */}
-      <Card freelancer={freelancerData} />
+      <Proposalscard freelancer={freelancerData} />
     </div>
   );
 }

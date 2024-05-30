@@ -1,6 +1,6 @@
 import React from "react";
 import "./styles.scss";
-import SuccessSvg from "../../svg/ProfileView/JobSucces";
+import { JobSucces } from "../../svg";
 import Profile from "/images/Profile.png";
 
 const Card = ({ freelancer }) => {
@@ -30,7 +30,7 @@ const Card = ({ freelancer }) => {
           </div>
           <div className="rateSuccessEarned">
             <span className="rate">${freelancer.rate}/hr</span>
-            <SuccessSvg className="svg" />
+            <JobSucces className="svg" />
             <span className="success">{freelancer.successRate}% Success</span>
             <span className="earned">${freelancer.amountEarned} earned</span>
           </div>

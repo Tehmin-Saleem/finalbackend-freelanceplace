@@ -1,16 +1,14 @@
 import { Routes, Route } from "react-router-dom";
 import "./App.css";
-import Login from "./Pages/Sign-up/Login";
-import ProfileView from "./Pages/ProfileView/ProfileView";
-import Proposal from "./Pages/ProposalsPage/Proposal";
-import StarRating from "./components/ProfileView/starrating/StarRating";
+// import Login from "./Pages/Signup/Login";
+import { ProfileView, Proposal } from "./Pages/index";
 
 function App() {
   return (
     <>
       {/* <Login /> */}
-      {/* <ProfileView /> */}
-      <Proposal />
+      <ProfileView />
+      {/* <Proposal /> */}
     </>
   );
 }

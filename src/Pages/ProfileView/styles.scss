@@ -1,104 +1,104 @@
-:root{
-    font: Poppins;
-    color: #2C3E50;
-}
+// :root{
+//     font: Poppins;
+//     color: #2C3E50;
+// }
 
-.Outer {
-    width: 75%;
+// .Outer {
+//     width: 75%;
     
-  }
-  .top{
-    border-bottom: 1px solid #d1d5db;
-    border-radius: 0.375rem; 
-    padding-bottom: 2rem;
-  }
+//   }
+//   .top{
+//     border-bottom: 1px solid #d1d5db;
+//     border-radius: 0.375rem; 
+//     padding-bottom: 2rem;
+//   }
   
-  .Profiletitle {
-    font-size: 24px;
-    margin-bottom: 2%;
-    font-weight: 500;
-  }
+//   .Profiletitle {
+//     font-size: 24px;
+//     margin-bottom: 2%;
+//     font-weight: 500;
+//   }
   
-  .ProfileDescription {
-    font-size: 18px;
-    margin-bottom: 4%;
-  }
+//   .ProfileDescription {
+//     font-size: 18px;
+//     margin-bottom: 4%;
+//   }
   
-  .PortfolioSection {
-    margin-top: 4%; /* Margin after description */
-    border-bottom: 1px solid #d1d5db;
-    border-radius: 0.375rem; 
-    padding-bottom: 2rem;
-  }
+//   .PortfolioSection {
+//     margin-top: 4%; /* Margin after description */
+//     border-bottom: 1px solid #d1d5db;
+//     border-radius: 0.375rem; 
+//     padding-bottom: 2rem;
+//   }
   
-  .PortfolioTitle {
-    font-weight: 500;
-    font-size: 24px;
-    margin-bottom: 2rem; /* Adjust as needed */
-  }
+//   .PortfolioTitle {
+//     font-weight: 500;
+//     font-size: 24px;
+//     margin-bottom: 2rem; /* Adjust as needed */
+//   }
   
-  .Carousel {
-    display: flex;
-    overflow-x: auto;
-    scroll-snap-type: x mandatory;
-  }
+//   .Carousel {
+//     display: flex;
+//     overflow-x: auto;
+//     scroll-snap-type: x mandatory;
+//   }
   
-  /* Individual portfolio card */
-  .PortfolioCard {
-    flex: 0 0 auto;
-    margin-right: 1rem; /* Adjust as needed */
-    scroll-snap-align: start;
-  }
+//   /* Individual portfolio card */
+//   .PortfolioCard {
+//     flex: 0 0 auto;
+//     margin-right: 1rem; /* Adjust as needed */
+//     scroll-snap-align: start;
+//   }
   
-  .PortfolioCardImage {
-    width: 100%;
-    cursor: pointer;
-  }
+//   .PortfolioCardImage {
+//     width: 100%;
+//     cursor: pointer;
+//   }
   
-  .PortfolioCardText {
-    font-size: 18px;
-    font-weight: 500;
-    margin-top: 0.5rem;
-  }
-  .PortfolioCard {
-    flex: 0 0 calc(33.33% - 1rem); /* Adjust as needed */
-    margin-right: 1rem; /* Adjust as needed */
-  }
+//   .PortfolioCardText {
+//     font-size: 18px;
+//     font-weight: 500;
+//     margin-top: 0.5rem;
+//   }
+//   .PortfolioCard {
+//     flex: 0 0 calc(33.33% - 1rem); /* Adjust as needed */
+//     margin-right: 1rem; /* Adjust as needed */
+//   }
 
-  .PortfolioCardsubtext{
-    font-size: 16px;
-    font-weight: 400;
-    color: #94A3B8;
+//   .PortfolioCardsubtext{
+//     font-size: 16px;
+//     font-weight: 400;
+//     color: #94A3B8;
 
-  }
-  .reviewtitle{
-    font-size: 24px;
-    font-weight: 500;
-    margin-bottom: 5%;
+//   }
+//   .reviewtitle{
+//     font-size: 24px;
+//     font-weight: 500;
+//     margin-bottom: 5%;
     
-  }
+//   }
 
-  .review{
+//   .review{
 
-    margin-top: 5%;
-    margin-left: 4%;
-  }
-
-
-  .border-line {
-    border-top: 1px solid #94A3B8;
-    margin-bottom: 4px;
-  }
+//     margin-top: 5%;
+//     margin-left: 4%;
+//   }
 
 
-  .left-side {
-    width: calc(100% / 3);
-    border-right: 1px solid #94A3B8;
-    border-radius: 0.375rem; // Rounded to 6px
-    padding: 1rem; // 16px
-    margin-bottom: 1rem; // 16px
-    margin-right: 1rem; // 16px
-  }
+//   .border-line {
+//     border-top: 1px solid #94A3B8;
+//     margin-bottom: 4px;
+//   }
+
+
+//   .left-side {
+//     width: calc(100% / 3);
+//     border-right: 1px solid #94A3B8;
+//     border-radius: 0.375rem; // Rounded to 6px
+//     padding: 1rem; // 16px
+//     margin-bottom: 1rem; // 16px
+//     margin-right: 1rem; // 16px
+//   }
 
 
   
@@ -108,7 +108,7 @@
 
 
 
-  // Responsiveness==================================
+//   // Responsiveness==================================
 
 
 
@@ -118,143 +118,347 @@
 
 
 
-  .upper-part {
+//   .upper-part {
 
     
-      border: 1px solid #94A3B8;
-      border-radius: 0.375rem; // Equivalent to rounded-md
-      padding: 1rem; // Equivalent to p-4
-      margin-bottom: 2rem; // Equivalent to mb-8
+//       border: 1px solid #94A3B8;
+//       border-radius: 0.375rem; // Equivalent to rounded-md
+//       padding: 1rem; // Equivalent to p-4
+//       margin-bottom: 2rem; // Equivalent to mb-8
     
     
 
-    @media (max-width: 768px) {
-      /* Adjust font size for smaller screens */
-      .name {
-        font-size: 24px;
-      }
+//     @media (max-width: 768px) {
+//       /* Adjust font size for smaller screens */
+//       .name {
+//         font-size: 24px;
+//       }
   
-      .location {
-        font-size: 18px;
-      }
+//       .location {
+//         font-size: 18px;
+//       }
   
-      /* Adjust margin and padding for smaller screens */
-      .container {
-        margin-bottom: 10px;
-        display: flex;
-        align-items: center;
+//       /* Adjust margin and padding for smaller screens */
+//       .container {
+//         margin-bottom: 10px;
+//         display: flex;
+//         align-items: center;
        
         
-      }
+//       }
   
-      /* Adjust button margins for smaller screens */
-      .buttons {
-        margin-left: 10px;
-      }
-      .buttons {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-      }
+//       /* Adjust button margins for smaller screens */
+//       .buttons {
+//         margin-left: 10px;
+//       }
+//       .buttons {
+//         display: flex;
+//         flex-direction: column;
+//         align-items: center;
+//       }
   
-      .buttons .CommonButton {
-        margin-top: 1rem;
-      }
+//       .buttons .CommonButton {
+//         margin-top: 1rem;
+//       }
   
-      .name,
-      .location {
-        font-size: 24px; /* Adjust the font size as needed */
-      }
-    }
+//       .name,
+//       .location {
+//         font-size: 24px; /* Adjust the font size as needed */
+//       }
+//     }
   
-    @media (max-width: 480px) {
-      /* Further adjust font size for smaller screens */
-      .name {
-        font-size: 20px;
-      }
+//     @media (max-width: 480px) {
+//       /* Further adjust font size for smaller screens */
+//       .name {
+//         font-size: 20px;
+//       }
   
-      .location {
-        font-size: 16px;
-      }
+//       .location {
+//         font-size: 16px;
+//       }
   
-      /* Further adjust margin and padding for smaller screens */
-      .container {
-        margin-bottom: 5px;
-        display: flex;
-        align-items: center;
-      }
+//       /* Further adjust margin and padding for smaller screens */
+//       .container {
+//         margin-bottom: 5px;
+//         display: flex;
+//         align-items: center;
+//       }
   
-      /* Further adjust button margins for smaller screens */
-      .buttons {
-        margin-left: 5px;
-      }
+//       /* Further adjust button margins for smaller screens */
+//       .buttons {
+//         margin-left: 5px;
+//       }
 
-      .buttons {
-        flex-direction: column;
-        align-items: center;
-      }
+//       .buttons {
+//         flex-direction: column;
+//         align-items: center;
+//       }
   
-      .buttons .CommonButton {
-        margin-top: 1rem;
-      }
+//       .buttons .CommonButton {
+//         margin-top: 1rem;
+//       }
   
-      .name,
-      .location {
-        font-size: 24px; /* Adjust the font size as needed */
-      }
-    }
+//       .name,
+//       .location {
+//         font-size: 24px; /* Adjust the font size as needed */
+//       }
+//     }
+//   }
+
+
+
+
+
+
+
+
+//   // ======================================responsiveness for lower portion
+
+
+
+//   // Define a mixin for common styles
+// @mixin common-styles {
+//   margin-bottom: 16px; // Adjust as needed
+// }
+
+// // Define a mixin for responsive layout changes
+// @mixin responsive-layout {
+//   @media (max-width: 768px) {
+//     flex-direction: column; // Change flex direction to column for smaller screens
+//   }
+// }
+
+// // Apply common styles to both sides
+// .left-side, .RightSide {
+//   @include common-styles;
+// }
+
+// // Apply responsive layout to the main flex container
+// .flex-container {
+//   @include responsive-layout;
+// }
+
+// // Apply specific styles for the left side
+// .left-side {
+//   width: 100%;
+  
+// }
+
+// // Apply specific styles for the right side
+// .RightSide {
+//   width: 100%; // Take full width on smaller screens
+// }
+
+// // Adjust text size for smaller screens
+// .text-responsive {
+//   @media (max-width: 768px) {
+//     font-size: 14px; // Adjust as needed
+//   }
+// }
+
+  
+  
+// Define variables for common values
+$font-family: 'Poppins', sans-serif;
+$color-primary: #2C3E50;
+$color-secondary: #94A3B8;
+$border-radius: 0.375rem;
+$padding: 1rem;
+$font-size-lg: 24px;
+$font-size-md: 18px;
+$font-size-sm: 16px;
+$margin-bottom: 16px;
+
+// Mixin for common borders
+@mixin border-style($color, $radius) {
+  border: 1px solid $color;
+  border-radius: $radius;
+}
+
+// Mixin for common padding
+@mixin common-padding($padding) {
+  padding: $padding;
+}
+
+// Mixin for responsive layout
+@mixin responsive-layout($breakpoint) {
+  @media (max-width: $breakpoint) {
+    flex-direction: column;
+  }
+}
+
+// Mixin for common text styles
+@mixin common-text($size, $color: $color-primary, $weight: 400) {
+  font-size: $size;
+  color: $color;
+  font-weight: $weight;
+}
+
+// Base styles
+:root {
+  font: $font-family;
+  color: $color-primary;
+}
+
+// Outer container
+.Outer {
+  width: 75%;
+}
+
+// Top section
+.top {
+  @include border-style(#d1d5db, $border-radius);
+  @include common-padding(2rem 0);
+}
+
+// Profile title
+.Profiletitle {
+  @include common-text($font-size-lg, $color-primary, 500);
+  margin-bottom: 2%;
+}
+
+// Profile description
+.ProfileDescription {
+  @include common-text($font-size-md);
+  margin-bottom: 4%;
+}
+
+// Portfolio section
+.PortfolioSection {
+  margin-top: 4%;
+  @include border-style(#d1d5db, $border-radius);
+  @include common-padding(2rem 0);
+}
+
+// Portfolio title
+.PortfolioTitle {
+  @include common-text($font-size-lg, $color-primary, 500);
+  margin-bottom: 2rem;
+}
+
+// Carousel
+.Carousel {
+  display: flex;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+}
+
+// Individual portfolio card
+.PortfolioCard {
+  flex: 0 0 calc(33.33% - 1rem);
+  margin-right: 1rem;
+  scroll-snap-align: start;
+
+  &Image {
+    width: 100%;
+    cursor: pointer;
   }
 
+  &Text {
+    @include common-text($font-size-md, $color-primary, 500);
+    margin-top: 0.5rem;
+  }
 
-
-
-
-
-
-
-  // ======================================responsiveness for lower portion
-
-
-
-  // Define a mixin for common styles
-@mixin common-styles {
-  margin-bottom: 16px; // Adjust as needed
-}
-
-// Define a mixin for responsive layout changes
-@mixin responsive-layout {
-  @media (max-width: 768px) {
-    flex-direction: column; // Change flex direction to column for smaller screens
+  &subtext {
+    @include common-text($font-size-sm, $color-secondary);
   }
 }
 
-// Apply common styles to both sides
-.left-side, .RightSide {
-  @include common-styles;
+// Review title
+.reviewtitle {
+  @include common-text($font-size-lg, $color-primary, 500);
+  margin-bottom: 5%;
 }
 
-// Apply responsive layout to the main flex container
-.flex-container {
-  @include responsive-layout;
+// Review section
+.review {
+  margin-top: 5%;
+  margin-left: 4%;
 }
 
-// Apply specific styles for the left side
+// Border line
+.border-line {
+  border-top: 1px solid $color-secondary;
+  margin-bottom: 4px;
+}
+
+// Left side
 .left-side {
-  width: 100%;
-  
+  width: calc(100% / 3);
+  @include border-style($color-secondary, $border-radius);
+  @include common-padding($padding);
+  margin-bottom: 1rem;
+  margin-right: 1rem;
 }
 
-// Apply specific styles for the right side
-.RightSide {
-  width: 100%; // Take full width on smaller screens
+// Responsiveness
+.upper-part {
+  @include border-style($color-secondary, $border-radius);
+  @include common-padding($padding);
+  margin-bottom: 2rem;
+
+  @media (max-width: 768px) {
+    .name {
+      @include common-text(24px);
+    }
+
+    .location {
+      @include common-text(18px);
+    }
+
+    .container {
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+    }
+
+    .buttons {
+      margin-left: 10px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+
+      .CommonButton {
+        margin-top: 1rem;
+      }
+    }
+  }
+
+  @media (max-width: 480px) {
+    .name {
+      @include common-text(20px);
+    }
+
+    .location {
+      @include common-text(16px);
+    }
+
+    .container {
+      margin-bottom: 5px;
+      display: flex;
+      align-items: center;
+    }
+
+    .buttons {
+      margin-left: 5px;
+      flex-direction: column;
+      align-items: center;
+
+      .CommonButton {
+        margin-top: 1rem;
+      }
+    }
+  }
 }
 
-// Adjust text size for smaller screens
+// Flex container for lower section
+.flex-container {
+  @include responsive-layout(768px);
+}
+
+// Text responsive
 .text-responsive {
   @media (max-width: 768px) {
-    font-size: 14px; // Adjust as needed
+    font-size: 14px;
   }
 }
-
-  
-  

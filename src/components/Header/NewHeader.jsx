@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from "react";
-import JobDropdown from "../../svg/Header/JobDropdwon";
-import IconSearchBar from "../../svg/Header/IconSearchBar";
-import Notification from "../../svg/Header/Notification";
-import GreaterThan from "../../svg/Header/GreaterThan";
-import ProfileIcon from "../../svg/Header/ClientFrame";
-import Logo from "../../svg/Header/Logo";
+import {
+  Logo,
+  ProfilePic,
+  GreaterThan,
+  Notification,
+  IconSearchBar,
+  JobDropdwon,
+} from "../../svg/index";
+
 import "./styles.scss";
 
 const Header = () => {
@@ -47,7 +50,7 @@ const Header = () => {
             onClick={toggleDropdown}
             className="cursor-pointer ml-2 md:mr-10"
           >
-            <JobDropdown />
+            <JobDropdwon />
           </div>
           {dropdownOpen && (
             <div className="absolute left-0 mt-28 bg-white shadow-lg rounded-lg z-10 w-28 max-h-36 overflow-y-auto origin-top-left">
@@ -95,7 +98,7 @@ const Header = () => {
         </div>
         <div className="flex items-center md:mr-20 space-x-6 ml-auto">
           <Notification className="mr-2 md:mr-4" width="20" height="20" />
-          <ProfileIcon className="mr-2 md:mr-4" width="20" height="20" />
+          <ProfilePic className="mr-2 md:mr-4" width="20" height="20" />
           <div className="flex flex-col text-sm md:text-base">
             <div className="font-Poppins text-[12px] text-[#0F172A] font-bold">
               Sammar Zahra

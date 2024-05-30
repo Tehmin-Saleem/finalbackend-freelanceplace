@@ -1,7 +1,7 @@
 import React from "react";
 import UserImage from "/images/Profile.png";
 import "./styles.scss";
-import StarRating from "../starrating/StarRating";
+import StarRating from "../starrating/index";
 
 const UserReview = ({ name, location, description, rating, locationIcon }) => {
   return (

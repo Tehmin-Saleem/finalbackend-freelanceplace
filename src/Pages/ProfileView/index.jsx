@@ -1,19 +1,25 @@
 import React, { useState } from "react";
-import NewHeader from "../../components/Header/NewHeader";
 import Profile from "/images/Profile.png";
 import "./styles.scss"; // Import the Sass file
-import CommonButton from "../../components/common/CommonButton";
-import JobSucces from "../../svg/ProfileView/JobSucces";
-import Star from "../../svg/ProfileView/Star";
-import Chat from "../../svg/ProfileView/Chat";
 import Port1 from "/images/Port1.png";
 import Port2 from "/images/Port2.png";
 import Port3 from "/images/Port3.png";
-import Carousel from "../../components/Carousel/Carousel";
-import UserReview from "../../components/ProfileView/UserReviews/UserReview"; // Import the UserReview component
-import Australia from "../../svg/ProfileView/Australia";
-import UStates from "../../svg/ProfileView/UStates";
-import SArabia from "../../svg/ProfileView/SArabia";
+
+import {
+  Carousel,
+  UserReview,
+  CommonButton,
+  NewHeader,
+} from "../../components/index";
+
+import {
+  Australia,
+  UStates,
+  SArabia,
+  Chat,
+  Star,
+  JobSucces,
+} from "../../svg/index";
 
 function ProfileView() {
   const [currentIndex, setCurrentIndex] = useState(0);

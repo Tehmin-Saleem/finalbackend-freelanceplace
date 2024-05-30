@@ -1,6 +1,6 @@
 import { React, useState } from "react";
-import Carouselleft from "../../svg/ProfileView/Carouselleft";
-import Crouselright from "../../svg/ProfileView/Crouselright";
+import { Carouselleft, Crouselright } from "../../../svg";
+
 import "./styles.scss";
 
 const Carousel = ({ cards }) => {
