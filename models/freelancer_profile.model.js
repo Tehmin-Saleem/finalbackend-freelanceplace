@@ -24,6 +24,11 @@ const freelancer_ProfileSchema = new Schema({
     required: true,
     ref: "User",
   },
+  first_name: {
+    type: mongoose.Types.ObjectId,
+    required: true,
+    ref: "User",
+  },
   image: {
     type: String,
   },
@@ -37,6 +42,11 @@ const freelancer_ProfileSchema = new Schema({
       },
     },
   ],
+  last_name: {
+    type: mongoose.Types.ObjectId,
+    required: true,
+    ref: "User",
+  },
   profile_overview: {
     type: String,
   },
