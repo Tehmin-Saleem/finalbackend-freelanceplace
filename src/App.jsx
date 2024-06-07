@@ -1,8 +1,12 @@
 import "./App.css";
 import React from "react";
-import SendOffer from "./components/FormProposal/OfferForm";
-import FreelancerCards from "./components/FreelanceCardDropdown/Index";
-import OfferForm from "./components/FormProposal/OfferForm";
+// import SendOffer from "./components/FormProposal/OfferForm";
+import FreelancerCards from "./components/FreelancerCards/index";
+import Header from "./components/Common/Header";
+import DashboardPage from "./Pages/ClientDashboard";
+import ErrorPage from "./Pages/ErrorPage";
+import SignUpSection from "./Pages/SignUpSection";
+// import OfferForm from "./components/FormProposal/OfferForm";
 const freelancers = [
   {
     id: 1,
@@ -31,20 +35,13 @@ const freelancers = [
 function App() {
   return (
     <>
-      {/* <div className="container mx-auto p-4">
-        {freelancers.map((freelancer, index) => (
-          <Card key={index} freelancer={freelancer} />
-        ))}
-      </div> */}
-      {/* <div>
+      <div>
         <FreelancerCards freelancers={freelancers} />
-      </div> */}
-      {/* <SignUpSection/> */}
-      {/* <Dummy2/>   */}
-      {/* <ClientDashboard/>  */}
-      {/* <SignUpForm /> */}
-      {/* <App /> */}?{/* <Textfield /> */}
-      <OfferForm />
+      </div>
+      {/* <Header /> */}
+      {/* <DashboardPage /> */}
+      {/* <ErrorPage /> */}
+      {/* <SignUpSection /> */}
     </>
   );
 }

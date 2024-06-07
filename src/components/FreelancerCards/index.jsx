@@ -1,58 +1,50 @@
 import React from "react";
-// import styles from "./style.scss";
-import SuccessSvg from "../../svg coponents/SuccessSvg";
+import "./style.scss";
+import { SuccessSvg } from "../../svg components/index";
 
 const Card = ({ freelancer }) => {
   return (
-    <div className={styles.card}>
-      <div className={styles.cardContent}>
-        <div className={styles.imageWrapper}>
-          <img
-            src={freelancer.picture}
-            alt="Freelancer"
-            className={styles.image}
-          />
+    <div className="card">
+      <div className="cardContent">
+        <div className="imageWrapper">
+          {/* <img src={freelancer.picture} alt="Freelancer" className="image" /> */}
         </div>
-        <div className={styles.details}>
-          <div className={styles.header}>
-            <div className={styles.profile}>
+        <div className="details">
+          <div className="header">
+            <div className="profile">
               <img
-                src={freelancer.picture}
+                // src={freelancer.picture}
                 alt="Freelancer"
-                className={styles.profileImage}
+                className="profileImage"
               />
               <div>
-                <div className={styles.flex}>
-                  <h4 className={styles.name}>{freelancer.name}</h4>
-                  <p className={styles.locationField}>
+                <div className="flex">
+                  <h4 className="name">{freelancer.name}</h4>
+                  <p className="locationField">
                     {freelancer.location}
                     {/* | {freelancer.field} */}
                   </p>
                 </div>
-                <p className={styles.FreelancerField}>{freelancer.field} </p>
-                <p className={styles.skills}></p>
+                <p className="FreelancerField">{freelancer.field} </p>
+                <p className="skills"></p>
               </div>
             </div>
-            <button className={styles.inviteButton}>Invite a Job</button>
+            <button className="inviteButton">Invite a Job</button>
           </div>
-          <div className={styles.rateSuccessEarned}>
-            <span className={styles.rate}>${freelancer.rate}/hr</span>
-            <SuccessSvg className={styles.svg} />
-            <span className={styles.success}>
-              {freelancer.successRate}% Success
-            </span>
-            <span className={styles.earned}>
-              ${freelancer.amountEarned} earned
-            </span>
+          <div className="rateSuccessEarned">
+            <span className="rate">${freelancer.rate}/hr</span>
+            <SuccessSvg className="svg" />
+            <span className="success">{freelancer.successRate}% Success</span>
+            <span className="earned">${freelancer.amountEarned} earned</span>
           </div>
-          <div className={styles.skillTags}>
+          <div className="skillTags">
             {freelancer.skills.map((skill) => (
-              <span key={skill} className={styles.skillTag}>
+              <span key={skill} className="skillTag">
                 {skill}
               </span>
             ))}
           </div>
-          <p className={styles.description}>{freelancer.description}</p>
+          <p className="description">{freelancer.description}</p>
         </div>
       </div>
     </div>

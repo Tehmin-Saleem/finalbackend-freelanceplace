@@ -1,10 +1,17 @@
 import React, { useState } from "react";
 import styles from "./style.module.scss";
-import SearchIcon from "../../svg coponents/SearchIcon";
-import CrossIcon from "../../svg coponents/CrossIcon";
-import PlusIcon from "../../svg coponents/PlusIcon";
-import HourlyRate from "../../svg coponents/HourlyRate";
-import FixedRate from "../../svg coponents/FixedRate";
+// import SearchIcon from "../../svg components/SearchIcon";
+// import CrossIcon from "../../svg components/CrossIcon";
+// import PlusIcon from "../../svg components/PlusIcon";
+// import HourlyRate from "../../svg components/HourlyRate";
+// import FixedRate from "../../svg components/FixedRate";
+import {
+  SearchIcon,
+  CrossIcon,
+  PlusIcon,
+  HourlyRate,
+  FixedRate,
+} from "../../svg components/index";
 
 const OfferForm = () => {
   const [selectedSkills, setSelectedSkills] = useState([]);
@@ -125,10 +132,11 @@ const OfferForm = () => {
               </span>
             </div>
           </div>
-
           <div className={styles.field}>
-            <label>Describe what you need:</label>
-            <textarea className={styles.textArea}></textarea>
+            <div>
+              <label>Describe what you need:</label>
+              <textarea className={styles.textArea}></textarea>
+            </div>
           </div>
           <div className={styles.field}>
             <button className={styles.attachButton}>
