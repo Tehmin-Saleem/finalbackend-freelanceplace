@@ -6,6 +6,8 @@ import Header from "./components/Common/Header";
 import DashboardPage from "./Pages/ClientDashboard";
 import ErrorPage from "./Pages/ErrorPage";
 import SignUpSection from "./Pages/SignUpSection";
+import OfferForm from "./Pages/FormProposal";
+import PostJob from "./Pages/PostAJob";
 // import OfferForm from "./components/FormProposal/OfferForm";
 const freelancers = [
   {
@@ -35,9 +37,16 @@ const freelancers = [
 function App() {
   return (
     <>
-      <div>
+      <PostJob />
+
+      {/* <OfferForm /> */}
+      {/* <div>
         <FreelancerCards freelancers={freelancers} />
       </div>
+      
+      
+      
+
       {/* <Header /> */}
       {/* <DashboardPage /> */}
       {/* <ErrorPage /> */}

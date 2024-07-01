@@ -1,0 +1,176 @@
+// Variables
+$primary-color: #3b82f6;
+$secondary-color: #6b7280;
+$gray-color: #f7fafc;
+$text-color: #4a5568;
+$border-color: #e2e8f0;
+$hover-darken: 10%;
+
+// Mixins
+@mixin flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@mixin box-shadow($color, $opacity) {
+  box-shadow: 0 4px 6px rgba($color, $opacity);
+}
+
+// Styles
+.post-job {
+  min-height: 100vh;
+  background-color: $gray-color;
+
+  .container {
+    margin: 0 auto;
+    padding: 1rem;
+
+    .job-form {
+      background-color: #fff;
+      @include box-shadow(0, 0.1);
+      border-radius: 0.5rem;
+      padding: 1.5rem;
+      margin-top: -2rem;
+      position: relative;
+      z-index: 10;
+
+      .header {
+        @include flex-center;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+
+        .title {
+          font-size: 1.5rem;
+          font-weight: 700;
+          padding-left: 2rem;
+        }
+      }
+
+      .progress-bar {
+        position: relative;
+        margin: 2.5rem 3rem 1.5rem 3rem;
+
+        .bar {
+          content: "";
+          position: absolute;
+          top: 50%;
+          left: 0;
+          right: 0;
+          height: 0.25rem;
+          background-color: $border-color;
+          transform: translateY(-50%);
+        }
+
+        .steps {
+          display: flex;
+          justify-content: space-between;
+
+          .step {
+            position: relative;
+            @include flex-center;
+            flex-direction: column;
+
+            .step-circle {
+              width: 2rem;
+              height: 2rem;
+              @include flex-center;
+              border-radius: 50%;
+            }
+
+            .step-label {
+              position: absolute;
+              bottom: 1.5rem;
+              font-size: 0.875rem;
+            }
+          }
+        }
+      }
+
+      .step-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+      }
+
+      .content {
+        display: grid;
+        gap: 1.5rem;
+
+        @media (min-width: 768px) {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .content-left {
+          .subtitle {
+            font-size: 1.125rem;
+            font-weight: 600;
+          }
+
+          .description {
+            color: #718096;
+            margin-top: 0.5rem;
+          }
+        }
+
+        .content-right {
+          .label {
+            color: $text-color;
+          }
+
+          .input {
+            margin-top: 0.5rem;
+            padding: 0.5rem;
+            border: 1px solid $border-color;
+            border-radius: 0.25rem;
+            width: 100%;
+          }
+
+          .examples {
+            margin-top: 0.5rem;
+            color: #718096;
+
+            strong {
+              font-weight: 600;
+            }
+
+            .list {
+              list-style-type: disc;
+              padding-left: 1.25rem;
+              margin-top: 0.25rem;
+            }
+          }
+        }
+      }
+
+      .actions {
+        margin-top: 1.5rem;
+        display: flex;
+        justify-content: space-between;
+
+        .btn {
+          padding: 0.5rem 1rem;
+          border-radius: 0.25rem;
+          color: #fff;
+          @include box-shadow(0, 0.1);
+
+          &.back-btn {
+            background-color: $secondary-color;
+
+            &:hover {
+              background-color: darken($secondary-color, $hover-darken);
+            }
+          }
+
+          &.next-btn {
+            background-color: $primary-color;
+
+            &:hover {
+              background-color: darken($primary-color, $hover-darken);
+            }
+          }
+        }
+      }
+    }
+  }
+}

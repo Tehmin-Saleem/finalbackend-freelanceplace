@@ -1,6 +1,6 @@
-//src/pages/PostJob.js
 import React from "react";
-// import Header from "../components/Header";
+import "./style.scss";
+// import Header from "../../components/Common/Header";
 // import GreaterThan from "../svg coponents/GreaterThan";
 
 const PostJob = () => {
@@ -14,63 +14,55 @@ const PostJob = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="post-job">
       {/* <Header /> */}
-      <div className="container mx-auto p-4">
-        <div className="bg-white shadow-lg rounded-lg p-6 -mt-8 relative z-10">
-          <div className="flex items-center space-x-2 mb-4">
-            <h2 className="text-2xl font-bold pl-8">Jobs</h2>
+      <div className="container">
+        <div className="job-form">
+          <div className="header">
+            <h2 className="title">Jobs</h2>
             {/* <GreaterThan /> */}
-            <h2 className="text-2xl font-bold">Post a Job</h2>
+            <h2 className="title">Post a Job</h2>
           </div>
-          <div className="relative mb-6 mt-10 ml-12 mr-12">
-            <div className="absolute inset-x-0 top-1/2 transform -translate-y-1/2 h-1 bg-gray-300"></div>
-            <div className="flex justify-between">
+          <div className="progress-bar">
+            <div className="bar"></div>
+            <div className="steps">
               {steps.map((step, index) => (
-                <div
-                  key={index}
-                  className="relative flex flex-col items-center"
-                >
+                <div key={index} className="step">
                   <div
-                    className="w-8 h-8 flex items-center justify-center rounded-full"
+                    className="step-circle"
                     style={{ backgroundColor: step.color }}
                   >
-                    <span className="text-white">{step.label}</span>
+                    <span className="text">{step.label}</span>
                   </div>
-                  <div
-                    className="absolute bottom-6 text-sm"
-                    style={{ color: step.color }}
-                  >
+                  <div className="step-label" style={{ color: step.color }}>
                     {`Label ${step.label}`}
                   </div>
                 </div>
               ))}
             </div>
           </div>
-          <h3 className="text-xl font-semibold mb-4">1/6 Job Title</h3>
-          <div className="grid md:grid-cols-2 gap-6">
-            <div>
-              <h4 className="text-lg font-semibold">
-                Let’s start with a strong title.
-              </h4>
-              <p className="text-gray-600 mt-2">
+          <h3 className="step-title">1/6 Job Title</h3>
+          <div className="content">
+            <div className="content-left">
+              <h4 className="subtitle">Let’s start with a strong title.</h4>
+              <p className="description">
                 This helps your job post stand out to the right candidates. It’s
                 the first thing they’ll see, so make it count!
               </p>
             </div>
-            <div>
-              <label htmlFor="jobTitle" className="block text-gray-700">
+            <div className="content-right">
+              <label htmlFor="jobTitle" className="label">
                 Enter job title:
               </label>
               <input
                 type="text"
                 id="jobTitle"
-                className="mt-2 p-2 border border-gray-300 rounded w-full"
+                className="input"
                 placeholder="UI/UX Designer"
               />
-              <div className="mt-2 text-gray-600">
+              <div className="examples">
                 <strong>Example titles:</strong>
-                <ul className="list-disc pl-5 mt-1">
+                <ul className="list">
                   <li>
                     Build responsive WordPress site with booking/payment
                     functionality
@@ -86,13 +78,9 @@ const PostJob = () => {
               </div>
             </div>
           </div>
-          <div className="mt-6 flex justify-between">
-            <button className="bg-gray-500 text-white px-4 py-2 rounded shadow hover:bg-gray-600">
-              Back
-            </button>
-            <button className="bg-blue-500 text-white px-4 py-2 rounded shadow hover:bg-blue-600">
-              Next: Description
-            </button>
+          <div className="actions">
+            <button className="btn back-btn">Back</button>
+            <button className="btn next-btn">Next: Description</button>
           </div>
         </div>
       </div>
