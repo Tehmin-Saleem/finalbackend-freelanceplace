@@ -1,144 +1,527 @@
-/* Card.module.scss */
+// /* Card.module.scss */
 
-.card {
-    background-color:#EEEDF2;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
-    border-radius: 0.3rem;
-    padding: 1rem;
-    margin: 1rem 0;
-    width: 90%;
-    margin-left:8%;
-  }
+// .card {
+//     background-color:#EEEDF2;
+//     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
+//     border-radius: 0.3rem;
+//     padding: 1rem;
+//     margin: 1rem 0;
+//     width: 90%;
+//     margin-left:8%;
+//   }
   
-  .cardContent {
-    display: flex;
-    margin-bottom: 1.5rem;
-    width: 100%;
-  }
-  .flex{
-    display:flex;
-  }
+//   .cardContent {
+//     display: flex;
+//     margin-bottom: 1.5rem;
+//     width: 100%;
+//   }
+//   .flex{
+//     display:flex;
+//   }
   
   
-  .image {
-    margin-top: 1rem;
-    width: 8.75rem; /* 35 * 0.25rem */
-    height: 11.5rem; /* 30 * 0.25rem */
-  }
+//   .image {
+//     margin-top: 1rem;
+//     width: 8.75rem; /* 35 * 0.25rem */
+//     height: 11.5rem; /* 30 * 0.25rem */
+//   }
   
-  .details {
+//   .details {
+//     display: flex;
+//     flex-direction: column;
+//     justify-content: space-between;
+//     width: 100%;
+//   }
+  
+//   .header {
+//     display: flex;
+//     align-items: center;
+//     justify-content: space-between;
+//     margin-bottom: 1rem;
+//   }
+  
+//   .profile {
+//     display: flex;
+//     align-items: center;
+//   }
+  
+//   .profileImage {
+//     border-radius: 11px;
+//     width: 3.5rem;
+//     height: 3.5rem;
+//     margin-right: 0.5rem;
+    
+//   }
+  
+//   .name {
+//     font-weight: 500;
+//     font-family: Poppins;
+//     color: #4BCBEB;
+//   }
+  
+//   .locationField {
+//     color:#000000;
+//    font-family: Poppins;
+//    margin-left: 1rem;
+//   }
+//   .FreelancerField{
+//     color:#2C3E50;
+//     font-family: Poppins;
+//     font-weight: 500;
+   
+//   }
+  
+//   .skills {
+//     color: #000000;
+//     margin-top: 0.25rem;
+//     font-family: Poppins;
+//   }
+  
+//   .inviteButton {
+//     background-color: #4BCBEB;
+//     color: white;
+//     padding: 0.5rem 1rem;
+//     border-radius: 1rem;
+//     font-family: Poppins;
+//     border-radius: 12px;
+//     margin-bottom: 5%;
+//   }
+  
+//   .rateSuccessEarned {
+//     display: flex;
+//     align-items: center;
+//     margin-bottom: 1rem;
+//     margin-left: 4rem;
+//     color: #94A3B8;
+//     font-family: Poppins;
+    
+//   }
+//   .svg{
+//     margin-left: 4rem;
+//   }
+  
+//   .rate {
+//     font-weight: 20px;
+//   }
+  
+//   .success {
+//     margin-left: 0.5rem;
+//     color: #94A3B8;
+//   }
+  
+//   .earned {
+//     margin-left: 0.5rem;
+//   }
+  
+//   .skillTags {
+//     display: flex;
+//     flex-wrap: wrap;
+//     margin-bottom: 0.25rem;
+//     margin-left: 4rem;
+//   }
+  
+//   .skillTag {
+//     background-color: #ECF0F1;
+//     color: #94A3B8;
+//     border-radius: 16px;
+//     padding: 0.25rem 0.5rem;
+//     font-size: 0.75rem;
+//     font-weight: 600;
+//     margin-right: 0.5rem;
+//     margin-bottom: 0.25rem;
+//     font-family: 'Poppins';
+//     border: 1px solid #d5dce6 ;
+//   }
+  
+  
+//   .description {
+//     color:#2C3E50;
+//     margin-bottom: 3rem;
+//     margin-left: 4rem;
+//     font-family: Poppins;
+//     margin-top: 1rem;
+//     font-weight: 400;
+//   }
+
+
+
+// ========================================================================
+
+
+// .proposals-page {
+//   padding: 20px;
+//   font-family: "Poppins", sans-serif;
+
+//   .proposals-container {
+//     display: flex;
+//     flex-direction: column;
+//     gap: 20px;
+//   }
+
+
+
+//     input {
+//       width: 50px;
+//       padding: 5px;
+//       margin-left: 10px;
+//     }
+
+//     button {
+//       background-color: #4bcbeb;
+//       border: none;
+//       color: white;
+//       padding: 5px 10px;
+//       cursor: pointer;
+//       margin-left: 10px;
+//     }
+//   }
+// }
+
+// .proposal-card {
+//   display: flex;
+//   padding: 20px;
+//   border: 1px solid #94a3b8;
+//   border-radius: 10px;
+//   background-color: white;
+
+//   &__image {
+//     width: 50px;
+//     height: 50px;
+//     border-radius: 50%;
+//     margin-right: 20px;
+//   }
+
+//   &__content {
+//     flex-grow: 1;
+//   }
+
+//   &__name {
+//     font-size: 18px;
+//     font-weight: bold;
+//     color: #4bcbeb;
+//   }
+
+//   &__title {
+//     font-size: 16px;
+//     font-weight: bold;
+//     color: #2c3e50;
+//   }
+
+//   &__location {
+//     font-size: 14px;
+//     color: #2c3e50;
+//     margin-bottom: 10px;
+//   }
+
+//   &__details,
+//   &__extra {
+//     display: flex;
+//     justify-content: space-between;
+//     font-size: 14px;
+//     color: #94a3b8;
+//     margin-bottom: 10px;
+//   }
+
+//   &__cover-letter {
+//     font-size: 14px;
+//     color: #2c3e50;
+//     margin-bottom: 20px;
+//   }
+
+//   &__actions {
+//     display: flex;
+//     justify-content: space-between;
+//     gap: 10px;
+
+//     .proposal-card__message-btn,
+//     .proposal-card__hire-btn {
+//       padding: 10px 20px;
+//       border-radius: 5px;
+//       border: none;
+//       cursor: pointer;
+//       font-size: 14px;
+//       font-weight: bold;
+//     }
+
+//     .proposal-card__message-btn {
+//       background-color: #ffffff;
+//       border: 1px solid #4bcbeb;
+//       color: #4bcbeb;
+//     }
+
+//     .proposal-card__hire-btn {
+//       background-color: #4bcbeb;
+//       color: #ffffff;
+//     }
+//   }
+// }
+
+
+
+// ================================================================
+
+
+// .proposal-card {
+//   display: flex;
+//   padding: 20px;
+//   border: 1px solid #e2e8f0;
+//   border-radius: 10px;
+//   background-color: #ffffff;
+//   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+
+
+
+//   &__image {
+//     width: 50px;
+//     height: 50px;
+//     border-radius: 50%;
+//     margin-right: 20px;
+//     object-fit: cover;
+//   }
+
+//   &__content {
+//     flex-grow: 1;
+//   }
+
+//   &__header {
+//     display: flex;
+//     align-items: center;
+//     gap: 10px;
+//     margin-bottom: 5px;
+//   }
+
+//   &__name {
+//     font-size: 16px;
+//     font-weight: bold;
+//     color: #0284c7; /* Match the blue color from the image */
+//   }
+
+//   &__status {
+//     font-size: 14px;
+//     color: #64748b; /* Grey color for the status text */
+//   }
+
+//   &__title {
+//     font-size: 16px;
+//     font-weight: 600;
+//     color: #0f172a; /* Darker color for title */
+//     margin: 5px 0;
+//   }
+
+//   &__location {
+//     font-size: 14px;
+//     color: #475569; /* Subtle grey for location text */
+//     margin-bottom: 10px;
+//   }
+
+//   &__details {
+//     display: flex;
+//     gap: 20px;
+//     font-size: 14px;
+//     color: #0f172a;
+//     margin-bottom: 5px;
+//   }
+
+//   &__rate {
+//     font-weight: 600;
+//     color: #64748b; /* Lighter grey for the rate text */
+//   }
+
+//   &__earned {
+//     font-weight: 600;
+//     color: #0284c7; /* Match the blue color from the image */
+//   }
+
+//   &__extra {
+//     display: flex;
+//     gap: 20px;
+//     font-size: 14px;
+//     color: #64748b;
+//     margin-bottom: 15px;
+//   }
+
+//   &__qualification {
+//     font-weight: 600;
+//   }
+
+//   &__timeline {
+//     font-weight: 600;
+//   }
+
+//   &__cover-letter {
+//     font-size: 14px;
+//     color: #0f172a;
+//     margin-bottom: 20px;
+//   }
+
+//   &__actions {
+//     display: flex;
+//     align-items: center;
+//     gap: 10px;
+
+//     .proposal-card__message-btn {
+//       background: none;
+//       border: 1px solid #0284c7;
+//       border-radius: 50%;
+//       padding: 8px;
+//       cursor: pointer;
+//       img {
+//         width: 20px;
+//         height: 20px;
+//       }
+//     }
+
+//     .proposal-card__hire-btn {
+//       background-color: #0284c7;
+//       border: none;
+//       color: #ffffff;
+//       padding: 8px 20px;
+//       border-radius: 5px;
+//       font-weight: bold;
+//       cursor: pointer;
+//     }
+//   }
+// }
+
+
+// ==============================
+.proposal-card {
+  position: relative; /* To allow absolute positioning of buttons */
+  padding: 3%;
+  border-bottom: 1px solid #e2e8f0;
+  border-radius: 10px;
+  background-color: #ffffff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  display: flex;
+  gap: 20px; /* Space between image and content */
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+
+  &:hover {
+    background-color: #f0f8ff; /* Light blue background on hover */
+    border-color: #4BCBEB; /* Border color change on hover */
+  }
+
+  &:active {
+    background-color: #e6f7ff; /* Slightly darker blue on click */
+    border-color: #2C3E50; /* Darker border color on click */
+  }
+
+  &__image {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+
+  &__content {
+    flex-grow: 1;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
-    width: 100%;
+    justify-content: center; /* Center content vertically */
   }
-  
-  .header {
+
+  &__header {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    margin-bottom: 1rem;
+    gap: 10px;
+    margin-bottom: 5px;
   }
-  
-  .profile {
-    display: flex;
-    align-items: center;
+
+  &__name {
+    font-size: 16px;
+    font-weight: bold;
+    color: #0284c7; /* Match the blue color from the image */
   }
-  
-  .profileImage {
-    border-radius: 11px;
-    width: 3.5rem;
-    height: 3.5rem;
-    margin-right: 0.5rem;
-    
+
+  &__status {
+    font-size: 14px;
+    color: #64748b; /* Grey color for the status text */
   }
-  
-  .name {
-    font-weight: 500;
-    font-family: Poppins;
-    color: #4BCBEB;
-  }
-  
-  .locationField {
-    color:#000000;
-   font-family: Poppins;
-   margin-left: 1rem;
-  }
-  .FreelancerField{
-    color:#2C3E50;
-    font-family: Poppins;
-    font-weight: 500;
-   
-  }
-  
-  .skills {
-    color: #000000;
-    margin-top: 0.25rem;
-    font-family: Poppins;
-  }
-  
-  .inviteButton {
-    background-color: #4BCBEB;
-    color: white;
-    padding: 0.5rem 1rem;
-    border-radius: 1rem;
-    font-family: Poppins;
-    border-radius: 12px;
-    margin-bottom: 5%;
-  }
-  
-  .rateSuccessEarned {
-    display: flex;
-    align-items: center;
-    margin-bottom: 1rem;
-    margin-left: 4rem;
-    color: #94A3B8;
-    font-family: Poppins;
-    
-  }
-  .svg{
-    margin-left: 4rem;
-  }
-  
-  .rate {
-    font-weight: 20px;
-  }
-  
-  .success {
-    margin-left: 0.5rem;
-    color: #94A3B8;
-  }
-  
-  .earned {
-    margin-left: 0.5rem;
-  }
-  
-  .skillTags {
-    display: flex;
-    flex-wrap: wrap;
-    margin-bottom: 0.25rem;
-    margin-left: 4rem;
-  }
-  
-  .skillTag {
-    background-color: #ECF0F1;
-    color: #94A3B8;
-    border-radius: 16px;
-    padding: 0.25rem 0.5rem;
-    font-size: 0.75rem;
+
+  &__title {
+    font-size: 16px;
     font-weight: 600;
-    margin-right: 0.5rem;
-    margin-bottom: 0.25rem;
-    font-family: 'Poppins';
-    border: 1px solid #d5dce6 ;
+    color: #0f172a; /* Darker color for title */
+    margin: 5px 0;
   }
-  
-  
-  .description {
-    color:#2C3E50;
-    margin-bottom: 3rem;
-    margin-left: 4rem;
-    font-family: Poppins;
-    margin-top: 1rem;
-    font-weight: 400;
+
+  &__location {
+    font-size: 14px;
+    color: #475569; /* Subtle grey for location text */
+    margin-bottom: 10px;
   }
+
+  &__details {
+    display: flex;
+    gap: 20px;
+    font-size: 14px;
+    color: #0f172a;
+    margin-bottom: 5px;
+  }
+
+  &__rate {
+    font-weight: 600;
+    color: #64748b; /* Lighter grey for the rate text */
+  }
+
+  &__earned {
+    font-weight: 600;
+    color: #0284c7; /* Match the blue color from the image */
+  }
+
+  &__extra {
+    display: flex;
+    gap: 20px;
+    font-size: 14px;
+    color: #64748b;
+    margin-bottom: 15px;
+  }
+
+  &__qualification {
+    font-weight: 600;
+  }
+
+  &__timeline {
+    font-weight: 600;
+  }
+
+  &__cover-letter {
+    font-size: 14px;
+    color: #0f172a;
+    margin-bottom: 20px;
+  }
+
+  &__actions {
+    position: absolute;
+    right: 20px; /* Adjust to position the buttons properly */
+    top: 10px; /* Adjust to align with the text */
+    display: flex;
+    gap: 10px;
+
+    .proposal-card__message-btn {
+      background: none;
+      border: 1px solid #0284c7;
+      border-radius: 50%;
+      padding: 8px;
+      cursor: pointer;
+
+      img {
+        width: 20px;
+        height: 20px;
+      }
+    }
+
+    .proposal-card__hire-btn {
+      background-color: #0284c7;
+      border: none;
+      color: #ffffff;
+      padding: 8px 20px;
+      border-radius: 5px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+  }
+}
+
+
