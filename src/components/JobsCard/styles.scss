@@ -1,0 +1,162 @@
+// Variables
+$primary-color: #4BCBEB;
+$secondary-color: #94A3B8;
+$font-family: 'Poppins', sans-serif;
+$text-color: #64748b;
+$background-color: #F8FAFC;
+$border-color: #DEE2E7;
+
+// Job Card Styling
+.jobs-page {
+  padding: 20px;
+  background-color: $background-color;
+}
+
+.jobs-heading {
+  font-size: 24px;
+  margin-bottom: 20px;
+  font-family: $font-family;
+}
+
+.jobs-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.job-card {
+  display: flex;
+  justify-content: space-between;
+  background-color: #ffffff;
+  border-radius: 10px;
+  padding: 20px;
+  border: 1px solid $border-color;
+
+  &:hover {
+    background-color: #f0f8ff;
+    border-color: $primary-color;
+  }
+
+  &__content {
+    display: flex;
+    flex-direction: column;
+  }
+
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+
+  &__title {
+    font-size: 18px;
+    font-weight: bold;
+    color: #0f172a;
+    font-family: $font-family;
+  }
+
+  &__view-button {
+    background-color: $primary-color;
+    color: #ffffff;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-family: $font-family;
+
+    &:hover {
+      background-color: darken($primary-color, 10%);
+    }
+  }
+
+  &__info {
+    display: flex;
+    gap: 15px;
+    font-size: 14px;
+    margin-bottom: 10px;
+    color: $text-color;
+  }
+
+  &__description {
+    font-size: 14px;
+    color: $text-color;
+    margin-bottom: 15px;
+  }
+
+  &__tags {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px;
+
+    &__tag {
+      background-color: #e2e8f0;
+      padding: 5px 10px;
+      border-radius: 5px;
+      font-size: 12px;
+      color: #475569;
+    }
+  }
+
+  &__extra {
+    display: flex;
+    gap: 15px;
+    font-size: 14px;
+    color: $text-color;
+  }
+
+  &__verified {
+    color: $primary-color;
+    font-weight: bold;
+  }
+
+  &__rating {
+    color: #f59e0b;
+  }
+
+  &__location {
+    color: #475569;
+  }
+}
+
+// Pagination Styling
+.pagination {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 30px;
+  font-family: $font-family;
+
+  .page-controls {
+    display: flex;
+    gap: 5px;
+
+    span {
+      padding: 5px;
+      border-radius: 5px;
+      cursor: pointer;
+
+      &:hover {
+        background-color: #e2e8f0;
+      }
+    }
+  }
+
+  input {
+    width: 40px;
+    text-align: center;
+  }
+
+  button {
+    background-color: $primary-color;
+    border: none;
+    color: white;
+    border-radius: 5px;
+    padding: 5px 10px;
+    cursor: pointer;
+
+    &:hover {
+      background-color: darken($primary-color, 10%);
+    }
+  }
+}

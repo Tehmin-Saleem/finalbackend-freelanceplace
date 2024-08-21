@@ -98,6 +98,15 @@
 import React from "react";
 import "./styles.scss"; // Import the SCSS file
 
+import {
+  CommonButton
+} from "../../components/index";
+
+
+import {
+  Chat
+} from "../../svg/index";
+
 const ProposalCard = ({
   name,
   title,
@@ -124,15 +133,24 @@ const ProposalCard = ({
           <span className="proposal-card__earned">{earned}</span>
         </div>
         <div className="proposal-card__extra">
-          <span className="proposal-card__qualification">Qualification:  {qualification}</span>
-          <span className="proposal-card__timeline">Estimated timeline: {timeline}</span>
+          <span className="proposal-card__qualification-head">Qualification: </span>
+          <span className="proposal-card__qualification"> {qualification}</span>
+          <span className="proposal-card__timeline-head">Estimated timeline:</span>
+          <span className="proposal-card__timeline"> {timeline}</span>
         </div>
+        <div>
+        <span className="proposal-card__cover-letter-head">Cover Letter</span>
         <p className="proposal-card__cover-letter">{coverLetter}</p>
+        </div>
         <div className="proposal-card__actions">
-          <button className="proposal-card__message-btn">
-            <img src="/icons/message-icon.svg" alt="Message" />
-          </button>
-          <button className="proposal-card__hire-btn">Hire</button>
+          <CommonButton
+            text={<Chat />}
+            className="bg-[#FFFFFF] border border-[#4BCBEB] text-[18px] font-Poppins text-[#FFFFFF] rounded-lg font-semibold font-Poppins py-1 px-6 w-full focus:outline-none focus:shadow-outline"
+          />
+          <CommonButton
+            text="Hire"
+            className="bg-[#4BCBEB] text-[18px] font-Poppins text-[#FFFFFF] rounded-lg font-semibold font-Poppins py-2 px-6 w-full focus:outline-none focus:shadow-outline"
+          />
         </div>
       </div>
     </div>

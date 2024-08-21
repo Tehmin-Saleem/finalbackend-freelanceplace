@@ -6,6 +6,7 @@ import StarRating from "./ProfileView/starrating";
 import UserReview from "./ProfileView/UserReviews";
 import Proposalscard from "./ProposalsCard";
 import Header from "./Header/Head";
+import JobsCard from "./JobsCard";
 
 
 export {default as CommonButton} from "./common/CommonButton"
@@ -16,3 +17,4 @@ export {default as Carousel} from "./ProfileView/Carousel"
 export {default as StarRating} from "./ProfileView/starrating"
 export {default as UserReview} from "./ProfileView/UserReviews"
 export {default as Proposalscard} from "./ProposalsCard"
+export {default as JobsCard} from "./JobsCard"

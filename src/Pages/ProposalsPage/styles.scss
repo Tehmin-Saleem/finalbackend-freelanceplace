@@ -1,121 +1,18 @@
-// // Variables
-// $primary-color: #4BCBEB;
-// $secondary-color: #94A3B8;
-// $border-color: #ccc;
-
-// // Mixins
-// @mixin flex-center {
-//   display: flex;
-//   justify-content: center;
-//   align-items: center;
-// }
-
-// .proposal-card {
-//   display: flex;
-//   border: 1px solid $border-color;
-//   border-radius: 8px;
-//   padding: 16px;
-//   margin-bottom: 16px;
-
-//   .left-section {
-//     @include flex-center;
-//     margin-right: 16px;
-
-//     .profile-picture {
-//       width: 64px;
-//       height: 64px;
-//       border-radius: 50%;
-//       margin-right: 16px;
-//     }
-
-//     .name-interest {
-//       display: flex;
-//       flex-direction: column;
-
-//       .name {
-//         font-size: 18px;
-//         font-weight: bold;
-//       }
-
-//       .interest-rate {
-//         font-size: 14px;
-//         color: green; // Or any color you prefer
-//       }
-//     }
-//   }
-
-//   .right-section {
-//     flex: 1;
-
-//     .buttons {
-//       @include flex-center;
-//       margin-bottom: 16px;
-
-//       .button {
-//         margin-left: 8px;
-//         padding: 8px 16px;
-//         background-color: $primary-color;
-//         color: white;
-//         border: none;
-//         border-radius: 4px;
-//         cursor: pointer;
-
-//         &:first-child {
-//           margin-left: 0;
-//         }
-//       }
-//     }
-
-//     .title {
-//       font-size: 20px;
-//       font-weight: bold;
-//       margin-bottom: 8px;
-//     }
-
-//     .location {
-//       @include flex-center;
-//       color: $secondary-color;
-
-//       .location-icon {
-//         width: 16px;
-//         margin-right: 8px;
-//       }
-//     }
-
-//     .hourly-rate-earning {
-//       font-size: 16px;
-//       color: $secondary-color;
-//       margin-bottom: 8px;
-
-//       .hourly-rate {
-//         margin-right: 16px;
-//       }
-//     }
-
-//     .qualification-timeline {
-//       font-size: 16px;
-//       color: $secondary-color;
-//       margin-bottom: 8px;
-//     }
-
-//     .cover-letter {
-//       font-size: 18px;
-//       font-weight: bold;
-//       margin-bottom: 8px;
-//     }
-
-//     .description {
-//       font-size: 16px;
-//       color: #333;
-//     }
-//   }
-// }
+// Variables
+$primary-color: #4BCBEB;
+$secondary-color: #94A3B8;
+$border-color: #ccc;
+$font-family: 'Poppins';
+$text-color: #2C3E50;
+$background-color: #F8FAFC;
+$border-radius: 8px;
 
 .proposals-container {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  border-bottom: #2C3E50;
   // min-height: 100vh; /* Ensures full height so cards can be centered vertically */
   // padding-top: 5%;
 }
@@ -131,25 +28,55 @@
 }
 
 
-.pagination {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: 20px;
 
-  span {
-    margin-right: 10px;
-  }
 
-  .page-controls {
+
+  .pagination {
     display: flex;
-    gap: 10px;
-  }
+    justify-content: space-between;
+    align-items: center;
+    margin: 5%;
+
+    font-family: $font-family;
+
+    span {
+      margin-right: 10px;
+    }
+
+    .page-controls {
+      display: flex;
+      gap: 10px;
+
+      span {
+        color: $secondary-color;
+        cursor: pointer;
+      }
+
+      span.current-page {
+        color: $primary-color;
+        font-weight: bold;
+      }
+    }
+
+    input {
+      width: 50px;
+      padding: 5px;
+      margin-left: 10px;
+      border: 1px solid $border-color;
+      border-radius: $border-radius;
+      text-align: center;
+      font-family: $font-family;
+    }
+
+    button {
+      background-color: $primary-color;
+      color: white;
+      border: none;
+      padding: 8px 12px;
+      border-radius: $border-radius;
+      cursor: pointer;
+      font-family: $font-family;
+    }
   }
 
 
-  input {
-  width: 50px;
-  padding: 5px;
-  margin-left: 10px;
-  }

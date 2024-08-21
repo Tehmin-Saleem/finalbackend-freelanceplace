@@ -32,6 +32,19 @@ const IndexPage = () => {
 				"I am an Upwork Verified and Experienced UI/UX/Graphic Designer with over 10+ years of quality experience in Websites, Mobile Apps, Branding, Editorials, Marketing Collateral and much more......",
 			image: "/images/Profile.png",
 		},
+		{
+			id: 3,
+			name: "Usman Shahid",
+			title: "UI/UX Designer| Figma Expert| Graphic Designer",
+			location: "Lahore, Punjab, Pakistan",
+			rate: "$200.00/Fixed",
+			earned: "$10k + earned",
+			qualification: "Bachelor in design",
+			timeline: "One week",
+			coverLetter:
+				"I am an Upwork Verified and Experienced UI/UX/Graphic Designer with over 10+ years of quality experience in Websites, Mobile Apps, Branding, Editorials, Marketing Collateral and much more......",
+			image: "/images/Profile.png",
+		}
 		// Add more proposals as needed
 	]);
 

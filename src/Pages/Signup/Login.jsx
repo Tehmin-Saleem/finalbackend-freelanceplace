@@ -93,7 +93,7 @@ function Login() {
               textColor="#94A3B8" // Custom text color
             />
 
-            <div className="relative">
+            {/* <div className="relative">
               <div className="flex mb-4 shadow  border rounded-xl w-full  py-3 px-3 bg-[#ECF0F1]   font-Poppins ">
                 <div className="pr-3">
                   <Fname />
@@ -108,7 +108,7 @@ function Login() {
                   onBlur={validateName}
                 />
               </div>
-            </div>
+            </div> */}
 
             <div className="relative">
               <div className="flex mb-4 shadow  border rounded-xl w-full  py-3 px-3 bg-[#ECF0F1]   font-Poppins ">
