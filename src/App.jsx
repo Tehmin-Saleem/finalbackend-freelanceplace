@@ -1,18 +1,22 @@
-import { Routes, Route } from "react-router-dom";
+import React from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import "./App.css";
-import Login from "./Pages/Signup/Login";
-import { ProfileView, Proposal , JobsPage, SignIn} from "./Pages/index";
+import { ProfileView, Proposal, JobsPage, SignIn, Signup } from "./Pages/index";
 
 function App() {
   return (
-    <>
-      {/* <Login /> */}
-      {/* <ProfileView /> */}
-      {/* <Proposal /> */}
-      {/* <JobsPage/> */}
-      <SignIn/>
-    </>
+    <Router>
+      <Routes>
+        <Route path="/signup" element={<Signup />} />
+        <Route path="/profile" element={<ProfileView />} />
+        <Route path="/proposal" element={<Proposal />} />
+        <Route path="/jobs" element={<JobsPage />} />
+        <Route path="/signin" element={<SignIn />} />
+      </Routes>
+    </Router>
   );
 }
 
 export default App;
+
+
