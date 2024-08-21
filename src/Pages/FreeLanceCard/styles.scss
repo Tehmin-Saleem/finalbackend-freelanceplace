@@ -24,8 +24,8 @@ $bg-color: #f7f8fa;
 
 .heading {
   font-size: 24px;
-  margin-bottom: 20px;
-  margin-left: 5rem; /* Left margin for the heading */
+  margin-bottom: 26px;
+  margin-left: 11rem; /* Left margin for the heading */
   font-family: $font-poppins;
   color:$color-dark;
   
@@ -34,8 +34,11 @@ $bg-color: #f7f8fa;
 .filter-options {
   display: flex;
   gap: 100px; /* Increased gap between filter headings */
-  margin-bottom: 1rem; /* Bottom margin below filters */
+  margin-bottom: 2rem; /* Bottom margin below filters */
   justify-content: center;
+  font-family: $font-poppins;
+  color:$color-dark;
+  font-size: 19px;
 }
 
 .filter-item {
@@ -46,23 +49,26 @@ $bg-color: #f7f8fa;
 
 .freelancer-card {
   display: flex;
-  background-color: gainsboro;
+   
+  background-color: #eeedf2;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
   margin: 0 auto 2rem auto; /* Centering the cards on the page */
   border-radius: 10px;
   width: 70%; /* Reduced width for the card */
 }
 
 .freelancer-profile {
-  width: 15%; /* Increased height but kept width the same */
+  width: 15%; /* Keep the width the same */
   display: flex;
   align-items: center;
   max-height: max-content;
 }
 
 .profile-pic {
-  height: 150px; /* Increased height for profile pic */
-  width: 100%;
+  height: 220px; /* Increased height */
+  width: 100%; /* Keep the width at 100% of the parent container */
   border-radius: 10px;
+  object-fit: cover; /* Ensure the image covers the entire area without distortion */
 }
 
 .freelancer-details {
@@ -72,15 +78,16 @@ $bg-color: #f7f8fa;
 
 .freelancer-header {
   display: flex;
-  align-items: center;
+  // align-items: center;
 }
 
 .small-box {
-  width: 60px; /* Increased size for the small profile pic box */
-  height: 35px;
+  width: 80px; /* Increased size for the small profile pic box */
+  height: 55px;
   border-radius: 5px;
   overflow: hidden;
   margin-right: 10px;
+  margin-top: 1rem;
 }
 
 .small-profile-pic {
@@ -91,43 +98,67 @@ $bg-color: #f7f8fa;
 
 .freelancer-name {
   font-size: 18px;
+  font-weight: 500;
 
 
-  font-weight: bold;
+  // font-weight: bold;
   margin-right: 10px;
+  font-family: $font-poppins;
+  color:$color-accent;
+  margin-top: 1.5rem;
 }
 
 .freelancer-location {
-  font-size: 14px;
-  color: gray;
+  font-size: 18px;
+  color: $color-dark;
   margin-right: 15px;
+  font-weight: 600;
+  font-family: $font-poppins;
+  margin-top: 1.5rem;
 }
 
 .invite-btn {
-  background-color: #008cba;
+  background-color: $color-accent;
   color: white;
-  padding: 10px 20px;
+  padding: 0rem 2.5rem;  /* Smaller padding for a shorter button */
   border: none;
-  border-radius: 5px;
+  border-radius: 8px;
   cursor: pointer;
-  margin-left: auto;
+  margin-left: auto;  /* Align the button to the far right */
+  font-family: $font-poppins;
+  display: flex;  /* Ensure proper alignment */
+  align-items: center;
+  line-height: 1;  /* Reduce line-height */
+  font-size: 1rem;  /* Reduce font size if needed */
+  margin-bottom: 1.5rem;
+  margin-top: 0.5rem;
 }
+
 
 .freelancer-role {
   font-size: 14px;
   margin-bottom: 10px;
+  font-family: $font-poppins;
+  font-size: 18px;
+  color: $color-dark;
+  font-weight: 600;
+
 }
 
 .freelancer-meta {
   display: flex;
   gap: 15px;
   margin-bottom: 15px;
+  color:$text-color;
+  font-family: $font-poppins;
 }
 
 .freelancer-rate,
 .freelancer-success,
 .freelancer-earnings {
   font-size: 14px;
+  font-family: $font-poppins;
+  color:$text-color;
 }
 
 .freelancer-skills {
@@ -135,6 +166,8 @@ $bg-color: #f7f8fa;
   flex-wrap: wrap;
   gap: 10px;
   margin-bottom: 15px;
+  font-family: $font-poppins;
+  color:$text-color;
 }
 
 .skill-badge {
@@ -143,10 +176,15 @@ $bg-color: #f7f8fa;
   border: 1px solid #ccc; /* Added border around skill badges */
   border-radius: 50px;
   font-size: 12px;
+  font-family: $font-poppins;
+  color:$text-color;
+
 }
 
 .freelancer-description {
   font-size: 14px;
   margin-bottom: 15px;
   color: #555;
+  font-family: $font-poppins;
+  color:$text-color;
 }

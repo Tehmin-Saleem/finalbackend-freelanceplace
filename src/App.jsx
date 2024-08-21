@@ -24,6 +24,8 @@ const freelancers = [
     name: 'Usman Shahid',
     location: 'Pakistan',
     profilePic: 'https://randomuser.me/api/portraits/men/1.jpg',
+    smallProfilePic:'https://randomuser.me/api/portraits/women/2.jpg',
+
     roles: ['UI/UX Designer', 'Figma Expert', 'WordPress', 'Graphic Designer'],
     rate: '$12/hr',
     successRate: '96% Job Success',
@@ -43,6 +45,32 @@ const freelancers = [
     skills: ['HTML', 'CSS', 'JavaScript', 'React', 'Photoshop', '+8'],
     description: 'Passionate about creating seamless web experiences. With over 8 years in the industry, I specialize in front-end development, ensuring responsive and visually appealing designs.'
   },
+  {
+    name: 'Sara Khan',
+    location: 'India',
+    profilePic: 'https://randomuser.me/api/portraits/women/2.jpg',
+    smallProfilePic:'https://randomuser.me/api/portraits/women/1.jpg',
+    roles: ['UI/UX Designer', 'Web Developer'],
+    rate: '$15/hr',
+    successRate: '98% Job Success',
+    earnings: '$15k+ earned',
+    skills: ['HTML', 'CSS', 'JavaScript', 'React', 'Photoshop', '+8'],
+    description: 'Passionate about creating seamless web experiences. With over 8 years in the industry, I specialize in front-end development, ensuring responsive and visually appealing designs.'
+  },
+  {
+    name: 'Usman Shahid',
+    location: 'Pakistan',
+    profilePic: 'https://randomuser.me/api/portraits/men/1.jpg',
+    smallProfilePic:'https://randomuser.me/api/portraits/women/2.jpg',
+
+    roles: ['UI/UX Designer', 'Figma Expert', 'WordPress', 'Graphic Designer'],
+    rate: '$12/hr',
+    successRate: '96% Job Success',
+    earnings: '$10k+ earned',
+    skills: ['Mobile app design', 'Wireframe', 'Mockup', 'Prototyping', 'Figma', 'User flow', '+10'],
+    description: 'I am an Upwork Verified and Experienced UI/UX/Graphic Designer with over 10+ years of quality experience in Websites, Mobile Apps, Branding, Editorials, Marketing Collateral, and much more...'
+  },
+
   // Add more freelancers as needed
 ];
 
