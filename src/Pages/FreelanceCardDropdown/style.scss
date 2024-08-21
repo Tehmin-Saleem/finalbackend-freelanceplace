@@ -1,47 +1,44 @@
-/* FreelancerCards.module.scss */
-
 .container {
-    margin: 0 auto;
-    padding: 3rem;
+  margin: 0 auto;
+  padding: 3rem;
+}
+
+.header {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  width: 70%;
+  margin-left: 15%;
+}
+
+.headerItem {
+  font-size: 1.25rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  margin-bottom: 0.5rem;
+  @media (min-width: 768px) {
+    width: auto;
+    margin-bottom: 0;
   }
-  
-  .header {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1rem;
-    width: 70%;
-    margin-left: 15%;
-  }
-  
-  .headerItem {
-    font-size: 1.25rem;
-    font-weight: 600;
-    display: flex;
-    align-items: center;
-    width: 100%;
-    margin-bottom: 0.5rem;
-    @media (min-width: 768px) {
-      width: auto;
-      margin-bottom: 0;
-    }
-    margin-right: 0.5rem;
-  }
-  
-  .lastHeaderItem {
-    margin-right: 0;
-  }
-  
-  .cardsWrapper {
-    display: flex;
-    flex-wrap: wrap;
-    margin-left: -0.5rem;
-    margin-right: -0.5rem;
-  }
-  
-  .cardWrapper {
-    width: 100%;
-    padding: 0.5rem;
-  }
-  
+  margin-right: 0.5rem;
+}
+
+.lastHeaderItem {
+  margin-right: 0;
+}
+
+.cardsWrapper {
+  display: flex;
+  flex-wrap: wrap;
+  margin-left: -0.5rem;
+  margin-right: -0.5rem;
+}
+
+.cardWrapper {
+  width: 100%;
+  padding: 0.5rem;
+}

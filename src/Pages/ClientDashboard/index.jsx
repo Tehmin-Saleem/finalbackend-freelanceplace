@@ -3,8 +3,13 @@ import Header from "../../components/Common/Header"; // Adjust the import path a
 import Illustration from "/images/Illustration.png"; // Adjust the image path as needed
 import { BackgroundLining } from "../../svg components/index";
 import "./styles.scss";
+import { useNavigate } from 'react-router-dom'; // Import useNavigate
 
 const DashboardPage = () => {
+  const navigate = useNavigate(); // Initialize useNavigate
+  const handleJobPostingButtonClick = () => {
+    navigate('/JobPosting'); // Replace with your target route
+  };
   return (
     <div className="dashboard-page">
       {/* Importing Header Component */}
@@ -28,7 +33,7 @@ const DashboardPage = () => {
               enim ad minim veniam, quis nostrud exercitation ullamco laboris
               nisi ut aliquip ex ea commodo consequat.
             </p>
-            <button className="start-button">Get start job posting</button>
+            <button className="start-button" onClick={handleJobPostingButtonClick}>Get start job posting</button>
           </div>
           <BackgroundLining className="background-lining" />
         </div>

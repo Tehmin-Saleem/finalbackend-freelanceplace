@@ -1,53 +1,67 @@
 import React from "react";
 import "./style.scss";
-// import Header from "../../components/Common/Header";
-// import GreaterThan from "../svg coponents/GreaterThan";
+import Header from "../../components/Common/Header";
+import GreaterThan from "../../svg components/GreaterThan";
+import { useNavigate } from 'react-router-dom'; // Import useNavigate
+
 
 const PostJob = () => {
+  const navigate = useNavigate(); // Initialize useNavigate
   const steps = [
-    { label: "", color: "#4BCBEB" }, // Blue
-    { label: "", color: "#FF7F50" }, // Coral
-    { label: "", color: "#3CB371" }, // Medium Sea Green
-    { label: "D", color: "#FFD700" }, // Gold
-    { label: "E", color: "#8A2BE2" }, // Blue Violet
-    { label: "F", color: "#FF4500" }, // Orange Red
+    { number: "1", label: "Job Title", color: "#4BCBEB" }, // Blue
+    { number: "2", label: "Description", color: "#6b7280" }, // Coral
+    { number: "3", label: "Preferred Skills", color: "#6b7280" }, // Medium Sea Green
+    { number: "4", label: "Budget", color: "#6b7280" }, // Gold
+    { number: "5", label: "Project Duration", color: "#6b7280" }, // Blue Violet
+    { number: "6", label: "Attachment", color: "#6b7280" }, // Orange Red
   ];
+  const handleDescriptionButtonClick = () => {
+    navigate('/JobDescription'); // Replace with your target route
+  };
 
   return (
     <div className="post-job">
-      {/* <Header /> */}
+      <Header />
       <div className="container">
         <div className="job-form">
-          <div className="header">
+          <div className="title-container">
             <h2 className="title">Jobs</h2>
-            {/* <GreaterThan /> */}
+            <GreaterThan />
             <h2 className="title">Post a Job</h2>
           </div>
-          <div className="progress-bar">
-            <div className="bar"></div>
-            <div className="steps">
-              {steps.map((step, index) => (
-                <div key={index} className="step">
-                  <div
-                    className="step-circle"
-                    style={{ backgroundColor: step.color }}
-                  >
-                    <span className="text">{step.label}</span>
+          <div className="progressdiv">
+            <div className="progress-bar">
+              <div className="bar"></div>
+              <div className="steps">
+                {steps.map((step, index) => (
+                  <div key={index} className="step">
+                    <div
+                      className="step-circle"
+                       style={{ backgroundColor: step.color }}
+                    >
+                      <span className="number">{step.number}</span>
+                    </div>
+                    <div className="step-label" style={{ color: step.color }}>
+                      {step.label}
+                    </div>
                   </div>
-                  <div className="step-label" style={{ color: step.color }}>
-                    {`Label ${step.label}`}
-                  </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
           </div>
           <h3 className="step-title">1/6 Job Title</h3>
           <div className="content">
             <div className="content-left">
-              <h4 className="subtitle">Let’s start with a strong title.</h4>
+              <h4 className="subtitle">Let’s start with a
+                <br/>
+               strong title.</h4>
               <p className="description">
-                This helps your job post stand out to the right candidates. It’s
-                the first thing they’ll see, so make it count!
+                This helps your job post stand out
+                <br/>
+                 to the right candidates. It’s
+                the first thing 
+                <br/>
+                they’ll see, so make it count!
               </p>
             </div>
             <div className="content-right">
@@ -80,7 +94,7 @@ const PostJob = () => {
           </div>
           <div className="actions">
             <button className="btn back-btn">Back</button>
-            <button className="btn next-btn">Next: Description</button>
+            <button className="btn next-btn" onClick={handleDescriptionButtonClick}>Next: Description</button>
           </div>
         </div>
       </div>

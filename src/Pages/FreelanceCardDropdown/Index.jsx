@@ -1,9 +1,11 @@
 import React from "react";
-import Card from "../FreelancerCards"; // Adjust the path as necessary
+import Card from "../../components/FreelancerCards";
 import JobDropdwon from "../../svg components/index";
-import "./style.scss"; // Import the SCSS module
+import "./style.scss";
 
-const FreelancerCards = ({ freelancers }) => {
+const FreelancerCards = ()=>{
+  
+
   return (
     <div className="container">
       <div className="header">
@@ -29,18 +31,13 @@ const FreelancerCards = ({ freelancers }) => {
         </h3>
       </div>
 
-      <div className="cardsWrapper">
+      {/* <div className="cardsWrapper">
         {freelancers.map((freelancer) => (
           <div key={freelancer.id} className="cardWrapper">
             <Card freelancer={freelancer} />
-            <Card freelancer={freelancer} />
-            <Card freelancer={freelancer} />
-            <Card freelancer={freelancer} />
-            <Card freelancer={freelancer} />
-            <Card freelancer={freelancer} />
           </div>
         ))}
-      </div>
+      </div> */}
     </div>
   );
 };

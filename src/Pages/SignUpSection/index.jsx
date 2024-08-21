@@ -3,14 +3,18 @@ import { ClientFrame, FreelancerFrame } from "../../svg components/index";
 // import FreelancerFrame from "../svg components/FreelancerFrame";
 // import ProjectName from "../svg components/ProjectName";
 import "./styles.scss";
+import { useNavigate } from 'react-router-dom'; // Import useNavigate
 
 const SignUpSection = () => {
+  const navigate = useNavigate(); // Initialize useNavigate
   const [selectedUserType, setSelectedUserType] = useState("");
 
   const handleChange = (e) => {
     setSelectedUserType(e.target.value);
   };
-
+  const handleCreateAccountButtonClick = () => {
+    navigate('/ClientDashboard'); // Replace with your target route
+  }
   return (
     <div className="sign-up-section">
       <div className="main-container">
@@ -78,7 +82,7 @@ const SignUpSection = () => {
           </div>
         </div>
         <div className="account-section">
-          <button className="create-account-button">Create Account</button>
+          <button className="create-account-button" on onClick={handleCreateAccountButtonClick}>Create Account</button>
           <p className="login-text">
             Already have an account?{" "}
             <a href="#" className="login-link">

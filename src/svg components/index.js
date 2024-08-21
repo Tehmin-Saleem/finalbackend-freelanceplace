@@ -17,6 +17,9 @@ import SearchIcon from "./SearchIcon";
 import SuccessSvg from "./SuccessSvg";
 import UserIcon from "./UserIcon";
 import Logo from "./Logo";
+import UploadIcon from "./UploadIcon";
+import DollarIcon from "./DollarIcon";
+
 
 export { default as BackgroundLining } from "./BackgroundLining";
 export { default as ClientFrame } from "./ClientFrame";
@@ -37,3 +40,5 @@ export { default as SearchIcon } from "./SearchIcon";
 export { default as SuccessSvg } from "./SuccessSvg";
 export { default as UserIcon } from "./UserIcon";
 export { default as Logo } from "./Logo";
+export { default as UploadIcon} from "./UploadIcon";
+export {default as DollarIcon} from "./DollarIcon";

@@ -5,6 +5,13 @@ $gray-color: #f7fafc;
 $text-color: #4a5568;
 $border-color: #e2e8f0;
 $hover-darken: 10%;
+$font-kodchasan: 'Kodchasan', sans-serif;
+$font-poppins: 'Poppins', sans-serif;
+$color-gray: #64748b;
+$color-dark: #2c3e50;
+$color-white: #ffffff;
+$color-accent: #4bcdeb;
+$bg-color: #f7f8fa;
 
 // Mixins
 @mixin flex-center {
@@ -12,44 +19,52 @@ $hover-darken: 10%;
   align-items: center;
   justify-content: center;
 }
+@mixin text-2xl {
+  font-size: 24px;
+}
 
 @mixin box-shadow($color, $opacity) {
-  box-shadow: 0 4px 6px rgba($color, $opacity);
+  // box-shadow: 0 4px 6px rgba($color, $opacity);
 }
 
 // Styles
 .post-job {
   min-height: 100vh;
-  background-color: $gray-color;
 
   .container {
-    margin: 0 auto;
-    padding: 1rem;
+    // margin: 0 auto;
+    padding-left: 9rem; // Padding for the left
+    padding-right: 9rem; // Padding for the right
+    max-width: 100%;
+    margin-top: 2rem;
 
     .job-form {
       background-color: #fff;
-      @include box-shadow(0, 0.1);
       border-radius: 0.5rem;
-      padding: 1.5rem;
-      margin-top: -2rem;
-      position: relative;
-      z-index: 10;
 
-      .header {
-        @include flex-center;
+      .title-container {
+        display: flex;
+        align-items: center;
         gap: 0.5rem;
-        margin-bottom: 1rem;
+        margin-bottom: 1.5rem;
+        margin-left: 4rem; // Ensure it's aligned to the left
 
         .title {
           font-size: 1.5rem;
-          font-weight: 700;
-          padding-left: 2rem;
+          font-weight: 500;
+          font-family:$font-poppins ;
         }
+      }
+
+      .progressdiv {
+        margin-top: 5rem; // Ensure enough space above the progress bar
+        padding-left: 5rem;
+        padding-right: 5rem;
       }
 
       .progress-bar {
         position: relative;
-        margin: 2.5rem 3rem 1.5rem 3rem;
+        margin: 2.5rem 0; // Ensures margin around the progress bar
 
         .bar {
           content: "";
@@ -76,12 +91,25 @@ $hover-darken: 10%;
               height: 2rem;
               @include flex-center;
               border-radius: 50%;
+              color: #fff; // Ensure the number is visible
+              font-weight: 600;
+              font-size: 0.875rem;
+              position: relative;
+              z-index: 2;
+
+              .number {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+              }
             }
 
             .step-label {
               position: absolute;
-              bottom: 1.5rem;
+              top: -2.5rem; // Adjust to position above the circle
               font-size: 0.875rem;
+              color: $text-color;
+              text-align: center;
             }
           }
         }
@@ -90,7 +118,10 @@ $hover-darken: 10%;
       .step-title {
         font-size: 1.25rem;
         font-weight: 600;
-        margin-bottom: 1rem;
+        margin-bottom: 1rem; // Adjusted margin
+        margin-left: 4rem;
+        margin-top: 2rem; // Ensure space above the title
+        color:#718096;
       }
 
       .content {
@@ -105,26 +136,39 @@ $hover-darken: 10%;
           .subtitle {
             font-size: 1.125rem;
             font-weight: 600;
+            margin-left: 4rem;
+            font-family: $font-kodchasan;
+            color:$color-dark;
           }
 
           .description {
             color: #718096;
             margin-top: 0.5rem;
+            font-family:$font-poppins ;
           }
         }
 
         .content-right {
+          // Ensures that the label is positioned above the input field
+          display: flex;
+          flex-direction: column;
+        
           .label {
-            color: $text-color;
+            color: $color-dark;
+            font-family: $font-poppins;
+            margin-bottom: 0.5rem; // Adds space between the label and the input field
           }
-
+        
           .input {
             margin-top: 0.5rem;
             padding: 0.5rem;
             border: 1px solid $border-color;
             border-radius: 0.25rem;
-            width: 100%;
+            width: 80%; // Adjust this value to make the input field smaller
+            max-width: 400px; // Optional: Set a maximum width to avoid the field becoming too large
           }
+        }
+        
 
           .examples {
             margin-top: 0.5rem;
@@ -144,33 +188,43 @@ $hover-darken: 10%;
       }
 
       .actions {
-        margin-top: 1.5rem;
+        margin-top: 1rem;
+        margin-left: 4rem;
         display: flex;
         justify-content: space-between;
-
         .btn {
           padding: 0.5rem 1rem;
-          border-radius: 0.25rem;
-          color: #fff;
+          border-radius: 0.75rem; // Make sure this matches the desired corner radius
+          color: #4BCBEB; // Text color
+          border: 1px solid #4BCBEB; // Border color
+          background-color: #ffffff; // Button background color
           @include box-shadow(0, 0.1);
-
+      
           &.back-btn {
-            background-color: $secondary-color;
-
-            &:hover {
-              background-color: darken($secondary-color, $hover-darken);
-            }
+            border-color: #4BCBEB;
+            padding: 4px 5px;
+           
+            cursor: pointer;
+            width: 100px;
+            
+             
+            // Border color for back button
+      
+           
           }
-
+      
           &.next-btn {
-            background-color: $primary-color;
-
-            &:hover {
-              background-color: darken($primary-color, $hover-darken);
-            }
+            margin-left: 20rem;
+          padding: 0.75rem 1.5rem;
+          background-color: $color-accent;
+          color: #fff;
+          border: none;
+          border-radius: 5px;
+          cursor: pointer;
+      
           }
         }
       }
     }
   }
-}
+
