@@ -1,5 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import React from "react";
+import axios from "axios";
+import { useNavigate } from "react-router-dom"; // Import useNavigate
 import CHARACTER from "/images/CHARACTER.png";
 import Group from "/images/Group.png";
 
@@ -14,16 +16,18 @@ import {
   Apple,
 } from "../../svg/index";
 
-function Login() {
+function Signup() {
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [passwordError, setPasswordError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [name, setName] = useState("");
   const [nameError, setNameError] = useState("");
-  const [email, setEmail] = useState("");
   const [emailError, setEmailError] = useState("");
-  const [value, setValue] = useState("");
-  const [errorMessage, setErrorMessage] = useState("");
+  const [signupError, setSignupError] = useState("");
+
+  const navigate = useNavigate(); // Initialize useNavigate
 
   const handlePasswordChange = (e) => {
     const newPassword = e.target.value;
@@ -49,10 +53,48 @@ function Login() {
   };
 
   const validateName = () => {
-    if (name.trim() === "") {
+    if (firstName.trim() === "" || lastName.trim() === "") {
       setNameError("Please enter your full name.");
     } else {
       setNameError("");
+    }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    validateName();
+    validateEmail();
+    if (password.length < 8) {
+      setPasswordError("Your password is not strong enough.");
+      return;
+    }
+
+    if (nameError || emailError || passwordError) {
+      return;
+    }
+
+    try {
+      const response = await axios.post('http://localhost:5000/api/client/signup', {
+        email,
+        password,
+        first_name: firstName,
+        last_name: lastName,
+        role: 'user', // You may want to add a role selector in your form
+        country_name: 'default' // You may want to add a country selector in your form
+      });
+
+      if (response.status === 201) {
+        console.log('Signup successful');
+        navigate('/signin'); // Redirect to login page after successful signup
+      }
+    } catch (error) {
+      if (error.response) {
+        setSignupError(error.response.data.message || 'An error occurred during signup');
+      } else if (error.request) {
+        setSignupError('No response received from server');
+      } else {
+        setSignupError('Error setting up the request');
+      }
     }
   };
 
@@ -76,7 +118,7 @@ function Login() {
       {/*================= Second Half - Form ================*/}
       <div className="md:w-1/2 w-full h-screen md:mt-9 md:mr-9 bg-white flex items-center justify-center shadow-lg">
         <div className="w-full max-w-lg p-16 shadow-2xl">
-          <form>
+          <form onSubmit={handleSubmit}>
             <h1 className="text-[24px] font-Poppins font-medium text-center px-16 py-2">
               Please sign up to hire talented individuals
             </h1>
@@ -84,81 +126,50 @@ function Login() {
             <TextField
               label=""
               icon={<Fname className="" />}
-              value={value}
+              value={firstName}
               placeholder="Enter First Name"
-              onChange={(e) => setName(e.target.value)}
+              onChange={(e) => setFirstName(e.target.value)}
               onBlur={validateName}
-              errorMessage={errorMessage}
-              className="flex mb-4 shadow text-[14px] border rounded-xl w-full  py-3 px-3 bg-[#ECF0F1]   font-Poppins"
-              textColor="#94A3B8" // Custom text color
+              errorMessage={nameError}
+              className="flex mb-4 shadow text-[14px] border rounded-xl w-full py-3 px-3 bg-[#ECF0F1] font-Poppins"
+              textColor="#94A3B8"
             />
 
-            {/* <div className="relative">
-              <div className="flex mb-4 shadow  border rounded-xl w-full  py-3 px-3 bg-[#ECF0F1]   font-Poppins ">
-                <div className="pr-3">
-                  <Fname />
-                </div>
-                <input
-                  type="text"
-                  id="firstName"
-                  name="firstName"
-                  placeholder="Enter First Name"
-                  className=" text-[#94A3B8] bg-[#ECF0F1] text-[14px] flex-1"
-                  onChange={(e) => setName(e.target.value)}
-                  onBlur={validateName}
-                />
-              </div>
-            </div> */}
+            <TextField
+              label=""
+              icon={<Fname className="" />}
+              value={lastName}
+              placeholder="Enter Last Name"
+              onChange={(e) => setLastName(e.target.value)}
+              onBlur={validateName}
+              errorMessage={nameError}
+              className="flex mb-4 shadow text-[14px] border rounded-xl w-full py-3 px-3 bg-[#ECF0F1] font-Poppins"
+              textColor="#94A3B8"
+            />
+
+            <TextField
+              label=""
+              icon={<Mail />}
+              value={email}
+              placeholder="Enter work email address"
+              onChange={(e) => setEmail(e.target.value)}
+              onBlur={validateEmail}
+              errorMessage={emailError}
+              className="flex mb-4 shadow text-[14px] border rounded-xl w-full py-3 px-3 bg-[#ECF0F1] font-Poppins"
+              textColor="#94A3B8"
+            />
 
             <div className="relative">
-              <div className="flex mb-4 shadow  border rounded-xl w-full  py-3 px-3 bg-[#ECF0F1]   font-Poppins ">
-                <div className="pr-3">
-                  <Fname />
-                </div>
-                <input
-                  type="text"
-                  id="lastName"
-                  name="lastName"
-                  placeholder="Enter Last Name"
-                  className=" text-[#94A3B8] bg-[#ECF0F1] text-[14px] flex-1"
-                  onChange={(e) => setName(e.target.value)}
-                  onBlur={validateName}
-                />
-              </div>
-              {nameError && (
-                <div className="text-red-500 text-xs mt-1">{nameError}</div>
-              )}
-            </div>
-            <div className="relative">
-              <div className="flex mb-4 shadow  border rounded-xl w-full  py-3 px-3 bg-[#ECF0F1]   font-Poppins ">
-                <div className="pr-3">
-                  <Mail />
-                </div>
-                <input
-                  type="email"
-                  id="email"
-                  name="email"
-                  placeholder="Enter work email address"
-                  className=" text-[#94A3B8] bg-[#ECF0F1] text-[14px] flex-1"
-                  onChange={(e) => setEmail(e.target.value)}
-                  onBlur={validateEmail}
-                />
-              </div>
-              {emailError && (
-                <div className="text-red-500 text-xs mt-1">{emailError}</div>
-              )}
-            </div>
-            <div className="relative">
-              <div className="flex mb-4 shadow  border rounded-xl w-full  py-3 px-3 bg-[#ECF0F1]   font-Poppins ">
+              <div className="flex mb-4 shadow border rounded-xl w-full py-3 px-3 bg-[#ECF0F1] font-Poppins">
                 <div className="pr-3">
                   <Password />
                 </div>
                 <input
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   id="password"
                   name="password"
                   placeholder="Enter Password (8 or more characters)"
-                  className=" text-[#94A3B8] bg-[#ECF0F1] text-[14px] flex-1"
+                  className="text-[#94A3B8] bg-[#ECF0F1] text-[14px] flex-1"
                   onChange={handlePasswordChange}
                   required
                 />
@@ -166,10 +177,7 @@ function Login() {
                   className="cursor-pointer"
                   onClick={handleTogglePasswordVisibility}
                 >
-                  <div
-                    className="pr-3"
-                    onClick={handleTogglePasswordVisibility}
-                  >
+                  <div className="pr-3">
                     <PassEye />
                   </div>
                 </span>
@@ -202,16 +210,22 @@ function Login() {
             <div className="flex items-center justify-between">
               <CommonButton
                 text="Create My Account"
+                type="submit"
                 className="bg-[#4BCBEB] text-[#FFFFFF] font-semibold font-Poppins text-[24px] py-2 px-7 w-full rounded-xl focus:outline-none focus:shadow-outline"
               />
             </div>
+
+            {signupError && (
+              <div className="text-red-500 text-xs mt-2">{signupError}</div>
+            )}
+
 
             <div className="mt-8 mx-[20%] font-Poppins text-[14px] text-[#0F172A] items-center md:text-left">
               Already have an account?
               <span>
                 <a
                   className="text-[#4BCBEB] font-Poppins hover:underline hover:underline-offset-4 text-base font-bold"
-                  href="#"
+                  href="/signin"
                 >
                   Log In
                 </a>
@@ -232,14 +246,14 @@ function Login() {
                   </a>
                 </div>
               </div>
-              <div className="flex justify-center shadow-xl mb-4 p-3">
+              <div className="flex justify-center shadow-xl p-3">
                 <div className="mr-3">
                   <Apple />
                 </div>
                 <div>
                   <a
                     href="https://www.apple.com" // Replace with the actual Apple authentication URL
-                    className="mr-4 text-[12px] text-[#3498DB] font-Poppins font-semibold text-center"
+                    className="mr-4 text-[12px] text-[#0F172A] font-Poppins font-semibold text-center"
                   >
                     Continue with Apple
                   </a>
@@ -253,4 +267,4 @@ function Login() {
   );
 }
 
-export default Login;
+export default Signup;

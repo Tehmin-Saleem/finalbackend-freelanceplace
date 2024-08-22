@@ -1,5 +1,6 @@
 import { useState } from "react";
 import React from "react";
+import { useNavigate } from "react-router-dom"; // Import useNavigate for navigation
 import CHARACTER from "/images/CHARACTER.png";
 import Group from "/images/Group.png";
 
@@ -13,6 +14,8 @@ function SignIn() {
   const [email, setEmail] = useState("");
   const [emailError, setEmailError] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+
+  const navigate = useNavigate(); // Initialize useNavigate for navigation
 
   const handlePasswordChange = (e) => {
     const newPassword = e.target.value;
@@ -37,13 +40,48 @@ function SignIn() {
     }
   };
 
+  const handleLogin = async (e) => {
+    e.preventDefault();
+
+    if (emailError || passwordError) {
+      setErrorMessage("Please fix the errors before submitting.");
+      return;
+    }
+
+    try {
+      const response = await fetch("http://localhost:5000/api/client/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        // Store user data in local storage
+        localStorage.setItem("token", data.token);
+        localStorage.setItem("user", JSON.stringify(data.user));
+
+        // Navigate to the desired page after login, e.g., dashboard
+        navigate("/matchingjobs");
+      } else {
+        setErrorMessage(data.message || "Login failed. Please try again.");
+      }
+    } catch (error) {
+      console.error("Error during login:", error);
+      setErrorMessage("An error occurred. Please try again later.");
+    }
+  };
+
   return (
     <div className="md:flex md:flex-row">
       {/* First Half - Logo and Picture */}
       <div className="md:w-1/2 h-screen bg-white hidden md:block">
         <div className="flex flex-col items-center justify-center h-full">
           <div className="mb-6">
-          <LogoName />
+            <LogoName />
           </div>
           <div className="mb-3">
             <img src={CHARACTER} alt="Character" className="md:max-w-md" />
@@ -57,7 +95,7 @@ function SignIn() {
       {/* Second Half - Form */}
       <div className="md:w-1/2 w-full h-screen md:mt-9 md:mr-9 bg-white flex items-center justify-center shadow-lg">
         <div className="w-full max-w-lg p-16 shadow-2xl">
-          <form>
+          <form onSubmit={handleLogin}>
             <h1 className="text-[24px] font-Poppins font-medium text-center px-16 py-2">
               Sign in to your account
             </h1>
@@ -76,6 +114,7 @@ function SignIn() {
                   className="text-[#94A3B8] bg-[#ECF0F1] text-[14px] flex-1"
                   onChange={(e) => setEmail(e.target.value)}
                   onBlur={validateEmail}
+                  value={email}
                 />
               </div>
               {emailError && (
@@ -96,6 +135,7 @@ function SignIn() {
                   placeholder="Enter Password (8 or more characters)"
                   className="text-[#94A3B8] bg-[#ECF0F1] text-[14px] flex-1"
                   onChange={handlePasswordChange}
+                  value={password}
                   required
                 />
                 <span
@@ -146,13 +186,20 @@ function SignIn() {
               />
             </div>
 
+            {/* Error Message Display */}
+            {errorMessage && (
+              <div className="text-red-500 text-xs mt-4 text-center">
+                {errorMessage}
+              </div>
+            )}
+
             {/* Sign Up Link */}
             <div className="mt-8 mx-[20%] font-Poppins text-[14px] text-[#0F172A] text-center">
               Don't have an account?
               <span>
                 <a
                   className="text-[#4BCBEB] font-Poppins hover:underline hover:underline-offset-4 text-base font-bold"
-                  href="#"
+                  href="/"
                 >
                   Sign Up
                 </a>
