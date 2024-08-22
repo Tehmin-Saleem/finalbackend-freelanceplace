@@ -30,8 +30,10 @@ const SearchIcon = () => (
 const SkillManagement = () => {
   const navigate = useNavigate(); // Initialize useNavigate
 
+  
   const handleUudgetButtonClick = () => {
-    navigate('/Budget'); // Replace with your target route
+    localStorage.setItem('preferredSkills', JSON.stringify(skills));
+    navigate('/Budget');
   };
   const handleBackButtonClick = () => {
     navigate('/JobDescription'); // Replace with your target route

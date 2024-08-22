@@ -1,12 +1,15 @@
 import React from "react";
 import "./style.scss";
 import Header from "../../components/Common/Header";
+import { useState } from "react";
 import GreaterThan from "../../svg components/GreaterThan";
 import { useNavigate } from 'react-router-dom'; // Import useNavigate
 
 
 const PostJob = () => {
   const navigate = useNavigate(); // Initialize useNavigate
+  const [jobTitle, setJobTitle] = useState("");
+  
   const steps = [
     { number: "1", label: "Job Title", color: "#4BCBEB" }, // Blue
     { number: "2", label: "Description", color: "#6b7280" }, // Coral
@@ -16,9 +19,12 @@ const PostJob = () => {
     { number: "6", label: "Attachment", color: "#6b7280" }, // Orange Red
   ];
   const handleDescriptionButtonClick = () => {
-    navigate('/JobDescription'); // Replace with your target route
+    localStorage.setItem('jobTitle', jobTitle);
+    navigate('/JobDescription');
   };
-
+  
+    
+  
   return (
     <div className="post-job">
       <Header />
@@ -69,11 +75,13 @@ const PostJob = () => {
                 Enter job title:
               </label>
               <input
-                type="text"
-                id="jobTitle"
-                className="input"
-                placeholder="UI/UX Designer"
-              />
+        type="text"
+        id="jobTitle"
+        className="input"
+        placeholder="UI/UX Designer"
+        value={jobTitle}
+        onChange={(e) => setJobTitle(e.target.value)}
+      />
               <div className="examples">
                 <strong>Example titles:</strong>
                 <ul className="list">

@@ -4,9 +4,10 @@ import ProgressBar from "../../components/Common/ProgressBar.jsx" // Assuming th
 import "./styles.scss";
 import { useNavigate } from 'react-router-dom'; // Import useNavigate
 
-
+import { useState, useEffect } from "react";
 const DescriptionPage = () => {
   const navigate = useNavigate(); // Initialize useNavigate
+  const [description, setDescription] = useState("");
     const steps = [
         { number: '1', label: 'Job Title', color: '#4BCBEB' },
         { number: '2', label: 'Description', color: '#4BCBEB' },
@@ -16,12 +17,20 @@ const DescriptionPage = () => {
         { number: '6', label: 'Attachment', color: '#6b7280' },
       ];
       const handlePrefferedSkillsButtonClick = () => {
+        localStorage.setItem('jobDescription', description);
         navigate('/PreferredSkills'); // Replace with your target route
       };
       const handleBackButtonClick = () => {
-        navigate('/'); // Replace with your target route
+        navigate('/JobPosting'); // Replace with your target route
       };
+      useEffect(() => {
+        // Retrieve description from localStorage if it exists
+        const savedDescription = localStorage.getItem('jobDescription');
+        if (savedDescription) setDescription(savedDescription);
+      }, []);
     
+    
+  
       const currentStep = 1; 
   return (
     <div className="description-page">
@@ -43,10 +52,12 @@ const DescriptionPage = () => {
               Description
             </label>
             <textarea
-              id="projectDescription"
-              className="input description-box"
-              placeholder="Enter about your project detail"
-            ></textarea>
+        id="projectDescription"
+        className="input description-box"
+        placeholder="Enter about your project detail"
+        value={description}
+        onChange={(e) => setDescription(e.target.value)}
+      ></textarea>
             <div className="examples">
               <strong>Example Description:</strong>
               <ul className="list">
