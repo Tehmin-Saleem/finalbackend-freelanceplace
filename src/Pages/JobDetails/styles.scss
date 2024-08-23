@@ -67,6 +67,7 @@ $font-poppins: 'Poppins', sans-serif;
         padding: 0.5rem 0;
         border-bottom: 1px solid $border-color;
         position: relative;
+        width: 1/3;
 
         &:last-child {
           border-bottom: none;
@@ -101,7 +102,10 @@ $font-poppins: 'Poppins', sans-serif;
           padding: 0.25rem 0.5rem; /* Reduced padding */
           margin-top: 0.25rem; /* Reduced margin */
         
-          
+          .file-description{
+           
+          margin-left: 90px;
+          }
           .file-details {
             display: flex;
             align-items: center;

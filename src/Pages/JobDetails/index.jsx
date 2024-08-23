@@ -40,49 +40,61 @@ const EyeIcon = () => (
     />
   </svg>
 );
-
 const JobDetails = () => {
   const navigate = useNavigate();
   const [jobData, setJobData] = useState({});
-  useEffect(() => {
-    // Retrieve all job data from localStorage
-    const title = localStorage.getItem('jobTitle');
-    const description = localStorage.getItem('jobDescription');
-    const skills = JSON.parse(localStorage.getItem('preferredSkills'));
-    const budget = JSON.parse(localStorage.getItem('jobBudget'));
-    const duration = JSON.parse(localStorage.getItem('projectDuration'));
-    const attachment = JSON.parse(localStorage.getItem('jobAttachment'));
 
-    const parsedMinRate = budget?.minRate ? parseFloat(budget.minRate) : null;
-    const parsedMaxRate = budget?.maxRate ? parseFloat(budget.maxRate) : null;
+  useEffect(() => {
+    const storedData = {
+      job_title: localStorage.getItem('jobTitle'),
+      description: localStorage.getItem('jobDescription'),
+      preferred_skills: JSON.parse(localStorage.getItem('preferredSkills')),
+      budget: JSON.parse(localStorage.getItem('jobBudget')),
+      duration: JSON.parse(localStorage.getItem('projectDuration')),
+      attachment: JSON.parse(localStorage.getItem('jobAttachment')),
+    };
+
+    const parsedMinRate = storedData.budget?.minRate ? parseFloat(storedData.budget.minRate) : null;
+    const parsedMaxRate = storedData.budget?.maxRate ? parseFloat(storedData.budget.maxRate) : null;
 
     setJobData({
-        job_title: title,
-        description,
-        preferred_skills: skills,
-        budget_type: budget?.type,
-        hourly_rate: budget?.type === 'hourly' ? {
-            from: parsedMinRate,
-            to: parsedMaxRate
-        } : null,
-        fixed_price: budget?.type === 'fixed' ? parsedMaxRate : null, // Make sure to set this correctly
-        project_duration: {
-            project_size: duration?.size,
-            duration_of_work: duration?.duration,
-            experience_level: duration?.experienceLevel
-        },
-        attachment: {
-            file: attachment?.fileName,
-            detailed_description: attachment?.description || ''
-        }
+      job_title: storedData.job_title,
+      description: storedData.description,
+      preferred_skills: storedData.preferred_skills,
+      budget_type: storedData.budget?.type,
+      hourly_rate: storedData.budget?.type === 'hourly' ? {
+        from: parsedMinRate,
+        to: parsedMaxRate
+      } : null,
+      fixed_price: storedData.budget?.type === 'fixed' ? parsedMaxRate : null,
+      project_duration: {
+        project_size: storedData.duration?.size,
+        duration_of_work: storedData.duration?.duration,
+        experience_level: storedData.duration?.experienceLevel
+      },
+      attachment: {
+        fileName: storedData.attachment?.attachment?.fileName || storedData.attachment?.fileName,
+        base64: storedData.attachment?.attachment?.base64,
+        detailed_description: storedData.attachment?.description || ''
+      }
     });
-}, []);
+  }, []);
 
   const handlePostJob = async () => {
     try {
-      const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NmM1YWE4NWI4ZTExYjBiMDIyNDQ2ZDgiLCJlbWFpbCI6ImpvaG4uZEBleGFtcGxlLmNvbSIsImlhdCI6MTcyNDMyNjgzMCwiZXhwIjoxNzI0MzMwNDMwfQ.oF8roTglu1dKC5QtHZmNZer7yAaQ6SREpQUjgavkBOQ';
+      const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NmM4MzViZWQ0OTViZGIyNmJhOWMyYmQiLCJlbWFpbCI6ImV4YW1wbGVAZXhhbXBsZS5jb20iLCJpYXQiOjE3MjQ0MDEzMDIsImV4cCI6MTcyNDQwNDkwMn0.fn1JButsWkDqBChSan7ibMNTvdNAuz9eovfDMRenC2A'; // Replace with actual token retrieval
+      let fileName = jobData.attachment?.fileName;
+
+      let uploadedFile = null;
+      if (jobData.attachment?.base64) {
+        uploadedFile = await handleFileUpload(jobData.attachment.base64, jobData.attachment.fileName);
+      }
+
       const postData = {
-        attachment: jobData.attachment,
+        attachment: uploadedFile ? {
+          fileName: uploadedFile.fileName,
+          description: jobData.attachment.detailed_description || ''
+        } : null,
         budget_type: jobData.budget_type,
         hourly_rate: jobData.hourly_rate,
         fixed_price: jobData.fixed_price,
@@ -93,28 +105,39 @@ const JobDetails = () => {
         status: 'public', // Assuming a default status
       };
 
-      // Log the jobData and token to check the payload and query parameters
-      console.log('Posting job data:', postData);
-      console.log('Token:', token);
-
-      // Configure axios request with token in Authorization header
       const response = await axios.post('http://localhost:5000/api/client/jobpost', postData, {
-        params: {
-          token: token // Include token as a query parameter
-      }
-  });
-    
+        params: { token: token }
+      });
 
-      console.log('Job posted successfully:', response.data);
-
-      // Clear localStorage and navigate only if the request was successful
       localStorage.clear();
       navigate('/ClientDashboard');
     } catch (error) {
       console.error('Error posting job:', error.response ? error.response.data : error.message);
-     
     }
   };
+
+// Add this function to handle file upload
+const handleFileUpload = async (base64File, fileName) => {
+  const formData = new FormData();
+  const blob = await fetch(base64File).then(res => res.blob());
+  formData.append('file', blob, fileName);
+  console.log('File:', base64File);
+  console.log('FileName:', fileName);
+  try {
+    const response = await axios.post('http://localhost:5000/api/client/upload', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+      params: { token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NmM4MzViZWQ0OTViZGIyNmJhOWMyYmQiLCJlbWFpbCI6ImV4YW1wbGVAZXhhbXBsZS5jb20iLCJpYXQiOjE3MjQ0MDEzMDIsImV4cCI6MTcyNDQwNDkwMn0.fn1JButsWkDqBChSan7ibMNTvdNAuz9eovfDMRenC2A' }
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error uploading file:', error);
+    return null;
+  }
+};
+
+
 
   return (
     <div>
@@ -153,19 +176,29 @@ const JobDetails = () => {
               <EditIcon />
             </div>
             <div className="detail-row">
-              <h3 className="detail-heading">Attachment</h3>
-              <div className="attachment">
-                <div className="file-details">
-                  <span className="file-icon">&#128206;</span>
-                  <span className="file-name">{jobData.attachment?.file}</span>
-                </div>
-                <button className="btn view-btn">
-                  <EyeIcon />
-                  View
-                </button>
-              </div>
-              <EditIcon />
-            </div>
+  <h3 className="detail-heading">Attachment</h3>
+  <div className="attachment">
+    <div className="file-details">
+      <span className="file-icon">&#128206;</span>
+      <span className="file-name">
+        {jobData.attachment?.fileName || "No file uploaded"}
+      </span>
+      {jobData.attachment?.detailed_description && (
+        <span className="file-description">
+          {jobData.attachment.detailed_description}
+        </span>
+      )}
+    </div>
+    {jobData.attachment?.fileName && (
+      <button className="btn view-btn">
+        <EyeIcon />
+        View
+      </button>
+    )}
+  </div>
+  <EditIcon />
+</div>
+
           </div>
           <div className="actions">
             <button className="btn back-btn" onClick={() => navigate(-1)}>Back</button>

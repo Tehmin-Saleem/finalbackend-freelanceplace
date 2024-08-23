@@ -19,26 +19,36 @@ const Attachment = () => {
   ];
 
   useEffect(() => {
-    // Load data from local storage if available
     const storedData = JSON.parse(localStorage.getItem('jobAttachment')) || {};
     setDescription(storedData.description || "");
-    setAttachment(storedData.attachment ? { name: storedData.attachment.fileName } : null);
+    setAttachment(storedData.attachment ? { name: storedData.attachment.fileName, base64: storedData.attachment.base64 } : null);
   }, []);
 
-  const handleBackButtonClick = () => {
-    navigate('/ProjectDuration');
-  };
+  const handleBackButtonClick = () => navigate('/ProjectDuration');
 
   const handleReviewButtonClick = () => {
     localStorage.setItem('jobAttachment', JSON.stringify({
       description,
-      attachment: attachment ? { fileName: attachment.name } : null
+      attachment: attachment ? { fileName: attachment.name, base64: attachment.base64 } : null
     }));
     navigate('/ProjectDetails');
   };
 
   const handleFileChange = (e) => {
-    setAttachment(e.target.files[0]);
+    const file = e.target.files[0];
+    setAttachment({ name: file.name });
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      const base64String = reader.result;
+      setAttachment({ name: file.name, base64: base64String });
+
+      localStorage.setItem('jobAttachment', JSON.stringify({
+        description,
+        attachment: { fileName: file.name, base64: base64String }
+      }));
+    };
+    reader.readAsDataURL(file);
   };
 
   return (
