@@ -1,0 +1,200 @@
+$font-kodchasan: 'Kodchasan', sans-serif;
+$font-poppins: 'Poppins', sans-serif;
+$color-gray: #64748b;
+$color-dark: #2c3e50;
+$color-white: #ffffff;
+$color-accent: #4bcdeb;
+$bg-color: #f7f8fa;
+
+.offerTitle {
+  font-family: $font-poppins;
+  color: $color-dark;
+  font-weight: 500;
+  font-size: 32px;
+  margin-left: 13rem;
+  margin-bottom: 16px;
+  margin-top: 2rem;
+}
+
+.outerContainer {
+  margin: 2rem 12rem; /* Adjust the margin as needed */
+}
+
+.container {
+  display: flex;
+  justify-content: space-between;
+  padding: 50px;
+  border: 2px solid #ddd;
+  border-radius: 10px;
+  background-color: $color-white;
+  font-family: $font-poppins;
+  @media (max-width: 768px) {
+    flex-direction: column;
+  }
+}
+
+.left {
+  width: 70%;
+  padding: 10px;
+}
+
+.right {
+  width: 30%;
+  padding: 10px;
+}
+
+.field {
+  margin-bottom: 12px;
+  font-family: $font-poppins;
+  display: block;
+}
+.inputWrapper {
+  width: 100%; /* Ensures wrapper takes full width */
+  
+}
+
+label {
+  display: block;
+  font-family: $font-poppins;
+  margin-bottom: 4px; /* Optional: Adds space between label and input */
+}
+
+.roundedInput,
+.textArea,
+.inputWithIcon {
+  width: 50%;
+  padding: 8px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  background-color: transparent; /* Transparent background */
+  font-family: $font-poppins;
+  margin-top: 8px;
+  display: flex;
+}
+
+.textArea {
+  height: 100px;
+}
+
+// .inputWithIcon {
+//    display: flex;
+//   align-items: center;
+//   gap: 8px;
+
+// }
+
+.searchIcon {
+   margin-right:4rem;
+}
+
+.skill,
+.skills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.skillButton {
+  display: flex;
+  align-items: center;
+  border: 1px solid #ccc;
+  border-radius: 20px;
+  padding: 5px 10px;
+  cursor: pointer;
+}
+
+.options {
+  display: flex;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.option {
+  flex: 1;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 100%; /* Adjusted height */
+  width: 20%;
+  position: relative; /* Position the radio button */
+}
+
+.optionText {
+  font-size: 14px;
+  font-family: $font-poppins;
+  align-items: center;
+}
+
+.Radio {
+  position: absolute;
+  top: 8px; /* Positioning the radio button */
+  right: 8px; /* Positioning the radio button */
+}
+
+.selected {
+  border: 2px solid $color-dark;
+}
+
+.attachButton {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 16px;
+  padding: 8px;
+  border: 1px solid #ccc;
+  cursor: pointer;
+  background-color: #f8f9fa;
+  font-family: $font-poppins;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.attachButton input[type="file"] {
+  display: none;
+}
+
+.attachedFile {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.userProfile {
+  font-family: $font-kodchasan;
+  // background-color: #f8f9fa;
+  padding: 20px;
+  border-radius: 8px;
+  // border: 1px solid #ccc;
+}
+
+.icon {
+  margin-right: 8px;
+}
+
+.buttonWithIcon {
+  display: inline-flex;
+  align-items: center;
+  background-color: $color-accent;
+  border-radius: 12px;
+  padding: 8px 16px;
+  border: none;
+  color: $color-white;
+  cursor: pointer;
+  font-family: $font-poppins;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.textArea {
+  background-color: transparent;
+}
+
+input,
+textarea {
+  background-color: transparent;
+}
+

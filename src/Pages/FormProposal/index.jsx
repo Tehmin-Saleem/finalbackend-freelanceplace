@@ -1,10 +1,6 @@
 import React, { useState } from "react";
-import styles from "./style.module.scss";
-// import SearchIcon from "../../svg components/SearchIcon";
-// import CrossIcon from "../../svg components/CrossIcon";
-// import PlusIcon from "../../svg components/PlusIcon";
-// import HourlyRate from "../../svg components/HourlyRate";
-// import FixedRate from "../../svg components/FixedRate";
+import Header from "../../components/Common/Header"; // Import the Header component
+import "./styles.scss"; // Correctly import the SCSS file
 import {
   SearchIcon,
   CrossIcon,
@@ -48,128 +44,139 @@ const OfferForm = () => {
 
   return (
     <>
-      {/* <h2 className={styles.h2}>Send an offer</h2> */}
-      <div className={styles.container}>
-        {/* <h2 className={styles.h2}>Send an offer</h2> */}
-        <div className={styles.left}>
-          <h2 className={styles.h2}>Send an offer</h2>
-          <div className={styles.field}>
-            <label>Enter job tittle:</label>
-            <div className={styles.roundedInput}>
-              <input type="text" placeholder="UI/UX Designer" />
-            </div>
-          </div>
-          <div className={styles.field}>
-            <label>Description:</label>
-
-            <div className={styles.textArea}>
-              <textarea placeholder="Enter about your project details"></textarea>
-            </div>
-          </div>
-          <div className={styles.field}>
-            <label>Search skills or add you own:</label>
-            <div className={styles.inputWithIcon}>
-              <input type="text" />
-              <span>
-                <SearchIcon className={styles.searchIcon} />
-              </span>
-            </div>
-          </div>
-          <h3 className={styles.field}>Selected skills</h3>
-          <div className={styles.skill}>
-            {selectedSkills.map((skill) => (
-              <button
-                key={skill}
-                className={styles.skillButton}
-                onClick={() => handleSkillRemove(skill)}
-              >
-                {skill}{" "}
-                <span>
-                  <CrossIcon />
-                </span>
-              </button>
-            ))}
-          </div>
-          <h3 className={styles.field}>Popular skills for UI/UX Design</h3>
-          <div className={styles.skills}>
-            {popularSkills.map((skill) => (
-              <button
-                key={skill}
-                className={styles.skillButton}
-                onClick={() => handleSkillAdd(skill)}
-              >
-                {skill}{" "}
-                <span>
-                  <PlusIcon />
-                </span>
-              </button>
-            ))}
-          </div>
-
-          <div className={styles.options}>
-            <div
-              className={`${styles.option} ${
-                selectedOption === "option1" ? styles.selected : ""
-              }`}
-              onClick={() => handleOptionChange("option1")}
-            >
-              <input type="radio" name="options" className={styles.Radio} />
-              <span className={styles.optionText}>
-                <HourlyRate />
-                HourlyRate
-              </span>
-            </div>
-            <div
-              className={`${styles.option} ${
-                selectedOption === "option2" ? styles.selected : ""
-              }`}
-              onClick={() => handleOptionChange("option2")}
-            >
-              <input type="radio" name="options" className={styles.Radio} />
-              <span className={styles.optionText}>
-                <FixedRate />
-                FixedRate
-              </span>
-            </div>
-          </div>
-          <div className={styles.field}>
-            <div>
-              <label>Describe what you need:</label>
-              <textarea className={styles.textArea}></textarea>
-            </div>
-          </div>
-          <div className={styles.field}>
-            <button className={styles.attachButton}>
-              <span className={styles.icon}>📎</span>
-              ATTACH
-              <input type="file" onChange={handleFileAttach} />
-            </button>
-            {attachedFile && (
-              <div className={styles.attachedFile}>
-                <span>{attachedFile.name}</span>
-                <button onClick={handleFileRemove}>
-                  <span className={styles.icon}>✖</span>
-                </button>
+      <Header />
+      <h2 className="offerTitle">Send an offer</h2>
+      
+      <div className="outerContainer">
+        <div className="container">
+          <div className="left">
+           
+              <div className="field">
+             <label>Enter job title:</label>
+             <div className="inputWrapper">
+              <input type="text" placeholder="UI/UX Designer" className="roundedInput" />
               </div>
-            )}
+              </div>
+
+            <div className="field">
+              <label>Description:</label>
+              <div className="inputWrapper">
+                <textarea placeholder="Enter about your project details" className="textArea"></textarea>
+                </div>
+            </div>
+
+            <div className="field">
+              <label>Search skills or add your own:</label>
+
+              <div >
+                <input type="text" className="inputWithIcon"  />
+                <span>
+                  <SearchIcon className="searchIcon" />
+                </span>
+              </div>
+            </div>
+
+            <h3 className="field">Selected skills</h3>
+            <div className="skill">
+              {selectedSkills.map((skill) => (
+                <button
+                  key={skill}
+                  className="skillButton"
+                  onClick={() => handleSkillRemove(skill)}
+                >
+                  {skill}{" "}
+                  <span>
+                    <CrossIcon />
+                  </span>
+                </button>
+              ))}
+            </div>
+
+            <h3 className="field">Popular skills for UI/UX Design</h3>
+            <div className="skills">
+              {popularSkills.map((skill) => (
+                <button
+                  key={skill}
+                  className="skillButton"
+                  onClick={() => handleSkillAdd(skill)}
+                >
+                  {skill}{" "}
+                  <span>
+                    <PlusIcon />
+                  </span>
+                </button>
+              ))}
+            </div>
+
+            <div className="options">
+              <div
+                className={`option ${
+                  selectedOption === "option1" ? "selected" : ""
+                }`}
+                onClick={() => handleOptionChange("option1")}
+              >
+                <input type="radio" name="options" className="Radio" />
+                <span className="optionText">
+                  <HourlyRate />
+                  Hourly Rate
+                </span>
+              </div>
+              <div
+                className={`option ${
+                  selectedOption === "option2" ? "selected" : ""
+                }`}
+                onClick={() => handleOptionChange("option2")}
+              >
+                <input type="radio" name="options" className="Radio" />
+                <span className="optionText">
+                  <FixedRate />
+                  Fixed Rate
+                </span>
+              </div>
+            </div>
+
+            <div className="field">
+              <label>Describe what you need:</label>
+              <div>
+              <textarea className="textArea"></textarea>
+            </div>
+            </div>
+
+            <div className="field">
+              <button className="attachButton">
+                <span className="icon">📎</span>
+                ATTACH
+                <input type="file" onChange={handleFileAttach} />
+              </button>
+              {attachedFile && (
+                <div className="attachedFile">
+                  <span>{attachedFile.name}</span>
+                  <button onClick={handleFileRemove}>
+                    <span className="icon">✖</span>
+                  </button>
+                </div>
+              )}
+            </div>
+
+            <div className="field">
+              <button className="buttonWithIcon">
+                <span className="icon">📤</span>
+                SEND OFFER
+              </button>
+            </div>
           </div>
-          <div className={styles.field}>
-            <button className={styles.buttonWithIcon}>
-              <span className={styles.icon}>📤</span>
-              SEND OFFER
-            </button>
-          </div>
-        </div>
-        <div className={styles.right}>
-          <div className={styles.userProfile}>
-            <h3>User Profile</h3>
-            <p>Name: John Doe</p>
-            <p>Location: New York, USA</p>
-            <p>Success Rate: 90%</p>
-            <p>Top Rated: ⭐️⭐️⭐️⭐️⭐️</p>
-            <p>Experience: 10 years</p>
-            <p>Total Jobs: 187</p>
-            <p>Total Hours: 156</p>
+          
+          <div className="right">
+            <div className="userProfile">
+              <h3>User Profile</h3>
+              <p>Name: John Doe</p>
+              <p>Location: New York, USA</p>
+              <p>Success Rate: 90%</p>
+              <p>Top Rated: ⭐️⭐️⭐️⭐️⭐️</p>
+              <p>Experience: 10 years</p>
+              <p>Total Jobs: 187</p>
+              <p>Total Hours: 156</p>
+            </div>
           </div>
         </div>
       </div>

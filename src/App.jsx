@@ -18,6 +18,8 @@ import ProjectDuration from "./Pages/ProjectDuration";
 import Attachment from "./Pages/Attachment";
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import FreelancerCard from "./Pages/FreeLanceCard";
+import ApplyJob from "./Pages/ApplyNow";
+import FreelanceDashboardPage from "./Pages/FreelancerDashboard";
 // import OfferForm from "./components/FormProposal/OfferForm";
 const freelancers = [
   {
@@ -108,8 +110,12 @@ function App() {
       
       
       <Routes>
+      <Route path="/" element={<OfferForm/>} />
+
+      <Route path="/FreelanceDashBoard" element={<FreelanceDashboardPage/>} />
+      <Route path="/ApplyJob" element={<ApplyJob/>} />
        
-      <Route path="/" element={ <FreelancerCard heading="UI/UX Designer" freelancers={freelancers} />} />
+      <Route path="/FreelanceCard" element={ <FreelancerCard heading="UI/UX Designer" freelancers={freelancers} />} />
       <Route path="/signup" element={<SignUpSection/>} />
          <Route path="/ClientDashboard" element={<DashboardPage/>} />
          <Route path="/JobPosting" element={<PostJob/>} /> 
@@ -121,6 +127,7 @@ function App() {
          <Route path="/ProjectDetails" element={<JobDetails/>} /> 
          <Route path="/Profile" element={<MyProfile/>} /> 
          <Route path="/ErrorPage" element={<ErrorPage/>} /> 
+
 
          
 
