@@ -4,60 +4,59 @@ $secondary-color: #94A3B8;
 $font-family: 'Poppins', sans-serif;
 $text-color: #64748b;
 $background-color: #F8FAFC;
-$border-color: #DEE2E7;
+$border-color: #dae0e7;
+$button-color: #00BFFF;
+$button-hover-color: darken($button-color, 10%);
 
 // Job Card Styling
-.jobs-page {
-  padding: 20px;
-  background-color: $background-color;
-}
-
-.jobs-heading {
-  font-size: 24px;
-  margin-bottom: 20px;
-  font-family: $font-family;
-}
-
-.jobs-container {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
 
 .job-card {
   display: flex;
+  flex-direction: column;
   justify-content: space-between;
-  background-color: #ffffff;
-  border-radius: 10px;
-  padding: 20px;
-  border: 1px solid $border-color;
+  border-bottom: 1px solid $border-color;
+  margin: 0% 5%;
+  padding: 25px;
+  padding-right:5%;
+  padding-left: 5%;
+
+  &__rate , &__timeline , &__level{
+    color: $secondary-color;
+  }
+
+  &__rate-head , &__timeline-head, &__level-head{
+    color: #0f172a;
+    font-weight: 400;
+  }
+
 
   &:hover {
-    background-color: #f0f8ff;
-    border-color: $primary-color;
+    background-color: #e7eaee;
+    border-color: $text-color;
   }
 
   &__content {
     display: flex;
     flex-direction: column;
+    width: 100%; // Ensure the content takes full width
   }
 
   &__header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 10px;
+    margin-bottom: 15px; // Increased spacing for better visual hierarchy
   }
 
   &__title {
-    font-size: 18px;
+    font-size: 20px;
     font-weight: bold;
     color: #0f172a;
     font-family: $font-family;
   }
 
   &__view-button {
-    background-color: $primary-color;
+    background-color: $button-color;
     color: #ffffff;
     padding: 10px 20px;
     border: none;
@@ -66,58 +65,65 @@ $border-color: #DEE2E7;
     font-family: $font-family;
 
     &:hover {
-      background-color: darken($primary-color, 10%);
+      background-color: $button-hover-color;
     }
   }
 
   &__info {
     display: flex;
-    gap: 15px;
+    gap: 20px;
     font-size: 14px;
-    margin-bottom: 10px;
+    margin-bottom: 15px;
     color: $text-color;
   }
 
   &__description {
     font-size: 14px;
     color: $text-color;
-    margin-bottom: 15px;
+    margin-bottom: 20px;
+    line-height: 1.5; // Improved readability
   }
 
-  &__tags {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 10px;
+  .job-card__tags {
+  display: flex;
+  flex-wrap: wrap;
+  margin-bottom: 6px; /* equivalent to mb-6 in Tailwind */
 
-    &__tag {
-      background-color: #e2e8f0;
-      padding: 5px 10px;
-      border-radius: 5px;
-      font-size: 12px;
-      color: #475569;
-    }
+  .job-card__tag {
+    border: 1px solid #94A3B8;  /* equivalent to border-[#94A3B8] in Tailwind */
+    border-radius: 20px;        /* equivalent to rounded-2xl in Tailwind */
+    padding: 8px;               /* equivalent to p-2 in Tailwind */
+    margin-right: 8px;          /* equivalent to mr-2 in Tailwind */
+    margin-bottom: 8px;         /* equivalent to mb-2 in Tailwind */
+    font-size: 14px;            /* equivalent to text-[14px] in Tailwind */
+    color: #94A3B8;             /* equivalent to text-[#94A3B8] in Tailwind */
+    font-family: 'Poppins', sans-serif; /* equivalent to font-Poppins in Tailwind */
+    background-color: #f4f7f9;
   }
+}
+
+
+
 
   &__extra {
     display: flex;
     gap: 15px;
+    align-items: center;  // Ensures stars align well
     font-size: 14px;
     color: $text-color;
   }
 
-  &__verified {
-    color: $primary-color;
-    font-weight: bold;
+  &__verified , &__location , &__rating {
+    color: darken($secondary-color, 1%);
+    font-weight: 300;
   }
 
-  &__rating {
-    color: #f59e0b;
-  }
-
-  &__location {
-    color: #475569;
-  }
+ 
 }
+
+
+
+
 
 // Pagination Styling
 .pagination {
@@ -126,13 +132,14 @@ $border-color: #DEE2E7;
   align-items: center;
   margin-top: 30px;
   font-family: $font-family;
+  // margin: 0;
 
   .page-controls {
     display: flex;
     gap: 5px;
 
     span {
-      padding: 5px;
+      padding: 8px 12px;  // Improved padding for better touch targets
       border-radius: 5px;
       cursor: pointer;
 
@@ -142,9 +149,13 @@ $border-color: #DEE2E7;
     }
   }
 
+  select,
   input {
-    width: 40px;
-    text-align: center;
+    border: 1px solid $border-color;
+    border-radius: 5px;
+    padding: 5px;
+    font-family: $font-family;
+    color: $text-color;
   }
 
   button {
@@ -152,11 +163,18 @@ $border-color: #DEE2E7;
     border: none;
     color: white;
     border-radius: 5px;
-    padding: 5px 10px;
+    padding: 5px 15px;
     cursor: pointer;
 
     &:hover {
-      background-color: darken($primary-color, 10%);
+      background-color: $button-hover-color;
     }
   }
 }
+
+
+
+
+
+
+

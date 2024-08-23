@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { NewHeader, JobsCard } from "../../components/index";
 
-
 import "./styles.scss"; // Import the SCSS file
 
 const JobsPage = () => {
@@ -13,8 +12,15 @@ const JobsPage = () => {
       rate: "$12/hr",
       timeline: "1 to 3 months",
       level: "Expert",
-      description: "Lorem ipsum dolor sit amet consectetur...",
-      tags: ["Mobile app design", "Wireframe", "Mockup", "Prototyping", "Figma"],
+      description:
+        "Lorem ipsum dolor, sit amet consectetur adipisicing elit. Commodi nam totam cupiditate odit esse, quisquam deserunt aut cumque odio consequuntur maxime distinctio non, illo dolor adipisci molestias pariatur. Maiores, officia...",
+      tags: [
+        "Mobile app design",
+        "Wireframe",
+        "Mockup",
+        "Prototyping",
+        "Figma",
+      ],
       verified: true,
       rating: "Top rated",
       location: "Lahore, Punjab, Pakistan",
@@ -26,8 +32,15 @@ const JobsPage = () => {
       rate: "$120",
       timeline: "1 to 3 months",
       level: "Intermediate",
-      description: "Lorem ipsum dolor sit amet consectetur...",
-      tags: ["Mobile app design", "Wireframe", "Mockup", "Prototyping", "Figma"],
+      description:
+        "Lorem ipsum dolor, sit amet consectetur adipisicing elit. Commodi nam totam cupiditate odit esse, quisquam deserunt aut cumque odio consequuntur maxime distinctio non, illo dolor adipisci molestias pariatur. Maiores, officia...",
+      tags: [
+        "Mobile app design",
+        "Wireframe",
+        "Mockup",
+        "Prototyping",
+        "Figma",
+      ],
       verified: true,
       rating: "Top rated",
       location: "Lahore, Punjab, Pakistan",

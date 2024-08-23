@@ -1,5 +1,7 @@
 import React from "react";
 import "./styles.scss"; // Import the SCSS file
+import StarRating from "../ProfileView/starrating"; // Import the StarRating component
+import { JobSucces } from "../../svg";
 
 const JobsCard = ({
   type,
@@ -21,9 +23,12 @@ const JobsCard = ({
           <button className="job-card__view-button">View</button>
         </div>
         <div className="job-card__info">
-          <span className="job-card__rate">{type}: {rate}</span>
-          <span className="job-card__timeline">Estimated time: {timeline}</span>
-          <span className="job-card__level">Level: {level}</span>
+          <span className="job-card__rate-head">{type}:</span>
+          <span className="job-card__rate">{rate}</span>
+          <span className="job-card__timeline-head">Estimated time:</span>
+          <span className="job-card__timeline"> {timeline}</span>
+          <span className="job-card__level-head">Level:</span>
+          <span className="job-card__level"> {level}</span>
         </div>
         <p className="job-card__description">{description}</p>
         <div className="job-card__tags">
@@ -32,8 +37,10 @@ const JobsCard = ({
           ))}
         </div>
         <div className="job-card__extra">
+        <JobSucces className="h-3 w-3" />
           {verified && <span className="job-card__verified">Verified account</span>}
-          <span className="job-card__rating">Rating: {rating}</span>
+          <StarRating /> {/* Insert the StarRating component here */}
+          <span className="job-card__rating">{rating}</span>
           <span className="job-card__location">{location}</span>
         </div>
       </div>
@@ -42,3 +49,4 @@ const JobsCard = ({
 };
 
 export default JobsCard;
+

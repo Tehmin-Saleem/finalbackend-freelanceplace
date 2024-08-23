@@ -94,7 +94,7 @@ function SignIn() {
 
       {/* Second Half - Form */}
       <div className="md:w-1/2 w-full h-screen md:mt-9 md:mr-9 bg-white flex items-center justify-center shadow-lg">
-        <div className="w-full max-w-lg p-16 shadow-2xl">
+        <div className="w-full max-w-lg p-16 shadow-2xl ">
           <form onSubmit={handleLogin}>
             <h1 className="text-[24px] font-Poppins font-medium text-center px-16 py-2">
               Sign in to your account
@@ -206,6 +206,7 @@ function SignIn() {
               </span>
             </div>
 
+            
             {/* Google and Apple Sign-In Options */}
             <div className="mt-5 mx-auto max-w-xs flex flex-row">
               <div className="flex justify-center mb-4 shadow-xl p-3">
@@ -221,7 +222,7 @@ function SignIn() {
                   </a>
                 </div>
               </div>
-              <div className="flex justify-center shadow-xl mb-4 p-3">
+              <div className="flex justify-center mb-4 shadow-xl  p-3">
                 <div className="mr-3">
                   <Apple />
                 </div>

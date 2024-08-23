@@ -117,7 +117,7 @@ function Signup() {
 
       {/*================= Second Half - Form ================*/}
       <div className="md:w-1/2 w-full h-screen md:mt-9 md:mr-9 bg-white flex items-center justify-center shadow-lg">
-        <div className="w-full max-w-lg p-16 shadow-2xl">
+        <div className="w-full max-w-lg px-16 shadow-2xl h-full">
           <form onSubmit={handleSubmit}>
             <h1 className="text-[24px] font-Poppins font-medium text-center px-16 py-2">
               Please sign up to hire talented individuals
@@ -246,14 +246,14 @@ function Signup() {
                   </a>
                 </div>
               </div>
-              <div className="flex justify-center shadow-xl p-3">
+              <div className="flex justify-center mb-4 shadow-xl p-3">
                 <div className="mr-3">
                   <Apple />
                 </div>
                 <div>
                   <a
                     href="https://www.apple.com" // Replace with the actual Apple authentication URL
-                    className="mr-4 text-[12px] text-[#0F172A] font-Poppins font-semibold text-center"
+                    className="mr-4 text-[12px] text-[#3498DB] font-Poppins font-semibold text-center"
                   >
                     Continue with Apple
                   </a>
