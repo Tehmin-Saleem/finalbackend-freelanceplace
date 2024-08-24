@@ -7,6 +7,8 @@ import UserReview from "./ProfileView/UserReviews";
 import Proposalscard from "./ProposalsCard";
 import Header from "./Header/Head";
 import JobsCard from "./JobsCard";
+import FreelancersJobsCard from "./Freelancers_Done_jobs";
+
 
 
 export {default as CommonButton} from "./common/CommonButton"
@@ -18,3 +20,5 @@ export {default as StarRating} from "./ProfileView/starrating"
 export {default as UserReview} from "./ProfileView/UserReviews"
 export {default as Proposalscard} from "./ProposalsCard"
 export {default as JobsCard} from "./JobsCard"
+export {default as FreelancersJobsCard} from "./Freelancers_Done_jobs"
+

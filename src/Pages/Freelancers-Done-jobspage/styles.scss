@@ -1,0 +1,150 @@
+.jobs-page {
+  $font-family: "Poppins", sans-serif;
+  $primary-color: #4bcbeb;
+  $secondary-color: #94a3b8;
+  $text-color: #64748b;
+  $background-color: #f8fafc;
+  $border-color: #dee2e7;
+  $dark-text-color: #0f172a;
+  $light-grey-color: #e2e8f0;
+
+  .search-container {
+    display: flex;
+    align-items: center;
+    margin-top: 1rem;
+    width: 100%;
+    margin-left: 9%;
+
+    @media (min-width: 768px) {
+      margin-top: 0;
+      width: 30%;
+    }
+
+    .search-bar-wrapper {
+      display: flex;
+      align-items: center;
+      border: 1px solid #dee2e7;
+      border-radius: 1.5rem;
+      padding: 0.5rem;
+      width: 400px; // Increased width
+      // margin-right: 5%;
+
+      @media (min-width: 768px) {
+        width: 70%; // Adjust for larger screens if needed
+        // margin-right: 4rem;
+      }
+
+      .icon {
+        margin-right: 0.5rem;
+
+        @media (min-width: 768px) {
+          // margin-right: 1rem;
+        }
+      }
+
+      input {
+        outline: none;
+        width: 100%;
+        margin-left: 0.5rem;
+        font-size: 0.875rem;
+
+        @media (min-width: 768px) {
+          font-size: 1rem;
+        }
+      }
+    }
+  }
+
+  .jobs-heading {
+    font-size: 28px;
+    font-weight: 300;
+    color: $dark-text-color;
+    margin: 3% 5%;
+    padding-left: 5%;
+  }
+
+  .jobs-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px; // Adds space between job cards
+  }
+
+  .filter-button {
+    display: flex;
+    align-items: center;
+    border: 1px solid #94a3b8; /* equivalent to border-[#94A3B8] in Tailwind */
+    border-radius: 20px; /* equivalent to rounded-2xl in Tailwind */
+    padding: 8px; /* equivalent to p-2 in Tailwind */
+    // margin-right: 2%; 
+    font-size: 14px; /* equivalent to text-[14px] in Tailwind */
+    color: #383a3d; /* equivalent to text-[#94A3B8] in Tailwind */
+    font-family: "Poppins", sans-serif; /* equivalent to font-Poppins in Tailwind */
+    background-color: #f4f7f9;
+    width: 30%;
+    cursor: pointer; // Adds a pointer cursor on hover
+
+   
+  
+    .filter-icon {
+      padding-left: 5%;
+    }
+  }
+
+  .pagination {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 2% 10%;
+    padding-bottom: 20px; // Add padding at the bottom
+
+    span {
+      margin: 0 10px;
+      color: $text-color;
+      font-family: $font-family;
+    }
+
+    select {
+      margin-right: 20px;
+      padding: 5px 10px;
+      border: 1px solid $border-color;
+      border-radius: 5px;
+      font-family: $font-family;
+    }
+
+    .page-controls {
+      display: flex;
+      gap: 8px;
+
+      span {
+        color: $text-color;
+        cursor: pointer;
+
+        &:hover {
+          text-decoration: underline;
+        }
+      }
+    }
+
+    input {
+      width: 50px;
+      padding: 5px;
+      border: 1px solid $border-color;
+      border-radius: 5px;
+      font-family: $font-family;
+    }
+
+    button {
+      background-color: $primary-color;
+      color: #ffffff;
+      padding: 5px 10px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-left: 10px;
+
+      &:hover {
+        background-color: darken($primary-color, 5%);
+      }
+    }
+  }
+}

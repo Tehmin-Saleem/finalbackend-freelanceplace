@@ -118,62 +118,14 @@ $button-hover-color: darken($button-color, 10%);
     font-weight: 300;
   }
 
+
+  &__posted-time { // New style for posted time
+    color: $secondary-color;
+    font-weight: 300;
+  }
+
  
 }
-
-
-
-
-
-// Pagination Styling
-.pagination {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-family: $font-family;
-  margin: 2% 10%;
-
-  .page-controls {
-    display: flex;
-    gap: 5px;
-
-    span {
-      padding: 8px 12px;  // Improved padding for better touch targets
-      border-radius: 5px;
-      cursor: pointer;
-
-      &:hover {
-        background-color: #e2e8f0;
-      }
-    }
-  }
-
-  select,
-  input {
-    border: 1px solid $border-color;
-    border-radius: 5px;
-    padding: 5px;
-    font-family: $font-family;
-    color: $text-color;
-  }
-
-  button {
-    background-color: $primary-color;
-    border: none;
-    color: white;
-    border-radius: 5px;
-    padding: 5px 15px;
-    cursor: pointer;
-
-    &:hover {
-      background-color: $button-hover-color;
-    }
-  }
-}
-
-
-
-
 
 
 
