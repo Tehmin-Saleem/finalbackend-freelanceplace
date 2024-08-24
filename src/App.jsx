@@ -18,7 +18,6 @@ import SkillManagement from "./Pages/SkilSection";
 import Budget from "./Pages/Budget";
 import ProjectDuration from "./Pages/ProjectDuration";
 import Attachment from "./Pages/Attachment";
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import FreelancerCard from "./Pages/FreeLanceCard";
 import ApplyJob from "./Pages/ApplyNow";
 import FreelanceDashboardPage from "./Pages/FreelancerDashboard";
