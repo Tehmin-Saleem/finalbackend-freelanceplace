@@ -1,0 +1,190 @@
+$primary-color: #3b82f6;
+$secondary-color: #6b7280;
+$gray-color: #f7fafc;
+$text-color: #4a5568;
+$border-color: #e2e8f0;
+$hover-darken: 10%;
+$font-kodchasan: 'Kodchasan', sans-serif;
+$font-poppins: 'Poppins', sans-serif;
+$color-gray: #64748b;
+$color-dark: #2c3e50;
+$color-white: #ffffff;
+$color-accent: #4bcdeb;
+$bg-color: #f7f8fa;
+
+
+
+
+
+.freelancer-card-container {
+  // background-color: #f0f0f0; /* Light grey background for the container */
+  // margin: 0 2rem; /* Right and left margins for the container */
+  // padding: 2rem; /* Padding inside the container */
+}
+
+.heading {
+  font-size: 24px;
+  margin-bottom: 26px;
+  margin-left: 11rem; /* Left margin for the heading */
+  font-family: $font-poppins;
+  color:$color-dark;
+  
+}
+
+.filter-options {
+  display: flex;
+  gap: 100px; /* Increased gap between filter headings */
+  margin-bottom: 2rem; /* Bottom margin below filters */
+  justify-content: center;
+  font-family: $font-poppins;
+  color:$color-dark;
+  font-size: 19px;
+}
+
+.filter-item {
+  display: flex;
+  align-items: center;
+  gap: 10px; /* Space between label and icon */
+}
+
+.freelancer-card {
+  display: flex;
+   
+  background-color: #eeedf2;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
+  margin: 0 auto 2rem auto; /* Centering the cards on the page */
+  border-radius: 10px;
+  width: 70%; /* Reduced width for the card */
+}
+
+.freelancer-profile {
+  width: 15%; /* Keep the width the same */
+  display: flex;
+  align-items: center;
+  max-height: max-content;
+}
+
+.profile-pic {
+  height: 220px; /* Increased height */
+  width: 100%; /* Keep the width at 100% of the parent container */
+  border-radius: 10px;
+  object-fit: cover; /* Ensure the image covers the entire area without distortion */
+}
+
+.freelancer-details {
+  width: 70%; /* Adjust width to accommodate profile pic change */
+  padding-left: 15px;
+}
+
+.freelancer-header {
+  display: flex;
+  // align-items: center;
+}
+
+.small-box {
+  width: 80px; /* Increased size for the small profile pic box */
+  height: 55px;
+  border-radius: 5px;
+  overflow: hidden;
+  margin-right: 10px;
+  margin-top: 1rem;
+}
+
+.small-profile-pic {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.freelancer-name {
+  font-size: 18px;
+  font-weight: 500;
+
+
+  // font-weight: bold;
+  margin-right: 10px;
+  font-family: $font-poppins;
+  color:$color-accent;
+  margin-top: 1.5rem;
+}
+
+.freelancer-location {
+  font-size: 18px;
+  color: $color-dark;
+  margin-right: 15px;
+  font-weight: 600;
+  font-family: $font-poppins;
+  margin-top: 1.5rem;
+}
+
+.invite-btn {
+  background-color: $color-accent;
+  color: white;
+  padding: 0rem 2.5rem;  /* Smaller padding for a shorter button */
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  margin-left: auto;  /* Align the button to the far right */
+  font-family: $font-poppins;
+  display: flex;  /* Ensure proper alignment */
+  align-items: center;
+  line-height: 1;  /* Reduce line-height */
+  font-size: 1rem;  /* Reduce font size if needed */
+  margin-bottom: 1.5rem;
+  margin-top: 0.5rem;
+}
+
+
+.freelancer-role {
+  font-size: 14px;
+  margin-bottom: 10px;
+  font-family: $font-poppins;
+  font-size: 18px;
+  color: $color-dark;
+  font-weight: 600;
+
+}
+
+.freelancer-meta {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 15px;
+  color:$text-color;
+  font-family: $font-poppins;
+}
+
+.freelancer-rate,
+.freelancer-success,
+.freelancer-earnings {
+  font-size: 14px;
+  font-family: $font-poppins;
+  color:$text-color;
+}
+
+.freelancer-skills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 15px;
+  font-family: $font-poppins;
+  color:$text-color;
+}
+
+.skill-badge {
+  background-color: #e0e0e0;
+  padding: 5px 10px;
+  border: 1px solid #ccc; /* Added border around skill badges */
+  border-radius: 50px;
+  font-size: 12px;
+  font-family: $font-poppins;
+  color:$text-color;
+
+}
+
+.freelancer-description {
+  font-size: 14px;
+  margin-bottom: 15px;
+  color: #555;
+  font-family: $font-poppins;
+  color:$text-color;
+}

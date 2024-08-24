@@ -1,0 +1,170 @@
+$primary-color: #3b82f6;
+$secondary-color: #6b7280;
+$gray-color: #f7fafc;
+$text-color: #4a5568;
+$border-color: #e2e8f0;
+$hover-darken: 10%;
+$font-kodchasan: 'Kodchasan', sans-serif;
+$font-poppins: 'Poppins', sans-serif;
+$color-gray: #64748b;
+$color-dark: #2c3e50;
+$color-white: #ffffff;
+$color-accent: #4bcdeb;
+$bg-color: #f7f8fa;
+
+.job-details-container {
+  margin: 2rem;
+
+  .job-details-heading {
+    margin-left: 10rem;
+    font-size: 1.9rem;
+    font-family: $font-poppins;
+  }
+
+  .job-card {
+    background-color: #f5f5f5;
+    padding: 2rem;
+    border: 2px solid #ddd;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    margin: 2rem 9rem;
+    border-radius: 10px;
+
+    .job-header {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 1rem;
+
+      .job-title {
+        font-size: 1.25rem;
+        margin: 0;
+        font-family: $font-poppins;
+      }
+
+      .job-location {
+        margin: 0.25rem 0;
+        color: $color-dark; // Change this color as needed
+        font-family: $font-poppins;
+        font-weight: 550;
+      }
+
+      .job-posted-time {
+        margin: 0.25rem 0;
+        
+        font-family: $font-poppins;
+        .posted-text {
+            color: $color-dark;
+            font-weight: 500; // Set the color for "Posted"
+          }
+        
+          .time-text {
+            color: #777; // Set the color for "55 minutes ago"
+          }
+      }
+    }
+
+    .apply-now-btn {
+      background-color: $color-accent;
+      color: white;
+      padding: 0.5rem 1rem;
+      border: none;
+      border-radius: 9px;
+      cursor: pointer;
+      align-self: flex-start;
+    }
+
+        .divider {
+            margin: 0.5rem 0; // Adjust the margin to reduce the gap
+          }
+      
+    
+
+          .job-info {
+            display: flex;
+            // justify-content: space-between;
+            margin-bottom: 1rem;
+            font-family: $font-poppins;
+            gap:2rem;
+          
+            .job-info-item {
+              display: flex;
+              gap: 0.3rem; /* Add some gap between the label and value text */
+            }
+          
+            .label {
+              color:$color-dark; /* Black color for "Hourly", "Estimated Time", "Level" */
+              font-weight: 550; /* Optional: Make it bold for emphasis */
+            }
+          
+            .value {
+              color:$text-color;  /* Change this to your desired color */
+            }
+          }
+
+    .section-title {
+      margin: 1rem 0 0.5rem;
+      font-size: 1.25rem;
+      font-family: $font-poppins;
+    }
+
+    .job-description {
+      margin-bottom: 1rem;
+      font-family: $font-poppins;
+      color: #777;
+    }
+
+    .attachments {
+      .attachment-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 0.5rem;
+        background-color: #e0e0e0;
+        padding: 0.5rem;
+        border-radius: 10px;
+        width: 45%; // Adjust width here for responsiveness
+
+        .attachment-file {
+          display: flex;
+          align-items: center;
+
+          .file-icon {
+            margin-right: 0.5rem;
+          }
+
+          .file-name {
+            color: #333;
+            font-family: $font-poppins;
+          }
+        }
+
+        .view-btn {
+          background-color: $color-accent;
+          color: white;
+          padding: 0.25rem 0.75rem;
+          border: none;
+          border-radius: 8px;
+          display: flex;
+          align-items: center;
+
+          svg {
+            margin-right: 0.25rem;
+          }
+        }
+      }
+    }
+
+    .skills {
+      display: flex;
+      flex-wrap: wrap;
+
+      .skill {
+        background-color: #e0e0e0;
+        border: 1px solid $border-color;
+        border-radius: 20px;
+        padding: 0.25rem 0.75rem;
+        margin: 0.25rem;
+        font-size: 0.875rem;
+      }
+    }
+  }
+}

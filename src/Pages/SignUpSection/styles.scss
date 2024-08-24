@@ -1,0 +1,166 @@
+// signUpSection.scss
+
+// Variables
+$primary-color: #4BCBEB;
+$secondary-color: #2C3E50;
+$text-color: #6d7b8e;
+$font-primary: 'Poppins', sans-serif;
+$font-secondary: 'Kodchasan', sans-serif;
+$border-radius: 0.5rem;
+$box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+
+// Mixins
+@mixin flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@mixin transition($property, $duration: 0.3s, $ease: ease) {
+  transition: $property $duration $ease;
+}
+
+@mixin font($family, $size, $weight: 400, $line-height: 1.5, $spacing: 0) {
+  font-family: $family;
+  font-size: $size;
+  font-weight: $weight;
+  line-height: $line-height;
+  letter-spacing: $spacing;
+}
+
+// Styles
+.sign-up-section {
+  .main-container {
+    max-width: 1024px;
+    margin: 0 auto;
+    margin-top: 65px;
+    padding: 1rem 2.5rem;
+    background-color: #fff;
+    box-shadow: $box-shadow;
+    border-radius: $border-radius;
+
+    .title {
+      text-align: center;
+      @include font($font-secondary, 32px, 700, 41.6px, 0.2em);
+      margin-bottom: 1rem;
+      background: linear-gradient(168.57deg, #6d7cc9 33.49%, #50adca 64.06%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+
+    }
+
+    .join-section {
+      background-color: #fff;
+      padding: 1rem;
+      border-radius: $border-radius;
+      margin-bottom: 2.5rem;
+
+      .join-title {
+        @include font($font-primary, 20px, 500);
+        color: #0F172A;
+        text-align: center;
+        margin-bottom: 1rem;
+
+        @media (min-width: 768px) {
+          font-size: 28px;
+        }
+      }
+
+      .options-container {
+        display: flex;
+        flex-direction: column;
+        gap: 2rem;
+        margin-left: 10rem;
+
+        @media (min-width: 768px) {
+          flex-direction: row;
+        }
+
+        .option {
+          background-color: #fff;
+          box-shadow: $box-shadow;
+          border-radius: $border-radius;
+          padding: 1.5rem;
+          position: relative;
+          transition: box-shadow 0.3s ease;
+          width: 35%;
+
+          &.selected {
+            box-shadow: 0 0 0 2px $primary-color;
+          }
+
+          .radio-input {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+          }
+
+          .option-content {
+            display: flex;
+            align-items: center;
+
+            .frame-icon {
+              margin-right: 0.5rem;
+
+              @media (min-width: 768px) {
+                margin-right: 1rem;
+              }
+            }
+
+            .option-label {
+              @include font($font-primary, 0.75rem, 500);
+
+              @media (min-width: 768px) {
+                font-size: 1rem;
+              }
+            }
+          }
+
+          .option-description {
+            @include font($font-primary, 0.875rem, 400);
+            color: $text-color;
+            margin-top: 0.5rem;
+          }
+        }
+      }
+    }
+
+    .account-section {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+
+      .create-account-button {
+        background-color: $primary-color;
+        color: #fff;
+        padding: 0.5rem 1.5rem;
+        border-radius: $border-radius;
+        cursor: pointer;
+        text-align: center;
+        width: 100%;
+        max-width: 12rem;
+        @include transition(background-color);
+
+        &:hover {
+          background-color: darken($primary-color, 10%);
+        }
+      }
+
+      .login-text {
+        margin-top: 0.5rem;
+        @include font($font-primary, 0.875rem, 400);
+        color: #64748b;
+        text-align: center;
+
+        .login-link {
+          color: $secondary-color;
+          font-weight: 700;
+          text-decoration: none;
+          &:hover {
+            text-decoration: underline;
+          }
+        }
+      }
+    }
+  }
+}

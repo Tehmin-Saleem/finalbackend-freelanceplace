@@ -1,0 +1,249 @@
+$primary-color: #3b82f6;
+$secondary-color: #6b7280;
+$gray-color: #f7fafc;
+$text-color: #4a5568;
+$border-color: #e2e8f0;
+$hover-darken: 10%;
+$font-kodchasan: 'Kodchasan', sans-serif;
+$font-poppins: 'Poppins', sans-serif;
+$color-gray: #64748b;
+$color-dark: #2c3e50;
+$color-white: #ffffff;
+$color-accent: #4bcdeb;
+$bg-color: #f7f8fa;
+.budget-page {
+    .progress-container {
+      margin-bottom: 20px;
+      padding: 0 120px;
+    }
+  
+    .container {
+      display: flex;
+      justify-content: space-between;
+      padding: 0 100px;
+
+      margin: 0 70px;
+    //   border: 1px solid #e6e6e6;
+      border-radius: 8px;
+    //   background-color: #f9f9f9;
+  
+      .left-section {
+        flex: 1;
+        padding-right: 20px;
+  
+        h3 {
+          font-size: 1rem;
+          color: #6c757d;
+          margin-bottom: 10px;
+         
+          font-size: 1.2rem;
+      font-weight: 500;
+      
+      margin-left: 1rem;
+font-family: $font-poppins;
+      
+color: #718096;
+        }
+  
+        h2 {
+         
+        
+          margin-bottom: 10px;
+          font-size: 1.7rem;
+          font-weight: 600;
+          margin-left: 1rem;
+          font-family: $font-kodchasan;
+          color: $color-dark;
+        }
+  
+        p {
+          font-size: 1rem;
+          margin-bottom: 8rem;
+          margin-left: 1rem;
+       
+          font-family:$font-poppins;
+          color: #718096;
+        }
+  
+        .back-button {
+          padding: 5px 8px;
+          border: 1px solid $color-accent; // Use your accent color
+          background-color: transparent;
+          color: $color-accent;
+          border-radius: 10px;
+          cursor: pointer;
+          width: 100px;
+          margin-top: 3rem;
+        }
+      }
+  
+      .right-section {
+        flex: 1;
+        padding-left: 20px;
+        margin-right: 4rem;
+  
+        .pricing-options {
+          display: flex;
+          justify-content: space-between;
+          margin-bottom: 20px;
+  
+          .option-box {
+            width: 45%;
+            padding: 50px;
+            height:200%;
+            border: 1px solid #e6e6e6;
+            border-radius: 8px;
+            background-color: #fff;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            position: relative;
+            cursor: pointer;
+  
+            .box-content {
+              display: flex;
+              justify-content: center;
+            //   align-items: center;
+            // svg {
+            //     margin-right: 1rem; // Adjust this value to increase or decrease space
+            //   }
+  
+              span {
+                font-size: 1rem;
+                font-weight: 600;
+                 top: 10px; // Adjust as needed for spacing from the top
+    left: 40px;
+    position: absolute;
+              }
+             
+  
+              p {
+                font-weight: 600;
+                font-size: 0.875rem;
+                color:$color-dark;
+                margin-right: 4rem;
+                margin-top: 1rem;
+                font-family: $font-poppins;
+              }
+  
+              .radio-btn {
+                position: absolute;
+                top: 10px;
+                right: 10px;
+                cursor: pointer;
+                
+              }
+            }
+          }
+        }
+  
+        .rate-inputs {
+            margin-bottom: 20px;
+          
+            .labels {
+              display: flex;
+              justify-content: space-between;
+              margin-bottom: 10px;
+          
+              label {
+                font-size: 1rem;
+                color: #6c757d;
+              }
+          
+              .to-label {
+                margin-right: 16rem; // Adjust as needed for spacing between labels
+              }
+            }
+          
+            .input-group {
+              display: flex;
+              justify-content: space-between;
+          
+              .input-wrapper {
+                position: relative;
+                flex: 1;
+                margin-right: 20px;
+          
+                &:last-child {
+                  margin-right: 0;
+                }
+          
+                input {
+                  width: 100%;
+                  padding: 10px;
+                  padding-right: 40px; // Extra space for "/hr"
+                  border: 1px solid #ccc;
+                  border-radius: 5px;
+                  font-size: 1rem;
+                }
+          
+                .rate-unit {
+                  position: absolute;
+                  top: 50%;
+                  right: 10px;
+                  transform: translateY(-50%);
+                  font-size: 1rem;
+                  color: #6c757d;
+                }
+              }
+            }
+          }
+          
+  
+        .average-rate-text {
+          font-size: 0.875rem;
+          color: #6c757d;
+          margin-bottom: 20px;
+          font-family: $font-poppins;
+        }
+  
+        .next-button {
+          // padding: 10px 20px;
+       
+          
+        
+           padding: 0.7rem 1rem;
+          background-color: $color-accent;
+          color: #fff;
+          border: none;
+          border-radius: 5px;
+          cursor: pointer;
+          width: 200px;
+          margin-left: 16rem;
+
+        }
+      }
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .container {
+      flex-direction: column;
+  
+      .right-section {
+        padding-left: 0;
+        margin-top: 20px;
+      }
+  
+      .pricing-options {
+        flex-direction: column;
+  
+        .option-box {
+          width: 100%;
+          margin-bottom: 20px;
+        }
+      }
+  
+      .rate-inputs {
+        flex-direction: column;
+  
+        .input-group {
+          margin-left: 0;
+          margin-top: 10px;
+        }
+      }
+  
+      .next-button {
+        width: 100%;
+      }
+    }
+  }
+  

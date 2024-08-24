@@ -1,0 +1,151 @@
+// Variables
+$primary-color: #3b82f6;
+$secondary-color: #6b7280;
+$gray-color: #f7fafc;
+$text-color: #4a5568;
+$border-color: #e2e8f0;
+$hover-darken: 10%;
+$font-kodchasan: 'Kodchasan', sans-serif;
+$font-poppins: 'Poppins', sans-serif;
+$color-gray: #64748b;
+$color-dark: #2c3e50;
+$color-white: #ffffff;
+$color-accent: #4bcdeb;
+$bg-color: #f7f8fa;
+
+// Mixins
+@mixin flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.description-page {
+  .container {
+    margin: 0 auto;
+    padding-left: 1rem;
+    padding-right: 1rem;
+    max-width: 80%;
+
+    .step-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      margin-left: 4rem;
+      margin-top: 2rem;
+      color: #718096;
+    }
+
+    .content {
+      display: grid;
+      gap: 12rem;
+      margin-bottom: 2rem;
+
+      @media (min-width: 768px) {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .content-left {
+        .title {
+          font-size: 1.125rem;
+          font-weight: 600;
+          margin-left: 4rem;
+          font-family: $font-kodchasan;
+          color: $color-dark;
+          margin-bottom: 1rem;
+        }
+
+        .description {
+          color: #718096;
+          margin-top: 0.5rem;
+          margin-left: 4rem;
+          font-family: $font-poppins;
+        }
+      }
+
+      .content-right {
+        display: flex;
+        flex-direction: column;
+        font-family: $font-poppins;
+
+        .label {
+          color: $color-dark;
+          font-family: $font-poppins;
+          margin-bottom: 0.5rem;
+          font-weight: 500;
+        }
+
+        .description-box {
+          margin-top: 0.5rem;
+          padding: 0.5rem;
+          border: 1px solid $border-color;
+          border-radius: 0.25rem;
+          width: 80%;
+          max-width: 400px;
+          min-height: 150px;
+        }
+
+        .examples {
+          margin-top: 0.5rem;
+          color: #718096;
+
+          strong {
+            font-weight: 600;
+          }
+
+          .list {
+            list-style-type: disc;
+            padding-left: 1.25rem;
+            margin-top: 0.25rem;
+          }
+        }
+      }
+    }
+
+    .actions {
+      margin-top: 0.5rem;
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 2rem;
+      
+
+      .btn {
+        padding: 0.7rem 1.3rem;
+        border-radius: 0.9rem;
+        color: #4bcbeb;
+        border: 1px solid #4bcbeb;
+        background-color: #ffffff;
+        margin-left: 3rem;
+
+        &.back-btn {
+          
+           // Use your accent color
+          
+          
+       
+          
+          &:hover {
+            background-color: #fff;
+
+          }
+        }
+
+        &.next-btn {
+          background-color: #4bcbeb;
+          color: #fff;
+          margin-left: 20rem;
+          padding: 0.75rem 1.5rem;
+          background-color: $color-accent;
+          color: #fff;
+          border: none;
+          border-radius: 5px;
+          cursor: pointer;
+
+          &:hover {
+            background-color: darken(#4bcbeb, $hover-darken);
+          }
+        }
+      }
+    }
+  }
+}
