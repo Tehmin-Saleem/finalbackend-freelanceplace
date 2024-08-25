@@ -1,0 +1,34 @@
+// errorPage.scss
+
+// Variables
+$color-background: #f7f8fa;
+$max-width-sm: 24rem;
+
+// Mixins
+@mixin flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@mixin flex-col {
+  display: flex;
+  flex-direction: column;
+}
+
+// Styles
+.error-page {
+  min-height: 100vh;
+  @include flex-col;
+
+  .error-content {
+    flex-grow: 1;
+    @include flex-center;
+
+    .error-image {
+      max-width: $max-width-sm;
+      max-height: 100%;
+      align-items:center ;
+    }
+  }
+}

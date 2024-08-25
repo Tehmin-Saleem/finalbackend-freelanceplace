@@ -1,0 +1,14 @@
+.image-container {
+    overflow: hidden; /* This hides the overflow of the zoomed image */
+    width: 100%; /* Adjust based on your needs */
+    height: auto; /* Adjust based on your needs */
+    /* Optional: Add max-width to contain the image */
+    max-width: 100%;
+  }
+  
+  .zoomed-image {
+    transform: scale(1.5); /* Adjust the scale factor to zoom in */
+    width: 100%; /* Ensure the image fits within the container */
+    height: auto; /* Maintain aspect ratio */
+  }
+  

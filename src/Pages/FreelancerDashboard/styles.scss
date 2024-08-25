@@ -1,0 +1,146 @@
+// dashboardPage.scss
+
+// Variables
+$font-kodchasan: 'Kodchasan', sans-serif;
+$font-poppins: 'Poppins', sans-serif;
+$color-gray: #64748b;
+$color-dark: #2c3e50;
+$color-white: #ffffff;
+$color-accent: #4bcdeb;
+$bg-color: #f7f8fa;
+
+// Mixins
+@mixin flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@mixin flex-col {
+  display: flex;
+  flex-direction: column;
+}
+
+@mixin text-lg {
+  font-size: 18px;
+}
+
+@mixin text-xl {
+  font-size: 20px;
+}
+
+@mixin text-2xl {
+  font-size: 24px;
+}
+
+@mixin text-5xl {
+  font-size: 48px;
+}
+
+@mixin transition {
+  transition: all 0.3s ease;
+}
+
+// Styles
+.dashboard-page {
+  min-height: 100px;
+  background-color: $bg-color;
+  @include flex-col;
+  
+
+  .main-content {
+    padding-top: 1rem;
+    padding-left: 2rem;
+    padding-bottom: 2rem;
+    // flex-grow: 1;
+    @include flex-col;
+    @media (min-width: 768px) {
+      @include flex-center;
+      flex-direction: row;
+    }
+
+    .left-section {
+      width: 100%;
+      padding: 2rem;
+      position: relative;
+      @media (min-width: 768px) {
+        width: 50%;
+        padding: 4rem;
+      }
+
+      .left-content {
+        position: absolute;
+        inset: 0;
+        z-index: 10;
+        @include flex-col;
+        align-items: flex-start;
+        justify-content: flex-start;
+
+        .welcome-text {
+          @include text-2xl;
+          font-family: $font-kodchasan;
+          margin-bottom: 1rem;
+          margin-top: 2rem;
+          margin-left: 4rem;
+          color: $color-dark;
+          @media (min-width: 768px) {
+            @include text-5xl;
+          }
+        }
+
+        .description-text {
+          margin-bottom: 1.5rem;
+          @include text-lg;
+          color: $color-gray;
+          margin-top: 0.5rem;
+          margin-left: 4rem;
+          @media (min-width: 768px) {
+            @include text-xl;
+          }
+        }
+
+        .start-button {
+          background-color: $color-accent;
+          color: $color-white;
+          padding: 0.5rem 2rem;
+          border-radius: 0.5rem;
+          margin-left: 6rem;
+          margin-top: 0.5rem;
+          cursor: pointer;
+         margin-bottom: 5rem;
+          &:hover {
+            background-color: darken($color-accent, 10%);
+          }
+          @include transition;
+        }
+      }
+
+      .background-lining {
+        @media (min-width: 768px) {
+          width: auto;
+          height: auto;
+        }
+      }
+    }
+
+    .right-section {
+      display: none;
+      width: 100%;
+      padding: 1rem;
+      @media (min-width: 768px) {
+        display: flex;
+        width: 50%;
+        @include flex-center;
+      }
+
+      .illustration {
+        width: 120%;
+        
+        max-width: 50%;
+        height: 100%;
+        margin-left: 7rem;
+        margin-top: 4rem;
+      }
+    }
+  }
+}
