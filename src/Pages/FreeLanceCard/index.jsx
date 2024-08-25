@@ -1,8 +1,7 @@
 import React from 'react';
-
 // Import your components and assets here
-import Header from "../../components/Common/Header";
-import JobDropdwon from '../../svg components/JobDropdwon';
+import {Header} from "../../components/index";
+import {JobsDropdwon} from '../../svg/index';
 import "./styles.scss";
 
 const FreelancerCard = ({ heading, freelancers }) => {
@@ -15,23 +14,23 @@ const FreelancerCard = ({ heading, freelancers }) => {
       <div className="filter-options">
         <div className="filter-item">
           <span className="filter-label">Skills</span>
-          <JobDropdwon alt="Dropdown Icon" className="dropdown-icon" />
+          <JobsDropdwon alt="Dropdown Icon" className="dropdown-icon" />
         </div>
         <div className="filter-item">
           <span className="filter-label">Categories</span>
-          <JobDropdwon alt="Dropdown Icon" className="dropdown-icon" />
+          <JobsDropdwon alt="Dropdown Icon" className="dropdown-icon" />
         </div>
         <div className="filter-item">
           <span className="filter-label">Availability</span>
-          <JobDropdwon alt="Dropdown Icon" className="dropdown-icon" />
+          <JobsDropdwon alt="Dropdown Icon" className="dropdown-icon" />
         </div>
         <div className="filter-item">
           <span className="filter-label">Location</span>
-          <JobDropdwon alt="Dropdown Icon" className="dropdown-icon" />
+          <JobsDropdwon alt="Dropdown Icon" className="dropdown-icon" />
         </div>
         <div className="filter-item">
           <span className="filter-label">Ratings</span>
-          <JobDropdwon alt="Dropdown Icon" className="dropdown-icon" />
+          <JobsDropdwon alt="Dropdown Icon" className="dropdown-icon" />
         </div>
       </div>
 

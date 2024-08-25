@@ -1,6 +1,6 @@
 import React from "react";
 import "./styles.scss";
-import Header from "../../components/Common/Header";
+import {Header} from "../../components/index";
 import { useNavigate } from 'react-router-dom';
 import { useState, useEffect } from "react";
 import axios from 'axios';

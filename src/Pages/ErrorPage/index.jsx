@@ -1,5 +1,5 @@
 import React from "react";
-import Header from "../../components/Common/Header"; // Adjust the import path as necessary
+import {Header} from "../../components/index"; // Adjust the import path as necessary
 import errorImage from "/images/Errorimage.png"; // Adjust the import path as necessary
 import "./styles.scss";
 

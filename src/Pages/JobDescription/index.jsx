@@ -1,6 +1,5 @@
 import React from 'react';
-import Header from '../../components/Common/Header';
-import ProgressBar from "../../components/Common/ProgressBar.jsx" // Assuming this is the extracted component
+import {ProgressBar, Header} from "../../components/index"; // Assuming this is the extracted component
 import "./styles.scss";
 import { useNavigate } from 'react-router-dom'; // Import useNavigate
 

@@ -1,26 +1,9 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import "./App.css";
-import { ProfileView, Proposal, JobsPage, SignIn, Signup , FreelancersDoneJobsPage} from "./Pages/index";
+import { ProfileView, Proposal, JobsPage, SignIn, Signup,ClientDashboard , FreelancersDoneJobsPage ,ErrorPage , SignUpSection, OfferForm, PostJob, JobDetails, MyProfile , DescriptionPage, SkillManagement, Budget, ProjectDuration, Attachment , FreeLancerCard, ApplyJob , FreelanceDashboardPage} from "./Pages/index";
 // import SendOffer from "./components/FormProposal/OfferForm";
-import FreelancerCards from "./components/FreelancerCards";
-import Header from "./components/Common/Header";
-import DashboardPage from "./Pages/ClientDashboard";
-import ErrorPage from "./Pages/ErrorPage";
-import SignUpSection from "./Pages/SignUpSection";
-import OfferForm from "./Pages/FormProposal";
-import PostJob from "./Pages/PostAJob";
-import JobDetails from "./Pages/JobDetails";
-import MyProfile from "./Pages/Profile";
-import DescriptionPage from "./Pages/JobDescription";
-import SkillSelection from "./Pages/SkilSection";
-import SkillManagement from "./Pages/SkilSection";
-import Budget from "./Pages/Budget";
-import ProjectDuration from "./Pages/ProjectDuration";
-import Attachment from "./Pages/Attachment";
-import FreelancerCard from "./Pages/FreeLanceCard";
-import ApplyJob from "./Pages/ApplyNow";
-import FreelanceDashboardPage from "./Pages/FreelancerDashboard";
+import {Header, FreelancerCards} from "./components/index";
 // import OfferForm from "./components/FormProposal/OfferForm";
 
 
@@ -94,9 +77,9 @@ function App() {
         <Route path="/offerform" element={<OfferForm/>} />
         <Route path="/FreelanceDashBoard" element={<FreelanceDashboardPage/>} />
         <Route path="/ApplyJob" element={<ApplyJob/>} />
-        <Route path="/FreelanceCard" element={ <FreelancerCard heading="UI/UX Designer" freelancers={freelancers} />} />
+        <Route path="/FreelanceCard" element={ <FreeLancerCard heading="UI/UX Designer" freelancers={freelancers} />} />
         <Route path="/signup" element={<SignUpSection/>} />
-        <Route path="/ClientDashboard" element={<DashboardPage/>} />
+        <Route path="/ClientDashboard" element={<ClientDashboard/>} />
         <Route path="/JobPosting" element={<PostJob/>} /> 
         <Route path="/JobDescription" element={<DescriptionPage/>} />
         <Route path="/PreferredSkills" element={<SkillManagement/>} /> 

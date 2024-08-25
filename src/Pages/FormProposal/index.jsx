@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import Header from "../../components/Common/Header"; // Import the Header component
+import {Header} from "../../components/index"; // Import the Header component
 import "./styles.scss"; // Correctly import the SCSS file
 import {
   SearchIcon,
@@ -7,7 +7,7 @@ import {
   PlusIcon,
   HourlyRate,
   FixedRate,
-} from "../../svg components/index";
+} from "../../svg/index";
 
 const OfferForm = () => {
   const [selectedSkills, setSelectedSkills] = useState([]);

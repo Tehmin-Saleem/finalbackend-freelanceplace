@@ -1,6 +1,7 @@
 import React from "react";
-import Card from "../../components/FreelancerCards";
-import JobDropdwon from "../../svg components/index";
+// there can be a masla here
+import {FreelancerCards} from "../../components/index";
+import {JobsDropdwon} from "../../svg/index";
 import "./style.scss";
 
 const FreelancerCards = ()=>{
@@ -11,23 +12,23 @@ const FreelancerCards = ()=>{
       <div className="header">
         <h3 className="headerItem">
           Skills
-          <JobDropdwon />
+          <JobsDropdwon />
         </h3>
         <h3 className="headerItem">
           Categories
-          <JobDropdwon />
+          <JobsDropdwon />
         </h3>
         <h3 className="headerItem">
           Availability
-          <JobDropdwon />
+          <JobsDropdwon />
         </h3>
         <h3 className="headerItem">
           Location
-          <JobDropdwon />
+          <JobsDropdwon />
         </h3>
         <h3 className="headerItem lastHeaderItem">
           Ratings
-          <JobDropdwon />
+          <JobsDropdwon />
         </h3>
       </div>
 

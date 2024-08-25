@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from "react";
 
 import {
-  JobDropdown,
+  JobsDropdwon,
   IconSearchBar,
   Notification,
   GreaterThan,
   ProfileIcon,
   Logo,
-} from "../../../svg components/index";
+} from "../../../svg/index";
 import "./styles.scss";
 
 const Header = () => {
@@ -48,7 +48,7 @@ const Header = () => {
         <div className="dropdown-container">
           <h2 className="find-work">Find Work</h2>
           <div onClick={toggleDropdown} className="dropdown-toggle">
-            <JobDropdown />
+            <JobsDropdwon />
           </div>
           {dropdownOpen && (
             <div className="dropdown-menu">

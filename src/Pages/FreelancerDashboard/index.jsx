@@ -1,7 +1,6 @@
 import React from "react";
-import Header from "../../components/Common/Header"; // Adjust the import path as needed
-import ZoomedImage from "../../components/Zoomed/zoom"; // Adjust the image path as needed
-import { BackgroundLining } from "../../svg components/index";
+import {Header, ZoomedImage} from "../../components/index"; // Adjust the import path as needed
+import { BackgroundLining } from "../../svg/index";
 import "./styles.scss";
 import { useNavigate } from 'react-router-dom'; // Import useNavigate
 

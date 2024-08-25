@@ -1,6 +1,7 @@
 import React from "react";
 // import PropTypes from "prop-types";
-import "../TextArea/TextArea.scss"; // Import the Sass file
+import "./style.scss"; // Import the Sass file
+
 const TextArea = ({
   label,
   icon,

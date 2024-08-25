@@ -1,7 +1,7 @@
 import React from "react";
 import PropTypes from "prop-types";
 import "./style.scss";
-import { SuccessSvg } from "../../svg components/index";
+import { SuccessSvg } from "../../svg/index";
 
 const Card = ({ freelancer }) => {
   console.log('Freelancer Data:', freelancer); // Add this line to debug

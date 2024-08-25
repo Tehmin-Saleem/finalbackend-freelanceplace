@@ -1,7 +1,5 @@
 import React, { useState } from "react";
-import { ClientFrame, FreelancerFrame } from "../../svg components/index";
-// import FreelancerFrame from "../svg components/FreelancerFrame";
-// import ProjectName from "../svg components/ProjectName";
+import { ClientFrame, FreelancerFrame } from "../../svg/index";
 import "./styles.scss";
 import { useNavigate } from 'react-router-dom'; // Import useNavigate
 

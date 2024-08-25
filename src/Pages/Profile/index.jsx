@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import './styles.scss';
-import { CrossIcon, IconSearchBar, UploadIcon, PlusIcon, DollarIcon } from '../../svg components/index.js';
-import Header from "../../components/Common/Header"; // Ensure this path is correct
+import { CrossIcon, IconSearchBar, UploadIcon, PlusIcon, DollarIcon } from '../../svg/index';
+import {Header} from "../../components/index"; // Ensure this path is correct
 
 const MyProfile = () => {
   const [skills, setSkills] = useState([]);

@@ -1,8 +1,8 @@
 import React from "react";
 import "./style.scss";
-import Header from "../../components/Common/Header";
+import {Header} from "../../components/index";
 import { useState } from "react";
-import GreaterThan from "../../svg components/GreaterThan";
+import {GreaterThan} from "../../svg/index";
 import { useNavigate } from 'react-router-dom'; // Import useNavigate
 
 

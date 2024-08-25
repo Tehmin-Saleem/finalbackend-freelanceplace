@@ -2,10 +2,8 @@ import React, { useState } from "react";
 import "./styles.scss"; // Import your SCSS file here
 
 // Dummy components
-import Header from "../../components/Common/Header";
-import ProgressBar from "../../components/Common/ProgressBar.jsx"; // Import your ProgressBar component
-import CrossIcon from "../../svg components/CrossIcon.jsx";
-import PlusIcon from "../../svg components/PlusIcon.jsx";
+import {ProgressBar, Header} from "../../components/index"; // Import your ProgressBar component
+import {CrossIcon, PlusIcon} from "../../svg/index.js";
 import { useNavigate } from 'react-router-dom'; // Import useNavigate
 
 

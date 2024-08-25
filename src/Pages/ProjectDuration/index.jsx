@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import Header from "../../components/Common/Header";
-import ProgressBar from "../../components/Common/ProgressBar.jsx";
+import {ProgressBar, Header} from "../../components/index";;
 import "./styles.scss";
 import { useNavigate } from 'react-router-dom'; // Import useNavigate
 

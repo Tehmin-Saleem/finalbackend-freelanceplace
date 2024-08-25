@@ -1,10 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import Header from "../../components/Common/Header";
-import ProgressBar from "../../components/Common/ProgressBar.jsx";
+import {ProgressBar , Header} from "../../components/index";
 import './styles.scss';
-import ClientFrame from '../../svg components/ClientFrame.jsx';
-import HourlyRate from '../../svg components/HourlyRate.jsx';
-import FixedRate from '../../svg components/FixedRate.jsx';
+import {ClientFrame, HourlyRate, FixedRate} from '../../svg/index.js';
 import { useNavigate } from 'react-router-dom';
 
 const Budget = () => {
