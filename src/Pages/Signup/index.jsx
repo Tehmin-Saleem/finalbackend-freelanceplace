@@ -2,8 +2,8 @@ import { useState } from "react";
 import React from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom"; // Import useNavigate
-import CHARACTER from "/images/CHARACTER.png";
-import Group from "/images/Group.png";
+import CHARACTER from "../../images/CHARACTER.png";
+import Group from "../../images/Group.png";
 
 import { CommonButton, TextField } from "../../components/index";
 import {

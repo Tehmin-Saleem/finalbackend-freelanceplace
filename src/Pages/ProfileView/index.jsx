@@ -1,9 +1,9 @@
 import React, { useState } from "react";
-import Profile from "/images/Profile.png";
+import Profile from "../../images/Profile.png";
 import "./styles.scss"; // Import the Sass file
-import Port1 from "/images/Port1.png";
-import Port2 from "/images/Port2.png";
-import Port3 from "/images/Port3.png";
+import Port1 from "../../images/Port1.png";
+import Port2 from "../../images/Port2.png";
+import Port3 from "../../images/Port3.png";
 
 import {
   Carousel,

@@ -1,8 +1,8 @@
 import { useState } from "react";
 import React from "react";
 import { useNavigate } from "react-router-dom"; // Import useNavigate for navigation
-import CHARACTER from "/images/CHARACTER.png";
-import Group from "/images/Group.png";
+import CHARACTER from "../../images/CHARACTER.png";
+import Group from "../../images/Group.png";
 
 import { CommonButton, TextField } from "../../components/index";
 import { Mail, Password, PassEye, Google, Apple ,LogoName} from "../../svg/index";

@@ -1,5 +1,5 @@
 import React from 'react';
-import DashboardImage from '../../../public/images/Dashboard.png';
+import DashboardImage from '../../images/Dashboard.png';
 import "./styles.scss";
 const ZoomedImage = () => {
   return (

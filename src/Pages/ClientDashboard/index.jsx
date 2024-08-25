@@ -1,6 +1,6 @@
 import React from "react";
 import {Header} from "../../components/index"; // Adjust the import path as needed
-import Illustration from "/images/Illustration.png"; // Adjust the image path as needed
+import Illustration from "../../images/Illustration.png"; // Adjust the image path as needed
 import { BackgroundLining } from "../../svg/index";
 import "./styles.scss";
 import { useNavigate } from 'react-router-dom'; // Import useNavigate
