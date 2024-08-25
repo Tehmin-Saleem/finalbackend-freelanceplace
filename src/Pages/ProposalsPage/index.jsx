@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { NewHeader, Proposalscard, Head } from "../../components/index";
+import { NewHeader, Proposalscard } from "../../components/index";
 
 import "./styles.scss"; // Import the SCSS file
 

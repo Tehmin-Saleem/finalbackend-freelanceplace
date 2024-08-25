@@ -1,0 +1,89 @@
+$primary-color: #3b82f6;
+$secondary-color: #6b7280;
+$gray-color: #f7fafc;
+$text-color: #4a5568;
+$border-color: #e2e8f0;
+$color-accent: #4bcdeb;
+$completed-color: #4bcdeb;
+$active-color: #00aaff; // Color when active
+$font-kodchasan: 'Kodchasan', sans-serif;
+$font-poppins: 'Poppins', sans-serif;
+
+.progress-bar {
+  position: relative;
+  margin: 2.5rem 4rem;
+
+  &__title {
+    font-size: 1.5rem;
+    font-weight: 500;
+    margin-bottom: 2rem;
+    text-align: left;
+    font-family: $font-poppins;
+    
+  }
+
+  &__steps {
+    display: flex;
+    align-items: center;
+    position: relative;
+
+    .progress-bar__step {
+      display: flex;
+      flex-direction: column-reverse;
+      align-items: center;
+      position: relative;
+      z-index: 2;
+
+      .progress-bar__circle {
+        width: 2rem;
+        height: 2rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        color: #fff;
+        font-weight: 600;
+        font-size: 0.875rem;
+        background-color: $border-color;
+        position: relative;
+        z-index: 2;
+
+        &.completed {
+          background-color: $completed-color;
+        }
+
+        &.active {
+          background-color: $active-color;
+        }
+      }
+
+      .progress-bar__label {
+        margin-top: 0.5rem;
+        font-size: 0.875rem;
+        color: $text-color;
+        text-align: center;
+        margin-bottom: 1rem;
+        font-family: $font-poppins;
+
+        &.completed,
+        &.active {
+          color: $completed-color;
+        }
+      }
+    }
+
+    .progress-bar__line {
+      flex-grow: 1;
+      height: 0.35rem;
+      background-color: $border-color;
+      z-index: 1;
+    
+      margin: 0 -2.5rem;
+      margin-top: 2.5rem; // Adjust margin to ensure space around circles
+
+      &.completed {
+        background-color: $completed-color;
+      }
+    }
+  }
+}
