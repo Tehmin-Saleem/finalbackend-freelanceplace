@@ -2,9 +2,17 @@ import React, { useState } from "react";
 
 import Header from "../../components/Commoncomponents/Header";
 import "./styles.scss";
-import PlusIcon from "../../svg components/PlusIcon";
+// import PlusIcon from "../../svg/Sammar's-SVG-Components/PlusIcon";
 
 const SubmitProposal = () => {
+
+    const PlusIcon = () => (
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+  <circle cx="12" cy="12" r="10" fill="#00BFFF"/>
+  <line x1="12" y1="8" x2="12" y2="16" stroke="white" stroke-width="2"/>
+  <line x1="8" y1="12" x2="16" y2="12" stroke="white" stroke-width="2"/>
+</svg>
+    );
   const CalendarIcon = () => (
     <svg
       className="calendar-icon"
@@ -62,8 +70,10 @@ const SubmitProposal = () => {
   return (
     <>
       <Header />
+      
       <div className="submit-proposal">
         <h1>Submit a Proposal</h1>
+        <div className="outerContainer">
         <div className="horizontal-container">
           <div className="left-section">
             <div className="job-details">
@@ -81,7 +91,7 @@ const SubmitProposal = () => {
                   <strong>Level:</strong> Expert
                 </span>
               </div>
-              <h3>Project Overview</h3>
+              <h3 className="projectoverview">Project Overview</h3>
               <p>
                 I'm looking to create memorable and user-centric digital
                 experiences? Your search ends here! I am a highly skilled and
@@ -106,7 +116,7 @@ const SubmitProposal = () => {
           <div className="right-section">
             <div className="add-requirements">
               <h2>Add Requirements</h2>
-              <label>Select how do you want to be paid:</label>
+              <label className="Label">Select how do you want to be paid:</label>
               <div className="payment-options">
                 <div className="option">
                   <label htmlFor="milestone">By milestones</label>
@@ -117,74 +127,73 @@ const SubmitProposal = () => {
                   <input type="radio" id="project" name="payment" />
                 </div>
               </div>
-              <label>
-                How many milestones do you want to include?
-                <span className="add-milestone-span" onClick={addMilestone}>
-                  <PlusIcon />
-                </span>
-              </label>
+              <label className="Label">
+    How many milestones do you want to include?
+    <span className="add-milestone-span" onClick={addMilestone}>
+         Add milestones <PlusIcon />
+    </span>
+</label>
+              
               {milestones.map((milestone, index) => (
-                <div key={index} className="milestone">
-                  <div className="milestone-row">
-                    <label>{index + 1}. Milestone Description:</label>
-                    <input
-                      type="text"
-                      placeholder="Lorem ipsum"
-                      value={milestone.description}
-                      onChange={(e) =>
-                        handleMilestoneChange(
-                          index,
-                          "description",
-                          e.target.value
-                        )
-                      }
-                    />
-                    <label>Due date:</label>
-                    <div className="date-input">
-                      <input
-                        type="text"
-                        placeholder="12-May-2024"
-                        value={milestone.dueDate}
-                        onChange={(e) =>
-                          handleMilestoneChange(
-                            index,
-                            "dueDate",
-                            e.target.value
-                          )
-                        }
-                      />
-                      <CalendarIcon />
-                    </div>
-                    <label>Amount:</label>
+  <div key={index} className="milestone">
+    <div className="milestone-row">
+      <div className="milestone-field">
+        <label>{index + 1}. Milestone Description:</label>
+        <input
+          type="text"
+          placeholder="Lorem ipsum"
+          value={milestone.description}
+          onChange={(e) =>
+            handleMilestoneChange(index, "description", e.target.value)
+          }
+        />
+      </div>
+      <div className="milestone-field">
+        <label>Due date:</label>
+        <div className="date-input">
+          <CalendarIcon className="calendar-icon" />
+          <input
+            type="text"
+            placeholder="12-May-2024"
+            value={milestone.dueDate}
+            onChange={(e) =>
+              handleMilestoneChange(index, "dueDate", e.target.value)
+            }
+          />
+        </div>
+      </div>
+      <div className="milestone-field">
+        <label>Amount:</label>
+        <input
+          type="text"
+          placeholder="$12,00 per milestone"
+          value={milestone.amount}
+          onChange={(e) =>
+            handleMilestoneChange(index, "amount", e.target.value)
+          }
+        />
+      </div>
+    </div>
+  </div>
+))}
 
-                    <input
-                      type="text"
-                      placeholder="$12,00 per milestone"
-                      value={milestone.amount}
-                      onChange={(e) =>
-                        handleMilestoneChange(index, "amount", e.target.value)
-                      }
-                    />
-                   
-                  </div>
-                </div>
-              ))}
-              <label>How long will this project take?</label>
+              
+              <label className="Label">How long will this project take?</label>
               <input
                 type="text"
                 placeholder="2 months"
                 className="project-duration"
               />
-              <label>Cover letter</label>
+              <label className="Label">Cover letter</label>
               <textarea placeholder="Lorem ipsum dolor sit amet consectetur..."></textarea>
-              <label>Attachment</label>
+              <label className="Label">Attachment</label>
               <div className="attachment-box">
                 <div className="attachment">
                   <FileIcon />
                   <span>Attach file</span>
                 </div>
               </div>
-              <label>Add portfolio link</label>
+              <label className="Label">Add portfolio link</label>
               <input
                 type="text"
                 placeholder="Lorem ipsum"
@@ -197,7 +206,10 @@ const SubmitProposal = () => {
             </div>
           </div>
         </div>
+
       </div>
+      </div>
+     
     </>
   );
 };
