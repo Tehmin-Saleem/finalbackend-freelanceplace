@@ -6,7 +6,7 @@ const chatSchema = new Schema({
     type: mongoose.Types.ObjectId,
     required: true,
     ref: "User",
-  }, // Reference to User model
+  }, 
   attachment: {
     type: String,
   },
@@ -18,7 +18,7 @@ const chatSchema = new Schema({
     type: mongoose.Types.ObjectId,
     required: true,
     ref: "User",
-  }, // Reference to User model
+  }, 
   send_by: {
     type: mongoose.Types.ObjectId,
     required: true,

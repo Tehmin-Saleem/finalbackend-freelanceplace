@@ -30,7 +30,7 @@ const ProposalSchema = new Schema({
   },
   client_id: {
     type: mongoose.Types.ObjectId,
-    required: true,
+    
     ref: "User",
   },
   cover_letter: {
@@ -38,7 +38,7 @@ const ProposalSchema = new Schema({
   },
   freelancer_id: {
     type: mongoose.Types.ObjectId,
-    required: true,
+    
     ref: "User",
   },
   job_id: {

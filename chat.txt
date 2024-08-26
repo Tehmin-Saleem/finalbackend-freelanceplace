@@ -1,0 +1,152 @@
+import React, { useState, useEffect } from 'react';
+import io from 'socket.io-client';
+
+const socket = io('http://localhost:5000');
+
+const Chat = ({ user }) => {
+  const [messages, setMessages] = useState([]);
+  const [message, setMessage] = useState('');
+
+  useEffect(() => {
+    // Listen for incoming messages
+    socket.on('receiveMessage', (newMessage) => {
+      setMessages((prevMessages) => [...prevMessages, newMessage]);
+    });
+
+    return () => {
+      socket.off('receiveMessage');
+    };
+  }, []);
+
+  const sendMessage = () => {
+    if (message.trim()) {
+      const newMessage = { sender: user, receiver: 'receiverId', message };
+      socket.emit('sendMessage', newMessage);
+      setMessage('');
+    }
+  };
+
+  return (
+    <div className="chat-container">
+      <div className="message-list">
+        {messages.map((msg, index) => (
+          <div key={index} className={`message-item ${msg.sender === user ? 'sent' : 'received'}`}>
+            <div className="message-header">
+              <span>{msg.sender}</span>
+              <span>{new Date(msg.timestamp).toLocaleTimeString()}</span>
+            </div>
+            <p>{msg.message}</p>
+          </div>
+        ))}
+      </div>
+      <div className="message-input">
+        <input
+          type="text"
+          value={message}
+          onChange={(e) => setMessage(e.target.value)}
+          placeholder="Write a message..."
+        />
+        <button onClick={sendMessage}>Send</button>
+      </div>
+    </div>
+  );
+};
+
+export default Chat;
+
+
+
+show all chat
+import React from 'react';
+
+const ChatSidebar = ({ chats, selectedChat, onSelectChat }) => {
+  return (
+    <div className="chat-sidebar">
+      {chats.map((chat, index) => (
+        <div 
+          key={index} 
+          className={`chat-item ${selectedChat === chat._id ? 'selected' : ''}`}
+          onClick={() => onSelectChat(chat._id)}
+        >
+          <div className="chat-item-header">
+            <span>{chat.sender_name}</span>
+            <span>{new Date(chat.createdAt).toLocaleTimeString()}</span>
+          </div>
+          <p>{chat.lastMessage}</p>
+        </div>
+      ))}
+    </div>
+  );
+};
+
+export default ChatSidebar;
+
+
+show chat between user
+
+
+import React, { useEffect, useState } from 'react';
+import io from 'socket.io-client';
+
+const socket = io('http://localhost:5000');
+
+const ChatWindow = ({ selectedChatId }) => {
+  const [messages, setMessages] = useState([]);
+  const [message, setMessage] = useState('');
+
+  useEffect(() => {
+    // Fetch chat history
+    const fetchChatHistory = async () => {
+      const response = await fetch(`/api/getChatHistory/${selectedChatId}`);
+      const data = await response.json();
+      setMessages(data);
+    };
+
+    fetchChatHistory();
+
+    // Listen for new messages
+    socket.on('newMessage', (newMessage) => {
+      setMessages((prevMessages) => [...prevMessages, newMessage]);
+    });
+
+    return () => {
+      socket.off('newMessage');
+    };
+  }, [selectedChatId]);
+
+  const sendMessage = () => {
+    const newMessage = {
+      client_id: 'clientId',
+      freelancer_id: 'freelancerId',
+      send_to: 'receiverId',
+      send_by: 'senderId',
+      message,
+    };
+
+    socket.emit('sendMessage', newMessage);
+    setMessage('');
+  };
+
+  return (
+    <div className="chat-window">
+      <div className="message-list">
+        {messages.map((msg, index) => (
+          <div key={index} className={`message-item ${msg.send_by === 'senderId' ? 'sent' : 'received'}`}>
+            <p>{msg.message}</p>
+          </div>
+        ))}
+      </div>
+      <div className="message-input">
+        <input 
+          type="text" 
+          value={message}
+          onChange={(e) => setMessage(e.target.value)}
+          placeholder="Write a message..."
+        />
+        <button onClick={sendMessage}>Send</button>
+      </div>
+    </div>
+  );
+};
+
+export default ChatWindow;
