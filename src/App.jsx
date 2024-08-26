@@ -68,7 +68,7 @@ function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<Signup />} />
+        <Route path="/" element={<SignUpSection />} />
         <Route path="/profile" element={<ProfileView />} />
         <Route path="/proposal" element={<Proposal />} />
         <Route path="/matchingjobs" element={<JobsPage />} />
@@ -77,8 +77,9 @@ function App() {
         <Route path="/offerform" element={<OfferForm/>} />
         <Route path="/FreelanceDashBoard" element={<FreelanceDashboardPage/>} />
         <Route path="/ApplyJob" element={<ApplyJob/>} />
+        <Route path="/ApplyJob/:jobPostId" element={<ApplyJob />} />
         <Route path="/FreelanceCard" element={ <FreeLancerCard heading="UI/UX Designer" freelancers={freelancers} />} />
-        <Route path="/signup" element={<SignUpSection/>} />
+        <Route path="/signup" element={<Signup/>} />
         <Route path="/ClientDashboard" element={<ClientDashboard/>} />
         <Route path="/JobPosting" element={<PostJob/>} /> 
         <Route path="/JobDescription" element={<DescriptionPage/>} />

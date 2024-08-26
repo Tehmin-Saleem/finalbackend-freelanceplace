@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import React from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom"; // Import useNavigate
@@ -26,6 +26,7 @@ function Signup() {
   const [nameError, setNameError] = useState("");
   const [emailError, setEmailError] = useState("");
   const [signupError, setSignupError] = useState("");
+  const [country, setCountry] = useState(""); // State for country
 
   const navigate = useNavigate(); // Initialize useNavigate
 
@@ -73,26 +74,33 @@ function Signup() {
       return;
     }
 
+    const role = localStorage.getItem("userType");
+
     try {
       const response = await axios.post('http://localhost:5000/api/client/signup', {
         email,
         password,
         first_name: firstName,
         last_name: lastName,
-        role: 'user', // You may want to add a role selector in your form
-        country_name: 'default' // You may want to add a country selector in your form
+        role,
+        country_name: country 
       });
-
+      console.log('Signup response:', response);
       if (response.status === 201) {
         console.log('Signup successful');
-        navigate('/signin'); // Redirect to login page after successful signup
+        navigate('/signin'); 
       }
     } catch (error) {
       if (error.response) {
+        console.error('Error response data:', error.response.data);
+        console.error('Error response status:', error.response.status);
+        console.error('Error response headers:', error.response.headers);
         setSignupError(error.response.data.message || 'An error occurred during signup');
       } else if (error.request) {
+        console.error('Error request:', error.request);
         setSignupError('No response received from server');
       } else {
+        console.error('Error message:', error.message);
         setSignupError('Error setting up the request');
       }
     }
@@ -173,6 +181,7 @@ function Signup() {
                   onChange={handlePasswordChange}
                   required
                 />
+                 
                 <span
                   className="cursor-pointer"
                   onClick={handleTogglePasswordVisibility}
@@ -185,6 +194,18 @@ function Signup() {
               {passwordError && (
                 <div className="text-red-500 text-xs mt-1">{passwordError}</div>
               )}
+            </div>
+            <div className="mb-4">
+             
+              <input
+                type="text"
+                id="country"
+                name="country"
+                value={country}
+                onChange={(e) => setCountry(e.target.value)}
+                placeholder="Enter your country"
+                className="flex mb-4 shadow text-[14px] border rounded-xl w-full py-3 px-3 bg-[#ECF0F1] font-Poppins"
+              />
             </div>
             <div className="mb-4 flex items-center">
               <input
@@ -220,7 +241,7 @@ function Signup() {
             )}
 
 
-            <div className="mt-8 mx-[20%] font-Poppins text-[14px] text-[#0F172A] items-center md:text-left">
+            <div className="mt-8 mx-[10%] font-Poppins text-[14px] text-[#0F172A] items-center md:text-left">
               Already have an account?
               <span>
                 <a

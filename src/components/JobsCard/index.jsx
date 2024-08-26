@@ -1,9 +1,11 @@
 import React from "react";
-import "./styles.scss"; // Import the SCSS file
-import StarRating from "../ProfileView/starrating"; // Import the StarRating component
+import "./styles.scss";
+import StarRating from "../ProfileView/starrating";
 import { JobSucces } from "../../svg";
+import { useNavigate } from "react-router-dom";
 
 const JobsCard = ({
+  jobPostId, 
   type,
   title,
   rate,
@@ -15,12 +17,25 @@ const JobsCard = ({
   rating,
   location,
 }) => {
+  const navigate = useNavigate();
+
+  const handleViewClick = () => {
+    console.log("Navigating to ApplyJob with ID:", jobPostId); // Debugging line
+    if (jobPostId) {
+      navigate(`/ApplyJob/${jobPostId}`);
+    } else {
+      console.error("jobPostId is undefined");
+    }
+  };
+
   return (
     <div className="job-card">
       <div className="job-card__content">
         <div className="job-card__header">
           <span className="job-card__title">{title}</span>
-          <button className="job-card__view-button">View</button>
+          <button className="job-card__view-button" onClick={handleViewClick}>
+            View
+          </button>
         </div>
         <div className="job-card__info">
           <span className="job-card__rate-head">{type}:</span>
@@ -37,9 +52,9 @@ const JobsCard = ({
           ))}
         </div>
         <div className="job-card__extra">
-        <JobSucces className="h-3 w-3" />
+          <JobSucces className="h-3 w-3" />
           {verified && <span className="job-card__verified">Verified account</span>}
-          <StarRating /> {/* Insert the StarRating component here */}
+          <StarRating /> 
           <span className="job-card__rating">{rating}</span>
           <span className="job-card__location">{location}</span>
         </div>
@@ -49,4 +64,3 @@ const JobsCard = ({
 };
 
 export default JobsCard;
-

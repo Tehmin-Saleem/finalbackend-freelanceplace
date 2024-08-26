@@ -36,12 +36,12 @@ const Attachment = () => {
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     setAttachment({ name: file.name });
-
+  
     const reader = new FileReader();
     reader.onloadend = () => {
       const base64String = reader.result;
       setAttachment({ name: file.name, base64: base64String });
-
+  
       localStorage.setItem('jobAttachment', JSON.stringify({
         description,
         attachment: { fileName: file.name, base64: base64String }

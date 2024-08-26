@@ -1,52 +1,55 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 import { NewHeader, JobsCard } from "../../components/index";
-
-import "./styles.scss"; // Import the SCSS file
+import "./styles.scss";
 
 const JobsPage = () => {
-  const [jobs, setJobs] = useState([
-    {
-      id: 1,
-      type: "Hourly",
-      title: "Freelance Graphic Designer for Cricket Tech Brand",
-      rate: "$12/hr",
-      timeline: "1 to 3 months",
-      level: "Expert",
-      description:
-        "Lorem ipsum dolor, sit amet consectetur adipisicing elit. Commodi nam totam cupiditate odit esse, quisquam deserunt aut cumque odio consequuntur maxime distinctio non, illo dolor adipisci molestias pariatur. Maiores, officia...",
-      tags: [
-        "Mobile app design",
-        "Wireframe",
-        "Mockup",
-        "Prototyping",
-        "Figma",
-      ],
-      verified: true,
-      rating: "Top rated",
-      location: "Lahore, Punjab, Pakistan",
-    },
-    {
-      id: 2,
-      type: "Fixed",
-      title: "Freelance Graphic Designer for Cricket Tech Brand",
-      rate: "$120",
-      timeline: "1 to 3 months",
-      level: "Intermediate",
-      description:
-        "Lorem ipsum dolor, sit amet consectetur adipisicing elit. Commodi nam totam cupiditate odit esse, quisquam deserunt aut cumque odio consequuntur maxime distinctio non, illo dolor adipisci molestias pariatur. Maiores, officia...",
-      tags: [
-        "Mobile app design",
-        "Wireframe",
-        "Mockup",
-        "Prototyping",
-        "Figma",
-      ],
-      verified: true,
-      rating: "Top rated",
-      location: "Lahore, Punjab, Pakistan",
-    },
-    // Add more jobs
-  ]);
+  const [jobs, setJobs] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    const fetchJobs = async () => {
+      try {
+        const token = localStorage.getItem('token');
+
+        if (token) {
+          console.log('Token retrieved:', token);
+        } else {
+          console.log('No token found in local storage.');
+        }
+
+        const response = await axios.get('http://localhost:5000/api/client/jobposts', {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+
+        setJobs(response.data.jobPosts);
+      } catch (error) {
+        setError("Error fetching jobs: " + error.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchJobs();
+  }, []);
+
+  // Correct formatRate function
+  const formatRate = (job) => {
+    if (job.budget_type === "fixed") {
+      return `$${job.fixed_price}`;
+    } else if (job.budget_type === "hourly" && job.hourly_rate) {
+      const { from, to } = job.hourly_rate;
+      return `$${from}-$${to}/hr`;
+    } else {
+      return "Rate not specified";
+    }
+  };
+
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div>{error}</div>;
 
   return (
     <div className="jobs-page">
@@ -54,7 +57,20 @@ const JobsPage = () => {
       <h1 className="jobs-heading">Jobs matching your skills</h1>
       <div className="jobs-container">
         {jobs.map((job) => (
-          <JobsCard key={job.id} {...job} />
+          <JobsCard 
+            key={job._id}
+            jobPostId={job._id}
+            type={job.budget_type === "fixed" ? "Fixed" : "Hourly"}
+            title={job.job_title}
+            rate={formatRate(job)}
+            timeline={job.project_duration?.duration_of_work || "Not specified"}
+            level={job.project_duration?.experience_level || "Not specified"}
+            description={job.description || "No description provided"}
+            tags={job.preferred_skills || []}
+            verified={true} 
+            rating="Top rated" 
+            location="Lahore, Punjab, Pakistan" 
+          />
         ))}
       </div>
       <div className="pagination">

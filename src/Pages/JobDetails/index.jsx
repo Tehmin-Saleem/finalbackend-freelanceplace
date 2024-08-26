@@ -79,66 +79,65 @@ const JobDetails = () => {
       }
     });
   }, []);
-
   const handlePostJob = async () => {
     try {
-      const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NmM4MzViZWQ0OTViZGIyNmJhOWMyYmQiLCJlbWFpbCI6ImV4YW1wbGVAZXhhbXBsZS5jb20iLCJpYXQiOjE3MjQ0MDEzMDIsImV4cCI6MTcyNDQwNDkwMn0.fn1JButsWkDqBChSan7ibMNTvdNAuz9eovfDMRenC2A'; // Replace with actual token retrieval
-      let fileName = jobData.attachment?.fileName;
-
-      let uploadedFile = null;
-      if (jobData.attachment?.base64) {
-        uploadedFile = await handleFileUpload(jobData.attachment.base64, jobData.attachment.fileName);
+      const token = localStorage.getItem('token');
+      let formData = new FormData();
+      formData.append('job_title', jobData.job_title);
+      formData.append('description', jobData.description);
+  
+      jobData.preferred_skills.forEach(skill => formData.append('preferred_skills[]', skill));
+  
+      formData.append('budget_type', jobData.budget_type);
+  
+      if (jobData.budget_type === 'hourly') {
+        formData.append('hourly_rate_from', jobData.hourly_rate.from);
+        formData.append('hourly_rate_to', jobData.hourly_rate.to);
+      } else if (jobData.budget_type === 'fixed') {
+        formData.append('fixed_price', jobData.fixed_price);
       }
-
-      const postData = {
-        attachment: uploadedFile ? {
-          fileName: uploadedFile.fileName,
-          description: jobData.attachment.detailed_description || ''
-        } : null,
-        budget_type: jobData.budget_type,
-        hourly_rate: jobData.hourly_rate,
-        fixed_price: jobData.fixed_price,
-        description: jobData.description,
-        job_title: jobData.job_title,
-        project_duration: jobData.project_duration,
-        preferred_skills: jobData.preferred_skills,
-        status: 'public', // Assuming a default status
-      };
-
-      const response = await axios.post('http://localhost:5000/api/client/jobpost', postData, {
-        params: { token: token }
+  
+      Object.entries(jobData.project_duration).forEach(([key, value]) => {
+        formData.append(`project_duration[${key}]`, value);
       });
-
-      localStorage.clear();
+  
+      formData.append('status', 'public');
+  
+      if (jobData.attachment?.base64) {
+        const blob = await fetch(jobData.attachment.base64).then(res => res.blob());
+        formData.append('attachment', blob, jobData.attachment.fileName);
+        formData.append('attachment_description', jobData.attachment.detailed_description || '');
+      }
+  
+      const response = await axios.post('http://localhost:5000/api/client/jobpost', formData, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+        // params: { token: token } 
+       
+          
+        
+      });
+  
       navigate('/ClientDashboard');
     } catch (error) {
       console.error('Error posting job:', error.response ? error.response.data : error.message);
     }
   };
-
-// Add this function to handle file upload
-const handleFileUpload = async (base64File, fileName) => {
-  const formData = new FormData();
-  const blob = await fetch(base64File).then(res => res.blob());
-  formData.append('file', blob, fileName);
-  console.log('File:', base64File);
-  console.log('FileName:', fileName);
-  try {
-    const response = await axios.post('http://localhost:5000/api/client/upload', formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-      params: { token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NmM4MzViZWQ0OTViZGIyNmJhOWMyYmQiLCJlbWFpbCI6ImV4YW1wbGVAZXhhbXBsZS5jb20iLCJpYXQiOjE3MjQ0MDEzMDIsImV4cCI6MTcyNDQwNDkwMn0.fn1JButsWkDqBChSan7ibMNTvdNAuz9eovfDMRenC2A' }
-    });
-    return response.data;
-  } catch (error) {
-    console.error('Error uploading file:', error);
-    return null;
-  }
-};
-
-
-
+  const handleViewFile = () => {
+    if (jobData.attachment?.base64) {
+      const fileUrl = jobData.attachment.base64;
+      const win = window.open();
+      win.document.write('<iframe src="' + fileUrl + '" frameborder="0" style="width:100%; height:100%;" allowfullscreen></iframe>');
+    } else {
+      console.error("No file available to view.");
+    }
+  };
+  
+    // const handleEditClick = () => {
+    //   navigate('/jobPosting'); // Ensure navigation path is correct
+    // };
+  
   return (
     <div>
       <Header />
@@ -150,16 +149,16 @@ const handleFileUpload = async (base64File, fileName) => {
           <div className="details-container">
             <div className="detail-row">
               <h2 className="detail-title">{jobData.job_title}</h2>
-              <EditIcon />
+              {/* <EditIcon onClick={handleEditClick} /> */}
             </div>
             <div className="detail-row">
               <p className="detail-description">{jobData.description}</p>
-              <EditIcon />
+              {/* <EditIcon /> */}
             </div>
             <div className="detail-row">
               <h3 className="detail-heading">Skills</h3>
               <p className="detail-text">{jobData.preferred_skills?.join(', ')}</p>
-              <EditIcon />
+              {/* <EditIcon /> */}
             </div>
             <div className="detail-row">
               <h3 className="detail-heading">Budget</h3>
@@ -168,12 +167,12 @@ const handleFileUpload = async (base64File, fileName) => {
                   ? `$${jobData.hourly_rate?.from}-${jobData.hourly_rate?.to} /hr`
                   : `$${jobData.fixed_price} fixed`}
               </p>
-              <EditIcon />
+              {/* <EditIcon /> */}
             </div>
             <div className="detail-row">
               <h3 className="detail-heading">Project Duration</h3>
               <p className="detail-text">{`${jobData.project_duration?.project_size}, ${jobData.project_duration?.duration_of_work}, ${jobData.project_duration?.experience_level}`}</p>
-              <EditIcon />
+              {/* <EditIcon /> */}
             </div>
             <div className="detail-row">
   <h3 className="detail-heading">Attachment</h3>
@@ -183,21 +182,21 @@ const handleFileUpload = async (base64File, fileName) => {
       <span className="file-name">
         {jobData.attachment?.fileName || "No file uploaded"}
       </span>
-      {jobData.attachment?.detailed_description && (
+      {/* {jobData.attachment?.detailed_description && (
         <span className="file-description">
           {jobData.attachment.detailed_description}
         </span>
-      )}
+      )} */}
     </div>
     {jobData.attachment?.fileName && (
-      <button className="btn view-btn">
+      <button className="btn view-btn" onClick={handleViewFile}>
         <EyeIcon />
         View
       </button>
     )}
   </div>
-  <EditIcon />
 </div>
+
 
           </div>
           <div className="actions">
