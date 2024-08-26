@@ -13,7 +13,7 @@ const Budget = () => {
   const steps = [
     { number: "1", label: "Job Title", color: "#4BCBEB" },
     { number: "2", label: "Description", color: "#4BCBEB" },
-    { number: "3", label: "Preferred Skills", color: "#4BCBEB" },
+    { number: "3", label: "Preferred Skills", color: "#4BCBEB"},
     { number: "4", label: "Budget", color: "#6b7280" },
     { number: "5", label: "Project Duration", color: "#6b7280" },
     { number: "6", label: "Attachment", color: "#6b7280" },
@@ -79,9 +79,9 @@ const Budget = () => {
     <div className="budget-page">
       <Header />
       <div className="progress-container">
-        <ProgressBar steps={steps} currentStep={4} />
+        <ProgressBar steps={steps} currentStep={3} />
       </div>
-      <div className="container">
+      <div className="budgetcontainer">
         <div className="left-section">
           <h3>4/6 Budget</h3>
           <h2>Tell us about your budget.</h2>

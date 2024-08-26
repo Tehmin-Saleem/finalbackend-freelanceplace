@@ -1,6 +1,6 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import "./App.css";
+// import "./App.css";
 import { ProfileView, Proposal, JobsPage, SignIn, Signup,ClientDashboard , FreelancersDoneJobsPage ,ErrorPage , SignUpSection, OfferForm, PostJob, JobDetails, MyProfile , DescriptionPage, SkillManagement, Budget, ProjectDuration, Attachment , FreeLancerCard, ApplyJob , FreelanceDashboardPage} from "./Pages/index";
 // import SendOffer from "./components/FormProposal/OfferForm";
 import {Header, FreelancerCards} from "./components/index";
