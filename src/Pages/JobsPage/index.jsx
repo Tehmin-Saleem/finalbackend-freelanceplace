@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { NewHeader, JobsCard } from "../../components/index";
+import { NewHeader, JobsCard, Header } from "../../components/index";
 
 import "./styles.scss"; // Import the SCSS file
 
@@ -50,7 +50,7 @@ const JobsPage = () => {
 
   return (
     <div className="jobs-page">
-      <NewHeader />
+      <Header/>
       <h1 className="jobs-heading">Jobs matching your skills</h1>
       <div className="jobs-container">
         {jobs.map((job) => (

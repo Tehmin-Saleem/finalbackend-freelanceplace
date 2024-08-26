@@ -56,7 +56,7 @@ const Attachment = () => {
       <div className="content">
         <ProgressBar steps={steps} currentStep={6} />
         <div className="form-container">
-          <div className="left-side">
+          <div className="left-sideBox">
             <h4>6/6 Attachment</h4>
             <h1>Start the conversation.</h1>
             <p>Talent are looking for:</p>
