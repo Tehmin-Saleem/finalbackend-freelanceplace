@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { NewHeader, JobsCard } from "../../components/index";
+import { NewHeader, JobsCard, Header } from "../../components/index";
 import "./styles.scss";
 
 const JobsPage = () => {
@@ -53,7 +53,7 @@ const JobsPage = () => {
 
   return (
     <div className="jobs-page">
-      <NewHeader />
+      <Header/>
       <h1 className="jobs-heading">Jobs matching your skills</h1>
       <div className="jobs-container">
         {jobs.map((job) => (

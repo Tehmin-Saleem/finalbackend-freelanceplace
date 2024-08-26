@@ -1,5 +1,6 @@
 import React from 'react';
-import {ProgressBar, Header} from "../../components/index"; // Assuming this is the extracted component
+import Header from "../../components/Commoncomponents/Header";
+import ProgressBar from "../../components/Commoncomponents/ProgressBar.jsx";
 import "./styles.scss";
 import { useNavigate } from 'react-router-dom'; // Import useNavigate
 
@@ -34,7 +35,7 @@ const DescriptionPage = () => {
   return (
     <div className="description-page">
       <Header />
-      <div className="container">
+      <div className="descontainer">
       <ProgressBar steps={steps} currentStep={1} />
         <h3 className="step-title">2/6 Description</h3>
         <div className="content">

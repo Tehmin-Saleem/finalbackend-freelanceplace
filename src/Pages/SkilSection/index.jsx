@@ -80,7 +80,7 @@ const SkillManagement = () => {
         <ProgressBar steps={steps} currentStep={2} />
       </div>
 
-      <div className="container">
+      <div className="precontainer">
         <div className="left-section">
           <h2>3/6 Preferred Skills</h2>
           <div className="info">

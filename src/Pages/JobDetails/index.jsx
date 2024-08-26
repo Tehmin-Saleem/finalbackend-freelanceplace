@@ -141,14 +141,14 @@ const JobDetails = () => {
   return (
     <div>
       <Header />
-      <div className="job-details">
-        <div className="top-bar">
+      <div className="job-detailsPage">
+        <div className="Top-bar">
           <h1 className="title">Job Details</h1>
         </div>
-        <div className="content">
-          <div className="details-container">
+        <div className="JobcontentBox">
+          <div className="details-containerBox">
             <div className="detail-row">
-              <h2 className="detail-title">{jobData.job_title}</h2>
+              <h2 className="Detail-title">{jobData.job_title}</h2>
               {/* <EditIcon onClick={handleEditClick} /> */}
             </div>
             <div className="detail-row">
