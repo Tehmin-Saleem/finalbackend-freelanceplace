@@ -20,6 +20,7 @@ import MyProfile from "./Profile";
 import ProjectDuration from "./ProjectDuration";
 import SignUpSection from "./SignUpSection";
 import SkillManagement from "./SkilSection";
+import AllJobs  from "./AllJobs";
 
 
 // Export all the imported modules
@@ -46,5 +47,6 @@ export {default as MyProfile} from "./Profile"
 export {default as ProjectDuration} from "./ProjectDuration"
 export {default as SignUpSection} from "./SignUpSection"
 export {default as SkillManagement} from "./SkilSection"
+export {default as AllJobs} from "./AllJobs"
 
 
