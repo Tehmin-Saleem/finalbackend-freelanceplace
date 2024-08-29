@@ -1,0 +1,48 @@
+$primary-color: #3b82f6;
+$secondary-color: #6b7280;
+$gray-color: #f7fafc;
+$text-color: #4a5568;
+$border-color: #e2e8f0;
+$hover-darken: 10%;
+$font-kodchasan: 'Kodchasan', sans-serif;
+$font-poppins: 'Poppins', sans-serif;
+$color-gray: #64748b;
+$color-dark: #2c3e50;
+$color-white: #ffffff;
+$color-accent: #4bcdeb;
+$bg-color: #f7f8fa;
+
+
+.notification-page {
+    padding: 20px;
+    margin: 0 8rem;
+    font-family:$font-poppins;
+  
+    h1 {
+      font-size: 24px;
+      margin-bottom: 10px;
+      font-family:$font-poppins;
+      color:$color-dark;
+      font-size: 2rem;
+      font-weight: 600;
+    }
+  
+    p {
+      margin-bottom: 20px;
+      color: #888;
+      font-family: $font-poppins;
+    }
+  
+    .notification-section {
+      margin-bottom: 40px;
+  
+      h2 {
+        font-size: 20px;
+        margin-bottom: 15px;
+        color: #333;
+        font-family: $font-poppins;
+        font-weight: 500;
+      }
+    }
+  }
+  
