@@ -12,7 +12,7 @@ import ProgressBar from "./Commoncomponents/ProgressBar.jsx";
 import TextArea from "./Commoncomponents/TextArea";
 import FreelancerCard from "../Pages/FreeLanceCard/index.jsx";
 import ZoomedImage from "./Zoomed/index.jsx";
-import Alljobs from "./Alljobs/index.jsx"
+import Alljobs from "./Alljobs/index.jsx";
 
 export {default as CommonButton} from "./Commoncomponents/CommonButton"
 export {default as TextField} from "./Commoncomponents/Textfield"

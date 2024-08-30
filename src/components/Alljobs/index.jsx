@@ -4,7 +4,7 @@ import "./styles.scss"; // Import the SCSS file
 import StarRating from "../ProfileView/starrating"; // Import the StarRating component if needed
 import { JobSucces } from "../../svg";
 
-const JobsCard = ({
+const Alljobs = ({
   type,
   title,
   rate,
@@ -36,4 +36,4 @@ const JobsCard = ({
   );
 };
 
-export default JobsCard;
+export default Alljobs;

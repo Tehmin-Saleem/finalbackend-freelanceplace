@@ -53,26 +53,25 @@ const AllJobsPage = () => {
           />
         </div>
         <div className="filter-wrapper">
-        <button className="filter-button">
-          <Filter className="filter-icon" />
-          All Filters
-        </button>
+          <button className="filter-button">
+            <Filter className="filter-icon" />
+            All Filters
+          </button>
           <div className="filter-dropdown">
-            <div className="filter-dropdown__inner">
+            <span className="filter-dropdown__inner">
             <input type="checkbox" id="active-jobs" />
             <label htmlFor="active-jobs">Active Jobs</label>
-            </div>
-            <div className="filter-dropdown__inner">
+            </span>
+            <span className="filter-dropdown__inner">
             <input type="checkbox" id="pending-jobs" />
             <label htmlFor="pending-jobs">Pending Jobs</label>
-            </div>
-            <div className="filter-dropdown__inner">
+            </span>
+            <span className="filter-dropdown__inner">
             <input type="checkbox" id="completed-jobs" />
             <label htmlFor="completed-jobs">Completed</label>
-            </div>
+            </span>
             <button className="filter-done-button">Done</button>
           </div>
-          
         </div>
         <button className="post-job-button">Post a new job</button>
       </div>
