@@ -88,6 +88,9 @@ function Signup() {
       console.log('Signup response:', response);
       if (response.status === 201) {
         console.log('Signup successful');
+        localStorage.setItem('firstName', firstName); 
+        localStorage.setItem('lastName', lastName); 
+          localStorage.setItem('country', country);  
         navigate('/signin'); 
       }
     } catch (error) {

@@ -1,26 +1,34 @@
-import React from "react";
-import {Header, ZoomedImage} from "../../components/index"; // Adjust the import path as needed
+import React, { useEffect, useState } from "react";
+import { Header, ZoomedImage } from "../../components/index"; // Adjust the import path as needed
 import { BackgroundLining } from "../../svg/index";
 import "./styles.scss";
-import { useNavigate } from 'react-router-dom'; // Import useNavigate
+import { useNavigate } from 'react-router-dom';
 
 const FreelanceDashboardPage = () => {
-  const navigate = useNavigate(); // Initialize useNavigate
+  const [firstName, setFirstName] = useState('');
+  const navigate = useNavigate();
+
+  
+  useEffect(() => {
+    
+    const storedFirstName = localStorage.getItem('firstName');
+    if (storedFirstName) {
+      setFirstName(storedFirstName);
+    }
+  }, []);
+
   const handleJobPostingButtonClick = () => {
-    navigate('/JobPosting'); // Replace with your target route
+    navigate('/myProfile'); 
   };
+
   return (
     <div className="dashboard-page">
-      {/* Importing Header Component */}
       <Header />
-
-      {/* Main Content */}
       <main className="main-content">
-        {/* Left Section */}
         <div className="left-section">
           <div className="left-content">
             <h1 className="welcome-text">
-              Hello, Ali!
+              Hello, {firstName}!
               <br />
               Let's begin by finding
               <br />
@@ -34,12 +42,12 @@ const FreelanceDashboardPage = () => {
               enim ad minim veniam, quis nostrud exercitation ullamco laboris
               nisi ut aliquip ex ea commodo consequat.
             </p>
-            <button className="start-button" onClick={handleJobPostingButtonClick}>Complete Your profile to get hired</button>
+            <button className="start-button" onClick={handleJobPostingButtonClick}>
+              Complete Your profile to get hired
+            </button>
           </div>
           <BackgroundLining className="background-lining" />
         </div>
-
-        {/* Right Section */}
         <div className="right-section">
           <ZoomedImage alt="Placeholder" className="illustration" />
         </div>

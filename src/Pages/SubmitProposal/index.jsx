@@ -1,18 +1,45 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useParams, useNavigate } from 'react-router-dom';
 
 import Header from "../../components/Commoncomponents/Header";
 import "./styles.scss";
-// import PlusIcon from "../../svg/Sammar's-SVG-Components/PlusIcon";
 
 const SubmitProposal = () => {
+  const [milestones, setMilestones] = useState([
+    { description: "", dueDate: "", amount: "" },
+  ]);
+  const { jobPostId } = useParams();
+  const [jobDetails, setJobDetails] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-    const PlusIcon = () => (
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
-  <circle cx="12" cy="12" r="10" fill="#00BFFF"/>
-  <line x1="12" y1="8" x2="12" y2="16" stroke="white" stroke-width="2"/>
-  <line x1="8" y1="12" x2="16" y2="12" stroke="white" stroke-width="2"/>
-</svg>
-    );
+  const [paymentMethod, setPaymentMethod] = useState(""); 
+
+  const addMilestone = () => {
+    setMilestones([
+      ...milestones,
+      { description: "", dueDate: "", amount: "" },
+    ]);
+  };
+
+  const handleMilestoneChange = (index, field, value) => {
+    const newMilestones = [...milestones];
+    newMilestones[index][field] = value;
+    setMilestones(newMilestones);
+  };
+
+  const handlePaymentMethodChange = (method) => {
+    setPaymentMethod(method);
+  };
+
+  const PlusIcon = () => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+      <circle cx="12" cy="12" r="10" fill="#00BFFF"/>
+      <line x1="12" y1="8" x2="12" y2="16" stroke="white" strokeWidth="2"/>
+      <line x1="8" y1="12" x2="16" y2="12" stroke="white" strokeWidth="2"/>
+    </svg>
+  );
+
   const CalendarIcon = () => (
     <svg
       className="calendar-icon"
@@ -49,169 +76,295 @@ const SubmitProposal = () => {
       <polyline points="10 9 9 9 8 9"></polyline>
     </svg>
   );
+  useEffect(() => {
+    const fetchJobDetails = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        const response = await fetch(`http://localhost:5000/api/client/job-posts/${jobPostId}`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
 
-  const [milestones, setMilestones] = useState([
-    { description: "", dueDate: "", amount: "" },
-  ]);
+        if (!response.ok) {
+          throw new Error(`Failed to fetch job details: ${response.statusText}`);
+        }
 
-  const addMilestone = () => {
-    setMilestones([
-      ...milestones,
-      { description: "", dueDate: "", amount: "" },
-    ]);
+        const data = await response.json();
+        setJobDetails(data.jobPost);
+        setLoading(false);
+      } catch (error) {
+        console.error('Error fetching job details:', error);
+        setError(error.message);
+        setLoading(false);
+      }
+    };
+
+    fetchJobDetails();
+  }, [jobPostId]);
+  const [formData, setFormData] = useState({
+    add_requirements: [],
+    attachment: null,
+    cover_letter: "",
+    project_duration: "",
+    portfolio_link: "",
+  });
+
+  const navigate = useNavigate();
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
   };
 
-  const handleMilestoneChange = (index, field, value) => {
-    const newMilestones = [...milestones];
-    newMilestones[index][field] = value;
-    setMilestones(newMilestones);
+  const handleFileChange = (e) => {
+    setFormData({ ...formData, attachment: e.target.files[0] });
   };
 
-  return (
-    <>
-      <Header />
-      
-      <div className="submit-proposal">
-        <h1>Submit a Proposal</h1>
-        <div className="outerContainer">
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const token = localStorage.getItem('token');
+      const formDataToSend = new FormData();
+      const add_requirements = paymentMethod === "milestone" 
+        ? { 
+            by_milestones: milestones.map(m => ({
+              amount: parseFloat(m.amount),
+              description: m.description,
+              due_date: m.dueDate
+            }))
+          }
+        : { 
+            by_project: {
+              bid_amount: parseFloat(formData.projectAmount),
+              due_date: formData.projectDueDate
+            }
+          };
+          formDataToSend.append('add_requirements', JSON.stringify(add_requirements));
+          if (formData.attachment) {
+            formDataToSend.append('attachment', formData.attachment);
+          }
+          formDataToSend.append('cover_letter', formData.cover_letter);
+          formDataToSend.append('job_id', jobPostId);
+          formDataToSend.append('project_duration', formData.project_duration);
+          formDataToSend.append('portfolio_link', formData.portfolio_link);
+          formDataToSend.append('client_id', jobDetails._id);
+    const response = await fetch(`http://localhost:5000/api/freelancer/proposal/${jobPostId}`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+      body: formDataToSend,
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || `Failed to submit proposal: ${response.statusText}`);
+    }
+
+    const result = await response.json();
+    console.log('Proposal submitted successfully:', result);
+    navigate('/JobPosting'); 
+  } catch (error) {
+    console.error('Error submitting proposal:', error);
+    setError(error.message);
+  }
+};
+return (
+  <>
+    <Header />
+    <div className="submit-proposal">
+      <h1>Submit a Proposal</h1>
+      <div className="outerContainer">
         <div className="horizontal-container">
           <div className="left-section">
-            <div className="job-details">
-              <h2>Job Details</h2>
-              <h3>Graphic Designer for Cricket Tech Brand</h3>
-              <p>Lahore, Punjab Pakistan.</p>
-              <div className="job-info">
-                <span>
-                  <strong>Hourly:</strong> $12/hr
-                </span>
-                <span>
-                  <strong>Estimated time:</strong> 1 to 3 months
-                </span>
-                <span>
-                  <strong>Level:</strong> Expert
-                </span>
+            {loading ? (
+              <p>Loading job details...</p>
+            ) : error ? (
+              <p>Error: {error}</p>
+            ) : jobDetails ? (
+              <div className="job-details">
+                <h2>Job Details</h2>
+                <h3>{jobDetails.job_title}</h3>
+                <p>{jobDetails.location}</p>
+                <div className="job-info">
+                  <span>
+                    <strong>{jobDetails.budget_type === 'fixed' ? 'Fixed Price:' : 'Hourly Rate:'}</strong> 
+                    {jobDetails.budget_type === 'fixed'
+                      ? `$${jobDetails.fixed_price}`
+                      : `$${jobDetails.hourly_rate?.from} - $${jobDetails.hourly_rate?.to} /hr`}
+                  </span>
+                  <span>
+                    <strong>Estimated time:</strong> {jobDetails.project_duration?.duration_of_work}
+                  </span>
+                  <span>
+                    <strong>Level:</strong> {jobDetails.project_duration?.experience_level}
+                  </span>
+                </div>
+                <h3 className="projectoverview">Project Overview</h3>
+                <p>{jobDetails.description}</p>
+                <h3>Skills and Expertise</h3>
+                <div className="skills">
+                  {jobDetails.preferred_skills.map((skill, index) => (
+                    <span key={index}>{skill}</span>
+                  ))}
+                </div>
               </div>
-              <h3 className="projectoverview">Project Overview</h3>
-              <p>
-                I'm looking to create memorable and user-centric digital
-                experiences? Your search ends here! I am a highly skilled and
-                innovative UX UI designer, Graphic designer, and WordPress
-                designer from Bangladesh, ready to revolutionize your projects.
-                With a deep passion for creating outstanding user experiences
-                and effective visuals, I guarantee top-notch results that will
-                leave a lasting impression.
-              </p>
-              <h3>Skills and Expertise</h3>
-              <div className="skills">
-                <span>Mobile app design</span>
-                <span>Wireframe</span>
-                <span>Mockup</span>
-                <span>Prototyping</span>
-                <span>Figma</span>
-                <span>User flow</span>
-                <span>+10</span>
-              </div>
-            </div>
+            ) : (
+              <p>No job details found</p>
+            )}
           </div>
           <div className="right-section">
             <div className="add-requirements">
               <h2>Add Requirements</h2>
-              <label className="Label">Select how do you want to be paid:</label>
-              <div className="payment-options">
-                <div className="option">
-                  <label htmlFor="milestone">By milestones</label>
-                  <input type="radio" id="milestone" name="payment" />
+              <form onSubmit={handleSubmit}>
+                <label className="Label">Select how do you want to be paid:</label>
+                <div className="payment-options">
+                  <div className="option">
+                    <label htmlFor="milestone">By milestones</label>
+                    <input 
+                      type="radio" 
+                      id="milestone" 
+                      name="payment" 
+                      onChange={() => handlePaymentMethodChange("milestone")} 
+                    />
+                  </div>
+                  <div className="option">
+                    <label htmlFor="project">By project</label>
+                    <input 
+                      type="radio" 
+                      id="project" 
+                      name="payment" 
+                      onChange={() => handlePaymentMethodChange("project")} 
+                    />
+                  </div>
                 </div>
-                <div className="option">
-                  <label htmlFor="project">By project</label>
-                  <input type="radio" id="project" name="payment" />
-                </div>
-              </div>
-              <label className="Label">
-    How many milestones do you want to include?
-    <span className="add-milestone-span" onClick={addMilestone}>
-         Add milestones <PlusIcon />
-    </span>
-</label>
-              
-              {milestones.map((milestone, index) => (
-  <div key={index} className="milestone">
-    <div className="milestone-row">
-      <div className="milestone-field">
-        <label>{index + 1}. Milestone Description:</label>
-        <input
-          type="text"
-          placeholder="Lorem ipsum"
-          value={milestone.description}
-          onChange={(e) =>
-            handleMilestoneChange(index, "description", e.target.value)
-          }
-        />
-      </div>
-      <div className="milestone-field">
-        <label>Due date:</label>
-        <div className="date-input">
-          <CalendarIcon className="calendar-icon" />
-          <input
-            type="text"
-            placeholder="12-May-2024"
-            value={milestone.dueDate}
-            onChange={(e) =>
-              handleMilestoneChange(index, "dueDate", e.target.value)
-            }
-          />
-        </div>
-      </div>
-      <div className="milestone-field">
-        <label>Amount:</label>
-        <input
-          type="text"
-          placeholder="$12,00 per milestone"
-          value={milestone.amount}
-          onChange={(e) =>
-            handleMilestoneChange(index, "amount", e.target.value)
-          }
-        />
-      </div>
-    </div>
-  </div>
-))}
 
-              
-              <label className="Label">How long will this project take?</label>
-              <input
-                type="text"
-                placeholder="2 months"
-                className="project-duration"
-              />
-              <label className="Label">Cover letter</label>
-              <textarea placeholder="Lorem ipsum dolor sit amet consectetur..."></textarea>
-              <label className="Label">Attachment</label>
-              <div className="attachment-box">
-                <div className="attachment">
-                  <FileIcon />
-                  <span>Attach file</span>
+                {paymentMethod === "milestone" && (
+                  <>
+                    <label className="Label">
+                      How many milestones do you want to include?
+                      <span className="add-milestone-span" onClick={addMilestone}>
+                        Add milestones <PlusIcon />
+                      </span>
+                    </label>
+
+                    {milestones.map((milestone, index) => (
+                      <div key={index} className="milestone">
+                        <div className="milestone-row">
+                          <div className="milestone-field">
+                            <label>{index + 1}. Milestone Description:</label>
+                            <input
+                              type="text"
+                              placeholder="Lorem ipsum"
+                              value={milestone.description}
+                              onChange={(e) => handleMilestoneChange(index, "description", e.target.value)}
+                            />
+                          </div>
+                          <div className="milestone-field">
+                            <label>Due date:</label>
+                            <div className="date-input">
+                              
+                              <input
+                                type="date"
+                                value={milestone.dueDate}
+                                onChange={(e) => handleMilestoneChange(index, "dueDate", e.target.value)}
+                              />
+                            </div>
+                          </div>
+                          <div className="milestone-field">
+                            <label>Amount:</label>
+                            <div className="date-input">
+                            <input
+                              type="number"
+                              placeholder="$12,00 per milestone"
+                              value={milestone.amount}
+                              onChange={(e) => handleMilestoneChange(index, "amount", e.target.value)}
+                             
+                            />
+                             </div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </>
+                )}
+
+                {paymentMethod === "project" && (
+                  <>
+                    <div className="milestone-field">
+                      <label>Amount:</label>
+                      <input
+                        type="number"
+                        name="projectAmount"
+                        value={formData.projectAmount}
+                        onChange={handleInputChange}
+                        placeholder="$12,00"
+                      />
+                    </div>
+                    <div className="milestone-field">
+                      <label>Due Date:</label>
+                      <input
+                        type="date"
+                        name="projectDueDate"
+                        value={formData.projectDueDate}
+                        onChange={handleInputChange}
+                      />
+                    </div>
+                  </>
+                )}
+
+                <label className="Label">How long will this project take?</label>
+                <input
+                  type="text"
+                  name="project_duration"
+                  value={formData.project_duration}
+                  onChange={handleInputChange}
+                  placeholder="2 months"
+                  className="project-duration"
+                />
+                
+                <label className="Label">Cover letter</label>
+                <textarea
+                  name="cover_letter"
+                  value={formData.cover_letter}
+                  onChange={handleInputChange}
+                  placeholder="Lorem ipsum dolor sit amet consectetur..."
+                ></textarea>
+                
+                <label className="Label">Attachment</label>
+                <div className="attachment-box">
+                  <div className="attachment">
+                    
+                    <input
+                      type="file"
+                      onChange={handleFileChange}
+                    />
+                  </div>
                 </div>
-              </div>
-              <label className="Label">Add portfolio link</label>
-              <input
-                type="text"
-                placeholder="Lorem ipsum"
-                className="portfolio-link"
-              />
-              <div className="actions">
-                <button className="cancel">Cancel</button>
-                <button className="submit">Send proposal</button>
-              </div>
+                
+                <label className="Label">Add portfolio link</label>
+                <input
+                  type="text"
+                  name="portfolio_link"
+                  value={formData.portfolio_link}
+                  onChange={handleInputChange}
+                  placeholder="Lorem ipsum"
+                  className="portfolio-link"
+                />
+                
+                <div className="actions">
+                  <button type="button" className="cancel" onClick={() => navigate(-1)}>Cancel</button>
+                  <button type="submit" className="submit">Send proposal</button>
+                </div>
+              </form>
             </div>
           </div>
         </div>
-
       </div>
-      </div>
-     
-    </>
-  );
+    </div>
+  </>
+);
 };
 
 export default SubmitProposal;

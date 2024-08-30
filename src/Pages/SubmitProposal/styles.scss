@@ -89,7 +89,47 @@ $bg-color: #f7f8fa;
         
           }
     }
-  
+  /* Apply a gray border and similar box style to date and amount inputs for both milestone and project sections */
+.milestone-field input[type="date"],
+.milestone-field input[type="number"],
+.project-duration,
+.portfolio-link,
+textarea {
+    border: 1px solid #ccc; /* Gray border */
+    border-radius: 6px; /* Rounded corners */
+    padding: 0.75rem 1rem; /* Adjust padding for consistent spacing */
+    font-size: 1rem; /* Adjust font size for consistency */
+    box-sizing: border-box; /* Ensure padding and border are included in element's total width and height */
+    width: 100%; /* Make input fields and textareas take the full width of their container */
+}
+
+.milestone-field {
+    margin-bottom: 1rem; /* Spacing between fields */
+}
+
+.add-requirements .milestone-row input[type="text"],
+.add-requirements .milestone-row input[type="date"],
+.add-requirements .milestone-row input[type="number"] {
+    border: 1px solid #ccc; /* Gray border */
+    border-radius: 6px; /* Rounded corners */
+    padding: 0.75rem 1rem; /* Adjust padding for consistency */
+    font-size: 1rem; /* Adjust font size for consistency */
+    box-sizing: border-box; /* Ensure padding and border are included in element's total width and height */
+    width: 100%; /* Make input fields take the full width of their container */
+}
+
+.add-requirements .milestone-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); /* Three equal-width columns */
+    gap: 1rem; /* Space between columns */
+    margin-bottom: 1rem; /* Spacing between rows */
+}
+
+.add-requirements .milestone-row .milestone-field label {
+    font-size: 0.9rem; /* Adjust font size for consistency */
+    margin-bottom: 0.25rem; /* Spacing between label and input */
+}
+
     .job-info {
         display: flex;
         gap: 2rem;

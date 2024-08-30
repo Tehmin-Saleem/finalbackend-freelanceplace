@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { NewHeader, Proposalscard } from "../../components/index";
+import {Header, Proposalscard } from "../../components/index";
 
 import "./styles.scss"; // Import the SCSS file
 
@@ -50,7 +50,7 @@ const IndexPage = () => {
 
 	return (
 		<div className="proposals-page">
-			<NewHeader />
+			<Header />
 			<h1 className="proposals-heading">Proposals</h1>
 			<div className="proposals-container">
 				{proposals.map((proposal) => (
