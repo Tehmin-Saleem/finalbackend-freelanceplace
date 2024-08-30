@@ -23,7 +23,7 @@ const ProposalCard = ({
 }) => {
   return (
     <div className="proposal-card">
-      <img src={image} alt={name} className="proposal-card__image" />
+      <img src={image} alt={`${name}'s profile`}  className="proposal-card__image" />
       <div className="proposal-card__content">
         <div className="proposal-card__header">
           <span className="proposal-card__name">{name}</span>

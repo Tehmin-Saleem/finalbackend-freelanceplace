@@ -94,7 +94,7 @@ function App() {
         {/* <Route path="/SubmitProposal" element={<SubmitProposal/>} />  */}
         <Route path="/SubmitProposal/:jobPostId" element={<SubmitProposal/>} /> 
         <Route path="/SubmitProposal" element={<SubmitProposal/>} /> 
-        <Route path="/Alljobs" element={<AllJobs/>} /> 
+        {/* <Route path="/Alljobs" element={<AllJobs/>} />  */}
 
         <Route path="/Alljobs" element={<AllJobsPage/>} /> 
       </Routes>
