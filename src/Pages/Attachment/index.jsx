@@ -36,12 +36,12 @@ const Attachment = () => {
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     setAttachment({ name: file.name });
-
+  
     const reader = new FileReader();
     reader.onloadend = () => {
       const base64String = reader.result;
       setAttachment({ name: file.name, base64: base64String });
-
+  
       localStorage.setItem('jobAttachment', JSON.stringify({
         description,
         attachment: { fileName: file.name, base64: base64String }
@@ -56,7 +56,7 @@ const Attachment = () => {
       <div className="content">
         <ProgressBar steps={steps} currentStep={6} />
         <div className="form-container">
-          <div className="left-side">
+          <div className="left-sideBox">
             <h4>6/6 Attachment</h4>
             <h1>Start the conversation.</h1>
             <p>Talent are looking for:</p>

@@ -1,5 +1,6 @@
 import React from "react";
-import UserImage from "../../../images/Profile.png";
+// import UserImage from "../../images/Profile.png";
+import UserImage from "../../..../../..../../../images/Profile.png";
 import "./styles.scss";
 import StarRating from "../starrating/index";
 

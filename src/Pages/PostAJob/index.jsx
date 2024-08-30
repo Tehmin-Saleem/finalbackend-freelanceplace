@@ -28,7 +28,7 @@ const PostJob = () => {
   return (
     <div className="post-job">
       <Header />
-      <div className="container">
+      <div className="Jobcontainer">
         <div className="job-form">
           <div className="title-container">
             <h2 className="title">Jobs</h2>

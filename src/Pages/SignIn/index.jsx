@@ -60,12 +60,18 @@ function SignIn() {
       const data = await response.json();
 
       if (response.ok) {
-        // Store user data in local storage
+       
         localStorage.setItem("token", data.token);
         localStorage.setItem("user", JSON.stringify(data.user));
 
-        // Navigate to the desired page after login, e.g., dashboard
-        navigate("/matchingjobs");
+        const userType = data.user.role; 
+        if (userType === "client") {
+          navigate("/ClientDashboard");
+        } else if (userType === "freelancer") {
+          navigate("/FreelanceDashBoard");
+        } else {
+          setErrorMessage("Unknown user type.");
+        }
       } else {
         setErrorMessage(data.message || "Login failed. Please try again.");
       }
@@ -199,7 +205,7 @@ function SignIn() {
               <span>
                 <a
                   className="text-[#4BCBEB] font-Poppins hover:underline hover:underline-offset-4 text-base font-bold"
-                  href="/"
+                  href="/signup"
                 >
                   Sign Up
                 </a>

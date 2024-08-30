@@ -1,18 +1,25 @@
 import React, { useState } from "react";
 import { ClientFrame, FreelancerFrame } from "../../svg/index";
 import "./styles.scss";
-import { useNavigate } from 'react-router-dom'; // Import useNavigate
+import { useNavigate } from 'react-router-dom';
 
 const SignUpSection = () => {
-  const navigate = useNavigate(); // Initialize useNavigate
+  const navigate = useNavigate();
   const [selectedUserType, setSelectedUserType] = useState("");
 
   const handleChange = (e) => {
     setSelectedUserType(e.target.value);
   };
+
   const handleCreateAccountButtonClick = () => {
-    navigate('/ClientDashboard'); // Replace with your target route
-  }
+    if (selectedUserType) {
+      localStorage.setItem("userType", selectedUserType); // Save selectedUserType to local storage
+      navigate('/signup'); // Replace with your target route
+    } else {
+      alert("Please select a user type."); // Alert if no user type is selected
+    }
+  };
+
   return (
     <div className="sign-up-section">
       <div className="main-container">
@@ -80,7 +87,12 @@ const SignUpSection = () => {
           </div>
         </div>
         <div className="account-section">
-          <button className="create-account-button" on onClick={handleCreateAccountButtonClick}>Create Account</button>
+          <button
+            className="create-account-button"
+            onClick={handleCreateAccountButtonClick}
+          >
+            Create Account
+          </button>
           <p className="login-text">
             Already have an account?{" "}
             <a href="#" className="login-link">

@@ -1,9 +1,10 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import "./App.css";
+// import "./App.css";
 import { ProfileView, Proposal, JobsPage, SignIn, Signup,ClientDashboard , FreelancersDoneJobsPage ,ErrorPage , SignUpSection, OfferForm, PostJob, JobDetails, MyProfile , DescriptionPage, SkillManagement, Budget, ProjectDuration, Attachment , FreeLancerCard, ApplyJob , FreelanceDashboardPage, AllJobsPage} from "./Pages/index";
 // import SendOffer from "./components/FormProposal/OfferForm";
 import {Header, FreelancerCards} from "./components/index";
+import SubmitProposal from "./Pages/SubmitProposal";
 // import OfferForm from "./components/FormProposal/OfferForm";
 
 
@@ -68,7 +69,7 @@ function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<Signup />} />
+        <Route path="/" element={<SignUpSection />} />
         <Route path="/profile" element={<ProfileView />} />
         <Route path="/proposal" element={<Proposal />} />
         <Route path="/matchingjobs" element={<JobsPage />} />
@@ -77,8 +78,9 @@ function App() {
         <Route path="/offerform" element={<OfferForm/>} />
         <Route path="/FreelanceDashBoard" element={<FreelanceDashboardPage/>} />
         <Route path="/ApplyJob" element={<ApplyJob/>} />
+        <Route path="/ApplyJob/:jobPostId" element={<ApplyJob />} />
         <Route path="/FreelanceCard" element={ <FreeLancerCard heading="UI/UX Designer" freelancers={freelancers} />} />
-        <Route path="/signup" element={<SignUpSection/>} />
+        <Route path="/signup" element={<Signup/>} />
         <Route path="/ClientDashboard" element={<ClientDashboard/>} />
         <Route path="/JobPosting" element={<PostJob/>} /> 
         <Route path="/JobDescription" element={<DescriptionPage/>} />
@@ -89,6 +91,8 @@ function App() {
         <Route path="/ProjectDetails" element={<JobDetails/>} /> 
         <Route path="/myProfile" element={<MyProfile/>} /> 
         <Route path="/ErrorPage" element={<ErrorPage/>} /> 
+        <Route path="/SubmitProposal" element={<SubmitProposal/>} /> 
+
         <Route path="/Alljobs" element={<AllJobsPage/>} /> 
       </Routes>
     </Router>
