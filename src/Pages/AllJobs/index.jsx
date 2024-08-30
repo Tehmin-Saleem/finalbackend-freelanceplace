@@ -55,20 +55,21 @@ const AllJobsPage = () => {
         <div className="filter-wrapper">
           <button className="filter-button">
             <Filter className="filter-icon" />
-            <select value={selectedFilter} onChange={handleFilterChange}>
-              <option value="All">All Filters</option>
-              <option value="Public">Public</option>
-              <option value="Private">Private</option>
-              {/* Add other filters as necessary */}
-            </select>
+            All Filters
           </button>
           <div className="filter-dropdown">
+            <span className="filter-dropdown__inner">
             <input type="checkbox" id="active-jobs" />
             <label htmlFor="active-jobs">Active Jobs</label>
+            </span>
+            <span className="filter-dropdown__inner">
             <input type="checkbox" id="pending-jobs" />
             <label htmlFor="pending-jobs">Pending Jobs</label>
+            </span>
+            <span className="filter-dropdown__inner">
             <input type="checkbox" id="completed-jobs" />
             <label htmlFor="completed-jobs">Completed</label>
+            </span>
             <button className="filter-done-button">Done</button>
           </div>
         </div>
