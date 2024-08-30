@@ -1,7 +1,7 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import "./App.css";
-import { ProfileView, Proposal, JobsPage, SignIn, Signup,ClientDashboard , FreelancersDoneJobsPage ,ErrorPage , SignUpSection, OfferForm, PostJob, JobDetails, MyProfile , DescriptionPage, SkillManagement, Budget, ProjectDuration, Attachment , FreeLancerCard, ApplyJob , FreelanceDashboardPage} from "./Pages/index";
+import { ProfileView, Proposal, JobsPage, SignIn, Signup,ClientDashboard , FreelancersDoneJobsPage ,ErrorPage , SignUpSection, OfferForm, PostJob, JobDetails, MyProfile , DescriptionPage, SkillManagement, Budget, ProjectDuration, Attachment , FreeLancerCard, ApplyJob , FreelanceDashboardPage, AllJobsPage} from "./Pages/index";
 // import SendOffer from "./components/FormProposal/OfferForm";
 import {Header, FreelancerCards} from "./components/index";
 // import OfferForm from "./components/FormProposal/OfferForm";
@@ -89,6 +89,7 @@ function App() {
         <Route path="/ProjectDetails" element={<JobDetails/>} /> 
         <Route path="/myProfile" element={<MyProfile/>} /> 
         <Route path="/ErrorPage" element={<ErrorPage/>} /> 
+        <Route path="/Alljobs" element={<AllJobsPage/>} /> 
       </Routes>
     </Router>
   );
