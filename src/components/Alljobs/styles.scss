@@ -1,0 +1,81 @@
+.job-card {
+    display: flex;
+    justify-content: space-between;
+    border: 1px solid #e0e0e0;
+    padding: 20px;
+    margin-bottom: 20px;
+    background-color: #f8fafc;
+    border-radius: 10px;
+  
+    &__content {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+    }
+  
+    &__header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+  
+    &__title {
+      
+      font-size: 18px;
+      font-weight: bold;
+      color: #0f172a;
+      font-family: 'Poppins', sans-serif;
+    }
+  
+    &__view-button {
+      background-color: #00bfff;
+      color: #ffffff;
+      padding: 8px 16px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-family: 'Poppins', sans-serif;
+  
+      &:hover {
+        background-color: darken(#00bfff, 10%);
+      }
+    }
+  
+    &__info {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      font-size: 14px;
+      color: #64748b;
+    }
+  
+    &__rate {
+      font-size: 16px;
+      font-weight: 500;
+      color: #0f172a;
+    }
+  
+    &__details {
+      display: flex;
+      gap: 5%;
+      color: #94a3b8;
+    }
+
+    &__posted-by-head,
+    &__proposals-head,
+    &__messages-head {
+      font-size: 14px;
+      color: #0f172a;
+      
+      
+    }
+  
+    &__posted-by,
+    &__proposals,
+    &__messages {
+      font-size: 14px;
+    }
+
+
+  }
