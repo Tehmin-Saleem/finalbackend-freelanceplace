@@ -24,9 +24,9 @@ const JobsCard = ({
           <span className="job-card__posted-time">Posted {postedTime}</span>
           <button className="job-card__view-button">View</button>
         </div>
-        <div className="job-card__info">
+        <div className="job-card__information">
           <span className="job-card__rate-head">{type}:</span>
-          <span className="job-card__rate">{rate}</span>
+          <span className="job-card__rated">{rate}</span>
           <span className="job-card__timeline-head">Estimated time:</span>
           <span className="job-card__timeline"> {timeline}</span>
           <span className="job-card__level-head">Level:</span>

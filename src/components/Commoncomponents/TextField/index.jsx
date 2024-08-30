@@ -14,7 +14,7 @@ const Textfield = ({
   textColor,
 }) => {
   return (
-    <div>
+    <div className="textfield-container">
       {label && <label>{label}</label>}
       <div style={{ display: "flex", flexDirection: "row" }}>
         {icon && (

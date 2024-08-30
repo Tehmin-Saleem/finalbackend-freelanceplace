@@ -58,7 +58,7 @@ const FreelancersJobsPage = () => {
     <div className="jobs-page">
       <NewHeader />
       <h1 className="jobs-heading">My Jobs</h1>
-      <div className="search-container">
+      <div className="searchbar-container">
         <div className="search-bar-wrapper">
           <IconSearchBar className="icon" width="20" height="20" />
           <input type="text" placeholder="Search" className="search-input" />

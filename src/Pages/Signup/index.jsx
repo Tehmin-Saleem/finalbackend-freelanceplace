@@ -14,6 +14,7 @@ import {
   PassEye,
   Google,
   Apple,
+  Location,
 } from "../../svg/index";
 
 function Signup() {
@@ -77,31 +78,36 @@ function Signup() {
     const role = localStorage.getItem("userType");
 
     try {
-      const response = await axios.post('http://localhost:5000/api/client/signup', {
-        email,
-        password,
-        first_name: firstName,
-        last_name: lastName,
-        role,
-        country_name: country 
-      });
-      console.log('Signup response:', response);
+      const response = await axios.post(
+        "http://localhost:5000/api/client/signup",
+        {
+          email,
+          password,
+          first_name: firstName,
+          last_name: lastName,
+          role,
+          country_name: country,
+        }
+      );
+      console.log("Signup response:", response);
       if (response.status === 201) {
-        console.log('Signup successful');
-        navigate('/signin'); 
+        console.log("Signup successful");
+        navigate("/signin");
       }
     } catch (error) {
       if (error.response) {
-        console.error('Error response data:', error.response.data);
-        console.error('Error response status:', error.response.status);
-        console.error('Error response headers:', error.response.headers);
-        setSignupError(error.response.data.message || 'An error occurred during signup');
+        console.error("Error response data:", error.response.data);
+        console.error("Error response status:", error.response.status);
+        console.error("Error response headers:", error.response.headers);
+        setSignupError(
+          error.response.data.message || "An error occurred during signup"
+        );
       } else if (error.request) {
-        console.error('Error request:', error.request);
-        setSignupError('No response received from server');
+        console.error("Error request:", error.request);
+        setSignupError("No response received from server");
       } else {
-        console.error('Error message:', error.message);
-        setSignupError('Error setting up the request');
+        console.error("Error message:", error.message);
+        setSignupError("Error setting up the request");
       }
     }
   };
@@ -131,41 +137,70 @@ function Signup() {
               Please sign up to hire talented individuals
             </h1>
 
-            <TextField
-              label=""
-              icon={<Fname className="" />}
-              value={firstName}
-              placeholder="Enter First Name"
-              onChange={(e) => setFirstName(e.target.value)}
-              onBlur={validateName}
-              errorMessage={nameError}
-              className="flex mb-4 shadow text-[14px] border rounded-xl w-full py-3 px-3 bg-[#ECF0F1] font-Poppins"
-              textColor="#94A3B8"
-            />
+            <div className="relative">
+              <div className="flex mb-4 shadow border rounded-xl w-full py-3 px-3 bg-[#ECF0F1] font-Poppins">
+                <div className="pr-3">
+                  <Fname />
+                </div>
+                <input
+                  type="text"
+                  id="Firstname"
+                  name="Firstname"
+                  placeholder="Enter First name"
+                  className="text-[#94A3B8] bg-[#ECF0F1] text-[14px] flex-1"
+                  onChange={(e) => setFirstName(e.target.value)}
+                  onBlur={validateName}
+                  errorMessage={nameError}
+                  required
+                  value={firstName}
+                />
+              </div>
+            </div>
 
-            <TextField
-              label=""
-              icon={<Fname className="" />}
-              value={lastName}
-              placeholder="Enter Last Name"
-              onChange={(e) => setLastName(e.target.value)}
-              onBlur={validateName}
-              errorMessage={nameError}
-              className="flex mb-4 shadow text-[14px] border rounded-xl w-full py-3 px-3 bg-[#ECF0F1] font-Poppins"
-              textColor="#94A3B8"
-            />
 
-            <TextField
-              label=""
-              icon={<Mail />}
-              value={email}
-              placeholder="Enter work email address"
-              onChange={(e) => setEmail(e.target.value)}
-              onBlur={validateEmail}
-              errorMessage={emailError}
-              className="flex mb-4 shadow text-[14px] border rounded-xl w-full py-3 px-3 bg-[#ECF0F1] font-Poppins"
-              textColor="#94A3B8"
-            />
+
+            <div className="relative">
+              <div className="flex mb-4 shadow border rounded-xl w-full py-3 px-3 bg-[#ECF0F1] font-Poppins">
+                <div className="pr-3">
+                  <Fname />
+                </div>
+                <input
+                  type="text"
+                  id="Lastname"
+                  name="Lastname"
+                  placeholder="Enter Last name"
+                  className="text-[#94A3B8] bg-[#ECF0F1] text-[14px] flex-1"
+                  onChange={(e) => setLastName(e.target.value)}
+                  onBlur={validateName}
+                  errorMessage={nameError}
+                  required
+                  value={lastName}
+                />
+              </div>
+            </div>
+
+
+
+            <div className="relative">
+              <div className="flex mb-4 shadow border rounded-xl w-full py-3 px-3 bg-[#ECF0F1] font-Poppins">
+                <div className="pr-3">
+                  <Mail />
+                </div>
+                <input
+                  type="text"
+                  id="Lastname"
+                  name="Lastname"
+                  placeholder="Enter work email address"
+                  className="text-[#94A3B8] bg-[#ECF0F1] text-[14px] flex-1"
+                  onChange={(e) => setEmail(e.target.value)}
+                  onBlur={validateEmail}
+                  errorMessage={emailError}
+                  required
+                  value={email}
+                />
+              </div>
+            </div>
+
 
             <div className="relative">
               <div className="flex mb-4 shadow border rounded-xl w-full py-3 px-3 bg-[#ECF0F1] font-Poppins">
@@ -181,7 +216,7 @@ function Signup() {
                   onChange={handlePasswordChange}
                   required
                 />
-                 
+
                 <span
                   className="cursor-pointer"
                   onClick={handleTogglePasswordVisibility}
@@ -195,18 +230,34 @@ function Signup() {
                 <div className="text-red-500 text-xs mt-1">{passwordError}</div>
               )}
             </div>
-            <div className="mb-4">
-             
-              <input
-                type="text"
-                id="country"
-                name="country"
-                value={country}
-                onChange={(e) => setCountry(e.target.value)}
-                placeholder="Enter your country"
-                className="flex mb-4 shadow text-[14px] border rounded-xl w-full py-3 px-3 bg-[#ECF0F1] font-Poppins"
-              />
+
+            <div className="relative">
+              <div className="flex mb-4 shadow border rounded-xl w-full py-3 px-3 bg-[#ECF0F1] font-Poppins">
+                <div className="pr-3">
+                  <Location />
+                </div>
+                <input
+                  type="text"
+                  id="country"
+                  name="country"
+                  placeholder="Enter your country"
+                  className="text-[#94A3B8] bg-[#ECF0F1] text-[14px] flex-1"
+                  onChange={(e) => setCountry(e.target.value)}
+                  value={country}
+                />
+              </div>
             </div>
+
+
+
+
+
+
+
+
+
+
+
             <div className="mb-4 flex items-center">
               <input
                 type="checkbox"
@@ -239,7 +290,6 @@ function Signup() {
             {signupError && (
               <div className="text-red-500 text-xs mt-2">{signupError}</div>
             )}
-
 
             <div className="mt-8 mx-[10%] font-Poppins text-[14px] text-[#0F172A] items-center md:text-left">
               Already have an account?
