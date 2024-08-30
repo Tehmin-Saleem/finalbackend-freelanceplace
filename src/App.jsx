@@ -92,7 +92,7 @@ function App() {
         <Route path="/myProfile" element={<MyProfile/>} /> 
         <Route path="/ErrorPage" element={<ErrorPage/>} /> 
         <Route path="/SubmitProposal" element={<SubmitProposal/>} /> 
-        <Route path="/Alljobs" element={<AllJobs/>} /> 
+        {/* <Route path="/Alljobs" element={<AllJobs/>} />  */}
 
         <Route path="/Alljobs" element={<AllJobsPage/>} /> 
       </Routes>
