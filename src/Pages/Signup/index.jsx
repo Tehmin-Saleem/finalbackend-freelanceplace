@@ -97,6 +97,7 @@ function Signup() {
           localStorage.setItem('country', country);  
         navigate('/signin'); 
         console.log("Signup successful");
+        
         navigate("/signin");
       }
     } catch (error) {

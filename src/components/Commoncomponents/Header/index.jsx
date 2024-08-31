@@ -22,9 +22,11 @@ const state = proxy({
 });
 
 const Header = () => {
+  const userId = localStorage.getItem("userId");
   const snap = useSnapshot(state);
   const navigate = useNavigate();
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
+  const [userType, setUserType] = useState('');
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -42,6 +44,10 @@ const Header = () => {
     };
 
     fetchProfile();
+    
+    // Retrieve user type from local storage
+    const type = localStorage.getItem("userType");
+    setUserType(type);
   }, []);
 
   const toggleDropdown = (e, dropdownType) => {
@@ -63,11 +69,12 @@ const Header = () => {
   const handleProfileOption = (option) => {
     setProfileDropdownOpen(false);
     if (option === "PROFILE") {
-      navigate("/profile");
+      navigate(`/profile/${userId}`);
     } else if (option === "LOGOUT") {
       localStorage.removeItem("token");
       localStorage.removeItem("firstName");
       localStorage.removeItem("lastName");
+      localStorage.removeItem("userType");
       navigate("/signup");
     }
   };
@@ -93,6 +100,11 @@ const Header = () => {
     ? getInitials(firstName, lastName)
     : "";
 
+  // Define dropdown options based on user type
+  const dropdownOptions = userType === "client"
+    ? ["Post a Job", "All Jobs Post", "Add Payment", "Privacy Policy"]
+    : ["Explore Jobs", "Add Payment", "Privacy Policy"];
+
   return (
     <header className="header">
       <div className="header-top">
@@ -100,14 +112,14 @@ const Header = () => {
           <Logo width="100" height="40" />
         </div>
         <div className="dropdown-container">
-          <h2 className="find-work">Find Work</h2>
+          <h2 className="find-work">{userType === "client" ? "Find Talent" : "Find Work"}</h2>
           <div onClick={(e) => toggleDropdown(e, "jobs")} className="dropdown-toggle">
             <JobsDropdwon />
           </div>
           {snap.dropdownOpen && (
             <div className="dropdown-menu">
               <ul>
-                {["Post a Job", "All Jobs Post", "Add Payment", "Privacy Policy"].map((option) => (
+                {dropdownOptions.map((option) => (
                   <li
                     key={option}
                     className={`dropdown-item ${snap.selectedOption === option ? "selected" : ""}`}

@@ -12,6 +12,7 @@ const MyProfile = () => {
   const [skillInput, setSkillInput] = useState('');
   const [error, setError] = useState(null);
   const [profile, setProfile] = useState({
+    profileId: '',
     freelancer_id: '', 
     first_name: '',
     last_name: '',
@@ -234,20 +235,26 @@ const MyProfile = () => {
           formData.append(`portfolios`, portfolio.attachment, `portfolio_${index}_${portfolio.attachment.name}`);
         }
       });
-  
+      
       const token = localStorage.getItem('token');
+      console.log("Retrieved token:", token);
       const response = await axios.post('http://localhost:5000/api/freelancer/profile', formData, {
         headers: { 
           'Content-Type': 'multipart/form-data',
           'Authorization': `Bearer ${token}`
         }
+        
       });
-  
-      console.log('Profile updated successfully:', response);
+      
+      console.log('Profile updated successfully:', response.data);
+    
+    // Save profileId in local storage
+    localStorage.setItem('profileId', response.data.data.profileId);
+    
       navigate('/FreelanceDashBoard'); 
     } catch (error) {
-      console.error('Error submitting proposal:', error);
-      setError(error.message);
+      console.error('Error submitting profile:', error);
+      setError('An error occurred while updating the profile.');
     }
   };
 
