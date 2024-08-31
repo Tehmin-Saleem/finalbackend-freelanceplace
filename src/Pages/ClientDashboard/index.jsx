@@ -4,12 +4,20 @@ import Illustration from "../../images/Illustration.png"; // Adjust the image pa
 import { BackgroundLining } from "../../svg/index";
 import "./styles.scss";
 import { useNavigate } from 'react-router-dom'; // Import useNavigate
-
+import { useState, useEffect } from "react";
 const DashboardPage = () => {
-  const navigate = useNavigate(); // Initialize useNavigate
+  const navigate = useNavigate(); 
+  const [firstName, setFirstName] = useState('');
   const handleJobPostingButtonClick = () => {
-    navigate('/JobPosting'); // Replace with your target route
+    navigate('/JobPosting'); 
   };
+  useEffect(() => {
+    
+    const storedFirstName = localStorage.getItem('firstName');
+    if (storedFirstName) {
+      setFirstName(storedFirstName);
+    }
+  }, []);
   return (
     <div className="dashboard-page">
       {/* Importing Header Component */}
@@ -21,7 +29,7 @@ const DashboardPage = () => {
         <div className="left-section">
           <div className="left-content">
             <h1 className="welcome-text">
-              Welcome, Usman!
+              Welcome, {firstName}!
               <br />
               Let's start with
               <br />

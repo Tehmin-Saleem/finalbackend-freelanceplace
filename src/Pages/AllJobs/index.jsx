@@ -1,38 +1,52 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Header, Alljobs } from "../../components";
 import { Filter, IconSearchBar } from "../../svg";
+import axios from "axios";
 import "./styles.scss";
 
 const AllJobsPage = () => {
-  const [jobs] = useState([
-    {
-      id: 1,
-      title: "Create UI mockups of new website layout",
-      rate: "$200.00/fixed",
-      postedBy: "Public",
-      proposals: 22,
-      messages: 7,
-    },
-    {
-      id: 2,
-      title: "Create UI mockups of new website layout",
-      rate: "$12.00/Hourly",
-      postedBy: "Private",
-      proposals: 22,
-      messages: 7,
-    },
-    // Add more jobs here...
-  ]);
-
+  const [jobs, setJobs] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedFilter, setSelectedFilter] = useState("All");
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [currentPage, setCurrentPage] = useState(1);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  useEffect(() => {
+    fetchJobs();
+  }, []);
+
+  const fetchJobs = async () => {
+    try {
+      const token = localStorage.getItem("token")
+      setLoading(true);
+      const response = await axios.get("http://localhost:5000/api/client/jobposts", {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      
+      setJobs(response.data.jobPosts);
+      setLoading(false);
+    } catch (err) {
+      console.error("Error fetching job posts:", err);
+      setError("Failed to fetch job posts. Please try again later.");
+      setLoading(false);
+    }
+  };
 
   const handleSearchChange = (e) => setSearchTerm(e.target.value);
   const handleFilterChange = (e) => setSelectedFilter(e.target.value);
-  const handleRowsPerPageChange = (e) => setRowsPerPage(e.target.value);
+  const handleRowsPerPageChange = (e) => setRowsPerPage(Number(e.target.value));
   const handlePageChange = (pageNumber) => setCurrentPage(pageNumber);
+
+  const filteredJobs = jobs.filter((job) =>
+    job.job_title.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const indexOfLastJob = currentPage * rowsPerPage;
+  const indexOfFirstJob = indexOfLastJob - rowsPerPage;
+  const currentJobs = filteredJobs.slice(indexOfFirstJob, indexOfLastJob);
 
   return (
     <div className="jobs-page">
@@ -78,15 +92,24 @@ const AllJobsPage = () => {
 
       {/* Jobs List */}
       <div className="jobs-container">
-        {jobs
-          .filter((job) =>
-            job.title.toLowerCase().includes(searchTerm.toLowerCase())
-          )
-          .map((job) => (
-            <Alljobs key={job.id} {...job} />
-          ))}
+        {loading ? (
+          <p>Loading job posts...</p>
+        ) : error ? (
+          <p>{error}</p>
+        ) : currentJobs.length > 0 ? (
+          currentJobs.map((job) => (
+            <Alljobs
+              key={job._id}
+              title={job.job_title}
+              rate={job.budget_type === "hourly" ? `$${job.hourly_rate.from}-$${job.hourly_rate.to}/hr` : `$${job.fixed_price}/fixed`}
+              proposals={job.proposalCount || 0}
+              messages={job.messages ? job.messages.length : 0}
+            />
+          ))
+        ) : (
+          <p>No job posts found.</p>
+        )}
       </div>
-
       {/* Pagination */}
       <div className="pagination">
         <span>Rows per page</span>

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { Header } from "../../components/index";
 import "./styles.scss";
 
@@ -8,25 +8,24 @@ const ApplyJob = () => {
   const [jobPost, setJobPost] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
+  const navigate = useNavigate();
   useEffect(() => {
     const fetchJobPost = async () => {
       try {
         const token = localStorage.getItem('token');
-        console.log('Token retrieved:', token);
-        
         const response = await fetch(`http://localhost:5000/api/client/job-posts/${jobPostId}`, {
           headers: {
             'Authorization': `Bearer ${token}`
           }
         });
-    
+  
         if (!response.ok) {
           const errorData = await response.json();
           throw new Error(`Failed to fetch job post: ${response.statusText} - ${errorData.message}`);
         }
-    
+  
         const data = await response.json();
+        console.log('Fetched job post:', data); // Log the job post data to inspect
         setJobPost(data.jobPost);
         setLoading(false);
       } catch (error) {
@@ -35,9 +34,10 @@ const ApplyJob = () => {
         setLoading(false);
       }
     };
-
+  
     fetchJobPost();
   }, [jobPostId]);
+
 
   const EyeIcon = () => (
     <svg
@@ -62,28 +62,50 @@ const ApplyJob = () => {
     const now = new Date();
     const postedDate = new Date(dateString);
     const diffInSeconds = Math.floor((now - postedDate) / 1000);
-    
+
     if (diffInSeconds < 60) return 'Just now';
     if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)} minutes ago`;
     if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)} hours ago`;
     return `${Math.floor(diffInSeconds / 86400)} days ago`;
   };
 
-  const handleViewFile = () => {
-    const filePath = jobPost.attachment?.path; // Assuming the path to the file is stored in `attachment.path`
-    if (filePath) {
-      const fileUrl = `http://localhost:5000/${filePath}`; // Adjust this base URL as needed
-      const win = window.open();
-      win.document.write('<iframe src="' + fileUrl + '" frameborder="0" style="width:100%; height:100%;" allowfullscreen></iframe>');
+  const handleViewFile = async () => {
+    if (jobPost?.attachment?.fileName) {
+      try {
+        const token = localStorage.getItem('token');
+        const response = await fetch(`http://localhost:5000/api/client/jobpost/${jobPost.attachment.fileName}`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+  
+        if (!response.ok) {
+          throw new Error(`Failed to fetch file: ${response.statusText}`);
+        }
+  
+        const blob = await response.blob();
+        const fileUrl = URL.createObjectURL(blob);
+        const win = window.open();
+        win.document.write('<iframe src="' + fileUrl + '" frameborder="0" style="width:100%; height:100%;" allowfullscreen></iframe>');
+      } catch (error) {
+        console.error("Error fetching file:", error);
+        alert("Error fetching file: " + error.message);
+      }
     } else {
       console.error("No file available to view.");
+      alert("No file available to view.");
     }
   };
+  
+  
+  
 
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error: {error}</div>;
   if (!jobPost) return <div>No job post found</div>;
-
+  const handleApplyNow = () => {
+    navigate(`/submitProposal/${jobPostId}`);
+  };
   return (
     <>
       <Header />
@@ -100,7 +122,7 @@ const ApplyJob = () => {
                 <span className="time-text"> {formatTimeAgo(jobPost.createdAt)}</span>
               </p>
             </div>
-            <button className="apply-now-btn">Apply now</button>
+            <button className="apply-now-btn" onClick={handleApplyNow}>Apply now</button>
           </div>
 
           <hr className="divider" />

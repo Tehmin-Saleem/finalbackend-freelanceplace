@@ -91,8 +91,16 @@ function Signup() {
       );
       console.log("Signup response:", response);
       if (response.status === 201) {
+<<<<<<< HEAD
+        console.log('Signup successful');
+        localStorage.setItem('firstName', firstName); 
+        localStorage.setItem('lastName', lastName); 
+          localStorage.setItem('country', country);  
+        navigate('/signin'); 
+=======
         console.log("Signup successful");
         navigate("/signin");
+>>>>>>> 2a8b89ba492feb581378b7bc3b3f517fcd092b9e
       }
     } catch (error) {
       if (error.response) {

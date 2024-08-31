@@ -1,23 +1,31 @@
-// JobsCard.jsx
 import React from "react";
 import "./styles.scss"; // Import the SCSS file
-import StarRating from "../ProfileView/starrating"; // Import the StarRating component if needed
-import { JobSucces } from "../../svg";
+import { useNavigate } from 'react-router-dom';
 
 const Alljobs = ({
-  type,
   title,
   rate,
   postedBy,
   proposals,
   messages,
 }) => {
+  const navigate = useNavigate();
+
+  const handleViewClick = () => {
+    console.log('View button clicked');
+    navigate('/proposal');
+  };
+
   return (
     <div className="job-card">
       <div className="job-card__content">
         <div className="job-card__header">
           <span className="job-card__title">{title}</span>
-          <button className="job-card__view-button">View</button>
+          {proposals > 0 && (
+            <button className="job-card__view-button" onClick={handleViewClick}>
+              View
+            </button>
+          )}
         </div>
         <div className="job-card__info">
           <span className="job-card__rate">{rate}</span>
@@ -28,7 +36,6 @@ const Alljobs = ({
             <span className="job-card__proposals">{proposals}</span>
             <span className="job-card__messages-head">Message: </span>
             <span className="job-card__messages">{messages}</span>
-            
           </div>
         </div>
       </div>

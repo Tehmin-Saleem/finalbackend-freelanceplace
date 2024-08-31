@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import {
-  NewHeader,
+  Header,
   FreelancersJobsCard,
   CommonButton,
 } from "../../components/index";
@@ -56,7 +56,7 @@ const FreelancersJobsPage = () => {
 
   return (
     <div className="jobs-page">
-      <NewHeader />
+      <Header />
       <h1 className="jobs-heading">My Jobs</h1>
       <div className="searchbar-container">
         <div className="search-bar-wrapper">

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { NewHeader, JobsCard, Header } from "../../components/index";
+import {  JobsCard, Header } from "../../components/index";
 import "./styles.scss";
 
 const JobsPage = () => {
