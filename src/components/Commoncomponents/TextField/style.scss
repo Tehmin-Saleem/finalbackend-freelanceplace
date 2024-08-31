@@ -6,16 +6,19 @@ $input-background-color: #ECF0F1;
   // label {
   //   // Add any label-specific styles here
   // }
-
+  // border: 1px solid black;
+  
   .input-wrapper {
     display: flex;
-
+    align-items: center;
+    justify-content: center;
+    
     .icon {
-        fill: red !important;
-        margin-top: 20px;
+      fill: red !important;
+      margin-top: 20px;
       // Add any icon-specific styles here
     }
-
+    
     input {
       background-color: $input-background-color;
       &:focus {
