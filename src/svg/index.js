@@ -48,7 +48,8 @@ import UserIcon from "./Sammar's-SVG-Components/UserIcon";
 import Logo from "./Sammar's-SVG-Components/Logo";
 import UploadIcon from "./Sammar's-SVG-Components/UploadIcon";
 import DollarIcon from "./Sammar's-SVG-Components/DollarIcon";
-import Cross from "./Myprofile/Cross"
+import Cross from "./Myprofile/Cross";
+import Notifications from "./Sammar's-SVG-Components/Notifications";
 
 
 export { default as BackgroundLining } from "./Sammar's-SVG-Components/BackgroundLining";
@@ -100,3 +101,4 @@ export {default as Star} from "./ProfileView/Star"
 export {default as UStates} from "./ProfileView/UStates"
 export {default as Filter} from "./FreelanceDoneJobs/Filter"
 export {default as Cross} from "./Myprofile/Cross"
+export {default as Notifications} from "./Sammar's-SVG-Components/Notifications"

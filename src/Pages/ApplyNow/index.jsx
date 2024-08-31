@@ -109,27 +109,27 @@ const ApplyJob = () => {
   return (
     <>
       <Header />
-      <div className="job-details-container">
-        <h2 className="job-details-heading">Job details</h2>
+      <div className="job-Details-Container">
+        <h2 className="job-details-Heading">Job details</h2>
 
-        <div className="job-card">
-          <div className="job-header">
+        <div className="job-Card">
+          <div className="header-job">
             <div>
-              <h3 className="job-title">{jobPost.job_title}</h3>
-              <p className="job-location">Lahore</p>
-              <p className="job-posted-time">
+              <h3 className="job-Title">{jobPost.job_title}</h3>
+              <p className="job-Location">Lahore</p>
+              <p className="job-posted-Time">
                 <span className="posted-text">Posted:</span> 
                 <span className="time-text"> {formatTimeAgo(jobPost.createdAt)}</span>
               </p>
             </div>
-            <button className="apply-now-btn" onClick={handleApplyNow}>Apply now</button>
+            <button className="apply-now-bton" onClick={handleApplyNow}>Apply now</button>
           </div>
 
           <hr className="divider" />
 
-          <div className="job-info">
+          <div className="job-infor">
             <span className="job-info-item">
-              <span className="label">
+              <span className="labeltext">
                 {jobPost.budget_type === 'fixed' ? 'Fixed Price:' : 'Hourly Rate:'}
               </span> 
               <span className="value">
@@ -139,11 +139,11 @@ const ApplyJob = () => {
               </span>
             </span>
             <span className="job-info-item">
-              <span className="label">Estimated Time:</span> 
+              <span className="labeltext">Estimated Time:</span> 
               <span className="value">{jobPost.project_duration?.duration_of_work}</span>
             </span>
             <span className="job-info-item">
-              <span className="label">Level:</span> 
+              <span className="labeltext">Level:</span> 
               <span className="value">{jobPost.project_duration?.experience_level}</span>
             </span>
           </div>

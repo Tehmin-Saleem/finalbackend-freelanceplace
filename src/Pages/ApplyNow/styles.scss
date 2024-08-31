@@ -12,16 +12,16 @@ $color-white: #ffffff;
 $color-accent: #4bcdeb;
 $bg-color: #f7f8fa;
 
-.job-details-container {
+.job-Details-Container {
   margin: 2rem;
 
-  .job-details-heading {
+  .job-details-Heading {
     margin-left: 10rem;
     font-size: 1.9rem;
     font-family: $font-poppins;
   }
 
-  .job-card {
+  .job-Card {
     background-color: #f5f5f5;
     padding: 2rem;
     border: 2px solid #ddd;
@@ -29,26 +29,26 @@ $bg-color: #f7f8fa;
     margin: 2rem 9rem;
     border-radius: 10px;
 
-    .job-header {
+    .header-job {
       display: flex;
       justify-content: space-between;
       margin-bottom: 1rem;
 
-      .job-title {
+      .job-Title {
         font-size: 2rem;
         margin: 0;
         font-family: $font-poppins;
         font-weight: 600;
       }
 
-      .job-location {
+      .job-Location {
         margin: 0.25rem 0;
         color: $color-dark; // Change this color as needed
         font-family: $font-poppins;
         font-weight: 550;
       }
 
-      .job-posted-time {
+      .job-posted-Time {
         margin: 0.25rem 0;
         
         font-family: $font-poppins;
@@ -63,7 +63,7 @@ $bg-color: #f7f8fa;
       }
     }
 
-    .apply-now-btn {
+    .apply-now-bton {
       background-color: $color-accent;
       color: white;
       padding: 0.5rem 1rem;
@@ -79,7 +79,7 @@ $bg-color: #f7f8fa;
       
     
 
-          .job-info {
+          .job-infor {
             display: flex;
             // justify-content: space-between;
             margin-bottom: 1rem;
@@ -91,7 +91,7 @@ $bg-color: #f7f8fa;
               gap: 0.3rem; /* Add some gap between the label and value text */
             }
           
-            .label {
+            .labeltext {
               color:$color-dark; /* Black color for "Hourly", "Estimated Time", "Level" */
               font-weight: 550; /* Optional: Make it bold for emphasis */
             }

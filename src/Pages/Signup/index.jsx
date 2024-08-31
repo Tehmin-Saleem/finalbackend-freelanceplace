@@ -98,6 +98,7 @@ function Signup() {
         navigate('/signin'); 
         console.log("Signup successful");
         
+        navigate("/signin");
       }
     } catch (error) {
       if (error.response) {
