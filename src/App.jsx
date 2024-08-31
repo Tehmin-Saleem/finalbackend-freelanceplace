@@ -5,6 +5,8 @@ import { ProfileView, Proposal, JobsPage, SignIn, Signup,ClientDashboard , Freel
 // import SendOffer from "./components/FormProposal/OfferForm";
 import {Header, FreelancerCards} from "./components/index";
 import SubmitProposal from "./Pages/SubmitProposal";
+import Notification from "./Pages/Notifications";
+import Chat from "./Pages/ChatPage";
 // import OfferForm from "./components/FormProposal/OfferForm";
 
 
@@ -69,7 +71,8 @@ function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<SignUpSection />} />
+      <Route path="/Chat" element={<Chat/>} />
+        <Route path="/Notifications" element={<Notification/>} />        <Route path="/" element={<SignUpSection />} />
         <Route path="/profile" element={<ProfileView />} />
         <Route path="/proposal" element={<Proposal />} />
         <Route path="/matchingjobs" element={<JobsPage />} />
@@ -94,9 +97,7 @@ function App() {
         {/* <Route path="/SubmitProposal" element={<SubmitProposal/>} />  */}
         <Route path="/SubmitProposal/:jobPostId" element={<SubmitProposal/>} /> 
         <Route path="/SubmitProposal" element={<SubmitProposal/>} /> 
-        {/* <Route path="/Alljobs" element={<AllJobs/>} />  */}
 
-        <Route path="/Alljobs" element={<AllJobsPage/>} /> 
       </Routes>
     </Router>
   );
