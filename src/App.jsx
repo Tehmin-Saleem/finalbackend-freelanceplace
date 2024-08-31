@@ -70,7 +70,7 @@ function App() {
     <Router>
       <Routes>
         <Route path="/" element={<SignUpSection />} />
-        <Route path="/profile" element={<ProfileView />} />
+        {/* <Route path="/profile" element={<ProfileView />} /> */}
         <Route path="/proposal" element={<Proposal />} />
         <Route path="/matchingjobs" element={<JobsPage />} />
         <Route path="/signin" element={<SignIn />} />
@@ -91,6 +91,7 @@ function App() {
         <Route path="/ProjectDetails" element={<JobDetails/>} /> 
         <Route path="/myProfile" element={<MyProfile/>} /> 
         <Route path="/ErrorPage" element={<ErrorPage/>} /> 
+        <Route path="/profile/:userId" element={<ProfileView />} />
         {/* <Route path="/SubmitProposal" element={<SubmitProposal/>} />  */}
         <Route path="/SubmitProposal/:jobPostId" element={<SubmitProposal/>} /> 
         <Route path="/SubmitProposal" element={<SubmitProposal/>} /> 
