@@ -6,6 +6,7 @@ const authMiddleware = require('../middleware/auth.middleware');
 const jobPostController = require('../controllers/post_job.controller');
 const reviewRequestController = require("../controllers/review_request.controller");
 const paymentMethodController = require('../controllers/payment_method.controller');
+const path = require('path');
 
 const hireFreelancerController = require('../controllers/hire_freelancer.controller');
 const upload = require('../config/multer'); 
@@ -21,7 +22,7 @@ router.post('/login', login);
 router.use(authMiddleware);
 
 
-router.post('/upload', upload.single('File'), (req, res) => {
+router.post('/uploads', upload.single('File'), (req, res) => {
   try {
     const file = req.file;
     if (!file) {
@@ -32,7 +33,11 @@ router.post('/upload', upload.single('File'), (req, res) => {
     res.status(500).send('Server error');
   }
 });
-
+router.get('/jobpost/:fileName', (req, res) => {
+  const { fileName } = req.params;
+  const filePath = path.join(__dirname, '../uploads', fileName); // Adjust path as necessary
+  res.sendFile(filePath);
+});
 
 router.post('/reviews', ReviewController.createReview);
 

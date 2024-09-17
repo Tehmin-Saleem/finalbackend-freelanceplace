@@ -1,5 +1,5 @@
 const Job_Post = require('../models/post_job.model');
-
+const Proposal = require('../models/proposal.model');
 exports.createJobPost = async (req, res) => {
   try {
     const {
@@ -59,15 +59,20 @@ exports.createJobPost = async (req, res) => {
 
 exports.getClientJobPosts = async (req, res) => {
   try {
-    // const client_id = req.user._id; 
+    const jobPosts = await Job_Post.find().lean();
 
-    const jobPosts = await Job_Post.find();
+    // Fetch proposal counts for each job post
+    const jobPostsWithProposalCounts = await Promise.all(jobPosts.map(async (job) => {
+      const proposalCount = await Proposal.countDocuments({ job_id: job._id });
+      return { ...job, proposalCount };
+    }));
 
-    res.status(200).json({ jobPosts });
+    res.status(200).json({ jobPosts: jobPostsWithProposalCounts });
   } catch (err) {
-    res.status(500).json({ message: 'Internal server error' });
+    console.error('Error fetching job posts:', err);
+    res.status(500).json({ message: 'Internal server error', error: err.message });
   }
-};  
+};
 
 // Backend API controller
 exports.getJobPostById = async (req, res) => {

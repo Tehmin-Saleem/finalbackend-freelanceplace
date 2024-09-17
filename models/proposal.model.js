@@ -36,16 +36,17 @@ const ProposalSchema = new Schema({
   cover_letter: {
     type: String,
   },
-  freelancer_id: {
-    type: mongoose.Types.ObjectId,
-    
-    ref: "User",
-  },
+ 
   job_id: {
     type: mongoose.Types.ObjectId,
-    required: true,
+    
     ref: "Job_Post",
   },
+  freelancer_id: { 
+    type: Schema.Types.ObjectId, 
+    ref: 'User'  
+  },
+  
   project_duration: {
     type: String,
   },
