@@ -105,3 +105,4 @@ router.put('/hire/:hireRequestId', hireFreelancerController.updateHireRequest);
 router.delete('/hire/:hireRequestId', hireFreelancerController.deleteHireRequest);
 
 module.exports = router;
+
