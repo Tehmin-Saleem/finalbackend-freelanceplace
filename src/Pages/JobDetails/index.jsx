@@ -45,6 +45,12 @@ const JobDetails = () => {
   const [jobData, setJobData] = useState({});
 
   useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      navigate('/signin');
+      return;
+    }
+
     const storedData = {
       job_title: localStorage.getItem('jobTitle'),
       description: localStorage.getItem('jobDescription'),
@@ -78,7 +84,7 @@ const JobDetails = () => {
         detailed_description: storedData.attachment?.description || ''
       }
     });
-  }, []);
+  }, [navigate]);
   const handlePostJob = async () => {
     try {
       const token = localStorage.getItem('token');
