@@ -119,13 +119,15 @@ const Freelancer_Profile = require('../models/freelancer_profile.model');
 //     res.status(400).json({ success: false, error: err.message });
 //   }
 // };
+
 exports.createOrUpdateProfile = async (req, res) => {
   try {
     console.log('Received data:', req.body);
     console.log('Received files:', req.files);
-    console.log('Received freelancer_id:', req.body.freelancer_id);
+    console.log('User ID from middleware:', req.user);
+    const freelancerId = req.user && (req.user.userId || req.user);
     const profileData = {
-      freelancer_id: req.body.freelancer_id, // Add this line
+      freelancer_id: freelancerId, // Use the ID from the middleware
       first_name: req.body.first_name,
       last_name: req.body.last_name,
       title: req.body.title,
@@ -136,9 +138,9 @@ exports.createOrUpdateProfile = async (req, res) => {
       skills: JSON.parse(req.body.skills),
     };
 
-     // Handle image upload
+    // Handle image upload
     if (req.files && req.files.image) {
-      profileData.image = req.files.image[0].filename; // Store only the filename, not the full path
+      profileData.image = req.files.image[0].filename;
     }
 
     // Handle portfolios
@@ -149,7 +151,7 @@ exports.createOrUpdateProfile = async (req, res) => {
       if (req.files && req.files.portfolios) {
         req.files.portfolios.forEach((file, index) => {
           if (profileData.portfolios[index]) {
-            profileData.portfolios[index].attachment = file.filename; // Use filename instead of full path
+            profileData.portfolios[index].attachment = file.filename;
           }
         });
       }
@@ -227,7 +229,7 @@ function calculateJobSuccess(profile) {
 
 exports.getProfileByUserId = async (req, res) => {
   try {
-    const userId = req.user.id;
+    const userId = req.user; // Assumed to be set after authentication middleware
     const profile = await Freelancer_Profile.findOne({ profileId: userId })
       .select('-__v -createdAt -updatedAt');
 
@@ -235,6 +237,7 @@ exports.getProfileByUserId = async (req, res) => {
       return res.status(404).json({ success: false, message: 'Profile not found' });
     }
 
+    // Constructing the formatted profile
     const formattedProfile = {
       name: `${profile.first_name} ${profile.last_name}`.trim() || 'No Name',
       location: profile.location || 'Not specified',
@@ -242,10 +245,10 @@ exports.getProfileByUserId = async (req, res) => {
       rate: profile.hourly_rate || 'Not specified',
       skills: profile.skills || [],
       totalJobs: profile.completed_projects || 0,
-      totalHours: profile.total_hours || 0,  // Assuming this field exists or should be calculated
+      totalHours: profile.total_hours || 0,
       title: profile.title || '',
       experience: {
-        description: profile.profile_overview || 'No description available',  // Assuming profile_overview is used here
+        description: profile.profile_overview || 'No description available',
         title: profile.title || '',
       },
       availability: {
@@ -256,8 +259,9 @@ exports.getProfileByUserId = async (req, res) => {
       languages: profile.languages || [],
       portfolios: profile.portfolios || [],
       image: profile.image ? `/api/freelancer/profile/image/${profile.image}` : null,
+    
     };
-
+    console.log("formatted", formattedProfile)
     res.status(200).json({ success: true, data: formattedProfile });
   } catch (err) {
     console.error('Error in getProfileByUserId:', err);
@@ -266,9 +270,9 @@ exports.getProfileByUserId = async (req, res) => {
 };
 
 function calculateJobSuccess(profile) {
-  // You might want to implement a more accurate calculation based on actual job data
   return profile.completed_projects > 0 ? Math.floor(Math.random() * (100 - 80 + 1)) + 80 : 0;
 }
+
 
 
 

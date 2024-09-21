@@ -84,7 +84,7 @@ router.post('/profile', upload.fields([
 ]), freelancerProfileController.createOrUpdateProfile);
 
 router.get('/profile', authMiddleware, freelancerProfileController.getAuthenticatedProfile);
-router.put('/profile/:freelancerId', freelancerProfileController.updateProfile);
+// router.put('/profile/:freelancerId', freelancerProfileController.getProfileByUserId);
 router.delete('/profile/:freelancerId', freelancerProfileController.deleteProfile);
-router.get('/profile/:profileId', authMiddleware, freelancerProfileController.getProfileByUserId);
+router.get('/profile', authMiddleware, freelancerProfileController.getProfileByUserId);
 module.exports = router;

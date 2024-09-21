@@ -26,7 +26,7 @@ const freelancer_ProfileSchema = new Schema({
   freelancer_id: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
-    required: true
+   
   },
   profileId: { type: mongoose.Schema.Types.ObjectId, auto: true },
   first_name: {
