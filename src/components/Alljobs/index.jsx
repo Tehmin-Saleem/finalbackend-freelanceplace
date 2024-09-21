@@ -1,28 +1,23 @@
 import React from "react";
-import "./styles.scss"; // Import the SCSS file
-import { useNavigate } from 'react-router-dom';
+import "./styles.scss";
 
 const Alljobs = ({
+  jobId,
   title,
   rate,
   postedBy,
   proposals,
   messages,
+  onViewClick,
 }) => {
-  const navigate = useNavigate();
-
-  const handleViewClick = () => {
-    console.log('View button clicked');
-    navigate('/proposal');
-  };
-
+  // console.log("jobId in Alljobs:", jobId);
   return (
     <div className="job-card">
       <div className="job-card__content">
         <div className="job-card__header">
           <span className="job-card__title">{title}</span>
           {proposals > 0 && (
-            <button className="job-card__view-button" onClick={handleViewClick}>
+            <button className="job-card__view-button" onClick={() => onViewClick(jobId)}>
               View
             </button>
           )}

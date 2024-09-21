@@ -82,7 +82,7 @@ function SignIn() {
   };
 
   return (
-    <div className="md:flex md:flex-row">
+    <div className="md:flex md:flex-row  h-auto">
       {/* First Half - Logo and Picture */}
       <div className="md:w-1/2 h-screen bg-white hidden md:block">
         <div className="flex flex-col items-center justify-center h-full">
@@ -99,7 +99,7 @@ function SignIn() {
       </div>
 
       {/* Second Half - Form */}
-      <div className="md:w-1/2 w-full h-screen md:mt-9 md:mr-9 bg-white flex items-center justify-center shadow-lg">
+      <div className="md:w-1/2 w-full h-screen  md:mr-9 bg-white flex items-center justify-center shadow-lg">
         <div className="w-full max-w-lg p-16 shadow-2xl ">
           <form onSubmit={handleLogin}>
             <h1 className="text-[24px] font-Poppins font-medium text-center px-16 py-2">

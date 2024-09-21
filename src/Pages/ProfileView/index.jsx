@@ -271,3 +271,4 @@ console.log('Portfolio path:', `http://localhost:5000/api/freelancer/profile/por
 }
 
 export default ProfileView;
+

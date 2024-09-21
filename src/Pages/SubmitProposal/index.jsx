@@ -12,7 +12,7 @@ const SubmitProposal = () => {
   const [jobDetails, setJobDetails] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
+  const [freelancerId, setFreelancerId] = useState(null);
   const [paymentMethod, setPaymentMethod] = useState(""); 
 
   const addMilestone = () => {
@@ -77,15 +77,41 @@ const SubmitProposal = () => {
     </svg>
   );
   useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        if (!token) {
+          navigate('/signin');
+          return;
+        }
+        const response = await fetch('http://localhost:5000/api/freelancer/profile', {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        if (!response.ok) {
+          throw new Error('Failed to fetch user data');
+        }
+        const userData = await response.json();
+        setFreelancerId(userData.id); // Save the freelancer ID
+      } catch (error) {
+        console.error('Error fetching user data:', error);
+        setError(error.message);
+      }
+    };
+    fetchUserData();
     const fetchJobDetails = async () => {
       try {
         const token = localStorage.getItem('token');
+        if (!token) {
+          navigate('/signin');
+          return;
+        }
         const response = await fetch(`http://localhost:5000/api/client/job-posts/${jobPostId}`, {
           headers: {
             'Authorization': `Bearer ${token}`
           }
         });
-
         if (!response.ok) {
           throw new Error(`Failed to fetch job details: ${response.statusText}`);
         }
@@ -108,6 +134,7 @@ const SubmitProposal = () => {
     cover_letter: "",
     project_duration: "",
     portfolio_link: "",
+   
   });
 
   const navigate = useNavigate();
@@ -126,6 +153,7 @@ const SubmitProposal = () => {
     try {
       const token = localStorage.getItem('token');
       const formDataToSend = new FormData();
+     
       const add_requirements = paymentMethod === "milestone" 
         ? { 
             by_milestones: milestones.map(m => ({
@@ -140,36 +168,38 @@ const SubmitProposal = () => {
               due_date: formData.projectDueDate
             }
           };
-          formDataToSend.append('add_requirements', JSON.stringify(add_requirements));
-          if (formData.attachment) {
-            formDataToSend.append('attachment', formData.attachment);
-          }
-          formDataToSend.append('cover_letter', formData.cover_letter);
-          formDataToSend.append('job_id', jobPostId);
-          formDataToSend.append('project_duration', formData.project_duration);
-          formDataToSend.append('portfolio_link', formData.portfolio_link);
-          formDataToSend.append('client_id', jobDetails._id);
-    const response = await fetch(`http://localhost:5000/api/freelancer/proposal/${jobPostId}`, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-      },
-      body: formDataToSend,
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || `Failed to submit proposal: ${response.statusText}`);
+      formDataToSend.append('add_requirements', JSON.stringify(add_requirements));
+      if (formData.attachment) {
+        formDataToSend.append('attachment', formData.attachment);
+      }
+      formDataToSend.append('cover_letter', formData.cover_letter);
+      formDataToSend.append('job_id', jobPostId);
+      formDataToSend.append('project_duration', formData.project_duration);
+      formDataToSend.append('portfolio_link', formData.portfolio_link);
+      formDataToSend.append('client_id', jobDetails._id);
+      // Removed: formDataToSend.append('freelancer_id', userId);
+  
+      const response = await fetch(`http://localhost:5000/api/freelancer/proposal/${jobPostId}`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+        body: formDataToSend,
+      });
+  
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || `Failed to submit proposal: ${response.statusText}`);
+      }
+  
+      const result = await response.json();
+      console.log('Proposal submitted successfully:', result);
+      navigate('/matchingJobs'); 
+    } catch (error) {
+      console.error('Error submitting proposal:', error);
+      setError(error.message);
     }
-
-    const result = await response.json();
-    console.log('Proposal submitted successfully:', result);
-    navigate('/JobPosting'); 
-  } catch (error) {
-    console.error('Error submitting proposal:', error);
-    setError(error.message);
-  }
-};
+  };
 return (
   <>
     <Header />
