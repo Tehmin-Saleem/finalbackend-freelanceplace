@@ -98,6 +98,8 @@ function App() {
         {/* <Route path="/SubmitProposal" element={<SubmitProposal/>} />  */}
         <Route path="/SubmitProposal/:jobPostId" element={<SubmitProposal/>} /> 
         <Route path="/SubmitProposal" element={<SubmitProposal/>} /> 
+        <Route path="/Alljobspage" element={<AllJobsPage/>} /> 
+
 
       </Routes>
     </Router>

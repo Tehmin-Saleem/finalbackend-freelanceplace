@@ -4,7 +4,7 @@ import {  Header  } from "../../components/index";
 import {  JobsDropdwon  } from '../../svg/index';
 import "./styles.scss";
 import axios from 'axios';
-import { useState } from 'react';
+
 
 const FreelancerCard = ({ heading }) => {
   const [freelancers, setFreelancers] = useState([]);
