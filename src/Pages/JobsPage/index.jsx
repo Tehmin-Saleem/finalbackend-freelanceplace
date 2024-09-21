@@ -2,17 +2,20 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import {  JobsCard, Header } from "../../components/index";
 import "./styles.scss";
-
+import { useNavigate } from 'react-router-dom';
 const JobsPage = () => {
   const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-
+  const navigate = useNavigate();
   useEffect(() => {
     const fetchJobs = async () => {
       try {
         const token = localStorage.getItem('token');
-
+        if (!token) {
+          navigate('/signin');
+          return;
+        }
         if (token) {
           console.log('Token retrieved:', token);
         } else {

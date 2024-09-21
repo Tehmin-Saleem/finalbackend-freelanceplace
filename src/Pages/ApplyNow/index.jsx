@@ -9,21 +9,27 @@ const ApplyJob = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
+
   useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      navigate('/signin');
+      return;
+    }
+
     const fetchJobPost = async () => {
       try {
-        const token = localStorage.getItem('token');
         const response = await fetch(`http://localhost:5000/api/client/job-posts/${jobPostId}`, {
           headers: {
             'Authorization': `Bearer ${token}`
           }
         });
-  
+
         if (!response.ok) {
           const errorData = await response.json();
           throw new Error(`Failed to fetch job post: ${response.statusText} - ${errorData.message}`);
         }
-  
+
         const data = await response.json();
         console.log('Fetched job post:', data); // Log the job post data to inspect
         setJobPost(data.jobPost);
@@ -34,10 +40,9 @@ const ApplyJob = () => {
         setLoading(false);
       }
     };
-  
-    fetchJobPost();
-  }, [jobPostId]);
 
+    fetchJobPost();
+  }, [jobPostId, navigate]);
 
   const EyeIcon = () => (
     <svg
@@ -78,11 +83,11 @@ const ApplyJob = () => {
             'Authorization': `Bearer ${token}`
           }
         });
-  
+
         if (!response.ok) {
           throw new Error(`Failed to fetch file: ${response.statusText}`);
         }
-  
+
         const blob = await response.blob();
         const fileUrl = URL.createObjectURL(blob);
         const win = window.open();
@@ -96,13 +101,11 @@ const ApplyJob = () => {
       alert("No file available to view.");
     }
   };
-  
-  
-  
 
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error: {error}</div>;
   if (!jobPost) return <div>No job post found</div>;
+
   const handleApplyNow = () => {
     navigate(`/submitProposal/${jobPostId}`);
   };

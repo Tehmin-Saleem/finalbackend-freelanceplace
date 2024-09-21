@@ -74,7 +74,9 @@ function App() {
       <Route path="/Chat" element={<Chat/>} />
         <Route path="/Notifications" element={<Notification/>} />        <Route path="/" element={<SignUpSection />} />
         {/* <Route path="/profile" element={<ProfileView />} /> */}
-        <Route path="/proposal" element={<Proposal />} />
+        <Route path="/proposals" element={<Proposal />} />
+        <Route path="/proposals/:jobId" element={<Proposal />} />
+        <Route path="/alljobs" element={<AllJobsPage />} />
         <Route path="/matchingjobs" element={<JobsPage />} />
         <Route path="/signin" element={<SignIn />} />
         <Route path="/freelancersjobpage" element={<FreelancersDoneJobsPage />} />
@@ -94,10 +96,11 @@ function App() {
         <Route path="/ProjectDetails" element={<JobDetails/>} /> 
         <Route path="/myProfile" element={<MyProfile/>} /> 
         <Route path="/ErrorPage" element={<ErrorPage/>} /> 
-        <Route path="/profile/:userId" element={<ProfileView />} />
-        {/* <Route path="/SubmitProposal" element={<SubmitProposal/>} />  */}
+        <Route path="/profile" element={<ProfileView />} />
+        
         <Route path="/SubmitProposal/:jobPostId" element={<SubmitProposal/>} /> 
         <Route path="/SubmitProposal" element={<SubmitProposal/>} /> 
+        <Route path="*" element={<ErrorPage />} />
 
       </Routes>
     </Router>
