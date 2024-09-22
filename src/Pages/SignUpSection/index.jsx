@@ -95,7 +95,7 @@ const SignUpSection = () => {
           </button>
           <p className="login-text">
             Already have an account?{" "}
-            <a href="#" className="login-link">
+            <a href="signin" className="login-link">
               Login
             </a>
           </p>

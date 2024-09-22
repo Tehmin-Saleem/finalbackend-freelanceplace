@@ -97,6 +97,7 @@ function Signup() {
           localStorage.setItem('country', country);  
         navigate('/signin'); 
         console.log("Signup successful");
+        
         navigate("/signin");
       }
     } catch (error) {
@@ -118,10 +119,10 @@ function Signup() {
   };
 
   return (
-    <div className="md:flex md:flex-row">
+    <div className="md:flex md:flex-row  h-[730px]">
       {/* First Half - Logo and Picture */}
-      <div className="md:w-1/2 h-screen bg-white hidden md:block">
-        <div className="flex flex-col items-center justify-center h-full">
+      <div className="md:w-1/2  bg-white hidden md:block h-[730px]">
+        <div className="flex flex-col items-center justify-center h-[730px] ">
           <div className="mb-6">
             <LogoName />
           </div>
@@ -135,8 +136,8 @@ function Signup() {
       </div>
 
       {/*================= Second Half - Form ================*/}
-      <div className="md:w-1/2 w-full h-screen md:mt-9 md:mr-9 bg-white flex items-center justify-center shadow-lg">
-        <div className="w-full max-w-lg px-16 shadow-2xl h-full">
+      <div className="md:w-1/2 w-full h-[730px] md:mt-9 md:mr-9 bg-white flex items-center justify-center shadow-lg">
+        <div className="w-full max-w-lg px-16 shadow-2xl h-600  ">
           <form onSubmit={handleSubmit}>
             <h1 className="text-[24px] font-Poppins font-medium text-center px-16 py-2">
               Please sign up to hire talented individuals

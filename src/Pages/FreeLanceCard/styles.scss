@@ -110,24 +110,26 @@ $bg-color: #f7f8fa;
   // align-items: center;
 }
 
-.small-box {
-  width: 80px; /* Increased size for the small profile pic box */
-  height: 55px;
-  border-radius: 5px;
-  overflow: hidden;
-  margin-right: 10px;
-  margin-top: 1rem;
-}
+// .small-box {
+//   width: 80px; /* Increased size for the small profile pic box */
+//   height: 55px;
+//   border-radius: 5px;
+//   // overflow: hidden;
+//   // margin-right: 10px;
+//   margin-top: 1rem;
+//   background-color: #2c3e50;
+// }
 
-.small-profile-pic {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
+// .small-profile-pic {
+//   width: 100%;
+//   height: 100%;
+//   object-fit: cover;
+// }
 
 .freelancer-name {
   font-size: 18px;
   font-weight: 500;
+  
 
 
   // font-weight: bold;
@@ -159,8 +161,8 @@ $bg-color: #f7f8fa;
   align-items: center;
   line-height: 1;  /* Reduce line-height */
   font-size: 1rem;  /* Reduce font size if needed */
-  margin-bottom: 1.5rem;
-  margin-top: 0.5rem;
+ 
+  margin-top: 1rem;
 }
 
 

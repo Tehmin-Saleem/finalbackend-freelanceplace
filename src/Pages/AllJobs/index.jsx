@@ -3,6 +3,7 @@ import { Header, Alljobs } from "../../components";
 import { Filter, IconSearchBar } from "../../svg";
 import axios from "axios";
 import "./styles.scss";
+import { useNavigate } from "react-router-dom";
 
 const AllJobsPage = () => {
   const [jobs, setJobs] = useState([]);
@@ -12,26 +13,38 @@ const AllJobsPage = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const navigate = useNavigate();
+
   useEffect(() => {
     fetchJobs();
   }, []);
 
   const fetchJobs = async () => {
+    const token = localStorage.getItem("token");
+  
+    if (!token) {
+      navigate("/signin");
+      return;
+    }
+  
     try {
-      const token = localStorage.getItem("token")
       setLoading(true);
       const response = await axios.get("http://localhost:5000/api/client/jobposts", {
         headers: {
           'Authorization': `Bearer ${token}`
         }
       });
-      
+  
       setJobs(response.data.jobPosts);
       setLoading(false);
     } catch (err) {
       console.error("Error fetching job posts:", err);
       setError("Failed to fetch job posts. Please try again later.");
       setLoading(false);
+  
+      if (err.response && err.response.status === 401) {
+        navigate("/signin");
+      }
     }
   };
 
@@ -47,7 +60,14 @@ const AllJobsPage = () => {
   const indexOfLastJob = currentPage * rowsPerPage;
   const indexOfFirstJob = indexOfLastJob - rowsPerPage;
   const currentJobs = filteredJobs.slice(indexOfFirstJob, indexOfLastJob);
-
+  const handleViewClick = (jobId) => {
+    if (!jobId) {
+      console.error("jobId is undefined");
+      return;
+    }
+    navigate(`/proposals/${jobId}`);
+  };
+  
   return (
     <div className="jobs-page">
       <Header />
@@ -100,10 +120,13 @@ const AllJobsPage = () => {
           currentJobs.map((job) => (
             <Alljobs
               key={job._id}
+              jobId={job._id}
               title={job.job_title}
               rate={job.budget_type === "hourly" ? `$${job.hourly_rate.from}-$${job.hourly_rate.to}/hr` : `$${job.fixed_price}/fixed`}
+              postedBy={job.posted_by || "Unknown"}
               proposals={job.proposalCount || 0}
               messages={job.messages ? job.messages.length : 0}
+              onViewClick={handleViewClick}
             />
           ))
         ) : (

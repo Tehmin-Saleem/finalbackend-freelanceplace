@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import './styles.scss';
@@ -11,8 +11,11 @@ import { Header } from "../../components/index";
 const MyProfile = () => {
   const [skillInput, setSkillInput] = useState('');
   const [error, setError] = useState(null);
+  const navigate = useNavigate();
+
   const [profile, setProfile] = useState({
-    freelancer_id: '', 
+    profileId: '',
+
     first_name: '',
     last_name: '',
     image: '',
@@ -30,6 +33,19 @@ const MyProfile = () => {
     skills: [],
     portfolios: []
   });
+  
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    const userId = localStorage.getItem('userId');
+    if (!token) {
+      navigate('/signin');
+    } else {
+      setProfile(prevProfile => ({
+        ...prevProfile,
+        freelancer_id: userId 
+      }));
+    }
+  }, [navigate]);
   const [portfolioModalOpen, setPortfolioModalOpen] = useState(false);
  
 
@@ -130,37 +146,39 @@ const MyProfile = () => {
   };
   const [portfolioThumbnails, setPortfolioThumbnails] = useState({});
   const generateThumbnail = async (file) => {
+    if (file.type !== 'application/pdf') {
+      throw new Error('Unsupported file type');
+    }
+  
+    const fileReader = new FileReader();
     return new Promise((resolve, reject) => {
-      if (file.type === 'application/pdf') {
-        const fileReader = new FileReader();
-        fileReader.onload = async (event) => {
-          try {
-            const typedArray = new Uint8Array(event.target.result);
-            const pdf = await pdfjsLib.getDocument(typedArray).promise;
-            const page = await pdf.getPage(1);
-            const scale = 1.5;
-            const viewport = page.getViewport({ scale });
-            const canvas = document.createElement('canvas');
-            const context = canvas.getContext('2d');
-            canvas.height = viewport.height;
-            canvas.width = viewport.width;
-            const renderContext = {
-              canvasContext: context,
-              viewport: viewport
-            };
-            await page.render(renderContext).promise;
-            resolve(canvas.toDataURL());
-          } catch (error) {
-            reject(error);
-          }
-        };
-        fileReader.onerror = reject;
-        fileReader.readAsArrayBuffer(file);
-      } else {
-        reject(new Error('Unsupported file type'));
-      }
+      fileReader.onload = async (event) => {
+        try {
+          const typedArray = new Uint8Array(event.target.result);
+          const pdf = await pdfjsLib.getDocument(typedArray).promise;
+          const page = await pdf.getPage(1);
+          const scale = 1.5;
+          const viewport = page.getViewport({ scale });
+          const canvas = document.createElement('canvas');
+          const context = canvas.getContext('2d');
+          canvas.height = viewport.height;
+          canvas.width = viewport.width;
+          const renderContext = {
+            canvasContext: context,
+            viewport: viewport
+          };
+          await page.render(renderContext).promise;
+          resolve(canvas.toDataURL());
+        } catch (error) {
+          reject(error);
+        }
+      };
+  
+      fileReader.onerror = reject;
+      fileReader.readAsArrayBuffer(file);
     });
   };
+  
   
   const handlePortfolioChange = async (e) => {
     const { name, value, type } = e.target;
@@ -202,7 +220,7 @@ const MyProfile = () => {
       attachment: null
     });
   };
-  const navigate = useNavigate();
+ 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -213,13 +231,13 @@ const MyProfile = () => {
       formData.append('last_name', profile.last_name);
       formData.append('title', profile.title);
       formData.append('profile_overview', profile.profile_overview);
-      
+     
       // Append nested objects as JSON strings
       formData.append('experience', JSON.stringify(profile.experience));
       formData.append('availability', JSON.stringify(profile.availability));
       formData.append('languages', JSON.stringify(profile.languages));
       formData.append('skills', JSON.stringify(profile.skills));
-  
+      
       // Append profile image if changed
       if (imageFile) {
         formData.append('image', imageFile);
@@ -234,20 +252,25 @@ const MyProfile = () => {
           formData.append(`portfolios`, portfolio.attachment, `portfolio_${index}_${portfolio.attachment.name}`);
         }
       });
-  
+      
       const token = localStorage.getItem('token');
+      console.log("Retrieved token:", token);
       const response = await axios.post('http://localhost:5000/api/freelancer/profile', formData, {
         headers: { 
           'Content-Type': 'multipart/form-data',
           'Authorization': `Bearer ${token}`
         }
+        
       });
-  
-      console.log('Profile updated successfully:', response);
+      
+      console.log('Profile updated successfully:', response.data);
+    
+    // Save profileId in local storage
+   
       navigate('/FreelanceDashBoard'); 
     } catch (error) {
-      console.error('Error submitting proposal:', error);
-      setError(error.message);
+      console.error('Error submitting profile:', error);
+      setError('An error occurred while updating the profile.');
     }
   };
 

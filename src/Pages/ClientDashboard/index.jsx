@@ -1,27 +1,53 @@
 import React from "react";
-import {Header} from "../../components/index"; // Adjust the import path as needed
+import { Header } from "../../components/index"; // Adjust the import path as needed
 import Illustration from "../../images/Illustration.png"; // Adjust the image path as needed
-import { BackgroundLining } from "../../svg/index";
+import { BackgroundLining, JobsDropdwon } from "../../svg/index";
 import "./styles.scss";
 import { useNavigate } from 'react-router-dom'; // Import useNavigate
 import { useState, useEffect } from "react";
+
 const DashboardPage = () => {
-  const navigate = useNavigate(); 
+  const navigate = useNavigate();
   const [firstName, setFirstName] = useState('');
+
   const handleJobPostingButtonClick = () => {
-    navigate('/JobPosting'); 
+    navigate('/JobPosting');
   };
+
   useEffect(() => {
-    
     const storedFirstName = localStorage.getItem('firstName');
     if (storedFirstName) {
       setFirstName(storedFirstName);
     }
   }, []);
+
   return (
     <div className="dashboard-page">
       {/* Importing Header Component */}
       <Header />
+
+      <div className="filter-options">
+        <div className="filter-item">
+          <span className="filter-label">Skills</span>
+          <JobsDropdwon alt="Dropdown Icon" className="dropdown-icon" />
+        </div>
+        <div className="filter-item">
+          <span className="filter-label">Categories</span>
+          <JobsDropdwon alt="Dropdown Icon" className="dropdown-icon" />
+        </div>
+        <div className="filter-item">
+          <span className="filter-label">Availability</span>
+          <JobsDropdwon alt="Dropdown Icon" className="dropdown-icon" />
+        </div>
+        <div className="filter-item">
+          <span className="filter-label">Location</span>
+          <JobsDropdwon alt="Dropdown Icon" className="dropdown-icon" />
+        </div>
+        <div className="filter-item">
+          <span className="filter-label">Ratings</span>
+          <JobsDropdwon alt="Dropdown Icon" className="dropdown-icon" />
+        </div>
+      </div>
 
       {/* Main Content */}
       <main className="main-content">
@@ -41,7 +67,9 @@ const DashboardPage = () => {
               enim ad minim veniam, quis nostrud exercitation ullamco laboris
               nisi ut aliquip ex ea commodo consequat.
             </p>
-            <button className="start-button" onClick={handleJobPostingButtonClick}>Get start job posting</button>
+            <button className="start-button" onClick={handleJobPostingButtonClick}>
+              Get start job posting
+            </button>
           </div>
           <BackgroundLining className="background-lining" />
         </div>

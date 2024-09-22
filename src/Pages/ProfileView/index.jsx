@@ -91,18 +91,20 @@ console.log('Portfolio path:', `http://localhost:5000/api/freelancer/profile/por
       <div className="m-20 p-8 absolute">
         <div className="upper-part">
           <div className="container">
-            <div className="flex items-center mb-16 pl-8 ">
-            <img
-                src={`http://localhost:5000${profileData.image}`}
-                alt={profileData.name}
-                 className="w-20 h-18 rounded-full mr-4"
-              />
+          <div className="flex items-center mb-16 pl-8">
+  <img
+    src={`http://localhost:5000${profileData.image}`}
+    alt={profileData.name}
+    className="w-18 h-20 rounded-full  aspect-square"
+  />
+
+
               <div className="flex flex-col">
                 <div className="font-Poppins text-[#4BCBEB] text-[32px] name">
                   {profileData.name}
                 </div>
                 <div className="flex items-center">
-                  <svg
+                  {/* <svg
                     xmlns="http://www.w3.org/2000/svg"
                     className="h-4 w-4 mr-1 text-gray-500"
                     viewBox="0 0 20 20"
@@ -118,10 +120,10 @@ console.log('Portfolio path:', `http://localhost:5000/api/freelancer/profile/por
                       d="M3 10a7 7 0 1114 0 7 7 0 01-14 0zm7-9a1 1 0 100 2 1 1 0 000-2zm0 16a1 1 0 100 2 1 1 0 000-2zm8-11a1 1 0 011 1v2a1 1 0 11-2 0V7a1 1 0 011-1zm-14 0a1 1 0 011 1v2a1 1 0 11-2 0V7a1 1 0 011-1zm14 8a1 1 0 100 2 1 1 0 000-2zM7 17a1 1 0 100 2 1 1 0 000-2zm6-2a1 1 0 100 2 1 1 0 000-2z"
                       clipRule="evenodd"
                     />
-                  </svg>
-                  <span className="text-[#2C3E50] text-[20px] font-Poppins mb-5 location">
+                  </svg> */}
+                  <div className="text-[#2C3E50] text-[20px] font-Poppins mb-5 location">
                     {country}
-                  </span>
+                  </div>
                 </div>
 
                 <div className="flex">
@@ -269,3 +271,4 @@ console.log('Portfolio path:', `http://localhost:5000/api/freelancer/profile/por
 }
 
 export default ProfileView;
+
