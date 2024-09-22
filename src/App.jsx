@@ -8,6 +8,13 @@ import SubmitProposal from "./Pages/SubmitProposal";
 import Notification from "./Pages/Notifications";
 import Chat from "./Pages/ChatPage";
 // import OfferForm from "./components/FormProposal/OfferForm";
+import { Elements } from '@stripe/react-stripe-js';
+import { loadStripe } from '@stripe/stripe-js';
+import PaymentMethod from "./Pages/PaymentMethod";
+// import PaymentMethod from './components/PaymentMethod';
+
+// Load your Stripe public key
+const stripePromise = loadStripe('your-stripe-publishable-key-here');
 
 
 const freelancers = [
@@ -71,6 +78,7 @@ function App() {
   return (
     <Router>
       <Routes>
+
       <Route path="/Chat" element={<Chat/>} />
         <Route path="/Notifications" element={<Notification/>} />        <Route path="/" element={<SignUpSection />} />
         <Route path="/profile" element={<ProfileView />} />
@@ -97,6 +105,8 @@ function App() {
         {/* <Route path="/SubmitProposal" element={<SubmitProposal/>} />  */}
         <Route path="/SubmitProposal/:jobPostId" element={<SubmitProposal/>} /> 
         <Route path="/SubmitProposal" element={<SubmitProposal/>} /> 
+        <Route path="/Payment" element={ <PaymentMethod/>}/>
+    
 
       </Routes>
     </Router>
