@@ -229,13 +229,22 @@ function calculateJobSuccess(profile) {
 
 exports.getProfileByUserId = async (req, res) => {
   try {
-    const userId = req.user; // Assumed to be set after authentication middleware
-    const profile = await Freelancer_Profile.findOne({ profileId: userId })
+    const userId = req.user; // Make sure this matches the property name in your JWT payload
+    console.log('Fetching profile for user ID:', userId);
+
+    const profiles = await Freelancer_Profile.find({ profileId: userId })
       .select('-__v -createdAt -updatedAt');
 
-    if (!profile) {
+    console.log('Found profiles:', profiles);
+
+    if (!profiles || profiles.length === 0) {
+      console.log('No profiles found for user ID:', userId);
       return res.status(404).json({ success: false, message: 'Profile not found' });
     }
+
+    // Use the first profile if multiple are found
+    const profile = profiles[0];
+    console.log('Using profile:', profile);
 
     // Constructing the formatted profile
     const formattedProfile = {
@@ -259,21 +268,20 @@ exports.getProfileByUserId = async (req, res) => {
       languages: profile.languages || [],
       portfolios: profile.portfolios || [],
       image: profile.image ? `/api/freelancer/profile/image/${profile.image}` : null,
-    
     };
-    console.log("formatted", formattedProfile)
+
+    console.log('Formatted profile data:', formattedProfile);
+
     res.status(200).json({ success: true, data: formattedProfile });
   } catch (err) {
     console.error('Error in getProfileByUserId:', err);
-    res.status(400).json({ success: false, error: err.message });
+    res.status(500).json({ success: false, error: err.message });
   }
 };
 
 function calculateJobSuccess(profile) {
   return profile.completed_projects > 0 ? Math.floor(Math.random() * (100 - 80 + 1)) + 80 : 0;
 }
-
-
 
 
 
