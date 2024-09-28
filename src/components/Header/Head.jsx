@@ -110,6 +110,7 @@
 
 
 import React, { useState, useEffect } from "react";
+
 import {
   Logo,
   ProfilePic,
@@ -119,8 +120,47 @@ import {
   JobDropdwon,
 } from "../../svg/index";
 import "./styles.scss";
+import jwt_decode from 'jwt-decode'; // Import jwt-decode to decode the token
 
 const Header = () => {
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    // Clear the user data from local storage
+    localStorage.removeItem('user');  // Remove specific item (user data)
+    // Or use localStorage.clear() to remove everything
+    // localStorage.clear();
+
+    // Redirect to login or home page
+    navigate('/login');
+  };
+  
+ const handleLogoClick = () => {
+    const token = localStorage.getItem('token'); // Get the token from local storage
+    if (token) {
+      try {
+        const decodedToken = jwt_decode(token); // Decode the token to get user information
+        const role = decodedToken.role; // Extract the role
+
+        // Navigate to the appropriate dashboard based on the user role
+        if (role === 'client') {
+          navigate('/ClientDashboard'); // Navigate to client dashboard
+        } else if (role === 'freelancer') {
+          navigate('/FreelanceDashBoard'); // Navigate to freelancer dashboard
+        } else {
+          navigate('/signin'); // Redirect to signin if role is unknown
+        }
+      } catch (error) {
+        console.error("Token decoding error:", error);
+        navigate('/signin'); // Redirect to signin if token decoding fails
+      }
+    } else {
+      navigate('/signin'); // Redirect to signin if no token is found
+    }
+  };
+
+
+
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [selectedOption, setSelectedOption] = useState("");
   const [hoveredOption, setHoveredOption] = useState("");
@@ -163,9 +203,11 @@ const Header = () => {
 
     <header className="header">
       <div className="header-left">
-        <div className="logo">
-          <Logo />
+      
+        <div className="logo" >
+          <Logo  onClick={handleLogoClick}/>
         </div>
+        
         <div className="menu">
           <div className="menu-item dropdown" onClick={toggleDropdown}>
             Jobs

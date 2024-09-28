@@ -77,7 +77,7 @@ const IndexPage = () => {
     <div className="proposals-page">
     <Header />
     
-    <h1 className="proposals-heading">Freelancer Profiles</h1>
+    <h1 className="proposals-heading">Proposals</h1>
     <div className="profiles-container">
       {currentProposals.map((proposal) => (
         <div key={proposal.id} onClick={() => handleProposalClick(proposal)} className="profile-card">

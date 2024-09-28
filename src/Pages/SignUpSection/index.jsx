@@ -14,6 +14,7 @@ const SignUpSection = () => {
   const handleCreateAccountButtonClick = () => {
     if (selectedUserType) {
       localStorage.setItem("userType", selectedUserType); // Save selectedUserType to local storage
+      console.log(`User type stored in localStorage: ${localStorage.getItem("userType")}`); // Log to check if it's stored
       navigate('/signup'); // Replace with your target route
     } else {
       alert("Please select a user type."); // Alert if no user type is selected
