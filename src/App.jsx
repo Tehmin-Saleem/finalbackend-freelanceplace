@@ -115,6 +115,8 @@ function App() {
         <Route path="/Payment" element={ <PaymentMethod/>}/>
         <Route path="/propsalPopUp" element={<Popup/>} />
         <Route path="/ReviewPopUp" element={<ReviewPopup/>} />
+        <Route path="/Alljobspage" element={<AllJobsPage/>} /> 
+
 
       </Routes>
     </Router>

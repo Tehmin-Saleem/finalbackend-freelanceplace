@@ -22,6 +22,17 @@ const ProposalCard = ({
     e.stopPropagation(); // Prevent any other click events
     navigate("/offerform"); // Navigate to the offer form page
   };
+
+  const handleChatClick = () => {
+    const freelancerData = {
+      name,
+      jobTitle,
+      image,
+    };
+    localStorage.setItem("freelancerData", JSON.stringify(freelancerData));
+    navigate("/chat");  // Navigate to chat page
+  };
+
   return (
     <div className="proposal-card">
       <img src={image} alt={`${name}'s profile`} className="proposal-card__image" />
@@ -54,7 +65,8 @@ const ProposalCard = ({
           <CommonButton
             text={<Chat />}
             className="bg-[#FFFFFF] border border-[#4BCBEB] text-[18px] font-Poppins text-[#FFFFFF] rounded-lg font-semibold font-Poppins py-1 px-6 w-full focus:outline-none focus:shadow-outline"
-          />
+            onClick={handleChatClick}  // Add click handler
+         />
         <CommonButton
             text="Hire"
             className="bg-[#4BCBEB] text-[18px] font-Poppins text-[#FFFFFF] rounded-lg font-semibold font-Poppins py-2 px-6 w-full focus:outline-none focus:shadow-outline"

@@ -19,7 +19,7 @@ import {
 
 function ProfileView() {
   const [profileData, setProfileData] = useState(null);
-  // const [portfolioData, setportfolioData] = useState(null);
+
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [country, setCountry] = useState("");
@@ -32,12 +32,22 @@ function ProfileView() {
         const token = localStorage.getItem("token");
         const response = await axios.get('http://localhost:5000/api/freelancer/profile', {
           headers: {
-           'Authorization': `Bearer ${token}`
+            'Authorization': `Bearer ${token}`
           }
         });
-        setProfileData(response.data.data);
+        console.log('Fetched profile data:', response.data);
+        
+        // Check if the data is an array and get the first profile
+        const profileArray = response.data.data;
+        if (Array.isArray(profileArray) && profileArray.length > 0) {
+          setProfileData(profileArray[0]);
+        } else {
+          setProfileData(response.data.data);
+        }
+        
         setLoading(false);
       } catch (err) {
+        console.error('Error fetching profile data:', err);
         setError('Failed to fetch profile data');
         setLoading(false);
       }
@@ -50,6 +60,8 @@ function ProfileView() {
   if (loading) return <div>Loading...</div>;
   if (error) return <div>{error}</div>;
   if (!profileData) return <div>No profile data found</div>;
+
+  console.log('Profile data:', profileData);
 
 console.log('Profile image path:', `http://localhost:5000${profileData.image}`);
 console.log('Profile data:', profileData.image);
