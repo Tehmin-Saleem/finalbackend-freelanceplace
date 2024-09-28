@@ -1,0 +1,82 @@
+
+$color-accent: #4bcdeb;
+$primary-color: #3b82f6;
+$secondary-color: #6b7280;
+$gray-color: #f7fafc;
+$text-color: #4a5568;
+$border-color: #e2e8f0;
+$hover-darken: 10%;
+$font-kodchasan: 'Kodchasan', sans-serif;
+$font-poppins: 'Poppins', sans-serif;
+$color-gray: #64748b;
+$color-dark: #2c3e50;
+$color-white: #ffffff;
+$color-accent: #4bcdeb;
+$bg-color: #f7f8fa;
+
+
+.popup-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); // Semi-transparent background
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    
+  }
+  
+  .popup {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    width: 350px;
+    height: 250px; // Specify a fixed height to ensure proper button placement
+    text-align: center;
+    box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.2);
+    position: relative; // Needed for absolute positioning of the button
+    display: flex;
+    flex-direction: column; // Ensures the content stacks vertically
+    justify-content: center; // Vertically centers the content
+    align-items: center; // Horizontally centers the content
+    font-family: $font-poppins;
+    
+  
+  }
+  
+  .message {
+    font-size: 22px;
+    font-weight: bold;
+    margin-bottom: 10px;
+  }
+  
+  .sub-message {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 30px; // Add margin to give space for the button
+  }
+  
+  .emoji {
+    margin-left: 10px;
+  }
+  
+  .close-button {
+    background-color: $color-accent;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    position: absolute; // Position the button relative to the popup
+    right: 140px; // Place at the right inside the popup
+    bottom: 30px; // Place at the bottom inside the popup
+  }
+  
+  .close-button:hover {
+    background-color: $color-accent;
+  }
+  

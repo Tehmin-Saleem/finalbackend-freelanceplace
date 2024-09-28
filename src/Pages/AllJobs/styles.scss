@@ -1,11 +1,15 @@
-.jobs-page {
-  .jobs-heading {
+$color-accent: #4bcdeb;
+
+.jobs-Page {
+  .jobs-Heading {
     font-size: 24px;
     font-weight: 600;
     color: #0f172a;
+    margin-left: 8.5rem;
+    margin-bottom: 2rem;
   }
 
-  .search-container {
+  .search-Container {
     display: flex;
   //   align-items: center;
     justify-content: space-between;
@@ -15,7 +19,7 @@
     
   }
 
-  .search-bar-wrapper {
+  .search-bar-Wrapper {
     // flex-grow: 1;
     display: flex;
     
@@ -31,11 +35,11 @@
     
   }
 
-  .filter-wrapper {
+  .filter-Wrapper {
     position: relative;
     margin: 0px 10%;
 
-    .filter-button {
+    .filter-Button {
       display: flex;
       align-items: center;
       border: 1px solid #94a3b8; /* equivalent to border-[#94A3B8] in Tailwind */
@@ -53,7 +57,7 @@
       // }
     }
 
-    .filter-dropdown {
+    .filter-Dropdown {
       display: none;
       position: absolute;
       // top: 100%;
@@ -79,7 +83,7 @@
       }
 
       .filter-done-button {
-        background-color: #00bfff;
+        background-color: $color-accent;
         color: white;
         padding: 5px 10px;
         border: none;
@@ -94,11 +98,11 @@
     }
   }
 
-  .post-job-button {
+  .post-job-Button {
     width: 30%;
     margin-left: 20%;
     // margin: 0px 10%;
-    background-color: #00bfff;
+    background-color: $color-accent;
     color: white;
     padding: 10px 20px;
     border: none;
@@ -108,11 +112,11 @@
   
 
     &:hover {
-      background-color: darken(#00bfff, 10%);
+      background-color: darken($color-accent, 10%);
     }
   }
 
-  .jobs-container {
+  .jobs-containers {
     margin: 20px 6%;
   }
 
@@ -202,8 +206,8 @@
           margin-right: 10px;
         }
   
-        .filter-done-button {
-          background-color: #00bfff;
+        .filter-done-Button {
+          background-color: $color-accent;
           color: white;
           padding: 5px 10px;
           border: none;
@@ -218,9 +222,9 @@
       }
     }
   
-    .post-job-button {
+    .post-job-Button {
       margin-left: auto;
-      background-color: #00bfff;
+      background-color: $color-accent;
       color: white;
       padding: 10px 15px;
       border: none;
@@ -229,7 +233,7 @@
       font-family: "Poppins", sans-serif;
   
       &:hover {
-        background-color: darken(#00bfff, 10%);
+        background-color: darken($color-accent, 10%);
       }
     }
   

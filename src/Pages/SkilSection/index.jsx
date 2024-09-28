@@ -1,13 +1,9 @@
 import React, { useState } from "react";
 import "./styles.scss"; // Import your SCSS file here
-
-// Dummy components
-import {ProgressBar, Header} from "../../components/index"; // Import your ProgressBar component
-import {CrossIcon, PlusIcon} from "../../svg/index.js";
+import { ProgressBar, Header } from "../../components/index"; // Import your ProgressBar component
+import { CrossIcon, PlusIcon } from "../../svg/index.js"; // Dummy SVG icons, replace with your own SVGs
 import { useNavigate } from 'react-router-dom'; // Import useNavigate
 
-
-// Dummy SVG icons, replace with your own SVGs
 const SearchIcon = () => (
   <svg
     width="16"
@@ -23,30 +19,11 @@ const SearchIcon = () => (
   </svg>
 );
 
-
-
 const SkillManagement = () => {
   const navigate = useNavigate(); // Initialize useNavigate
-
-  
-  const handleUudgetButtonClick = () => {
-    localStorage.setItem('preferredSkills', JSON.stringify(skills));
-    navigate('/Budget');
-  };
-  const handleBackButtonClick = () => {
-    navigate('/JobDescription'); // Replace with your target route
-  };
-
   const [skills, setSkills] = useState([]);
   const [availableSkills, setAvailableSkills] = useState([
-    "HTML",
-    "CSS",
-    "JavaScript",
-    "React",
-    "Figma",
-    "Mobile App Design",
-    "Prototyping",
-    "Mockups"
+    "HTML", "CSS", "JavaScript", "React", "Figma", "Mobile App Design", "Prototyping", "Mockups"
   ]);
   const [searchTerm, setSearchTerm] = useState("");
 
@@ -59,6 +36,16 @@ const SkillManagement = () => {
     setSkills(skills.filter((s) => s !== skill));
     setAvailableSkills([...availableSkills, skill]);
   };
+
+  const handleBudgetButtonClick = () => {
+    localStorage.setItem('preferredSkills', JSON.stringify(skills));
+    navigate('/Budget');
+  };
+
+  const handleBackButtonClick = () => {
+    navigate('/JobDescription'); // Replace with your target route
+  };
+
   const steps = [
     { number: "1", label: "Job Title", color: "#4BCBEB" },
     { number: "2", label: "Description", color: "#4BCBEB" },
@@ -67,10 +54,6 @@ const SkillManagement = () => {
     { number: "5", label: "Project Duration", color: "#6b7280" },
     { number: "6", label: "Attachment", color: "#6b7280" },
   ];
-  
-  
-  
-  const currentStep = 1;
 
   return (
     <div className="skill-management">
@@ -97,7 +80,9 @@ const SkillManagement = () => {
               voluptates similique quaerat porro a vero.
             </p>
           </div>
-          <button className="back-button" onClick={handleBackButtonClick}>Back</button>
+          <button className="back-button" onClick={handleBackButtonClick}>
+            Back
+          </button>
         </div>
 
         <div className="right-section">
@@ -145,7 +130,9 @@ const SkillManagement = () => {
             </div>
           </div>
 
-          <button className="next-button" onClick={handleUudgetButtonClick}>Next: Budget</button>
+          <button className="next-button" onClick={handleBudgetButtonClick}>
+            Next: Budget
+          </button>
         </div>
       </div>
     </div>

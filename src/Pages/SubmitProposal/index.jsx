@@ -3,8 +3,23 @@ import { useParams, useNavigate } from 'react-router-dom';
 
 import Header from "../../components/Commoncomponents/Header";
 import "./styles.scss";
+import Popup from "../../components/PopUps/PropsalSubmit";
+// import Popup from "../../components/PopUps/PropsalSubmit";
 
 const SubmitProposal = () => {
+  const [isPopupVisible, setPopupVisible] = useState(false);
+
+  // Step 2: Function to show the popup
+  const showPopup = () => {
+    setPopupVisible(true);
+  };
+
+  // Step 3: Function to hide the popup
+  const hidePopup = () => {
+    setPopupVisible(false);
+  };
+
+
   const [milestones, setMilestones] = useState([
     { description: "", dueDate: "", amount: "" },
   ]);
@@ -385,7 +400,8 @@ return (
                 
                 <div className="actions">
                   <button type="button" className="cancel" onClick={() => navigate(-1)}>Cancel</button>
-                  <button type="submit" className="submit">Send proposal</button>
+                  <button type="submit" className="submit" onClick={showPopup}>Send proposal</button>
+                  {isPopupVisible && <Popup onClose={hidePopup} />}
                 </div>
               </form>
             </div>

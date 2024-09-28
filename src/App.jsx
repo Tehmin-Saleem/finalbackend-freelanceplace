@@ -11,6 +11,9 @@ import Chat from "./Pages/ChatPage";
 import { Elements } from '@stripe/react-stripe-js';
 import { loadStripe } from '@stripe/stripe-js';
 import PaymentMethod from "./Pages/PaymentMethod";
+import ProposalPopup from "./components/PopUps/PropsalSubmit";
+import Popup from "./components/PopUps/PropsalSubmit";
+import ReviewPopup from "./components/PopUps/ReviewPopup";
 // import PaymentMethod from './components/PaymentMethod';
 
 // Load your Stripe public key
@@ -110,7 +113,8 @@ function App() {
         <Route path="/SubmitProposal" element={<SubmitProposal/>} /> 
         <Route path="*" element={<ErrorPage />} />
         <Route path="/Payment" element={ <PaymentMethod/>}/>
-    
+        <Route path="/propsalPopUp" element={<Popup/>} />
+        <Route path="/ReviewPopUp" element={<ReviewPopup/>} />
 
       </Routes>
     </Router>

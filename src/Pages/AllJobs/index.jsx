@@ -69,14 +69,14 @@ const AllJobsPage = () => {
   };
   
   return (
-    <div className="jobs-page">
+    <div className="jobs-Page">
       <Header />
 
-      <h1 className="jobs-heading">All Job Posts</h1>
+      <h1 className="jobs-Heading">All Job Posts</h1>
 
       {/* Search Bar, Filters, and "Post a new job" button */}
-      <div className="search-container">
-        <div className="search-bar-wrapper">
+      <div className="search-Container">
+        <div className="search-bar-Wrapper">
           <IconSearchBar className="icon" width="20" height="20" />
           <input
             type="text"
@@ -86,12 +86,12 @@ const AllJobsPage = () => {
             onChange={handleSearchChange}
           />
         </div>
-        <div className="filter-wrapper">
-          <button className="filter-button">
+        <div className="filter-Wrapper">
+          <button className="filter-Button">
             <Filter className="filter-icon" />
             All Filters
           </button>
-          <div className="filter-dropdown">
+          <div className="filter-Dropdown">
             <span className="filter-dropdown__inner">
             <input type="checkbox" id="active-jobs" />
             <label htmlFor="active-jobs">Active Jobs</label>
@@ -104,14 +104,14 @@ const AllJobsPage = () => {
             <input type="checkbox" id="completed-jobs" />
             <label htmlFor="completed-jobs">Completed</label>
             </span>
-            <button className="filter-done-button">Done</button>
+            <button className="filter-done-Button">Done</button>
           </div>
         </div>
-        <button className="post-job-button">Post a new job</button>
+        <button className="post-job-Button">Post a new job</button>
       </div>
 
       {/* Jobs List */}
-      <div className="jobs-container">
+      <div className="jobs-containers">
         {loading ? (
           <p>Loading job posts...</p>
         ) : error ? (
