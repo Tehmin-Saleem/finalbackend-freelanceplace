@@ -9,6 +9,9 @@ const proposalController = require('../controllers/proposal.controller');
 const authMiddleware = require('../middleware/auth.middleware');
 const freelancerProfileController = require('../controllers/freelancer_profile.controller');
 
+// Import Chat controller
+const chatController = require('../controllers/chat.controller'); // Add this
+
 // Set up multer for file uploads
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -87,4 +90,9 @@ router.get('/profile', authMiddleware, freelancerProfileController.getAuthentica
 // router.put('/profile/:freelancerId', freelancerProfileController.getProfileByUserId);
 router.delete('/profile/:freelancerId', freelancerProfileController.deleteProfile);
 router.get('/profile', authMiddleware, freelancerProfileController.getProfileByUserId);
+
+// Chat-related routes for freelancers
+router.post('/chat/sendMessage', chatController.sendMessage); // Send message
+router.get('/chat/getChatHistory/:client_id/:freelancer_id', chatController.getChatHistory); // Fetch chat history
+
 module.exports = router;

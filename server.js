@@ -9,6 +9,15 @@ const dotenv = require("dotenv");
 const clientRoutes = require("./routes/client.route");
 const freelancerRoutes = require("./routes/freelancer.route");
 const socketIo = require('socket.io');
+const cors = require("cors");
+
+
+
+
+
+
+// Enable CORS for all routes
+app.use(cors());
 
 
 dotenv.config();
@@ -26,7 +35,20 @@ app.use("/api/freelancer", freelancerRoutes);
 
 
 const server = http.createServer(app);
-const io = socketIo(server);
+// const io = socketIo(server);
+const io = socketIo(server, {
+  cors: {
+    origin: "http://localhost:5173", // Specify your client origin here
+    methods: ["GET", "POST"],
+    allowedHeaders: ["Content-Type"],
+  },
+});
+
+
+// Set up a simple route (optional)
+app.get("/", (req, res) => {
+  res.send("Chat server is running");
+});
 
 
 io.on('connection', (socket) => {

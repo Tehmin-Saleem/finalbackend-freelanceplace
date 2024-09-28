@@ -8,6 +8,10 @@ const reviewRequestController = require("../controllers/review_request.controlle
 const paymentMethodController = require('../controllers/payment_method.controller');
 const path = require('path');
 
+
+// Import Chat controller
+const chatController = require('../controllers/chat.controller'); // Add this
+
 const hireFreelancerController = require('../controllers/hire_freelancer.controller');
 const upload = require('../config/multer'); 
 const router = express.Router();
@@ -103,6 +107,12 @@ router.put('/hire/:hireRequestId', hireFreelancerController.updateHireRequest);
 
 
 router.delete('/hire/:hireRequestId', hireFreelancerController.deleteHireRequest);
+
+
+
+// Chat-related routes
+router.post('/chat/sendMessage', chatController.sendMessage); // Send message
+router.get('/chat/getChatHistory/:client_id/:freelancer_id', chatController.getChatHistory); // Fetch chat history
 
 module.exports = router;
 
