@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import './styles.scss';
 // import creditCardIcon from './assets/credit-card.svg'; // Add your icon file paths
 // import paypalIcon from './assets/paypal.svg'; // Add your icon file paths
-import { Header, NewHeader } from '../../components';
 
+import Header from '../../components/Commoncomponents/Header/index';
 const PaymentMethod = () => {
   const [selectedMethod, setSelectedMethod] = useState('creditCard'); // Default is credit card
 
@@ -14,7 +14,7 @@ const PaymentMethod = () => {
   
   return (
     <>
-    <NewHeader/>
+    <Header/>
     <div className="payment-page">
       <h2>Payment</h2>
       <p>Choose payment method below</p>

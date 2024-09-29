@@ -1,29 +1,51 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Header } from "../../components/index"; // Adjust the import path as needed
 import Illustration from "../../images/Illustration.png"; // Adjust the image path as needed
 import { BackgroundLining, JobsDropdwon } from "../../svg/index";
 import "./styles.scss";
-import { useNavigate } from 'react-router-dom'; // Import useNavigate
-import { useState, useEffect } from "react";
+import { useNavigate } from 'react-router-dom';
+import axios from "axios";
+import { jwtDecode } from 'jwt-decode';
 
 const DashboardPage = () => {
+  const [user, setUser] = useState({ first_name: '' });
   const navigate = useNavigate();
-  const [firstName, setFirstName] = useState('');
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        if (!token) {
+          console.error("No token found");
+          navigate('/signin');
+          return;
+        }
+
+        const decodedToken = jwtDecode(token);
+        const userId = decodedToken.userId;
+
+        const response = await axios.get(`http://localhost:5000/api/client/users/${userId}`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+
+        setUser(response.data);
+      } catch (error) {
+        console.error("Error fetching user:", error);
+        navigate('/signin');
+      }
+    };
+
+    fetchUser();
+  }, [navigate]);
 
   const handleJobPostingButtonClick = () => {
     navigate('/JobPosting');
   };
 
-  useEffect(() => {
-    const storedFirstName = localStorage.getItem('firstName');
-    if (storedFirstName) {
-      setFirstName(storedFirstName);
-    }
-  }, []);
-
   return (
     <div className="dashboard-page">
-      {/* Importing Header Component */}
       <Header />
 
       <div className="filter-options">
@@ -49,13 +71,11 @@ const DashboardPage = () => {
         </div>
       </div>
 
-      {/* Main Content */}
       <main className="main-content">
-        {/* Left Section */}
         <div className="left-section">
           <div className="left-content">
             <h1 className="welcome-text">
-              Welcome, {firstName}!
+              Welcome, {user.first_name}!
               <br />
               Let's start with
               <br />
@@ -68,13 +88,12 @@ const DashboardPage = () => {
               nisi ut aliquip ex ea commodo consequat.
             </p>
             <button className="start-button" onClick={handleJobPostingButtonClick}>
-              Get start job posting
+              Get started with job posting
             </button>
           </div>
           <BackgroundLining className="background-lining" />
         </div>
 
-        {/* Right Section */}
         <div className="right-section">
           <img src={Illustration} alt="Placeholder" className="illustration" />
         </div>
