@@ -7,7 +7,7 @@ const jobPostController = require('../controllers/post_job.controller');
 const reviewRequestController = require("../controllers/review_request.controller");
 const paymentMethodController = require('../controllers/payment_method.controller');
 const path = require('path');
-
+const usercontroller=require ('../controllers/user.controller')
 
 // Import Chat controller
 const chatController = require('../controllers/chat.controller'); // Add this
@@ -18,7 +18,7 @@ const router = express.Router();
 
 
 router.post('/signup', signup);
-
+router.get('/users/:userId', usercontroller.getUserById);
 
 router.post('/login', login);
 
