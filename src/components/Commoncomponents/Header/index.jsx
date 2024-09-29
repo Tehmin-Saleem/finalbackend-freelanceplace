@@ -430,7 +430,7 @@ import {
   Logo,
 } from "../../../svg/index";
 import "./styles.scss";
-import jwt_decode from 'jwt-decode'; // Use the default import
+// import jwt_decode from 'jwt-decode'; // Use the default import
 
 
 const state = proxy({
