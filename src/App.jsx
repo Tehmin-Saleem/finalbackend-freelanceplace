@@ -83,7 +83,8 @@ function App() {
       <Routes>
 
       <Route path="/Chat" element={<Chat/>} />
-        <Route path="/Notifications" element={<Notification/>} />        <Route path="/" element={<SignUpSection />} />
+        <Route path="/Notifications" element={<Notification/>} />      
+          <Route path="/" element={<SignUpSection />} />
         {/* <Route path="/profile" element={<ProfileView />} /> */}
         <Route path="/proposals" element={<Proposal />} />
         <Route path="/proposals/:jobId" element={<Proposal />} />
