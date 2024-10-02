@@ -4,12 +4,12 @@ import { CommonButton } from "../../components/index";
 import { Chat } from "../../svg/index";
 import { useNavigate } from "react-router-dom";
 const ProposalCard = ({
+  id,
   name,
   title,
   location,
   rate,
   earned,
-  
   timeline,
   coverLetter,
   image,
@@ -25,6 +25,7 @@ const ProposalCard = ({
 
   const handleChatClick = () => {
     const freelancerData = {
+      id,
       name,
       jobTitle,
       image,
