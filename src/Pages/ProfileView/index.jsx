@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import "./styles.scss";
-
+import {jwtDecode} from "jwt-decode";
 import {
   UserReview,
   CommonButton,
@@ -30,42 +30,47 @@ function ProfileView() {
     const fetchProfileData = async () => {
       try {
         const token = localStorage.getItem("token");
-        const response = await axios.get('http://localhost:5000/api/freelancer/profile', {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        });
-        console.log('Fetched profile data:', response.data);
-        
-        // Check if the data is an array and get the first profile
-        const profileArray = response.data.data;
-        if (Array.isArray(profileArray) && profileArray.length > 0) {
-          setProfileData(profileArray[0]);
-        } else {
-          setProfileData(response.data.data);
+        if (!token) {
+          throw new Error("No token found");
         }
+
+        const decodedToken = jwtDecode(token);
+        const userId = decodedToken.userId;
+        const headers = {
+          'Authorization': `Bearer ${token}`
+        };
+        const [response, userResponse] = await Promise.all([
+           axios.get(`http://localhost:5000/api/freelancer/profile/${userId}`, { headers }),
+           axios.get(`http://localhost:5000/api/client/users`, { headers }),
+          ]);
         
+        
+        setProfileData(response.data.data);
+        const userInfo = userResponse.data.find(user => user._id === userId);
+        setCountry(userInfo ? userInfo.country_name : "Not specified");
+       
         setLoading(false);
       } catch (err) {
         console.error('Error fetching profile data:', err);
-        setError('Failed to fetch profile data');
+        setError(err.message || 'Failed to fetch profile data');
         setLoading(false);
       }
     };
 
+
     fetchProfileData();
     setCountry(localStorage.getItem("country") || "Not specified");
   }, []);
-
+  
   if (loading) return <div>Loading...</div>;
   if (error) return <div>{error}</div>;
   if (!profileData) return <div>No profile data found</div>;
 
-  console.log('Profile data:', profileData);
-
-console.log('Profile image path:', `http://localhost:5000${profileData.image}`);
-console.log('Profile data:', profileData.image);
-console.log('Portfolio path:', `http://localhost:5000/api/freelancer/profile/portfolios/${profileData.attachment}`);
+//   console.log('Profile data:', profileData);
+  
+// console.log('Profile image path:', `http://localhost:5000${profileData.image}`);
+// console.log('Profile data:', profileData.image);
+// console.log('Portfolio path:', `http://localhost:5000/api/freelancer/profile/portfolios/${profileData.attachment}`);
 
   const userReviews = [
     {
@@ -111,7 +116,7 @@ console.log('Portfolio path:', `http://localhost:5000/api/freelancer/profile/por
   />
 
 
-              <div className="flex flex-col">
+              <div className="flex flex-col ml-6">
                 <div className="font-Poppins text-[#4BCBEB] text-[32px] name">
                   {profileData.name}
                 </div>
@@ -148,7 +153,7 @@ console.log('Portfolio path:', `http://localhost:5000/api/freelancer/profile/por
                   <div className="flex items-center">
                     <Star className="h-3 w-3" />
                     <div className="text-[#2C3E50] text-[14px] font-Poppins ml-4 w-32">
-                      {profileData.rate}
+                      {profileData.rate}$/hr
                     </div>
                   </div>
                 </div>
@@ -229,7 +234,7 @@ console.log('Portfolio path:', `http://localhost:5000/api/freelancer/profile/por
 
               <div className="PortfolioSection">
         <h2 className="PortfolioTitle">Portfolio</h2>
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-3 gap-4 ml-4">
           {profileData.portfolios.map((portfolio, index) => (
             <div key={index} className="border rounded p-4">
               {portfolio.attachment && (

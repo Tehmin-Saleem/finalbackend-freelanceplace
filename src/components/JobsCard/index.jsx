@@ -13,9 +13,10 @@ const JobsCard = ({
   level,
   description,
   tags,
+  paymentMethodStatus,
   verified,
   rating,
-  location,
+  location // Receive location prop here
 }) => {
   const navigate = useNavigate();
 
@@ -56,6 +57,12 @@ const JobsCard = ({
           {verified && <span className="job-card__verified">Verified account</span>}
           <StarRating /> 
           <span className="job-card__rating">{rating}</span>
+          <div className="payment-status">
+            {paymentMethodStatus === "Payment Verified" // Updated this condition
+              ? <span className="verified">✓ Verified Payment</span>
+              : <span className="unverified">⚠ Unverified Payment</span>
+            }
+          </div>
           <span className="job-card__location">{location}</span>
         </div>
       </div>
