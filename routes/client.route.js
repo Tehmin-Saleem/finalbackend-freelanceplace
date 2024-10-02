@@ -15,7 +15,7 @@ const router = express.Router();
 
 router.post('/signup', signup);
 router.get('/users/:userId', usercontroller.getUserById);
-
+router.get('/users', usercontroller.getAllUsers);
 router.post('/login', login);
 
 
@@ -60,8 +60,8 @@ router.get('/review-requests', reviewRequestController.getClientReviewRequests);
 router.post('/jobpost', upload.single('attachment'), jobPostController.createJobPost);
 
 
+router.get('/job-posts', jobPostController.getAllJobPosts);
 router.get('/jobposts', jobPostController.getClientJobPosts);
-
 
 router.get('/job-posts/:jobPostId', jobPostController.getJobPostById);
 

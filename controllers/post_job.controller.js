@@ -1,5 +1,7 @@
 const Job_Post = require('../models/post_job.model');
 const Proposal = require('../models/proposal.model');
+const Payment_Method = require('../models/payment_method.model');
+
 exports.createJobPost = async (req, res) => {
   try {
     const {
@@ -34,8 +36,9 @@ exports.createJobPost = async (req, res) => {
         description: req.body.attachmentDescription || ''
       };
     }
+
     const newJobPost = new Job_Post({
-      client: req.user._id,
+      client_id: req.user.userId, 
       attachment: attachmentData,
       budget_type,
       hourly_rate,
@@ -44,8 +47,7 @@ exports.createJobPost = async (req, res) => {
       job_title,
       project_duration,
       preferred_skills,
-      status: status ,
-      freelancer_id: null,
+      status: status,
     });
 
     await newJobPost.save();
@@ -55,19 +57,53 @@ exports.createJobPost = async (req, res) => {
     res.status(500).json({ message: 'Internal server error', error: err.message });
   }
 };
-
-
-exports.getClientJobPosts = async (req, res) => {
+exports.getAllJobPosts = async (req, res) => {
   try {
-    const jobPosts = await Job_Post.find().lean();
+    const jobPosts = await Job_Post.find().populate('client_id', 'email').lean();
 
-    // Fetch proposal counts for each job post
-    const jobPostsWithProposalCounts = await Promise.all(jobPosts.map(async (job) => {
+    const jobPostsWithDetails = await Promise.all(jobPosts.map(async (job) => {
       const proposalCount = await Proposal.countDocuments({ job_id: job._id });
-      return { ...job, proposalCount };
+
+      // Check if the client has a payment method
+      const hasPaymentMethod = await Payment_Method.exists({ client_id: job.client_id });
+
+      return {
+        ...job,
+        proposalCount,
+        paymentMethodStatus: hasPaymentMethod ? "Payment method verified" : "Payment method unverified"
+      };
     }));
 
-    res.status(200).json({ jobPosts: jobPostsWithProposalCounts });
+    res.status(200).json({ jobPosts: jobPostsWithDetails });
+  } catch (err) {
+    console.error('Error fetching job posts:', err);
+    res.status(500).json({ message: 'Internal server error', error: err.message });
+  }
+};
+exports.getClientJobPosts = async (req, res) => {
+  try {
+    // Get the logged-in user's ID from the request object
+    const loggedInUserId = req.user.userId || req.user;
+
+    // Find job posts for the logged-in user
+    const jobPosts = await Job_Post.find({ client_id: loggedInUserId })
+      .populate('client_id', 'email')
+      .lean();
+    
+    const jobPostsWithDetails = await Promise.all(jobPosts.map(async (job) => {
+      const proposalCount = await Proposal.countDocuments({ job_id: job._id });
+      
+      // Check if the client has a payment method
+      const hasPaymentMethod = await Payment_Method.exists({ client_id: job.client_id });
+      
+      return {
+        ...job,
+        proposalCount,
+        paymentMethodStatus: hasPaymentMethod ? "Payment method verified" : "Payment method unverified"
+      };
+    }));
+    
+    res.status(200).json({ jobPosts: jobPostsWithDetails });
   } catch (err) {
     console.error('Error fetching job posts:', err);
     res.status(500).json({ message: 'Internal server error', error: err.message });
@@ -77,7 +113,7 @@ exports.getClientJobPosts = async (req, res) => {
 // Backend API controller
 exports.getJobPostById = async (req, res) => {
   try {
-    const { jobPostId } = req.params; // Change from req.query to req.params
+    const { jobPostId } = req.params; 
     const jobPost = await Job_Post.findById(jobPostId);
 
     if (!jobPost) {
