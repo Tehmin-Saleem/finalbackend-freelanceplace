@@ -8,7 +8,7 @@ import SubmitProposal from "./Pages/SubmitProposal";
 import Notification from "./Pages/Notifications";
 import Chat from "./Pages/ChatPage";
 // import OfferForm from "./components/FormProposal/OfferForm";
-import { Elements } from '@stripe/react-stripe-js';
+// import { Elements } from '@stripe/react-stripe-js';
 import { loadStripe } from '@stripe/stripe-js';
 import PaymentMethod from "./Pages/PaymentMethod";
 import ProposalPopup from "./components/PopUps/PropsalSubmit";
@@ -109,7 +109,7 @@ function App() {
         <Route path="/ProjectDetails" element={<JobDetails/>} /> 
         <Route path="/myProfile" element={<MyProfile/>} /> 
         <Route path="/ErrorPage" element={<ErrorPage/>} /> 
-        <Route path="/profile" element={<ProfileView />} />
+        <Route path="/profile/:userId" element={<ProfileView />} />
         
         <Route path="/SubmitProposal/:jobPostId" element={<SubmitProposal/>} /> 
         <Route path="/SubmitProposal" element={<SubmitProposal/>} /> 

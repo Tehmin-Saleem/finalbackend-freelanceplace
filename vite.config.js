@@ -13,7 +13,10 @@ export default defineConfig({
       'pdfjs-dist/build/pdf.worker.entry': 'pdfjs-dist/build/pdf.worker.min.js'
     }
   }
+  
 });
+
+
 
 // import { defineConfig } from 'vite';
 // import react from '@vitejs/plugin-react';

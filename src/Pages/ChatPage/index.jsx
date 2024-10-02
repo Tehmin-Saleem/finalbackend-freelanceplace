@@ -222,31 +222,74 @@
 // export default Chat;
 
 // =============================================================================================================
+// ==========================================================================================================
 
 import React, { useState, useEffect } from "react";
 import "./styles.scss";
 import axios from "axios";
 import { Header } from "../../components";
-// import io from "socket.io-client";
+import io from "socket.io-client";
 
-// const socket = io("http://localhost:5000"); // Replace with your server URL
+const socket = io("http://localhost:5173"); // Replace with your server URL
 
-const Chat = () => {
+const Chat = ({ clientId, freelancerId }) => {
   const [selectedChat, setSelectedChat] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
   const [conversations, setConversations] = useState([]); // Initialize as an empty array
 
+
+  const [freelancer, setFreelancer] = useState({});
+  const [chatHistory, setChatHistory] = useState([]);
+ 
+
   const [user, setUser] = useState(null); // Current user data (client)
   const freelancerData = JSON.parse(localStorage.getItem("freelancerData")); // Get freelancer data
 
+  // const socket = io("http://localhost:5173", {
+  //   transports: ["polling", "websocket"], // Ensure you're using both polling and WebSocket
+  // });
+
   // ===============================
+
+
+  useEffect(() => {
+    // Fetch freelancer details
+    axios.get(`http://localhost:5173/api/freelancer/profile`)
+      .then((response) => setFreelancer(response.data))
+      .catch((error) => console.error(error));
+
+    // Fetch chat history
+    axios.get(`http://localhost:5173/api/client/${clientId}/${freelancerId}`)
+      .then((response) => {
+        if (response.data && Array.isArray(response.data.messages)) {
+          setChatHistory(response.data.messages); // Only set if messages exist
+        } else {
+          setChatHistory([]);  // Default to empty array if no messages
+        }
+      })
+      .catch((error) => console.error(error));
+
+    // Join the chat room
+    socket.emit('join_room', `${clientId}-${freelancerId}`);
+  }, [clientId, freelancerId]);
+
+  // Load list of conversations
+  const loadConversations = () => {
+    axios
+      .get("/api/client/:clientId/:freelancerId", {
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+      })
+      .then((response) => {
+        setConversations(response.data);
+      });
+  };
 
   useEffect(() => {
     // Fetch user information (client) and conversations from API
     axios
-      .get("/api/user/me", {
+      .get("/api/client/me", {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       })
       .then((response) => {
@@ -254,17 +297,6 @@ const Chat = () => {
         loadConversations();
       });
   }, []);
-
-  // Load list of conversations
-  const loadConversations = () => {
-    axios
-      .get("/api/chat/conversations", {
-        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-      })
-      .then((response) => {
-        setConversations(response.data);
-      });
-  };
 
   // Fetch chat history when a conversation is selected
   const handleChatClick = (chat) => {
@@ -310,7 +342,7 @@ const Chat = () => {
   useEffect(() => {
     if (freelancerData) {
       setSelectedChat({
-        id: freelancerData.name,  // You can modify the ID based on your logic
+        id: freelancerData.id, // You can modify the ID based on your logic
         name: freelancerData.name,
         jobTitle: freelancerData.jobTitle,
         profilePicture: freelancerData.image,
@@ -319,24 +351,24 @@ const Chat = () => {
   }, [freelancerData]);
 
   // Fetch chat history when a user selects a conversation
-  useEffect(() => {
-    if (selectedChat) {
-      axios
-        .get(`/api/chat/getChatHistory/${selectedChat.id}`, {
-          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-        })
-        .then((response) => {
-          if (Array.isArray(response.data)) {
-            setMessages(response.data);
-          } else {
-            console.error("Chat history is not an array", response.data);
-          }
-        })
-        .catch((error) => {
-          console.error("Error fetching chat history", error);
-        });
-    }
-  }, [selectedChat]);
+  // useEffect(() => {
+  //   if (selectedChat) {
+  //     axios
+  //       .get(`/api/chat/getChatHistory/${selectedChat.id}`, {
+  //         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+  //       })
+  //       .then((response) => {
+  //         if (Array.isArray(response.data)) {
+  //           setMessages(response.data);
+  //         } else {
+  //           console.error("Chat history is not an array", response.data);
+  //         }
+  //       })
+  //       .catch((error) => {
+  //         console.error("Error fetching chat history", error);
+  //       });
+  //   }
+  // }, [selectedChat]);
 
   // // Listen for incoming messages
   useEffect(() => {
@@ -359,110 +391,61 @@ const Chat = () => {
     }
   };
 
-  // ================================================this is old above
-
-  //   return (
-  //     <>
-  //       <Header />
-  //       <div className="chat-page">
-  //         <div className="left-section">
-  //           <div className="search-bar">
-  //             <input
-  //               type="text"
-  //               placeholder="Search"
-  //               value={searchTerm}
-  //               onChange={(e) => setSearchTerm(e.target.value)}
-  //             />
-  //           </div>
-  //           {/* <div className="conversations">
-  //             {dummyData.map((chat) => (
-  //               <div
-  //                 key={chat.id}
-  //                 className={`conversation ${
-  //                   selectedChat && selectedChat.id === chat.id ? "active" : ""
-  //                 }`}
-  //                 onClick={() => setSelectedChat(chat)}
-  //               >
-  //                 <img src={chat.profilePicture} alt="Profile" />
-  //                 <div>
-  //                   <div className="chat-name">{chat.name}</div>
-  //                   <div className="latest-message">{chat.latestMessage}</div>
-  //                 </div>
-  //               </div>
-  //             ))}
-  //           </div> */}
-  //         </div>
-  //         <div className="right-section">
-  //           <div className="chat-header">
-  //             {selectedChat && (
-  //               <>
-  //                 <h3>{selectedChat.jobTitle}</h3>
-  //                 <p>{selectedChat.date}</p>
-  //               </>
-  //             )}
-  //           </div>
-  //           <div className="chat-messages">
-  //             {messages.length === 0 ? (
-  //               <p>No messages yet</p>
-  //             ) : (
-  //               messages.map((message, index) => (
-  //                 <div key={index} className="message">
-  //                   <img src={message.sender.profilePicture} alt="Sender" />
-  //                   <div className="message-content">
-  //                     <strong>{message.sender.name}</strong>
-  //                     <p>{message.text}</p>
-  //                   </div>
-  //                 </div>
-  //               ))
-  //             )}
-  //           </div>
-  //           <div className="message-input">
-  //             <input
-  //               type="text"
-  //               placeholder="Write a message..."
-  //               value={newMessage}
-  //               onChange={(e) => setNewMessage(e.target.value)}
-  //             />
-  //             <button className="send-btn" onClick={sendMessage}>
-  //               Send
-  //             </button>
-  //           </div>
-  //         </div>
-  //       </div>
-  //     </>
-  //   );
-  // };
+  
 
   return (
     <>
       <Header />
       <div className="chat-page">
+      <div className="chat-header">
+        <img src={freelancer.profilePic} alt="Profile" />
+        <h3>{freelancer.name}</h3>
+        <p>{freelancer.description}</p>
+      </div>
         <div className="left-section">
           <h2>Messages</h2>
-        <div className="search-bar">
-          <input
-            type="text"
-            placeholder="Search"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-        </div>
+          <div className="search-bar">
+            <input
+              type="text"
+              placeholder="Search"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
+          <div className="list">
+            {selectedChat && (
+              <>
+                <div className="chat-header-left">
+                  <img src={selectedChat.profilePicture} alt="Freelancer" />
+                  <h3>{selectedChat.jobTitle}</h3>
+                </div>
+              </>
+            )}
+          </div>
         </div>
         <div className="right-section">
           {selectedChat && (
             <>
               <div className="chat-header">
-                <img src={selectedChat.profilePicture} alt="Freelancer" />
+                {/* <img src={selectedChat.profilePicture} alt="Freelancer" /> */}
                 <h3>{selectedChat.jobTitle}</h3>
               </div>
               <div className="chat-messages">
-                {messages.map((message, index) => (
-                  <div key={index} className="message">
-                    <strong>{message.sender.name}</strong>
-                    <p>{message.text}</p>
-                  </div>
-                ))}
+                {messages.length === 0 ? (
+                  <p>No messages yet</p>
+                ) : (
+                  messages.map((messages, index) => (
+                    <div key={index} className="message">
+                      <strong>
+                        {messages.sender === "client" ? "Client" : "Freelancer"}
+                      </strong>
+                      <p>{messages.message}</p>{" "}
+                      {/* Update to access `message.message` */}
+                    </div>
+                  ))
+                )}
               </div>
+
               <div className="message-input">
                 <input
                   type="text"
@@ -481,3 +464,242 @@ const Chat = () => {
 };
 
 export default Chat;
+// ============================================================================================
+
+// import React, { useState, useEffect } from "react";
+// import "./styles.scss";
+// import axios from "axios";
+// import { Header } from "../../components";
+// import io from "socket.io-client";
+
+// const Chat = () => {
+//   const [selectedChat, setSelectedChat] = useState(null);
+//   const [searchTerm, setSearchTerm] = useState("");
+//   const [messages, setMessages] = useState([]);
+//   const [newMessage, setNewMessage] = useState("");
+//   const [conversations, setConversations] = useState([]);
+//   const [user, setUser] = useState(null);
+//   const freelancerData = JSON.parse(localStorage.getItem("freelancerData"));
+
+// const socket = io("http://localhost:5173", {
+//   transports: ["polling", "websocket"], // Ensure you're using both polling and WebSocket
+// });
+
+//   // Initialize socket connection
+//   // const socket = io("http://localhost:5000"); // Replace with your server URL
+
+// useEffect(() => {
+//   // Fetch user information (client) and conversations from API
+//   axios
+//     .get("/api/user/me", {
+//       headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+//     })
+//     .then((response) => {
+//       setUser(response.data);
+//       loadConversations();
+//     });
+
+//   // Listen for incoming messages through socket
+//   socket.on("chat message", (msg) => {
+//     if (msg.receiverId === user?.id) {
+//       // Ensure user data is available
+//       setMessages((prevMessages) => [...prevMessages, msg]);
+//     }
+//   });
+
+//   // Cleanup socket on component unmount
+//   return () => {
+//     socket.disconnect();
+//   };
+// }, [user]);
+
+//   // useEffect(() => {
+//   //   const fetchConversations = async () => {
+//   //     try {
+//   //       const response = await axios.get('/api/conversations');
+//   //       setConversations(response.data.conversations || []); // Ensure it defaults to an empty array
+//   //     } catch (error) {
+//   //       console.error('Error fetching conversations:', error);
+//   //     }
+//   //   };
+
+//   //   fetchConversations();
+//   // }, []);
+
+//   // Load list of conversations
+//   const loadConversations = () => {
+//     axios
+//       .get("/api/conversations", {
+//         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+//       })
+//       .then((response) => {
+//         setConversations(response.data.conversations || []);
+//       });
+//   };
+
+//   // Fetch chat history when a conversation is selected
+//   const handleChatClick = (chat) => {
+//     setSelectedChat(chat);
+//     axios
+//       .get(`/api/chat/history/${chat.freelancerId}`, {
+//         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+//       })
+//       .then((response) => {
+//         setMessages(response.data);
+//       });
+//   };
+
+//     // Fetch chat history when a user selects a conversation
+//     useEffect(() => {
+//       if (selectedChat) {
+//         axios
+//           .get(`/api/chat/getChatHistory/${selectedChat.id}`, {
+//             headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+//           })
+//           .then((response) => {
+//             if (Array.isArray(response.data)) {
+//               setMessages(response.data);
+//             } else {
+//               console.error("Chat history is not an array", response.data);
+//             }
+//           })
+//           .catch((error) => {
+//             console.error("Error fetching chat history", error);
+//           });
+//       }
+//     }, [selectedChat]);
+
+//   // Handle sending a message
+//   const sendMessage = () => {
+//     if (newMessage && selectedChat) {
+//       const messageData = {
+//         text: newMessage,
+//         senderId: user.id,
+//         receiverId: selectedChat.freelancerId,
+//       };
+
+//       // Emit message via socket
+//       socket.emit("chat message", messageData, (response) => {
+//         if (response.success) {
+//           setMessages((prevMessages) => [...prevMessages, messageData]); // Update message list
+//           setNewMessage("");
+//         } else {
+//           console.error("Failed to send message", response.error);
+//         }
+//       });
+//     }
+//   };
+
+//   // return (
+//     // <>
+//       // <Header />
+//       {/* <div className="chat-page">
+//         <div className="left-section">
+//           <h2>Messages</h2>
+//           <div className="search-bar">
+//             <input
+//               type="text"
+//               placeholder="Search"
+//               value={searchTerm}
+//               onChange={(e) => setSearchTerm(e.target.value)}
+//             />
+//           </div>
+//           <div className="conversations">
+
+//             {conversations.map((chat) => (
+//               <div
+//                 key={chat.freelancerId}
+//                 className={`conversation ${selectedChat?.freelancerId === chat.freelancerId ? "active" : ""}`}
+//                 onClick={() => handleChatClick(chat)}
+//               >
+//                 <img src={chat.profilePicture} alt="Profile" />
+//                 <div>
+//                   <div className="chat-name">{chat.name}</div>
+//                   <div className="latest-message">{chat.latestMessage}</div>
+//                 </div>
+//               </div>
+//             ))}
+//           </div>
+//         </div>
+//         <div className="right-section">
+//           {selectedChat ? (
+//             <>
+//               <div className="chat-header">
+//                 <img src={selectedChat.profilePicture} alt="Freelancer" />
+//                 <h3>{selectedChat.jobTitle}</h3>
+//               </div>
+//               <div className="chat-messages">
+//                 {messages.map((message, index) => (
+//                   <div key={index} className="message">
+//                     <strong>{message.sender.name}</strong>
+//                     <p>{message.text}</p>
+//                   </div>
+//                 ))}
+//               </div>
+//               <div className="message-input">
+//                 <input
+//                   type="text"
+//                   placeholder="Write a message..."
+//                   value={newMessage}
+//                   onChange={(e) => setNewMessage(e.target.value)}
+//                 />
+//                 <button onClick={sendMessage}>Send</button>
+//               </div>
+//             </>
+//           ) : (
+//             <p>Select a chat to start messaging</p>
+//           )}
+//         </div>
+//       </div>
+//     </>
+//   );
+// }; */}
+
+// return (
+//   <>
+//     <Header />
+//     <div className="chat-page">
+//       <div className="left-section">
+//         <h2>Messages</h2>
+//       <div className="search-bar">
+//         <input
+//           type="text"
+//           placeholder="Search"
+//           value={searchTerm}
+//           onChange={(e) => setSearchTerm(e.target.value)}
+//         />
+//       </div>
+//       </div>
+//       <div className="right-section">
+//         {selectedChat && (
+//           <>
+//             <div className="chat-header">
+//               <img src={selectedChat.profilePicture} alt="Freelancer" />
+//               <h3>{selectedChat.jobTitle}</h3>
+//             </div>
+//             <div className="chat-messages">
+//               {messages.map((message, index) => (
+//                 <div key={index} className="message">
+//                   <strong>{message.sender.name}</strong>
+//                   <p>{message.text}</p>
+//                 </div>
+//               ))}
+//             </div>
+//             <div className="message-input">
+//               <input
+//                 type="text"
+//                 placeholder="Write a message..."
+//                 value={newMessage}
+//                 onChange={(e) => setNewMessage(e.target.value)}
+//               />
+//               <button onClick={sendMessage}>Send</button>
+//             </div>
+//           </>
+//         )}
+//       </div>
+//     </div>
+//   </>
+// );
+// };
+
+// export default Chat;
