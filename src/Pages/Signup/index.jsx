@@ -187,10 +187,7 @@ function Signup() {
                 />
               </div>
             </div>
-
-
-
-            <div className="relative">
+<div className="relative">
               <div className="flex mb-4 shadow border rounded-xl w-full py-3 px-3 bg-[#ECF0F1] font-Poppins">
                 <div className="pr-3">
                   <Fname />
