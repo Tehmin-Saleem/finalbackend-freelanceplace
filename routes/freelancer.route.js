@@ -90,7 +90,7 @@ router.get('/profile', authMiddleware, freelancerProfileController.getAuthentica
 // router.put('/profile/:freelancerId', freelancerProfileController.getProfileByUserId);
 router.delete('/profile/:freelancerId', freelancerProfileController.deleteProfile);
 // router.get('/profile', authMiddleware, freelancerProfileController.getProfileByUserId);
-router.get('/profile', authMiddleware, freelancerProfileController.getProfileByUserId);
+router.get('/profile/:userId', authMiddleware, freelancerProfileController.getProfileByUserId);
 router.get('/profile/:freelancer_id', authMiddleware, freelancerProfileController.getProfileByFreelancerId);
 
 

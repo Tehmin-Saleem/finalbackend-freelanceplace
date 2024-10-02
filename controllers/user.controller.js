@@ -125,4 +125,15 @@ const login = async (req, res) => {
       res.status(500).json({ message: 'Internal server error' });
     }
   };
-  module.exports = { signup, login, hashPassword, checkUserExists,getUserById };
+  const getAllUsers = async (req, res) => {
+    try {
+      const users = await User.find(); // Retrieve all users with all fields
+      res.json(users);
+    } catch (err) {
+      console.error('Error fetching users:', err);
+      res.status(500).json({ message: 'Internal server error' });
+    }
+  };
+  
+  
+  module.exports = { signup, login, hashPassword, checkUserExists,getUserById, getAllUsers };

@@ -109,7 +109,6 @@ function calculateJobSuccess(profile) {
   // Implement your logic here. For now, returning a random number between 80 and 100
   return Math.floor(Math.random() * (100 - 80 + 1)) + 80;
 }
-
 exports.getProfileByUserId = async (req, res) => {
   console.log('Starting getProfileByUserId function');
   try {
@@ -130,11 +129,11 @@ exports.getProfileByUserId = async (req, res) => {
     const formattedProfile = {
       freelancer_id: profile.freelancer_id,
       name: `${profile.first_name} ${profile.last_name}`.trim() || 'No Name',
-      location: profile.location || 'Not specified',
+      // location: profile.location || 'Not specified',
       jobSuccess: calculateJobSuccess(profile),
-      rate: profile.hourly_rate || 'Not specified',
+      rate: profile.availability.hourly_rate || 'Not specified',
       skills: profile.skills || [],
-      totalJobs: profile.completed_projects || 0,
+      totalJobs: profile.experience.completed_projects || 0,
       totalHours: profile.total_hours || 0,
       title: profile.title || '',
       experience: {
