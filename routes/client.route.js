@@ -111,8 +111,16 @@ router.delete('/hire/:hireRequestId', hireFreelancerController.deleteHireRequest
 
 
 // Chat-related routes
-router.post('/chat/sendMessage', chatController.sendMessage); // Send message
-router.get('/chat/getChatHistory/:client_id/:freelancer_id', chatController.getChatHistory); // Fetch chat history
+
+// Route to get the chat history between client and freelancer
+router.get('/:clientId/:freelancerId', authMiddleware, chatController.getChatHistory);
+
+// Route to send a new message
+router.post('/send',authMiddleware, chatController.sendMessage);
+
+// Route to get all chats for a specific client
+router.get('/:clientId',authMiddleware, chatController.getClientChats);
+
 
 module.exports = router;
 

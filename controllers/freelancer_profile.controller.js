@@ -74,6 +74,7 @@ exports.getAuthenticatedProfile = async (req, res) => {
 
     // Format the response data for each profile
     const formattedProfiles = profiles.map(profile => ({
+      freelancer_id: profile.freelancer_id,
       name: `${profile.first_name} ${profile.last_name}`.trim() || 'No Name',
       location: profile.location || 'Not specified',
       jobSuccess: calculateJobSuccess(profile), // Implement this function based on your logic
@@ -127,6 +128,7 @@ exports.getProfileByUserId = async (req, res) => {
 
     // Constructing the formatted profile
     const formattedProfile = {
+      freelancer_id: profile.freelancer_id,
       name: `${profile.first_name} ${profile.last_name}`.trim() || 'No Name',
       location: profile.location || 'Not specified',
       jobSuccess: calculateJobSuccess(profile),
@@ -187,6 +189,110 @@ exports.deleteProfile = async (req, res) => {
 
     res.status(200).json({ success: true, message: 'Profile deleted successfully' });
   } catch (err) {
+    res.status(400).json({ success: false, error: err.message });
+  }
+};
+
+
+
+
+// exports.getProfileByFreelancerId = async (req, res) => {
+//   try {
+//     // Extract the freelancer_id from the request parameters
+//     const { freelancer_id } = req.params;
+    
+//     // Fetch the profile that matches the freelancer_id from the database
+//     const profile = await Freelancer_Profile.findOne({ freelancer_id })
+//     .select('-__v -createdAt -updatedAt'); // Exclude unnecessary fields
+//     console.log('Fetching profile for user ID:', freelancer_id);
+    
+//     if (!profile) {
+//       return res.status(404).json({ success: false, message: 'Profile not found' });
+//     }
+
+//     // Format the response data for the profile
+//     const formattedProfile = {
+//       freelancer_id: profile.freelancer_id,
+//       name: `${profile.first_name} ${profile.last_name}`.trim() || 'No Name',
+//       location: profile.location || 'Not specified',
+//       jobSuccess: calculateJobSuccess(profile), // Implement this function based on your logic
+//       rate: profile.availability?.hourly_rate || 'Not specified',
+//       skills: profile.skills || [],
+//       totalJobs: profile.experience?.completed_projects || 0,
+//       totalHours: profile.total_hours || 0,
+//       experience: {
+//         title: profile.title || '',
+//         description: profile.profile_overview || '',
+//       },
+//       availability: {
+//         full_time: profile.availability?.full_time || false,
+//         part_time: profile.availability?.part_time || false,
+//         hourly_rate: profile.availability?.hourly_rate || 'Not specified',
+//       },
+//       languages: profile.languages || [],
+//       portfolios: profile.portfolios || [],
+//       image: profile.image ? `/api/freelancer/profile/image/${profile.image.split('\\').pop()}` : null,
+//     };
+
+//     res.status(200).json({ success: true, data: formattedProfile });
+//   } catch (err) {
+//     console.error('Error in getProfileByFreelancerId:', err);
+//     res.status(400).json({ success: false, error: err.message });
+//   }
+// };
+
+
+
+
+
+// ===============
+
+exports.getProfileByFreelancerId = async (req, res) => {
+  try {
+    // Extract the freelancer_id from the request parameters
+    const { freelancer_id } = req.params;
+
+    // Log freelancer_id to check if it's correct
+    console.log('Requested freelancer_id:', freelancer_id);
+
+    // Fetch the profile that matches the freelancer_id from the database
+    const profile = await Freelancer_Profile.findOne({ freelancer_id })
+      .select('-__v -createdAt -updatedAt'); // Exclude unnecessary fields
+
+    // Log the fetched profile
+    console.log('Fetched profile:', profile);
+
+    if (!profile) {
+      return res.status(404).json({ success: false, message: 'Profile not found' });
+    }
+
+    // Format the response data for the profile
+    const formattedProfile = {
+      freelancer_id: profile.freelancer_id,
+      name: `${profile.first_name} ${profile.last_name}`.trim() || 'No Name',
+      location: profile.location || 'Not specified',
+      jobSuccess: calculateJobSuccess(profile),
+      rate: profile.availability?.hourly_rate || 'Not specified',
+      skills: profile.skills || [],
+      totalJobs: profile.experience?.completed_projects || 0,
+      totalHours: profile.total_hours || 0,
+      experience: {
+        title: profile.title || '',
+        description: profile.profile_overview || '',
+      },
+      availability: {
+        full_time: profile.availability?.full_time || false,
+        part_time: profile.availability?.part_time || false,
+        hourly_rate: profile.availability?.hourly_rate || 'Not specified',
+      },
+      languages: profile.languages || [],
+      portfolios: profile.portfolios || [],
+      image: profile.image ? `/api/freelancer/profile/image/${profile.image.split('\\').pop()}` : null,
+    };
+
+    res.status(200).json({ success: true, data: formattedProfile });
+  } catch (err) {
+    console.error('Error in getProfileByFreelancerId:', err);
     res.status(400).json({ success: false, error: err.message });
   }
 };

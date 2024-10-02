@@ -89,10 +89,18 @@ router.post('/profile', upload.fields([
 router.get('/profile', authMiddleware, freelancerProfileController.getAuthenticatedProfile);
 // router.put('/profile/:freelancerId', freelancerProfileController.getProfileByUserId);
 router.delete('/profile/:freelancerId', freelancerProfileController.deleteProfile);
+// router.get('/profile', authMiddleware, freelancerProfileController.getProfileByUserId);
 router.get('/profile', authMiddleware, freelancerProfileController.getProfileByUserId);
+router.get('/profile/:freelancer_id', authMiddleware, freelancerProfileController.getProfileByFreelancerId);
 
-// Chat-related routes for freelancers
-router.post('/chat/sendMessage', chatController.sendMessage); // Send message
-router.get('/chat/getChatHistory/:client_id/:freelancer_id', chatController.getChatHistory); // Fetch chat history
+
+// Route to get all chats for a specific freelancer
+router.get('/freelancer/:freelancerId',authMiddleware, chatController.getFreelancerChats);
+
+// Route to get the chat history between client and freelancer
+router.get('/:clientId/:freelancerId',authMiddleware, chatController.getChatHistory);
+
+// Route to send a new message
+router.post('/send',authMiddleware, chatController.sendMessage);
 
 module.exports = router;
