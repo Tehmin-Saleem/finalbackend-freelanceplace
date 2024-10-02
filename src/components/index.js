@@ -1,6 +1,6 @@
 import CommonButton from "./Commoncomponents/CommonButton";
 import TextField from "./Commoncomponents/Textfield";
-// import Header from "./Header/NewHeader";
+
 import Carousel from "./ProfileView/Carousel";
 import StarRating from "./ProfileView/starrating";
 import UserReview from "./ProfileView/UserReviews";
@@ -16,7 +16,7 @@ import Alljobs from "./Alljobs/index.jsx";
 
 export {default as CommonButton} from "./Commoncomponents/CommonButton"
 export {default as TextField} from "./Commoncomponents/Textfield"
-export {default as NewHeader} from "./Header/NewHeader"
+
 export {default as Header} from "./Commoncomponents/Header"
 export {default as Carousel} from "./ProfileView/Carousel"
 export {default as StarRating} from "./ProfileView/starrating"

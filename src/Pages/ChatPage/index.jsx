@@ -227,9 +227,9 @@ import React, { useState, useEffect } from "react";
 import "./styles.scss";
 import axios from "axios";
 import { Header } from "../../components";
-import io from "socket.io-client";
+// import io from "socket.io-client";
 
-const socket = io("http://localhost:5000"); // Replace with your server URL
+// const socket = io("http://localhost:5000"); // Replace with your server URL
 
 const Chat = () => {
   const [selectedChat, setSelectedChat] = useState(null);

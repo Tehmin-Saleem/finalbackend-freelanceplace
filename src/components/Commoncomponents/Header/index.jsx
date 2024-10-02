@@ -416,12 +416,11 @@
 
 
 
-
 import React, { useEffect, useState } from "react";
 import { proxy, useSnapshot } from "valtio";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
-import { Link } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
+import { jwtDecode } from 'jwt-decode';
 
 import {
   JobsDropdwon,
@@ -434,10 +433,12 @@ import "./styles.scss";
 
 
 const state = proxy({
-  profile: {
+  user: {
     first_name: "",
     last_name: "",
-    image: "",
+    email: "",
+    role: "",
+    country_name: "",
   },
   dropdownOpen: false,
   selectedOption: "",
@@ -448,28 +449,32 @@ const Header = () => {
   const snap = useSnapshot(state);
   const navigate = useNavigate();
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
-  const [userType, setUserType] = useState('');
 
   useEffect(() => {
-    const fetchProfile = async () => {
+    const fetchUser = async () => {
       try {
         const token = localStorage.getItem("token");
-        const response = await axios.get("http://localhost:5000/api/freelancer/profile", {
+        if (!token) {
+          console.error("No token found");
+          return;
+        }
+
+        const decodedToken = jwtDecode(token);
+        const userId = decodedToken.userId;
+
+        const response = await axios.get(`http://localhost:5000/api/client/users/${userId}`, {
           headers: {
             'Authorization': `Bearer ${token}`
           }
         });
-        state.profile = response.data.data;
+
+        state.user = response.data;
       } catch (error) {
-        console.error("Error fetching profile:", error);
+        console.error("Error fetching user:", error);
       }
     };
 
-    fetchProfile();
-    
-    // Retrieve user type from local storage
-    const type = localStorage.getItem("userType");
-    setUserType(type);
+    fetchUser();
   }, []);
 
   const toggleDropdown = (e, dropdownType) => {
@@ -496,55 +501,22 @@ const Header = () => {
     }
   };
 
-
   const handleLogoClick = () => {
-    const token = localStorage.getItem('token'); // Get the token from local storage
-    if (token) {
-      try {
-        const decodedToken = jwt_decode(token); // Decode the token to get user information
-        console.log(decodedToken);
-        const role = decodedToken.role; // Extract the role
-
-        // Navigate to the appropriate dashboard based on the user role
-        if (role === 'client') {
-          navigate('/ClientDashboard'); // Navigate to client dashboard
-        } else if (role === 'freelancer') {
-          navigate('/FreelanceDashBoard'); // Navigate to freelancer dashboard
-        } else {
-          navigate('/signin'); // Redirect to signin if role is unknown
-        }
-      } catch (error) {
-        console.error("Token decoding error:", error);
-        navigate('/signin'); // Redirect to signin if token decoding fails
-      }
+    if (snap.user.role === 'client') {
+      navigate('/ClientDashboard');
+    } else if (snap.user.role === 'freelancer') {
+      navigate('/FreelanceDashBoard');
     } else {
-      navigate('/signin'); // Redirect to signin if no token is found
+      navigate('/signin');
     }
   };
 
-  const handleProfileOption = async (option) => {
+  const handleProfileOption = (option) => {
     setProfileDropdownOpen(false);
     if (option === "PROFILE") {
-      try {
-        const token = localStorage.getItem("token");
-        const response = await axios.get("http://localhost:5000/api/freelancer/profile", {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        });
-        navigate('/profile', { state: { profileData: response.data.data } });
-      } catch (error) {
-        console.error("Error fetching profile:", error);
-      }
+      navigate('/profile', { state: { profileData: snap.user } });
     } else if (option === "LOGOUT") {
-      // Clear relevant local storage items on logout
-      localStorage.removeItem("token");
-      localStorage.removeItem("firstName");
-      localStorage.removeItem("lastName");
-      localStorage.removeItem("userType");
       localStorage.clear();
-
-      // Redirect the user to the login page
       navigate("/signin");
     }
   };
@@ -564,13 +536,9 @@ const Header = () => {
     return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
   };
 
-  const firstName = localStorage.getItem("firstName");
-  const lastName = localStorage.getItem("lastName");
-  
-  const initials = firstName && lastName ? getInitials(firstName, lastName) : "";
+  const initials = getInitials(snap.user.first_name, snap.user.last_name);
 
-  // Define dropdown options based on user type
-  const dropdownOptions = userType === "client"
+  const dropdownOptions = snap.user.role === "client"
     ? ["Post a Job", "All Jobs Post", "Add Payment", "Privacy Policy"]
     : ["Explore Jobs", "Add Payment", "Privacy Policy"];
 
@@ -581,7 +549,7 @@ const Header = () => {
           <Logo width="100" height="40"  onClick={handleLogoClick}/>
         </div>
         <div className="dropdown-container">
-          <h2 className="find-work">{userType === "client" ? "Find Talent" : "Find Work"}</h2>
+          <h2 className="find-work">{snap.user.role === "client" ? "Find Talent" : "Find Work"}</h2>
           <div onClick={(e) => toggleDropdown(e, "jobs")} className="dropdown-toggle">
             <JobsDropdwon />
           </div>

@@ -120,7 +120,7 @@ import {
   JobDropdwon,
 } from "../../svg/index";
 import "./styles.scss";
-import jwt_decode from 'jwt-decode'; // Import jwt-decode to decode the token
+import {jwt_decode} from 'jwt-decode'; // Import jwt-decode to decode the token
 
 const Header = () => {
   const navigate = useNavigate();
