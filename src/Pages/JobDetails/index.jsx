@@ -4,6 +4,7 @@ import {Header} from "../../components/index";
 import { useNavigate } from 'react-router-dom';
 import { useState, useEffect } from "react";
 import axios from 'axios';
+import JobPostedPopup from "../../components/PopUps/JobPosted";
 
 const EditIcon = () => (
   <svg
@@ -41,6 +42,19 @@ const EyeIcon = () => (
   </svg>
 );
 const JobDetails = () => {
+  const [isPopupVisible, setPopupVisible] = useState(false);
+  
+
+ 
+
+  const handleClosePopup = () => {
+    // Close the popup and redirect to homepage
+    setPopupVisible(false);
+    navigate('/ClientDashboard'); // Redirect to homepage
+  };
+
+
+
   const navigate = useNavigate();
   const [jobData, setJobData] = useState({});
 
@@ -86,6 +100,7 @@ const JobDetails = () => {
     });
   }, [navigate]);
   const handlePostJob = async () => {
+    setPopupVisible(true);
     try {
       const token = localStorage.getItem('token');
       let formData = new FormData();
@@ -125,7 +140,7 @@ const JobDetails = () => {
         
       });
   
-      navigate('/ClientDashboard');
+      // navigate('/ClientDashboard');
     } catch (error) {
       console.error('Error posting job:', error.response ? error.response.data : error.message);
     }
@@ -208,6 +223,8 @@ const JobDetails = () => {
           <div className="actions">
             <button className="btn back-btn" onClick={() => navigate(-1)}>Back</button>
             <button className="btn post-job-btn" onClick={handlePostJob}>Post a Job</button>
+      
+      {isPopupVisible && <JobPostedPopup onClose={handleClosePopup} />}
           </div>
         </div>
       </div>
