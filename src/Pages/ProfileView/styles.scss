@@ -309,24 +309,28 @@ $margin-bottom: 16px;
 .top {
   @include border-style(#d1d5db, $border-radius);
   @include common-padding(2rem 0);
+  
 }
 
 // Profile title
 .Profiletitle {
   @include common-text($font-size-lg, $color-primary, 500);
   margin-bottom: 2%;
-
+ 
+  margin-left: 10px
 }
 
 // Profile description
 .ProfileDescription {
   @include common-text($font-size-md);
   margin-bottom: 4%;
+  margin-left: 10px
 }
 
 // Portfolio section
 .PortfolioSection {
   margin-top: 4%;
+  
   @include border-style(#d1d5db, $border-radius);
   @include common-padding(2rem 0);
 }
@@ -335,12 +339,14 @@ $margin-bottom: 16px;
 .PortfolioTitle {
   @include common-text($font-size-lg, $color-primary, 500);
   margin-bottom: 2rem;
+  margin-left: 10px;
 }
 
 // Carousel
 .Carousel {
   display: flex;
   overflow-x: auto;
+
   scroll-snap-type: x mandatory;
 }
 
@@ -348,7 +354,9 @@ $margin-bottom: 16px;
 .PortfolioCard {
   flex: 0 0 calc(33.33% - 1rem);
   margin-right: 1rem;
+ 
   scroll-snap-align: start;
+ 
 
   &Image {
     width: 100%;

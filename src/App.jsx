@@ -108,7 +108,7 @@ function App() {
         <Route path="/ProjectDetails" element={<JobDetails/>} /> 
         <Route path="/myProfile" element={<MyProfile/>} /> 
         <Route path="/ErrorPage" element={<ErrorPage/>} /> 
-        <Route path="/profile" element={<ProfileView />} />
+        <Route path="/profile/:userId" element={<ProfileView />} />
         
         <Route path="/SubmitProposal/:jobPostId" element={<SubmitProposal/>} /> 
         <Route path="/SubmitProposal" element={<SubmitProposal/>} /> 

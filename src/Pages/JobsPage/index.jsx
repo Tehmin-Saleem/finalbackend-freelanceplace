@@ -1,45 +1,91 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import {  JobsCard, Header } from "../../components/index";
+import { JobsCard, Header } from "../../components/index";
 import "./styles.scss";
 import { useNavigate } from 'react-router-dom';
+import {jwtDecode} from "jwt-decode"; // Corrected jwtDecode import
+
 const JobsPage = () => {
   const [jobs, setJobs] = useState([]);
+  const [paymentMethods, setPaymentMethods] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [userMap, setUserMap] = useState({});
   const navigate = useNavigate();
+
   useEffect(() => {
-    const fetchJobs = async () => {
+    const fetchData = async () => {
       try {
         const token = localStorage.getItem('token');
         if (!token) {
           navigate('/signin');
           return;
         }
-        if (token) {
-          console.log('Token retrieved:', token);
-        } else {
-          console.log('No token found in local storage.');
-        }
 
-        const response = await axios.get('http://localhost:5000/api/client/jobposts', {
-          headers: {
-            'Authorization': `Bearer ${token}`
+        const decodedToken = jwtDecode(token);
+        const userId = decodedToken.userId;
+
+        const headers = {
+          'Authorization': `Bearer ${token}`
+        };
+
+        // Fetch jobs, user data, and payment methods concurrently
+        const [jobsResponse, userResponse, paymentMethodsResponse] = await Promise.all([
+          axios.get('http://localhost:5000/api/client/job-posts', { headers }),
+          axios.get(`http://localhost:5000/api/client/users`, { headers }),
+          axios.get('http://localhost:5000/api/client/payment-methods', { headers })
+        ]);
+        
+        // Check if paymentMethodsResponse.data.paymentMethods is an array
+        const paymentMethodsArray = Array.isArray(paymentMethodsResponse.data.paymentMethods)
+          ? paymentMethodsResponse.data.paymentMethods
+          : []; // Fallback to empty array if not
+
+        // Create a map of user IDs to country names
+        const userCountryMap = userResponse.data.reduce((acc, user) => {
+          acc[user._id] = user.country_name;
+          return acc;
+        }, {});
+
+        // Create a map of client IDs to payment method status
+        const paymentMethodMap = paymentMethodsArray.reduce((acc, method) => {
+          if (method && method.client_id) {
+            acc[method.client_id.toString()] = true; // Mark as verified
           }
-        });
+          return acc;
+        }, {});
 
-        setJobs(response.data.jobPosts);
+        setPaymentMethods(paymentMethodMap);
+
+        // Combine job data with payment method status and country name
+        const jobsWithPaymentStatus = jobsResponse.data.jobPosts.map(job => {
+          const clientId = job.client_id && job.client_id._id ? job.client_id._id.toString() : null;
+          return {
+            ...job,
+            paymentMethodStatus: clientId && paymentMethodMap[clientId]
+              ? "Payment Verified"
+              : "No Payment Method Available",
+            country: clientId ? userCountryMap[clientId] || "Unknown" : "Unknown"
+            
+          };
+          
+        });
+        console.log("Jobs with payment status:", jobsWithPaymentStatus);
+        setJobs(jobsWithPaymentStatus);
+        
       } catch (error) {
-        setError("Error fetching jobs: " + error.message);
+        console.error("Detailed error:", error);
+        setError("Error fetching data: " + error.message);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchJobs();
-  }, []);
+    fetchData();
+  }, [navigate]);
 
-  // Correct formatRate function
+
+
   const formatRate = (job) => {
     if (job.budget_type === "fixed") {
       return `$${job.fixed_price}`;
@@ -56,11 +102,11 @@ const JobsPage = () => {
 
   return (
     <div className="jobs-page">
-      <Header/>
+      <Header />
       <h1 className="jobs-heading">Jobs matching your skills</h1>
       <div className="jobs-container">
         {jobs.map((job) => (
-          <JobsCard 
+          <JobsCard
             key={job._id}
             jobPostId={job._id}
             type={job.budget_type === "fixed" ? "Fixed" : "Hourly"}
@@ -70,9 +116,8 @@ const JobsPage = () => {
             level={job.project_duration?.experience_level || "Not specified"}
             description={job.description || "No description provided"}
             tags={job.preferred_skills || []}
-            verified={true} 
-            rating="Top rated" 
-            location="Lahore, Punjab, Pakistan" 
+            paymentMethodStatus={job.paymentMethodStatus} 
+            location={job.country}
           />
         ))}
       </div>
