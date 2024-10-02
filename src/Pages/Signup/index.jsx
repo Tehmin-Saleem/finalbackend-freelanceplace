@@ -4,6 +4,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom"; // Import useNavigate
 import CHARACTER from "../../images/CHARACTER.png";
 import Group from "../../images/Group.png";
+import { signInWithGoogle } from "../../Firebase";
 
 import { CommonButton, TextField } from "../../components/index";
 import {
@@ -18,6 +19,21 @@ import {
 } from "../../svg/index";
 
 function Signup() {
+  const handleGoogleSignIn = () => {
+    signInWithGoogle()
+      .then(result => {
+        const user = result.user;
+        console.log('User Info: ', user);
+        navigate("/ClientDashboard") // Handle the user information
+      })
+      .catch(error => {
+        console.error('Error during sign in: ', error);
+      });
+  };
+  const [error, setError] = useState('');
+
+  
+ 
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
@@ -28,6 +44,7 @@ function Signup() {
   const [emailError, setEmailError] = useState("");
   const [signupError, setSignupError] = useState("");
   const [country, setCountry] = useState(""); // State for country
+  const [isChecked, setIsChecked] = useState(false);
 
   const navigate = useNavigate(); // Initialize useNavigate
 
@@ -61,6 +78,12 @@ function Signup() {
       setNameError("");
     }
   };
+  const handleCheckboxChange = (e) => {
+    setIsChecked(e.target.checked);
+    if (e.target.checked) {
+      setCheckboxError(""); // Clear the checkbox error if checked
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -72,6 +95,10 @@ function Signup() {
     }
 
     if (nameError || emailError || passwordError) {
+      return;
+    }
+    if (!isChecked) {
+      setCheckboxError("You must agree to the Terms and Conditions and Privacy Policy.");
       return;
     }
 
@@ -92,9 +119,7 @@ function Signup() {
       console.log("Signup response:", response);
       if (response.status === 201) {
         console.log('Signup successful');
-        // localStorage.setItem('firstName', firstName); 
-        // localStorage.setItem('lastName', lastName); 
-        //   localStorage.setItem('country', country);  
+       
         navigate('/signin'); 
         console.log("Signup successful");
         
@@ -162,10 +187,7 @@ function Signup() {
                 />
               </div>
             </div>
-
-
-
-            <div className="relative">
+<div className="relative">
               <div className="flex mb-4 shadow border rounded-xl w-full py-3 px-3 bg-[#ECF0F1] font-Poppins">
                 <div className="pr-3">
                   <Fname />
@@ -265,24 +287,26 @@ function Signup() {
 
 
             <div className="mb-4 flex items-center">
-              <input
-                type="checkbox"
-                id="terms"
-                name="terms"
-                className="mr-2 leading-tight"
-              />
-              <label
-                htmlFor="terms"
-                className="text-[12px] font-Poppins text-[#64748B] mt-3"
-              >
-                By creating an account means you agree to the
-                <strong>
-                  Terms <br />
-                  and Conditions
-                </strong>
-                and our
-                <strong> Privacy Policy</strong>
-              </label>
+               <input
+          type="checkbox"
+          id="terms"
+          name="terms"
+          className="mr-2 leading-tight"
+          checked={isChecked}
+          onChange={handleCheckboxChange}
+        />
+        <label
+          htmlFor="terms"
+          className="text-[12px] font-Poppins text-[#64748B] mt-3"
+        >
+          By creating an account means you agree to the
+          <strong>
+            Terms <br />
+            and Conditions
+          </strong>
+          and our
+          <strong> Privacy Policy</strong>
+        </label>
             </div>
 
             <div className="flex items-center justify-between">
@@ -314,14 +338,13 @@ function Signup() {
                 <div className="mr-3">
                   <Google />
                 </div>
-                <div>
-                  <a
-                    href="https://www.google.com" // Replace with the actual Google authentication URL
-                    className="mr-4 text-[12px] text-[#3498DB] font-Poppins font-semibold text-center"
-                  >
+                <button  className="mr-4 text-[12px] text-[#3498DB] font-Poppins font-semibold text-center" id="google-login"onClick={handleGoogleSignIn} >
+                  
+
+                
                     Continue with Google
-                  </a>
-                </div>
+              
+                </button>
               </div>
               <div className="flex justify-center mb-4 shadow-xl p-3">
                 <div className="mr-3">

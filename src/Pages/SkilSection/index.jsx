@@ -25,16 +25,19 @@ const SkillManagement = () => {
   const [availableSkills, setAvailableSkills] = useState([
     "HTML", "CSS", "JavaScript", "React", "Figma", "Mobile App Design", "Prototyping", "Mockups"
   ]);
+  const [filteredSkills, setFilteredSkills] = useState(availableSkills);
   const [searchTerm, setSearchTerm] = useState("");
 
   const handleAddSkill = (skill) => {
     setSkills([...skills, skill]);
     setAvailableSkills(availableSkills.filter((s) => s !== skill));
+    setFilteredSkills(filteredSkills.filter((s) => s !== skill));
   };
 
   const handleRemoveSkill = (skill) => {
     setSkills(skills.filter((s) => s !== skill));
     setAvailableSkills([...availableSkills, skill]);
+    setFilteredSkills([...filteredSkills, skill]);
   };
 
   const handleBudgetButtonClick = () => {
@@ -44,6 +47,18 @@ const SkillManagement = () => {
 
   const handleBackButtonClick = () => {
     navigate('/JobDescription'); // Replace with your target route
+  };
+
+  // Handle search input change
+  const handleSearchChange = (e) => {
+    const value = e.target.value.toLowerCase();
+    setSearchTerm(value);
+
+    // Filter available skills based on search input
+    const filtered = availableSkills.filter((skill) =>
+      skill.toLowerCase().includes(value)
+    );
+    setFilteredSkills(filtered);
   };
 
   const steps = [
@@ -93,7 +108,7 @@ const SkillManagement = () => {
               type="text"
               placeholder="Search skills or add your own"
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={handleSearchChange} // Search handler
             />
             <SearchIcon />
           </div>
@@ -117,7 +132,7 @@ const SkillManagement = () => {
           <div className="skills-section">
             <h3>Popular Skills for UI/UX Design</h3>
             <div className="skills-list">
-              {availableSkills.map((skill) => (
+              {filteredSkills.map((skill) => (
                 <button
                   key={skill}
                   onClick={() => handleAddSkill(skill)}
