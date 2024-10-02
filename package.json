@@ -12,7 +12,7 @@
   "dependencies": {
     "@paypal/react-paypal-js": "^8.6.0",
     "@pdftron/pdfjs-express": "^8.7.5",
-    "@stripe/react-stripe-js": "github:stripe/react-stripe-js",
+    "@stripe/react-stripe-js": "^2.8.0",
     "@stripe/stripe-js": "^4.5.0",
     "@vitejs/plugin-legacy": "^5.4.2",
     "axios": "^1.7.5",
