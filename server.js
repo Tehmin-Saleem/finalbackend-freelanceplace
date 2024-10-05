@@ -56,75 +56,41 @@ app.get("/", (req, res) => {
 });
 
 
-// Handle socket.io connections
+
+// Socket.io connection
 // io.on('connection', (socket) => {
-//   console.log(`User connected: ${socket.id}`);
+//   console.log('New client connected:', socket.id);
 
-//   // Event listener for receiving a message
-//   socket.on('sendMessage', async (data) => {
-//     try {
-//       const messageData = {
-//         sender: socket.id, // You should replace this with the authenticated user's ID
-//         text: data.text,
-//         timestamp: new Date(),
-//       };
-//       const newMessage = new Chat(messageData); // Assuming your Chat model
-//       await newMessage.save();
-
-//       io.emit('newMessage', newMessage); // Broadcast message to all clients
-//     } catch (error) {
-//       console.error('Error saving message:', error);
-//       socket.emit('error', 'Message could not be sent');
-//     }
+//   // Listen for send message event
+//   socket.on('sendMessage', (data) => {
+//     // Broadcast the message to the other user in the chat
+//     io.to(data.freelancerId).emit('newMessage', data);
 //   });
 
-//   // Handle user disconnection
+//   // Listen for disconnect event
 //   socket.on('disconnect', () => {
-//     console.log(`User disconnected: ${socket.id}`);
-//   });
-// });
-
-
-// io.on('connection', (socket) => {
-//   console.log(`User connected: ${socket.id}`);
-
-//   socket.on('sendMessage', async (data) => {
-//     const messageData = {
-//       sender: socket.id, // Use authenticated user's details
-//       text: data.text,
-//       timestamp: new Date(),
-//     };
-//     const newMessage = new Chat(messageData); // Assuming your Chat model
-//     await newMessage.save();
-
-//     io.emit('newMessage', newMessage); // Broadcast message to all clients
-//   });
-
-//   socket.on('disconnect', () => {
-//     console.log(`User disconnected: ${socket.id}`);
+//     console.log('Client disconnected:', socket.id);
 //   });
 // });
 
 
 
 io.on('connection', (socket) => {
-  console.log('A user connected');
+  console.log('a user connected');
 
-  socket.on('join_room', (room) => {
+  socket.on('joinRoom', ({ clientId, freelancerId }) => {
+    const room = `${clientId}_${freelancerId}`;
     socket.join(room);
-    console.log(`User joined room: ${room}`);
   });
 
-  socket.on('send_message', (data) => {
-    io.to(data.room).emit('receive_message', data);
+  socket.on('sendMessage', ({ room, message }) => {
+    io.to(room).emit('receiveMessage', message);
   });
 
   socket.on('disconnect', () => {
-    console.log('User disconnected');
+    console.log('user disconnected');
   });
 });
-
-
 
 const sendNotification = (userId, notificationData) => {
   io.to(userId.toString()).emit('notification', notificationData);

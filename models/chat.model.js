@@ -46,6 +46,9 @@ const chatSchema = new Schema({
 );
 
 
-const Chat = mongoose.model("Chat", chatSchema);
+const Chatprevious = mongoose.model("Chatprevious", chatSchema);
 
-module.exports = Chat;
+module.exports = Chatprevious;
+
+
+

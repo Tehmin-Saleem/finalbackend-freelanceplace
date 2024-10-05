@@ -219,3 +219,51 @@ exports.deleteProposal = async (req, res) => {
     res.status(500).json({ message: 'Internal server error' });
   }
 };
+
+
+// ======================
+// here i am adding new controller for getting freelancer details for specific proposal
+
+
+exports.getFreelancerDetailsByProposal = async (req, res) => {
+  try {
+    const { _id } = req.params;
+
+    // Find the proposal by ID and populate freelancer details
+    const proposal = await Proposal.findById(_id)
+      .populate('freelancer_id', 'first_name', 'last_name', 'profilePic',' jobTitle')  // Assuming freelancer_id references the user
+      .lean();
+
+    if (!proposal) {
+      return res.status(404).json({ message: 'Proposal not found' });
+    }
+
+    const freelancerId = proposal.freelancer_id._id;
+
+    // Find freelancer profile using the freelancer_id from the proposal
+    const profile = await Freelancer_Profile.findOne({ freelancer_id: freelancerId }).lean();
+
+    if (!profile) {
+      return res.status(404).json({ message: 'Freelancer profile not found' });
+    }
+
+    // Return freelancer details
+    const freelancerDetails = {
+      name: `${proposal.freelancer_id.first_name} ${proposal.freelancer_id.last_name}`.trim(),
+      profilePic: proposal.freelancer_id.profilePic || null,
+      jobTitle: proposal.freelancer_id.jobTitle || '',
+      profileOverview: profile.profile_overview || '',
+      experience: profile.experience || [],
+      skills: profile.skills || [],
+      location: profile.location || '',
+    };
+
+    res.status(200).json(freelancerDetails);
+  } catch (err) {
+    console.error('Error fetching freelancer details:', err);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+};
+
+
+
