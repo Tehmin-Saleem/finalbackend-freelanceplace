@@ -47,7 +47,7 @@ const DashboardPage = () => {
   return (
     <div className="dashboard-page">
       <Header />
-
+{/* 
       <div className="filter-options">
         <div className="filter-item">
           <span className="filter-label">Skills</span>
@@ -69,7 +69,7 @@ const DashboardPage = () => {
           <span className="filter-label">Ratings</span>
           <JobsDropdwon alt="Dropdown Icon" className="dropdown-icon" />
         </div>
-      </div>
+      </div> */}
 
       <main className="main-content">
         <div className="left-section">
