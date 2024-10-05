@@ -15,6 +15,8 @@ import ProposalPopup from "./components/PopUps/PropsalSubmit";
 import Popup from "./components/PopUps/PropsalSubmit";
 import ReviewPopup from "./components/PopUps/ReviewPopup";
 import JobPostedPopup from "./components/PopUps/JobPosted";
+import ChatProvider from "./context/ChatProvider.jsX";
+
 // import PaymentMethod from './components/PaymentMethod';
 
 // Load your Stripe public key
@@ -80,7 +82,11 @@ const freelancers = [
 
 function App() {
   return (
+      
+      
+
     <Router>
+      <ChatProvider>
       <Routes>
 
       <Route path="/Chat" element={<Chat/>} />
@@ -123,6 +129,7 @@ function App() {
 
 
       </Routes>
+      </ChatProvider>
     </Router>
   );
 }

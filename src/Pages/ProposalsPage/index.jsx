@@ -19,7 +19,7 @@ const IndexPage = () => {
     const fetchData = async () => {
       try {
         const token = localStorage.getItem("token");
-        console.log("Token:", token);
+        // console.log("Token:", token);
 
         if (!token) {
           navigate("/signin");
@@ -157,6 +157,15 @@ const IndexPage = () => {
 };
 
 export default IndexPage;
+
+
+
+
+
+
+
+
+
 // import React, { useState, useEffect } from "react";
 // import { Header, Proposalscard } from "../../components/index";
 // import axios from "axios";

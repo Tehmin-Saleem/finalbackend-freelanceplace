@@ -171,3 +171,64 @@ $bg-color: #f7f8fa;
     }
   }
   
+
+
+  .chat-page {
+    display: flex;
+    position: relative;
+  }
+  
+  .side-drawer {
+    position: fixed;
+    top: 0;
+    left: 0; /* Change from right to left */
+    width: 300px;
+    height: 100%;
+    background-color: white;
+    box-shadow: 4px 0 6px rgba(0, 0, 0, 0.1); /* Shadow on the right */
+    z-index: 1000;
+    padding: 20px;
+    transition: transform 0.3s ease-in-out;
+    transform: translateX(-100%); /* Initially hidden to the left */
+  }
+  
+  .side-drawer.open {
+    transform: translateX(0); /* Slide-in from the left */
+  }
+  
+  
+  .drawer-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #ccc;
+  }
+  
+  .drawer-search-bar {
+    margin-top: 20px;
+    width: 100%;
+    
+  }
+  
+  .drawer-search-bar input {
+    // width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    margin-right: 2%;
+  }
+
+
+  .drawer-search-bar-button{
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 10px;
+    font-size: 16px;
+  }
+  
+  .chat-page .left-section .search-bar input {
+    cursor: pointer; /* Make the search bar clickable */
+  }
+  

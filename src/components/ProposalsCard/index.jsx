@@ -3,8 +3,9 @@ import "./styles.scss";
 import { CommonButton } from "../../components/index";
 import { Chat } from "../../svg/index";
 import { useNavigate } from "react-router-dom";
+
 const ProposalCard = ({
-  id,
+  ProposalID,
   name,
   title,
   location,
@@ -16,6 +17,9 @@ const ProposalCard = ({
   jobTitle,
   status
 }) => {
+
+  console.log('Proposal ID:', ProposalID); // Log to check the id value
+  console.log('Proposal name:', name); // Log to check the id value
   const navigate = useNavigate();
 
   const handleHireClick = (e) => {
@@ -23,16 +27,68 @@ const ProposalCard = ({
     navigate("/offerform"); // Navigate to the offer form page
   };
 
-  const handleChatClick = () => {
-    const freelancerData = {
-      id,
-      name,
-      jobTitle,
-      image,
-    };
-    localStorage.setItem("freelancerData", JSON.stringify(freelancerData));
-    navigate("/chat");  // Navigate to chat page
+  // const handleChatClick = () => {
+  //   const freelancerData = {
+  //     id,
+  //     name,
+  //     jobTitle,
+  //     image,
+  //   };
+  //   localStorage.setItem("freelancerData", JSON.stringify(freelancerData));
+  //   navigate("/chat");  // Navigate to chat page
+  // };
+
+
+
+
+  // Function to fetch freelancer details by proposal ID (from backend)
+  async function getFreelancerDetails(ProposalID) {
+
+    const token = localStorage.getItem('token');  // Assuming you store the JWT token in localStorage
+  
+    try {
+      const response = await fetch(`http://localhost:5000/api/client/proposal/${ProposalID}`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,  // Add your token for authentication
+          'Content-Type': 'application/json'
+        }
+      });
+  
+      if (!response.ok) {
+        throw new Error(`Error: ${response.status} ${response.statusText}`);
+      }
+  
+      const freelancerDetails = await response.json();
+      console.log('Freelancer details:', freelancerDetails);
+  
+      return freelancerDetails;
+    } catch (error) {
+      console.error('Failed to fetch freelancer details:', error);
+      return null;
+    }
+  }
+
+  // Function to handle the chat button click
+  const handleChatClick = async (ProposalID) => {
+    console.log('Proposal ID:', ProposalID); // Add this line
+    const freelancerDetails = await getFreelancerDetails(ProposalID);
+  
+    if (freelancerDetails) {
+      localStorage.setItem("proposalId", ProposalID);
+      localStorage.setItem("freelancerDetails", JSON.stringify(freelancerDetails));
+      navigate("/chat");  // Now using navigate here is valid
+    } else {
+      console.error("Failed to fetch freelancer details");
+    }
   };
+  
+
+  // const handleChatClick = () => {
+  //   localStorage.setItem("proposalId", id); // Store the proposal ID in localStorage
+  //   navigate("/chat");
+  // };
+  
 
   return (
     <div className="proposal-card">
@@ -66,7 +122,7 @@ const ProposalCard = ({
           <CommonButton
             text={<Chat />}
             className="bg-[#FFFFFF] border border-[#4BCBEB] text-[18px] font-Poppins text-[#FFFFFF] rounded-lg font-semibold font-Poppins py-1 px-6 w-full focus:outline-none focus:shadow-outline"
-            onClick={handleChatClick}  // Add click handler
+            onClick={() => handleChatClick(ProposalID)} // Add click handler
          />
         <CommonButton
             text="Hire"
