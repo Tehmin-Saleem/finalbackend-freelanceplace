@@ -62,7 +62,7 @@ const signup = async (req, res) => {
 
     // Generate JWT token
     const token = jwt.sign({ userId: newUser._id }, process.env.JWT_SECRET, {
-      expiresIn: '1h',
+      expiresIn: '4h',
     });
 
     res.status(201).json({ token, message: 'Signup successful' });

@@ -56,57 +56,6 @@ app.get("/", (req, res) => {
 });
 
 
-// Handle socket.io connections
-// io.on('connection', (socket) => {
-//   console.log(`User connected: ${socket.id}`);
-
-//   // Event listener for receiving a message
-//   socket.on('sendMessage', async (data) => {
-//     try {
-//       const messageData = {
-//         sender: socket.id, // You should replace this with the authenticated user's ID
-//         text: data.text,
-//         timestamp: new Date(),
-//       };
-//       const newMessage = new Chat(messageData); // Assuming your Chat model
-//       await newMessage.save();
-
-//       io.emit('newMessage', newMessage); // Broadcast message to all clients
-//     } catch (error) {
-//       console.error('Error saving message:', error);
-//       socket.emit('error', 'Message could not be sent');
-//     }
-//   });
-
-//   // Handle user disconnection
-//   socket.on('disconnect', () => {
-//     console.log(`User disconnected: ${socket.id}`);
-//   });
-// });
-
-
-// io.on('connection', (socket) => {
-//   console.log(`User connected: ${socket.id}`);
-
-//   socket.on('sendMessage', async (data) => {
-//     const messageData = {
-//       sender: socket.id, // Use authenticated user's details
-//       text: data.text,
-//       timestamp: new Date(),
-//     };
-//     const newMessage = new Chat(messageData); // Assuming your Chat model
-//     await newMessage.save();
-
-//     io.emit('newMessage', newMessage); // Broadcast message to all clients
-//   });
-
-//   socket.on('disconnect', () => {
-//     console.log(`User disconnected: ${socket.id}`);
-//   });
-// });
-
-
-
 io.on('connection', (socket) => {
   console.log('A user connected');
 

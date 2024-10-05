@@ -8,12 +8,12 @@ const reviewRequestController = require("../controllers/review_request.controlle
 const paymentMethodController = require('../controllers/payment_method.controller');
 const path = require('path');
 const usercontroller=require ('../controllers/user.controller')
-
+const { upload } = require('../config/cloudinary.config');
 // Import Chat controller
 const chatController = require('../controllers/chat.controller'); // Add this
 
 const hireFreelancerController = require('../controllers/hire_freelancer.controller');
-const upload = require('../config/multer'); 
+
 const router = express.Router();
 
 

@@ -1,15 +1,14 @@
-
 const Freelancer_Profile = require('../models/freelancer_profile.model');
-
+const { cloudinary } = require('../config/cloudinary.config');
 
 exports.createOrUpdateProfile = async (req, res) => {
   try {
     console.log('Received data:', req.body);
     console.log('Received files:', req.files);
-    console.log('User ID from middleware:', req.user);
+
     const freelancerId = req.user && (req.user.userId || req.user);
     const profileData = {
-      freelancer_id: freelancerId, // Use the ID from the middleware
+      freelancer_id: freelancerId,
       first_name: req.body.first_name,
       last_name: req.body.last_name,
       title: req.body.title,
@@ -22,46 +21,62 @@ exports.createOrUpdateProfile = async (req, res) => {
 
     // Handle image upload
     if (req.files && req.files.image) {
-      profileData.image = req.files.image[0].filename;
-    }
+      const file = req.files.image[0];
+      console.log('Uploading file to Cloudinary:', file);
 
-    // Handle portfolios
+      const result = await cloudinary.uploader.upload(file.path, {
+        resource_type: 'image',
+        access_mode: 'public',
+        folder: 'uploads'
+      });
+
+      // Store the full Cloudinary URL
+      profileData.image = result.secure_url;
+      console.log('Stored image URL:', profileData.image);
+    }
     if (req.body.portfolios) {
       profileData.portfolios = JSON.parse(req.body.portfolios);
       
-      // Handle portfolio attachments
       if (req.files && req.files.portfolios) {
-        req.files.portfolios.forEach((file, index) => {
-          if (profileData.portfolios[index]) {
-            profileData.portfolios[index].attachment = file.filename;
+        for (let i = 0; i < req.files.portfolios.length; i++) {
+          const file = req.files.portfolios[i];
+          const result = await cloudinary.uploader.upload(file.path, {
+            resource_type: file.mimetype.startsWith('image') ? 'image' : 'raw',
+            public_id: `portfolio_uploads/${file.originalname}`,
+            format: file.mimetype.startsWith('image') ? null : 'pdf'
+          });
+          
+          // The correct URL should now be in result.secure_url
+          console.log("Uploaded PDF URL:", result.secure_url);
+          
+          if (profileData.portfolios[i]) {
+            profileData.portfolios[i].attachment = result.secure_url; // Store the full Cloudinary URL
           }
-        });
+        }
       }
     }
 
-    // Check if a profile with the given freelancer_id already exists
+    // Rest of the function remains the same...
+
     let profile = await Freelancer_Profile.findOne({ freelancer_id: profileData.freelancer_id });
 
     if (profile) {
-      // If profile exists, update it
       profile = await Freelancer_Profile.findOneAndUpdate(
         { freelancer_id: profileData.freelancer_id },
         profileData,
         { new: true }
       );
-      return res.status(200).json({ success: true, data: profile });
     } else {
-      // If no profile exists, create a new one
       profile = new Freelancer_Profile(profileData);
       await profile.save();
-      return res.status(201).json({ success: true, data: profile });
     }
+
+    return res.status(profile ? 200 : 201).json({ success: true, data: profile });
   } catch (err) {
     console.error('Error in createOrUpdateProfile:', err);
     res.status(400).json({ success: false, error: err.message });
   }
 };
-
 exports.getAuthenticatedProfile = async (req, res) => {
   try {
     // Fetch all profiles from the database
@@ -77,7 +92,7 @@ exports.getAuthenticatedProfile = async (req, res) => {
       freelancer_id: profile.freelancer_id,
       name: `${profile.first_name} ${profile.last_name}`.trim() || 'No Name',
       location: profile.location || 'Not specified',
-      jobSuccess: calculateJobSuccess(profile), // Implement this function based on your logic
+      jobSuccess: calculateJobSuccess(profile),
       rate: profile.availability?.hourly_rate || 'Not specified',
       skills: profile.skills || [],
       totalJobs: profile.experience?.completed_projects || 0,
@@ -93,10 +108,10 @@ exports.getAuthenticatedProfile = async (req, res) => {
       },
       languages: profile.languages || [],
       portfolios: profile.portfolios || [],
-      image: profile.image ? `/api/freelancer/profile/image/${profile.image.split('\\').pop()}` : null,
+      image: profile.image || null, 
     }));
 
-    // console.log('Formatted profiles data:', formattedProfiles);
+    console.log('Formatted profiles data:', formattedProfiles);
 
     res.status(200).json({ success: true, data: formattedProfiles });
   } catch (err) {
@@ -129,11 +144,10 @@ exports.getProfileByUserId = async (req, res) => {
     const formattedProfile = {
       freelancer_id: profile.freelancer_id,
       name: `${profile.first_name} ${profile.last_name}`.trim() || 'No Name',
-      // location: profile.location || 'Not specified',
       jobSuccess: calculateJobSuccess(profile),
-      rate: profile.availability.hourly_rate || 'Not specified',
+      rate: profile.availability?.hourly_rate || 'Not specified',
       skills: profile.skills || [],
-      totalJobs: profile.experience.completed_projects || 0,
+      totalJobs: profile.experience?.completed_projects || 0,
       totalHours: profile.total_hours || 0,
       title: profile.title || '',
       experience: {
@@ -142,10 +156,17 @@ exports.getProfileByUserId = async (req, res) => {
       },
       availability: profile.availability || {},
       languages: profile.languages || [],
-      portfolios: profile.portfolios || [],
-      image: profile.image ? `/api/freelancer/profile/image/${profile.image}` : null,
-    };
+      portfolios: profile.portfolios?.map(portfolio => ({
+        ...portfolio.toObject(),
+        attachment: portfolio.attachment.startsWith('http') 
+          ? portfolio.attachment 
+          : `https://res.cloudinary.com/dwqcs228h/raw/upload/v1728108804/uploads/${portfolio.attachment}`
+      })) || [],
+    
+      image: profile.image || null
+    }
 
+    console.log('profile image:', formattedProfile.image);
     console.log('Formatted profile data:', formattedProfile);
 
     res.status(200).json({ success: true, data: formattedProfile });
@@ -155,9 +176,6 @@ exports.getProfileByUserId = async (req, res) => {
   }
 };
 
-function calculateJobSuccess(profile) {
-  return profile.completed_projects > 0 ? Math.floor(Math.random() * (100 - 80 + 1)) + 80 : 0;
-}
 // Update freelancer profile by freelancer ID
 exports.updateProfile = async (req, res) => {
   try {
@@ -193,58 +211,6 @@ exports.deleteProfile = async (req, res) => {
 };
 
 
-
-
-// exports.getProfileByFreelancerId = async (req, res) => {
-//   try {
-//     // Extract the freelancer_id from the request parameters
-//     const { freelancer_id } = req.params;
-    
-//     // Fetch the profile that matches the freelancer_id from the database
-//     const profile = await Freelancer_Profile.findOne({ freelancer_id })
-//     .select('-__v -createdAt -updatedAt'); // Exclude unnecessary fields
-//     console.log('Fetching profile for user ID:', freelancer_id);
-    
-//     if (!profile) {
-//       return res.status(404).json({ success: false, message: 'Profile not found' });
-//     }
-
-//     // Format the response data for the profile
-//     const formattedProfile = {
-//       freelancer_id: profile.freelancer_id,
-//       name: `${profile.first_name} ${profile.last_name}`.trim() || 'No Name',
-//       location: profile.location || 'Not specified',
-//       jobSuccess: calculateJobSuccess(profile), // Implement this function based on your logic
-//       rate: profile.availability?.hourly_rate || 'Not specified',
-//       skills: profile.skills || [],
-//       totalJobs: profile.experience?.completed_projects || 0,
-//       totalHours: profile.total_hours || 0,
-//       experience: {
-//         title: profile.title || '',
-//         description: profile.profile_overview || '',
-//       },
-//       availability: {
-//         full_time: profile.availability?.full_time || false,
-//         part_time: profile.availability?.part_time || false,
-//         hourly_rate: profile.availability?.hourly_rate || 'Not specified',
-//       },
-//       languages: profile.languages || [],
-//       portfolios: profile.portfolios || [],
-//       image: profile.image ? `/api/freelancer/profile/image/${profile.image.split('\\').pop()}` : null,
-//     };
-
-//     res.status(200).json({ success: true, data: formattedProfile });
-//   } catch (err) {
-//     console.error('Error in getProfileByFreelancerId:', err);
-//     res.status(400).json({ success: false, error: err.message });
-//   }
-// };
-
-
-
-
-
-// ===============
 
 exports.getProfileByFreelancerId = async (req, res) => {
   try {
