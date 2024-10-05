@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import "./styles.scss";
-import {jwtDecode} from "jwt-decode";
+import { jwtDecode } from "jwt-decode";
 import {
   UserReview,
   CommonButton,
@@ -19,13 +19,10 @@ import {
 
 function ProfileView() {
   const [profileData, setProfileData] = useState(null);
-
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [country, setCountry] = useState("");
-  const getFileExtension = (filename) => {
-    return filename.slice((filename.lastIndexOf(".") - 1 >>> 0) + 2);
-  };
+
   useEffect(() => {
     const fetchProfileData = async () => {
       try {
@@ -44,19 +41,18 @@ function ProfileView() {
            axios.get(`http://localhost:5000/api/client/users`, { headers }),
           ]);
         
-        
         setProfileData(response.data.data);
         const userInfo = userResponse.data.find(user => user._id === userId);
         setCountry(userInfo ? userInfo.country_name : "Not specified");
        
         setLoading(false);
+        // console.log('profile:', profileData.image)
       } catch (err) {
         console.error('Error fetching profile data:', err);
         setError(err.message || 'Failed to fetch profile data');
         setLoading(false);
       }
     };
-
 
     fetchProfileData();
     setCountry(localStorage.getItem("country") || "Not specified");
@@ -109,35 +105,18 @@ function ProfileView() {
         <div className="upper-part">
           <div className="container">
           <div className="flex items-center mb-16 pl-8">
-  <img
-    src={`http://localhost:5000${profileData.image}`}
-    alt={profileData.name}
-    className="w-18 h-20 rounded-full  aspect-square"
-  />
-
+          <img
+                src={profileData.image}  // Image URL from Cloudinary
+                alt={profileData.name}
+                className="w-18 h-20 rounded-full aspect-square"
+              />
 
               <div className="flex flex-col ml-6">
                 <div className="font-Poppins text-[#4BCBEB] text-[32px] name">
                   {profileData.name}
                 </div>
                 <div className="flex items-center">
-                  {/* <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-4 w-4 mr-1 text-gray-500"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M10 12a2 2 0 100-4 2 2 0 000 4z"
-                      clipRule="evenodd"
-                    />
-                    <path
-                      fillRule="evenodd"
-                      d="M3 10a7 7 0 1114 0 7 7 0 01-14 0zm7-9a1 1 0 100 2 1 1 0 000-2zm0 16a1 1 0 100 2 1 1 0 000-2zm8-11a1 1 0 011 1v2a1 1 0 11-2 0V7a1 1 0 011-1zm-14 0a1 1 0 011 1v2a1 1 0 11-2 0V7a1 1 0 011-1zm14 8a1 1 0 100 2 1 1 0 000-2zM7 17a1 1 0 100 2 1 1 0 000-2zm6-2a1 1 0 100 2 1 1 0 000-2z"
-                      clipRule="evenodd"
-                    />
-                  </svg> */}
+                
                   <div className="text-[#2C3E50] text-[20px] font-Poppins mb-5 location">
                     {country}
                   </div>
@@ -237,28 +216,27 @@ function ProfileView() {
         <div className="grid grid-cols-3 gap-4 ml-4">
           {profileData.portfolios.map((portfolio, index) => (
             <div key={index} className="border rounded p-4">
-              {portfolio.attachment && (
-                getFileExtension(portfolio.attachment).toLowerCase() === 'pdf' ? (
-                  <div className="w-full h-40 flex items-center justify-center bg-gray-200 mb-2">
-                    <a 
-                      href={`http://localhost:5000/api/freelancer/profile/portfolios/${encodeURIComponent(portfolio.attachment)}`} 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="text-blue-500 underline"
-                    >
-                      View 
-                    </a>
-                  </div>
-                ) : (
-                  <img 
-                    src={`http://localhost:5000/api/freelancer/profile/portfolios/${encodeURIComponent(portfolio.attachment)}`}
-                    alt={portfolio.project_title} 
-                    className="w-full h-40 object-cover mb-2" 
-                  />
-                )
-              )}
+            {portfolio.attachment && (
+  portfolio.attachment.toLowerCase().endsWith('.pdf') ? (
+    <div className="w-full h-40 flex items-center justify-center bg-gray-200 mb-2">
+      <a 
+        href={portfolio.attachment}
+        target="_blank" 
+        rel="noopener noreferrer"
+        className="text-blue-500 underline"
+      >
+        View PDF
+      </a>
+    </div>
+  ) : (
+    <img 
+      src={portfolio.attachment}
+      alt={portfolio.project_title || `Portfolio item ${index + 1}`} 
+      className="w-full h-40 object-cover mb-2" 
+    />
+  )
+)}
               <h3 className="font-Poppins text-[16px] text-[#2C3E50]">{portfolio.project_title}</h3>
-             
             </div>
           ))}
         </div>

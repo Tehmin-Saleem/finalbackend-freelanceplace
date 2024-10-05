@@ -24,7 +24,7 @@ function Signup() {
       .then(result => {
         const user = result.user;
         console.log('User Info: ', user);
-        navigate("/ClientDashboard") // Handle the user information
+        navigate("/auth/google") // Handle the user information
       })
       .catch(error => {
         console.error('Error during sign in: ', error);

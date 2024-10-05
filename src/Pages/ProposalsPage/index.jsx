@@ -51,14 +51,19 @@ const IndexPage = () => {
           const freelancerId = proposal.freelancerProfile?.userId;
           return {
             ...proposal,
-            country: freelancerId ? userCountryMap[freelancerId] || "Unknown" : "Unknown"
+            country: freelancerId ? userCountryMap[freelancerId] || "Unknown" : "Unknown",
+            image: proposal.freelancerProfile?.image
+            ? `https://res.cloudinary.com/de4c3d999ac7ff7fbc37cf48351e5b/image/upload/${proposal.freelancerProfile.image.split('/uploads/')[1]}`
+            : "https://res.cloudinary.com/de4c3d999ac7ff7fbc37cf48351e5b/image/upload/v1/default-profile-image.png"
+          
           };
         });
 
-        console.log("Proposals with country:", proposalsWithCountry);
+        console.log("Proposals with country and Cloudinary URLs:", proposalsWithCountry);
 
         setProposals(proposalsWithCountry);
       } catch (err) {
+
         console.error("Error fetching data:", err.response ? err.response.data : err.message);
         setError(`Error fetching data: ${err.message}`);
       }
@@ -119,9 +124,10 @@ const IndexPage = () => {
             }
             earned={`$${proposal.freelancerProfile?.totalHours + (proposal.freelancerProfile?.totalJobs || 0)}+ earned`}
             timeline={proposal.timeline || "Not specified"}
-            image={proposal.freelancerProfile?.image 
-              ? `http://localhost:5000${proposal.freelancerProfile.image}`
-              : "/images/Profile.png"}
+            // image={proposal.freelancerProfile?.image 
+            //   ? `http://localhost:5000${proposal.freelancerProfile.image}`
+            //   : "/images/Profile.png"}
+            image={proposal.image}
             coverLetter={proposal.coverLetter || "No cover letter available"}
             jobTitle={proposal.jobTitle || "No job title"}
             status={proposal.proposalStatus || "Available"}
