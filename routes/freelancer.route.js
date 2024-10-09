@@ -8,6 +8,8 @@ const usercontroller = require('../controllers/user.controller');
 const proposalController = require('../controllers/proposal.controller');
 const authMiddleware = require('../middleware/auth.middleware');
 const freelancerProfileController = require('../controllers/freelancer_profile.controller');
+//import forgot and rest password
+// const { forgotPassword, resetPassword } = require('../controllers/user.controller');
 
 // Import Chat controller
 const chatController = require('../controllers/chat.controller'); // Add this
@@ -70,6 +72,11 @@ router.get('/profile/portfolios/:fileName', (req, res) => {
 // Routes
 router.post('/signup', usercontroller.signup);
 router.post('/login', usercontroller.login);
+///sammar addedd///
+// router.post('/ForgotPass', usercontroller.forgotPassword);
+
+// // Reset password route (for resetting password with token)
+// router.post('/ChangePassword', usercontroller.resetPassword);
 
 router.use(authMiddleware);
 
@@ -102,5 +109,15 @@ router.get('/:clientId/:freelancerId',authMiddleware, chatController.getChatHist
 
 // Route to send a new message
 router.post('/send',authMiddleware, chatController.sendMessage);
+
+
+
+router.post('/ForgotPass', usercontroller.forgotPassword);
+router.get('/ChangePass/:id/:token',usercontroller.ChangePass);
+router.post('/ChangePass/:id/:token', usercontroller.ChangePass);
+
+
+// Reset Password Route (handles when the user clicks the link from email)
+// router.post('/ChangePass/:token', usercontroller.resetPassword);
 
 module.exports = router;

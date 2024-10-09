@@ -8,6 +8,8 @@ const reviewRequestController = require("../controllers/review_request.controlle
 const paymentMethodController = require('../controllers/payment_method.controller');
 const path = require('path');
 const usercontroller=require ('../controllers/user.controller')
+// const { forgotPassword, resetPassword } = require('../controllers/user.controller');
+
 
 // Import Chat controller
 const chatController = require('../controllers/chat.controller'); // Add this
@@ -21,6 +23,9 @@ router.post('/signup', signup);
 router.get('/users/:userId', usercontroller.getUserById);
 router.get('/users', usercontroller.getAllUsers);
 router.post('/login', login);
+
+router.post('/ForgotPass', usercontroller.forgotPassword);
+router.post('/ChangePass/:id/:token',usercontroller.ChangePass);
 
 
 router.use(authMiddleware);

@@ -1,6 +1,10 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user.model');
+const crypto = require('crypto');
+const {sendEmail}  = require("../utils/email");
+const { userInfo } = require('os');
+
 
 const checkUserExists = async (req, res, next) => {
   try {
@@ -62,7 +66,7 @@ const signup = async (req, res) => {
 
     // Generate JWT token
     const token = jwt.sign({ userId: newUser._id }, process.env.JWT_SECRET, {
-      expiresIn: '1h',
+      expiresIn: '5h',
     });
 
     res.status(201).json({ token, message: 'Signup successful' });
@@ -90,7 +94,7 @@ const login = async (req, res) => {
       const token = jwt.sign(
         { userId: user._id, email: user.email, role: user.role },
         process.env.JWT_SECRET,
-        { expiresIn: '1h' }
+        { expiresIn: '5h' }
       );
   
       
@@ -134,6 +138,73 @@ const login = async (req, res) => {
       res.status(500).json({ message: 'Internal server error' });
     }
   };
+
+/////////////////////////////Sammar adding the forgot password functionlaity///////
+
+
+
+const forgotPassword = async (req, res) => {
+  const { email } = req.body;
+  const JWT_SECRET = process.env.JWT_SECRET;
+
+  try {
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(404).json({ message: 'No user found with this email.' });
+    }
+
+    const token = jwt.sign({ email: user.email, id: user._id }, JWT_SECRET, { expiresIn: "10m" });
+    const link = `http://localhost:5173/ChangePass/${user._id}/${token}`;
+    
+    await sendEmail(user.email, 'Password Reset Request', `Click this link to reset your password: ${link}`);
+    return res.status(200).json({ message: "Password reset link generated and sent to your email.", link });
+
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: 'Something went wrong.' });
+  }
+};
+
+
+
+const ChangePass = async (req, res) => {
+  const { newPassword, confirmPassword } = req.body;
+  const { id, token } = req.params;
+  const JWT_SECRET = process.env.JWT_SECRET;
+
+  if (!newPassword || !confirmPassword) {
+    return res.status(400).json({ message: "All fields are required." });
+  }
+
+  if (newPassword !== confirmPassword) {
+    return res.status(400).json({ message: "Passwords do not match." });
+  }
+
+  try {
+    // Verify the token with just JWT_SECRET
+    const decoded = jwt.verify(token, JWT_SECRET);
+
+    const user = await User.findById(id);
+    if (!user) {
+      return res.status(404).json({ message: "User not found." });
+    }
+
+    // Hash the new password and save it
+    const salt = await bcrypt.genSalt(10);
+    user.password = await bcrypt.hash(newPassword, salt);
+    await user.save();
+
+    return res.status(200).json({ message: "Password changed successfully." });
+
+  } catch (error) {
+    return res.status(400).json({ message: "Link has expired or is invalid." });
+  }
+};
+
+
+
+
   
   
-  module.exports = { signup, login, hashPassword, checkUserExists,getUserById, getAllUsers };
+  
+  module.exports = { signup, login, hashPassword, checkUserExists,getUserById, getAllUsers,forgotPassword,ChangePass};
