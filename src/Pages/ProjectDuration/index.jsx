@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import {ProgressBar, Header} from "../../components/index";;
+import { ProgressBar, Header } from "../../components/index";
 import "./styles.scss";
-import { useNavigate } from 'react-router-dom'; // Import useNavigate
+import { useNavigate } from 'react-router-dom';
 
 const ProjectDuration = () => {
-    const navigate = useNavigate(); // Initialize useNavigate
+    const navigate = useNavigate();
     const [projectSize, setProjectSize] = useState("");
     const [duration, setDuration] = useState("");
     const [experienceLevel, setExperienceLevel] = useState("");
@@ -19,7 +19,6 @@ const ProjectDuration = () => {
     ];
 
     useEffect(() => {
-        // Load saved project duration data from localStorage on component mount
         const savedData = JSON.parse(localStorage.getItem('projectDuration') || '{}');
         setProjectSize(savedData.size || "");
         setDuration(savedData.duration || "");
@@ -32,29 +31,25 @@ const ProjectDuration = () => {
             duration,
             experienceLevel
         };
-
-        // Debugging: Log data to be saved
-        console.log('Saving project duration data to localStorage:', projectDurationData);
-
         localStorage.setItem('projectDuration', JSON.stringify(projectDurationData));
-        navigate('/Attachment'); // Replace with your target route
+        navigate('/Attachment');
     };
 
     const handleSizeChange = (size) => {
         setProjectSize(size);
-        // Update localStorage with the selected size
         const currentData = JSON.parse(localStorage.getItem('projectDuration') || '{}');
         const updatedData = { ...currentData, size };
         localStorage.setItem('projectDuration', JSON.stringify(updatedData));
+        // Reset the duration when size changes
+        setDuration("");
     };
 
     const handleBackButtonClick = () => {
-        navigate('/Budget'); // Replace with your target route
+        navigate('/Budget');
     };
 
     const handleDurationChange = (duration) => {
         setDuration(duration);
-        // Update localStorage with the selected duration
         const currentData = JSON.parse(localStorage.getItem('projectDuration') || '{}');
         const updatedData = { ...currentData, duration };
         localStorage.setItem('projectDuration', JSON.stringify(updatedData));
@@ -62,7 +57,6 @@ const ProjectDuration = () => {
 
     const handleExperienceChange = (experience) => {
         setExperienceLevel(experience);
-        // Update localStorage with the selected experience level
         const currentData = JSON.parse(localStorage.getItem('projectDuration') || '{}');
         const updatedData = { ...currentData, experienceLevel: experience };
         localStorage.setItem('projectDuration', JSON.stringify(updatedData));
@@ -77,12 +71,12 @@ const ProjectDuration = () => {
                     <div className="left-section">
                         <h4>5/6 Project duration</h4>
                         <h1>Next, estimate the 
-                            <br/>
+                            <br />
                             scope of your
-                            <br/>
+                            <br />
                             work.</h1>
                         <p>Consider the size of your project 
-                            <br/>
+                            <br />
                             and the time it will take.</p>
                         <button className="back-button" onClick={handleBackButtonClick}>Back</button>
                     </div>
@@ -132,39 +126,86 @@ const ProjectDuration = () => {
                             </div>
                         </div>
 
-                        <h2>How long will your work take?</h2>
-                        <div className="work-duration-options">
-                            <label>
-                                <input
-                                    type="radio"
-                                    name="duration"
-                                    value="3 to 6 months"
-                                    checked={duration === '3 to 6 months'}
-                                    onChange={() => handleDurationChange('3 to 6 months')}
-                                />
-                                3 to 6 months
-                            </label>
-                            <label>
-                                <input
-                                    type="radio"
-                                    name="duration"
-                                    value="1 to 3 months"
-                                    checked={duration === '1 to 3 months'}
-                                    onChange={() => handleDurationChange('1 to 3 months')}
-                                />
-                                1 to 3 months
-                            </label>
-                            <label>
-                                <input
-                                    type="radio"
-                                    name="duration"
-                                    value="Less than 1 month"
-                                    checked={duration === 'Less than 1 month'}
-                                    onChange={() => handleDurationChange('Less than 1 month')}
-                                />
-                                Less than 1 month
-                            </label>
-                        </div>
+                        {/* Conditionally render the "How long will your work take?" section */}
+                        {projectSize && (
+                            <>
+                                <h2>How long will your work take?</h2>
+                                <div className="work-duration-options">
+                                    {projectSize === 'Large' && (
+                                        <>
+                                            <label>
+                                                <input
+                                                    type="radio"
+                                                    name="duration"
+                                                    value="3 to 6 months"
+                                                    checked={duration === '3 to 6 months'}
+                                                    onChange={() => handleDurationChange('3 to 6 months')}
+                                                />
+                                                3 to 6 months
+                                            </label>
+                                            <label>
+                                                <input
+                                                    type="radio"
+                                                    name="duration"
+                                                    value="1 to 3 months"
+                                                    checked={duration === '1 to 3 months'}
+                                                    onChange={() => handleDurationChange('1 to 3 months')}
+                                                />
+                                                1 to 3 months
+                                            </label>
+                                            <label>
+                                                <input
+                                                    type="radio"
+                                                    name="duration"
+                                                    value="Less than 1 month"
+                                                    checked={duration === 'Less than 1 month'}
+                                                    onChange={() => handleDurationChange('Less than 1 month')}
+                                                />
+                                                Less than 1 month
+                                            </label>
+                                        </>
+                                    )}
+
+                                    {projectSize === 'Medium' && (
+                                        <>
+                                            <label>
+                                                <input
+                                                    type="radio"
+                                                    name="duration"
+                                                    value="1 to 3 months"
+                                                    checked={duration === '1 to 3 months'}
+                                                    onChange={() => handleDurationChange('1 to 3 months')}
+                                                />
+                                                1 to 3 months
+                                            </label>
+                                            <label>
+                                                <input
+                                                    type="radio"
+                                                    name="duration"
+                                                    value="Less than 1 month"
+                                                    checked={duration === 'Less than 1 month'}
+                                                    onChange={() => handleDurationChange('Less than 1 month')}
+                                                />
+                                                Less than 1 month
+                                            </label>
+                                        </>
+                                    )}
+
+                                    {projectSize === 'Small' && (
+                                        <label>
+                                            <input
+                                                type="radio"
+                                                name="duration"
+                                                value="Less than 1 month"
+                                                checked={duration === 'Less than 1 month'}
+                                                onChange={() => handleDurationChange('Less than 1 month')}
+                                            />
+                                            Less than 1 month
+                                        </label>
+                                    )}
+                                </div>
+                            </>
+                        )}
 
                         <h2>What level of experience will it need?</h2>
                         <div className="experience-options">
