@@ -1,0 +1,196 @@
+// OfferDetails.scss
+$primary-color: #3b82f6;
+$secondary-color: #6b7280;
+$gray-color: #f7fafc;
+$text-color: #4a5568;
+$border-color: #e2e8f0;
+$hover-darken: 10%;
+$font-kodchasan: 'Kodchasan', sans-serif;
+$font-poppins: 'Poppins', sans-serif;
+$color-gray: #64748b;
+$color-dark: #2c3e50;
+$color-white: #ffffff;
+$color-accent: #4bcdeb;
+$bg-color: #f7f8fa;
+
+
+
+
+
+.offer-details-card {
+    max-width: 800px; // Set a max width for the card
+    margin: 2rem auto; // Center the card with margins
+    padding: 2rem;
+    background-color: #fff;
+    border: 1px solid #ddd; // Add a border
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); // Shadow for depth
+    transition: box-shadow 0.3s;
+  
+    &:hover {
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+    }
+  
+    @media (max-width: 768px) {
+      padding: 1rem; // Reduce padding on smaller screens
+    }
+  }
+  
+  .freelancer-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+  
+    .freelancer-profile {
+        width: 30%; // Adjust the width for the profile section
+        display: flex;
+        justify-content: center;
+        margin-bottom: 20px;
+      }
+      
+      .profile-pic {
+        width: 150px; // Set the width
+        height: 150px; // Set the height to make it a square
+        border-radius: 50%; // Makes the picture circular
+        border: 2px solid $color-accent; // Adds a border to the profile picture
+        object-fit: cover; // Ensures the image scales correctly without distortion
+        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1); // Optional: Adds shadow around the profile picture for a stylish effect
+      }
+  
+    .freelancer-info {
+      width: 70%; // Adjust the width for info section
+      padding-left: 20px;
+    }
+  
+    .freelancer-name {
+      font-size: 24px;
+      font-weight: bold;
+      color:$color-accent;
+    }
+  
+    .freelancer-location {
+      font-size: 20px;
+      color:$color-dark;
+      font-family: $font-poppins;
+    }
+  
+    .freelancer-role {
+      font-size: 16px;
+      color: $color-dark;
+      margin-top: 5px;
+      font-family: $font-poppins;
+      font-weight: 600;
+
+    }
+  
+    .freelancer-meta {
+      display: flex;
+      flex-wrap: wrap; // Allow items to wrap
+      gap: 18px;
+      margin: 10px 2px;
+      font-family: $font-poppins;
+     
+  
+      span {
+        font-size: 16px;
+        color: #555;
+      }
+    }
+  }
+  
+  .freelancer-skills {
+    margin: 20px 0;
+  
+    h3 {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 10px;
+      color:$color-dark;
+    }
+  
+    .skill-badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      
+
+    }
+  
+    .skill-badge {
+      background-color: #e0e0e0;
+      padding: 5px 10px;
+      border-radius: 5px;
+      font-size: 14px;
+    }
+  }
+  
+  .freelancer-description {
+    margin: 20px 0;
+  
+    h3 {
+      font-size: 18px;
+      margin-bottom: 10px;
+      color: #333;
+      font-weight: 600;
+      font-family: $font-poppins;
+    }
+  
+    p {
+      font-size: 16px;
+      color: $text-color;
+      font-family: $font-poppins;
+
+    }
+  }
+  
+  .freelancer-attachments {
+    margin: 20px 0;
+  
+    h3 {
+      font-size: 18px;
+      margin-bottom: 10px;
+      color: #333;
+      font-weight: 600;
+      font-family: $font-poppins;
+
+    }
+  
+    ul {
+      list-style: none; // Remove default list styles
+      padding: 0; // Remove padding
+    }
+  
+    .attachment-item {
+      font-size: 14px;
+      color: $color-accent; // Color for links or attachment names
+      cursor: pointer; // Show pointer on hover
+      transition: color 0.2s;
+  
+      &:hover {
+        color: $color-accent; // Darker color on hover
+      }
+    }
+  }
+  
+  .button-container {
+    display: flex;
+    justify-content: flex-end; // Aligns the button to the right
+    width: 100%;
+    margin-top: 20px;
+  }
+  
+  .accept-btn {
+    background-color: $color-accent;
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s;
+    
+    &:hover {
+      background-color: darken($color-accent, 10%);
+    }
+  }
+  
