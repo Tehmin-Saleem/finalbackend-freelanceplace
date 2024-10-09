@@ -16,6 +16,7 @@ export default defineConfig({
       'pdfjs-dist/build/pdf.worker.entry': 'pdfjs-dist/build/pdf.worker.min.js'
     }
   }
+
   
 });
 

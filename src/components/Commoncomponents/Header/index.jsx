@@ -11,7 +11,7 @@ import {
   Logo,
 } from "../../../svg/index";
 import "./styles.scss";
-// import jwt_decode from 'jwt-decode'; // Use the default import
+//  import jwtDecode from 'jwt-decode'; // Use the default import
 
 const state = proxy({
   user: {
@@ -101,6 +101,7 @@ const Header = () => {
     }
   };
   const token = localStorage.getItem("token");
+  
   const decodedToken = jwtDecode(token);
   const userId = decodedToken.userId;
 

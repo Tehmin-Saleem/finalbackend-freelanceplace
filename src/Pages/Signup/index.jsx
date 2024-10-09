@@ -21,19 +21,17 @@ import {
 function Signup() {
   const handleGoogleSignIn = () => {
     signInWithGoogle()
-      .then(result => {
+      .then((result) => {
         const user = result.user;
-        console.log('User Info: ', user);
-        navigate("/auth/google") // Handle the user information
+        console.log("User Info: ", user);
+        navigate("/auth/google"); // Handle the user information
       })
-      .catch(error => {
-        console.error('Error during sign in: ', error);
+      .catch((error) => {
+        console.error("Error during sign in: ", error);
       });
   };
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
 
-  
- 
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
@@ -98,31 +96,70 @@ function Signup() {
       return;
     }
     if (!isChecked) {
-      setCheckboxError("You must agree to the Terms and Conditions and Privacy Policy.");
+      setCheckboxError(
+        "You must agree to the Terms and Conditions and Privacy Policy."
+      );
       return;
     }
 
     const role = localStorage.getItem("userType");
 
+    // const user = localStorage.getItem("userInfo");
+
     try {
-      const response = await axios.post(
-        "http://localhost:5000/api/client/signup",
-        {
+      // const response = await axios.post(
+      //   "http://localhost:5000/api/client/signup",
+      //   {
+      //     email,
+      //     password,
+      //     first_name: firstName,
+      //     last_name: lastName,
+      //     role,
+      //     country_name: country,
+      //   }
+      // );
+
+      const response = await fetch("http://localhost:5000/api/client/signup", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          // Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({
           email,
           password,
           first_name: firstName,
           last_name: lastName,
           role,
           country_name: country,
-        }
-      );
+        }),
+      });
+
+      const data = await response.json();
+      console.log("data at signup", data);
+
       console.log("Signup response:", response);
       if (response.status === 201) {
-        console.log('Signup successful');
-       
-        navigate('/signin'); 
         console.log("Signup successful");
-        
+
+        // localStorage.setItem("userInfo", JSON.stringify(data.user));
+        // console.log("user data", data.user);
+
+        // Storing the user info and token in localStorage
+        localStorage.setItem(
+          "userInfo",
+          JSON.stringify({
+            user: data.user, // user info
+            token: data.token, // token from server
+          })
+        );
+
+        console.log("User info stored in localStorage:", data.user);
+        console.log("Token stored in localStorage:", data.token);
+
+        navigate("/signin");
+        console.log("Signup successful");
+
         navigate("/signin");
       }
     } catch (error) {
@@ -187,7 +224,7 @@ function Signup() {
                 />
               </div>
             </div>
-<div className="relative">
+            <div className="relative">
               <div className="flex mb-4 shadow border rounded-xl w-full py-3 px-3 bg-[#ECF0F1] font-Poppins">
                 <div className="pr-3">
                   <Fname />
@@ -206,8 +243,6 @@ function Signup() {
                 />
               </div>
             </div>
-
-
 
             <div className="relative">
               <div className="flex mb-4 shadow border rounded-xl w-full py-3 px-3 bg-[#ECF0F1] font-Poppins">
@@ -228,7 +263,6 @@ function Signup() {
                 />
               </div>
             </div>
-
 
             <div className="relative">
               <div className="flex mb-4 shadow border rounded-xl w-full py-3 px-3 bg-[#ECF0F1] font-Poppins">
@@ -276,37 +310,27 @@ function Signup() {
               </div>
             </div>
 
-
-
-
-
-
-
-
-
-
-
             <div className="mb-4 flex items-center">
-               <input
-          type="checkbox"
-          id="terms"
-          name="terms"
-          className="mr-2 leading-tight"
-          checked={isChecked}
-          onChange={handleCheckboxChange}
-        />
-        <label
-          htmlFor="terms"
-          className="text-[12px] font-Poppins text-[#64748B] mt-3"
-        >
-          By creating an account means you agree to the
-          <strong>
-            Terms <br />
-            and Conditions
-          </strong>
-          and our
-          <strong> Privacy Policy</strong>
-        </label>
+              <input
+                type="checkbox"
+                id="terms"
+                name="terms"
+                className="mr-2 leading-tight"
+                checked={isChecked}
+                onChange={handleCheckboxChange}
+              />
+              <label
+                htmlFor="terms"
+                className="text-[12px] font-Poppins text-[#64748B] mt-3"
+              >
+                By creating an account means you agree to the
+                <strong>
+                  Terms <br />
+                  and Conditions
+                </strong>
+                and our
+                <strong> Privacy Policy</strong>
+              </label>
             </div>
 
             <div className="flex items-center justify-between">
@@ -338,12 +362,12 @@ function Signup() {
                 <div className="mr-3">
                   <Google />
                 </div>
-                <button  className="mr-4 text-[12px] text-[#3498DB] font-Poppins font-semibold text-center" id="google-login"onClick={handleGoogleSignIn} >
-                  
-
-                
-                    Continue with Google
-              
+                <button
+                  className="mr-4 text-[12px] text-[#3498DB] font-Poppins font-semibold text-center"
+                  id="google-login"
+                  onClick={handleGoogleSignIn}
+                >
+                  Continue with Google
                 </button>
               </div>
               <div className="flex justify-center mb-4 shadow-xl p-3">
