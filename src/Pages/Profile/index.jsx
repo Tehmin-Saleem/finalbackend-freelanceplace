@@ -12,7 +12,7 @@ const MyProfile = () => {
   const [skillInput, setSkillInput] = useState('');
   const [error, setError] = useState(null);
   const navigate = useNavigate();
-
+  const [portfolioThumbnails, setPortfolioThumbnails] = useState({});
   const [profile, setProfile] = useState({
     profileId: '',
 
@@ -133,6 +133,10 @@ const MyProfile = () => {
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
     if (file) {
+      if (file.size > 5 * 1024 * 1024) {
+        alert("File size exceeds 5MB limit.");
+        return;
+      }
       setImageFile(file);
       const reader = new FileReader();
       reader.onloadend = () => {
@@ -144,7 +148,7 @@ const MyProfile = () => {
       reader.readAsDataURL(file);
     }
   };
-  const [portfolioThumbnails, setPortfolioThumbnails] = useState({});
+
   const generateThumbnail = async (file) => {
     if (file.type !== 'application/pdf') {
       throw new Error('Unsupported file type');
@@ -178,12 +182,15 @@ const MyProfile = () => {
       fileReader.readAsArrayBuffer(file);
     });
   };
-  
-  
+
   const handlePortfolioChange = async (e) => {
     const { name, value, type } = e.target;
     if (type === 'file') {
       const file = e.target.files[0];
+      if (file.size > 10 * 1024 * 1024) {
+        alert("File size exceeds 10MB limit.");
+        return;
+      }
       setCurrentPortfolio(prev => ({
         ...prev,
         attachment: file

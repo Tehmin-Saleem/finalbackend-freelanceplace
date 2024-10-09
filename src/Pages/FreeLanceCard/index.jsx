@@ -33,6 +33,7 @@ const FreelancerCard = ({ heading }) => {
           });
           setFreelancers(response.data.data);
           setLoading(false);
+          console.log('profile', response.data.data)
         } catch (err) {
           setError('Failed to fetch freelancer profiles');
           setLoading(false);
@@ -173,12 +174,15 @@ const FreelancerCard = ({ heading }) => {
       {filteredFreelancers.map((freelancer, index) => (
         <div key={index} className="freelancer-card">
           <div className="freelancer-profile">
-            <img src={`http://localhost:5000${freelancer.image}`} alt="Profile" className="profile-pic" />
+          <img
+              src={freelancer.image}  
+              alt="Profile" className="profile-pic"
+            />
           </div>
           <div className="freelancer-details">
             <div className="freelancer-header">
               <h2 className="freelancer-name">{freelancer.name}</h2>
-              <span className="freelancer-location">{localStorage.getItem("country")}</span>
+              <span className="freelancer-location">{localStorage.getItem("country"||'unknown')}</span>
               <button className="invite-btn">Invite to job</button>
             </div>
             <div className="freelancer-role">{freelancer.experience.title}</div>
