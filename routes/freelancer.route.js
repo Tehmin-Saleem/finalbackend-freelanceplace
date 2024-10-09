@@ -8,7 +8,7 @@ const usercontroller = require('../controllers/user.controller');
 const proposalController = require('../controllers/proposal.controller');
 const authMiddleware = require('../middleware/auth.middleware');
 const freelancerProfileController = require('../controllers/freelancer_profile.controller');
-//import forgot and rest password
+const { upload } = require('../config/cloudinary.config');//import forgot and rest password
 // const { forgotPassword, resetPassword } = require('../controllers/user.controller');
 
 // Import Chat controller
@@ -23,7 +23,7 @@ const storage = multer.diskStorage({
     cb(null, Date.now() + "-" + file.originalname);
   }
 });
-const upload = multer({ 
+const uploads = multer({ 
   storage: storage,
   fileFilter: (req, file, cb) => {
     const allowedFileTypes = /jpeg|jpg|png|gif|pdf/;
@@ -87,12 +87,13 @@ router.get('/proposals/:proposalId', proposalController.getProposalById);
 router.put('/proposals/:proposalId', proposalController.updateProposal);
 router.delete('/proposals/:proposalId', proposalController.deleteProposal);
 
-// Freelancer profile routes
-router.post('/profile', upload.fields([
-  { name: 'image', maxCount: 1 },
-  { name: 'portfolios', maxCount: 5 } // Adjust maxCount as needed
-]), freelancerProfileController.createOrUpdateProfile);
-
+router.post('/profile', 
+  upload.fields([
+    { name: 'image', maxCount: 1 },
+    { name: 'portfolios', maxCount: 5 }
+  ]), 
+  freelancerProfileController.createOrUpdateProfile
+);
 router.get('/profile', authMiddleware, freelancerProfileController.getAuthenticatedProfile);
 // router.put('/profile/:freelancerId', freelancerProfileController.getProfileByUserId);
 router.delete('/profile/:freelancerId', freelancerProfileController.deleteProfile);
