@@ -11,27 +11,67 @@
 // const User = require('../models/user.model'); // Assuming you have a User model
 
 // Get chat history between client and freelancer
-exports.getChatHistory = async (req, res) => {
-  try {
-    const { clientId, freelancerId } = req.params;
+// exports.getChatHistory = async (req, res) => {
+//   try {
+//     const { clientId, freelancerId } = req.params;
 
-    // Fetch the chat between the client and freelancer
-    const chat = await Chat.findOne({ client_id: clientId, freelancer_id: freelancerId });
+//     // Fetch the chat between the client and freelancer
+//     const chat = await Chat.findOne({ client_id: clientId, freelancer_id: freelancerId });
 
-    // If no chat exists, return an empty array
-    if (!chat) {
-      return res.status(200).json({ messages: [] });
-    }
+//     // If no chat exists, return an empty array
+//     if (!chat) {
+//       return res.status(200).json({ messages: [] });
+//     }
 
-    res.status(200).json(chat);
-  } catch (error) {
-    console.error("Error fetching chat history:", error);
-    res.status(500).json({ error: "An error occurred while fetching the chat history" });
-  }
-};
+//     res.status(200).json(chat);
+//   } catch (error) {
+//     console.error("Error fetching chat history:", error);
+//     res.status(500).json({ error: "An error occurred while fetching the chat history" });
+//   }
+// };
 
-// Send a new message
+// // Send a new message
+// // exports.sendMessage = async (req, res) => {
+// //   try {
+// //     const { clientId, freelancerId, message, sender, attachment } = req.body;
+
+// //     let chat = await Chat.findOne({ client_id: clientId, freelancer_id: freelancerId });
+
+// //     // If no chat exists between the client and freelancer, create one
+// //     if (!chat) {
+// //       chat = new Chat({
+// //         client_id: clientId,
+// //         freelancer_id: freelancerId,
+// //         messages: [],
+// //       });
+// //     }
+
+// //     // Add the new message to the chat
+// //     const newMessage = {
+// //       sender,
+// //       message,
+// //       timestamp: new Date(),
+// //     };
+
+// //     if (attachment) {
+// //       newMessage.attachment = attachment; // Add attachment if provided
+// //     }
+
+// //     chat.messages.push(newMessage);
+// //     await chat.save();
+
+// //     res.status(200).json(chat);
+// //   } catch (error) {
+// //     console.error("Error sending message:", error);
+// //     res.status(500).json({ error: "An error occurred while sending the message" });
+// //   }
+// // };
+
+
+// // Assuming you have access to the `io` instance here
+
 // exports.sendMessage = async (req, res) => {
+//   const io = req.io; // Access io from req
 //   try {
 //     const { clientId, freelancerId, message, sender, attachment } = req.body;
 
@@ -60,146 +100,8 @@ exports.getChatHistory = async (req, res) => {
 //     chat.messages.push(newMessage);
 //     await chat.save();
 
-//     res.status(200).json(chat);
-//   } catch (error) {
-//     console.error("Error sending message:", error);
-//     res.status(500).json({ error: "An error occurred while sending the message" });
-//   }
-// };
-
-
-// Assuming you have access to the `io` instance here
-
-exports.sendMessage = async (req, res) => {
-  const io = req.io; // Access io from req
-  try {
-    const { clientId, freelancerId, message, sender, attachment } = req.body;
-
-    let chat = await Chat.findOne({ client_id: clientId, freelancer_id: freelancerId });
-
-    // If no chat exists between the client and freelancer, create one
-    if (!chat) {
-      chat = new Chat({
-        client_id: clientId,
-        freelancer_id: freelancerId,
-        messages: [],
-      });
-    }
-
-    // Add the new message to the chat
-    const newMessage = {
-      sender,
-      message,
-      timestamp: new Date(),
-    };
-
-    if (attachment) {
-      newMessage.attachment = attachment; // Add attachment if provided
-    }
-
-    chat.messages.push(newMessage);
-    await chat.save();
-
-    // Emit the message to the connected clients
-    io.emit('newMessage', { clientId, freelancerId, ...newMessage }); // Send the message to all connected clients
-
-    res.status(200).json(chat);
-  } catch (error) {
-    console.error("Error sending message:", error);
-    res.status(500).json({ error: "An error occurred while sending the message" });
-  }
-};
-
-
-
-// Fetch all chat conversations for a specific client (chat overview)
-exports.getClientChats = async (req, res) => {
-  try {
-    const { clientId } = req.params;
-
-    // Fetch all chat histories for this client
-    const chats = await Chat.find({ client_id: clientId }).populate('freelancer_id', 'name profilePic');
-
-    res.status(200).json(chats);
-  } catch (error) {
-    console.error("Error fetching client chats:", error);
-    res.status(500).json({ error: "An error occurred while fetching client chats" });
-  }
-};
-
-// Fetch all chat conversations for a specific freelancer (chat overview)
-exports.getFreelancerChats = async (req, res) => {
-  try {
-    const { freelancerId } = req.params;
-
-    // Fetch all chat histories for this freelancer
-    const chats = await Chat.find({ freelancer_id: freelancerId }).populate('client_id', 'name profilePic');
-
-    res.status(200).json(chats);
-  } catch (error) {
-    console.error("Error fetching freelancer chats:", error);
-    res.status(500).json({ error: "An error occurred while fetching freelancer chats" });
-  }
-};
-
-// --------------------------------------------------------------------------------------------------------------------
-// ======================================
-
-
-// const Chat = require('../models/chat.model');
-// const User = require('../models/user.model'); // Assuming you have a User model
-
-// // Get chat history between client and freelancer
-// exports.getChatHistory = async (req, res) => {
-//   try {
-//     const { clientId, freelancerId } = req.params;
-
-//     // Fetch the chat between the client and freelancer
-//     const chat = await Chat.findOne({ client_id: clientId, freelancer_id: freelancerId });
-
-//     // If no chat exists, return an empty array
-//     if (!chat) {
-//       return res.status(200).json({ messages: [] });
-//     }
-
-//     res.status(200).json(chat);
-//   } catch (error) {
-//     console.error("Error fetching chat history:", error);
-//     res.status(500).json({ error: "An error occurred while fetching the chat history" });
-//   }
-// };
-
-// // Send a new message
-// exports.sendMessage = async (req, res) => {
-//   try {
-//     const { clientId, freelancerId, message, sender, attachment } = req.body;
-
-//     // Find the existing chat or create a new one
-//     let chat = await Chat.findOne({ client_id: clientId, freelancer_id: freelancerId });
-
-//     // If no chat exists between the client and freelancer, create one
-//     if (!chat) {
-//       chat = new Chat({
-//         client_id: clientId,
-//         freelancer_id: freelancerId,
-//         messages: [],
-//       });
-//     }
-
-//     // Create a new message object
-//     const newMessage = {
-//       sender,
-//       message,
-//       timestamp: new Date(),
-//     };
-
-//     if (attachment) {
-//       newMessage.attachment = attachment; // Add attachment if provided
-//     }
-
-//     // Push the new message to the chat's messages array
-//     chat.messages.push(newMessage);
-//     await chat.save();
+//     // Emit the message to the connected clients
+//     io.emit('newMessage', { clientId, freelancerId, ...newMessage }); // Send the message to all connected clients
 
 //     res.status(200).json(chat);
 //   } catch (error) {
@@ -207,6 +109,8 @@ exports.getFreelancerChats = async (req, res) => {
 //     res.status(500).json({ error: "An error occurred while sending the message" });
 //   }
 // };
+
+
 
 // // Fetch all chat conversations for a specific client (chat overview)
 // exports.getClientChats = async (req, res) => {
@@ -239,16 +143,21 @@ exports.getFreelancerChats = async (req, res) => {
 // };
 
 
+
+
 // -----------------------------------------------------------------------------
 const asyncHandler = require("express-async-handler");
 const Chat = require("../models/Chatting.model");
 const User = require("../models/user.model");
+const Message = require("../models/Message.model")
 
 //@description     Create or fetch One to One Chat
 //@route           POST /api/chat/
 //@access          Protected
 const accessChat = asyncHandler(async (req, res) => {
-  const { userId,  } = req.body;
+  const { userId  } = req.body;
+
+  // console.log("userid",req.user.userId)
 
   
 
@@ -260,7 +169,7 @@ const accessChat = asyncHandler(async (req, res) => {
   var isChat = await Chat.find({
     isGroupChat: false,
     $and: [
-      { users: { $elemMatch: { $eq: req.user._id } } },
+      { users: { $elemMatch: { $eq: req.user.userId } } },
       { users: { $elemMatch: { $eq: userId } } },
     ],
   })
@@ -278,7 +187,7 @@ const accessChat = asyncHandler(async (req, res) => {
     var chatData = {
       chatName: "sender",
       isGroupChat: false,
-      users: [req.user._id, userId],
+      users: [req.user.userId, userId],
     };
 
     try {
@@ -301,7 +210,7 @@ const accessChat = asyncHandler(async (req, res) => {
 //@access          Protected
 const fetchChats = asyncHandler(async (req, res) => {
   try {
-    Chat.find({ users: { $elemMatch: { $eq: req.user._id } } })
+    Chat.find({ users: { $elemMatch: { $eq: req.user.userId } } })
       .populate("users", "-password")
       .populate("groupAdmin", "-password")
       .populate("latestMessage")
@@ -447,6 +356,62 @@ const addToGroup = asyncHandler(async (req, res) => {
 
 
 
+//@description     Get all Messages
+//@route           GET /api/Message/:chatId
+//@access          Protected
+const allMessages = asyncHandler(async (req, res) => {
+  try {
+    const messages = await Message.find({ chat: req.params.chatId })
+      .populate("sender", "name pic email")
+      .populate("chat");
+    res.json(messages);
+  } catch (error) {
+    res.status(400);
+    throw new Error(error.message);
+  }
+});
+
+
+//@description     Create New Message
+//@route           POST /api/Message/
+//@access          Protected
+const sendMessage = asyncHandler(async (req, res) => {
+  const { content, chatId } = req.body;
+
+  if (!content || !chatId) {
+    console.log("Invalid data passed into request");
+    return res.sendStatus(400);
+  }
+
+  var newMessage = {
+    sender: req.user.userId,
+    content: content,
+    chat: chatId,
+  };
+
+  try {
+    var message = await Message.create(newMessage);
+
+    message = await message.populate("sender", "name pic");
+    message = await message.populate("chat");
+    message = await User.populate(message, {
+      path: "chat.users",
+      select: "name pic email",
+    });
+
+    await Chat.findByIdAndUpdate(req.body.chatId, { latestMessage: message });
+
+    res.json(message);
+  } catch (error) {
+    res.status(400);
+    throw new Error(error.message);
+  }
+});
+
+
+
+
+
 module.exports = {
   accessChat,
   fetchChats,
@@ -454,6 +419,8 @@ module.exports = {
   renameGroup,
   addToGroup,
   removeFromGroup,
+  allMessages ,
+  sendMessage,
 };
 
 

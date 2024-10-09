@@ -13,6 +13,7 @@ const { upload } = require('../config/cloudinary.config');
 // Import Chat controller
 const chatController = require('../controllers/chat.controller'); // Add this
 
+
 const hireFreelancerController = require('../controllers/hire_freelancer.controller');
 
 const Proposal = require('../models/proposal.model');
@@ -127,17 +128,13 @@ router.get("/proposal/:proposalId", proposalController.getProposalById);
 
 
 
+router.get("/SearchAllUsers", authMiddleware, usercontroller.SearchallUsers);
+
+
+
 
 // Chat-related routes
 
-// // Route to get the chat history between client and freelancer
-// router.get('/:clientId/:freelancerId', authMiddleware, chatController.getChatHistory);
-
-// // Route to send a new message
-// router.post('/send',authMiddleware, chatController.sendMessage);
-
-// // Route to get all chats for a specific client
-// router.get('/:clientId',authMiddleware, chatController.getClientChats);
 
 
 router.post('/accesschats',authMiddleware, chatController.accessChat);
@@ -146,6 +143,13 @@ router.post('/group',authMiddleware, chatController.createGroupChat);
 router.put("/rename",authMiddleware, chatController.renameGroup);
 router.put("/groupremove" , authMiddleware, chatController.removeFromGroup);
 router.put("/groupadd", authMiddleware, chatController.addToGroup);
+
+
+// message-related routes
+
+
+router.get("/allMessages/:chatId", authMiddleware, chatController.allMessages);
+router.post("/sendMessage", authMiddleware, chatController.sendMessage);
 
 
 
