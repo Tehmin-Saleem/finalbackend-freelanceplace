@@ -15,6 +15,8 @@ import ProposalPopup from "./components/PopUps/PropsalSubmit";
 import Popup from "./components/PopUps/PropsalSubmit";
 import ReviewPopup from "./components/PopUps/ReviewPopup";
 import JobPostedPopup from "./components/PopUps/JobPosted";
+import ForgotPassword from "./Pages/ResetPass";
+import ChangePassword from "./Pages/ForgotPass";
 // import PaymentMethod from './components/PaymentMethod';
 
 // Load your Stripe public key
@@ -119,6 +121,10 @@ function App() {
         <Route path="/ReviewPopUp" element={<ReviewPopup/>} />
         <Route path="/Alljobspage" element={<AllJobsPage/>} /> 
         <Route path="/JobPopUp" element={<JobPostedPopup/>} /> 
+        <Route path="/ForgotPass" element={<ForgotPassword/>} /> 
+        <Route path="/ChangePass/:id/:token" element={<ChangePassword/>} /> 
+        
+
 
 
 

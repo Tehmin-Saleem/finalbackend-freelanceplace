@@ -175,8 +175,8 @@ function SignIn() {
                 </label>
               </div>
               <div>
-                <a
-                  href="#"
+                <a 
+                  href="/ForgotPass"
                   className="text-[#4BCBEB] font-Poppins text-sm hover:underline"
                 >
                   Forgot Password?

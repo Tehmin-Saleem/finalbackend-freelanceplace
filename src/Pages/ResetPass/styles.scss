@@ -1,0 +1,117 @@
+/* General styles */
+.main-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+  }
+  
+  /* Left section styles */
+  .left-section {
+    width: 50%;
+    background-color: #4bcdeb;
+    height: auto;
+    padding: 100px;
+    background: rgba(255, 255, 255, 0.06);
+  }
+  
+  .logo-container {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  
+  .logo-image {
+    margin-right: 10px;
+  }
+  
+  .app-title {
+    font-size: 1.875rem; /* 3xl */
+    font-weight: bold;
+    color: white;
+  }
+  
+  .cover-image {
+    width: 100%;
+  }
+  
+  /* Right section styles */
+  .right-section {
+    width: 50%;
+    height: 100%;
+    padding-top: 130px;
+  }
+  
+  .form-container {
+    display: flex;
+    flex-direction: column;
+    margin: 0 100px;
+  }
+  
+  .form-title {
+    margin-bottom: 0.75rem; /* mb-3 */
+    font-size: 1.875rem; /* text-3xl */
+    font-weight: bold;
+  }
+  
+  .form-description {
+    color: #64748b;
+    font-family: "Poppins", sans-serif;
+  }
+  
+  .email-input {
+    font-size: 0.875rem; /* text-sm */
+    width: 80%;
+    padding: 1rem; /* py-4 */
+    border: 1px solid #d1d5db; /* border-gray-300 */
+    border-radius: 0.375rem; /* rounded */
+    margin-top: 1rem; /* mt-4 */
+  }
+  
+  .button-container {
+    text-align: center;
+    margin-top: 1rem; /* mt-4 */
+  }
+  
+  .continue-button {
+    padding: 1rem; /* py-4 */
+    width: 80%;
+    background-color: #4bcdeb;
+    color: white;
+    text-transform: uppercase;
+    border-radius: 0.375rem;
+    font-size: 0.75rem; /* text-xs */
+    letter-spacing: 0.05em; /* tracking-wider */
+  }
+  
+  .back-link {
+    color: #4bcdeb;
+    display: block;
+    margin-top: 1rem; /* px-28 replaced */
+    font-weight: bold;
+    text-decoration: none;
+    &:hover {
+      text-decoration: underline;
+      text-underline-offset: 4px;
+    }
+  }
+  
+  .signup-section {
+    margin-top: 2rem; /* mt-8 */
+    padding-left: 1rem; /* px-9 */
+    font-size: 0.875rem; /* text-sm */
+    font-weight: 600;
+    color: #64748b;
+    text-align: center;
+  }
+  
+  .signup-link {
+    color: #4bcdeb;
+    font-weight: bold;
+    text-decoration: none;
+    &:hover {
+      text-decoration: underline;
+      text-underline-offset: 4px;
+    }
+  }
+  
