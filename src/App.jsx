@@ -82,56 +82,56 @@ const freelancers = [
 
 function App() {
   return (
-      
-      
-
     <Router>
-      <ChatProvider>
       <Routes>
-
-      <Route path="/Chat" element={<Chat/>} />
-        <Route path="/Notifications" element={<Notification/>} />      
-          <Route path="/" element={<SignUpSection />} />
-        {/* <Route path="/profile" element={<ProfileView />} /> */}
+        <Route path="/" element={<SignUpSection />} />
+        <Route path="/notifications" element={<Notification />} />
         <Route path="/proposals" element={<Proposal />} />
         <Route path="/proposals/:jobId" element={<Proposal />} />
         <Route path="/alljobs" element={<AllJobsPage />} />
         <Route path="/matchingjobs" element={<JobsPage />} />
-        <Route path="/signin" element={<SignIn />} />
         <Route path="/freelancersjobpage" element={<FreelancersDoneJobsPage />} />
-        <Route path="/offerform" element={<OfferForm/>} />
-        <Route path="/FreelanceDashBoard" element={<FreelanceDashboardPage/>} />
-        <Route path="/ApplyJob" element={<ApplyJob/>} />
-        <Route path="/ApplyJob/:jobPostId" element={<ApplyJob />} />
-        <Route path="/FreelanceCard" element={ <FreeLancerCard heading="UI/UX Designer" freelancers={freelancers} />} />
-        <Route path="/signup" element={<Signup/>} />
-        <Route path="/ClientDashboard" element={<ClientDashboard/>} />
-        <Route path="/JobPosting" element={<PostJob/>} /> 
-        <Route path="/JobDescription" element={<DescriptionPage/>} />
-        <Route path="/PreferredSkills" element={<SkillManagement/>} /> 
-        <Route path="/Budget" element={<Budget/>} /> 
-        <Route path="/ProjectDuration" element={<ProjectDuration/>} /> 
-        <Route path="/Attachment" element={<Attachment/>} /> 
-        <Route path="/ProjectDetails" element={<JobDetails/>} /> 
-        <Route path="/myProfile" element={<MyProfile/>} /> 
-        <Route path="/ErrorPage" element={<ErrorPage/>} /> 
-        <Route path="/profile/:userId" element={<ProfileView />} />
-        
-        <Route path="/SubmitProposal/:jobPostId" element={<SubmitProposal/>} /> 
-        <Route path="/SubmitProposal" element={<SubmitProposal/>} /> 
+        <Route path="/offerform" element={<OfferForm />} />
+        <Route path="/freelancedashboard" element={<FreelanceDashboardPage />} />
+        <Route path="/applyjob" element={<ApplyJob />} />
+        <Route path="/applyjob/:jobPostId" element={<ApplyJob />} />
+        <Route
+          path="/freelancercard"
+          element={<FreeLancerCard heading="UI/UX Designer" freelancers={freelancers} />}
+        />
+        <Route path="/clientdashboard" element={<ClientDashboard />} />
+        <Route path="/jobposting" element={<PostJob />} />
+        <Route path="/jobdescription" element={<DescriptionPage />} />
+        <Route path="/preferredskills" element={<SkillManagement />} />
+        <Route path="/budget" element={<Budget />} />
+        <Route path="/projectduration" element={<ProjectDuration />} />
+        <Route path="/attachment" element={<Attachment />} />
+        <Route path="/projectdetails" element={<JobDetails />} />
+        <Route path="/myprofile" element={<MyProfile />} />
+        <Route path="/submitproposal/:jobPostId" element={<SubmitProposal />} />
+        <Route path="/submitproposal" element={<SubmitProposal />} />
+        <Route path="/payment" element={<PaymentMethod />} />
+        <Route path="/proposalpopup" element={<Popup />} />
+        <Route path="/reviewpopup" element={<ReviewPopup />} />
+        <Route path="/jobpopup" element={<JobPostedPopup />} />
+        <Route path="/signin" element={<SignIn />} />
+        <Route path="/signup" element={<Signup />} />
+
+        {/* Chat Route with ChatProvider */}
+        <Route
+          path="/chat"
+          element={
+            <ChatProvider>
+              <Chat />
+            </ChatProvider>
+          }
+        />
+
+        {/* Fallback Route */}
         <Route path="*" element={<ErrorPage />} />
-        <Route path="/Payment" element={ <PaymentMethod/>}/>
-        <Route path="/propsalPopUp" element={<Popup/>} />
-        <Route path="/ReviewPopUp" element={<ReviewPopup/>} />
-        <Route path="/Alljobspage" element={<AllJobsPage/>} /> 
-        <Route path="/JobPopUp" element={<JobPostedPopup/>} /> 
-
-
-
       </Routes>
-      </ChatProvider>
     </Router>
-  );
+    );
 }
 
 export default App;

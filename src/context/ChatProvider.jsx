@@ -7,15 +7,23 @@ const ChatProvider = ({ children }) => {
   const [selectedChat, setSelectedChat] = useState();
   const [user, setUser] = useState();
   const [notification, setNotification] = useState([]);
-  const [chats, setChats] = useState();
+  // const [token, settoken] = useState();
+  const [chats, setChats] = useState([]);
 
   const navigate = useNavigate(); // Use navigate from react-router-dom
 
   useEffect(() => {
-    const userType = (localStorage.getItem("userType"));
-    setUser(userType);
+    const userInfo = JSON.parse(localStorage.getItem("userInfo"));
+    // const token = (localStorage.getItem("token"));
+    console.log(userInfo);
+    setUser(userInfo);
+    
 
-    if (!userType) navigate("/"); // Replace history.push with navigate
+    
+
+
+
+    if (!userInfo) navigate("/"); // Replace history.push with navigate
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [navigate]);
 
@@ -26,6 +34,8 @@ const ChatProvider = ({ children }) => {
         setSelectedChat,
         user,
         setUser,
+        // token,
+        // settoken,
         notification,
         setNotification,
         chats,
