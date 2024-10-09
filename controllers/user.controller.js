@@ -1,6 +1,7 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user.model');
+const asyncHandler = require("express-async-handler");
 const crypto = require('crypto');
 const {sendEmail}  = require("../utils/email");
 const { userInfo } = require('os');
@@ -69,6 +70,23 @@ const signup = async (req, res) => {
       expiresIn: '5h',
     });
 
+    const userData = {
+      email: newUser.email,
+      role: newUser.role,
+      userId: newUser._id,
+      first_name: newUser.first_name, 
+      last_name: newUser.last_name,
+      country_name: newUser.country_name,
+      token,
+      
+    };
+
+   
+
+
+  
+
+
     res.status(201).json({ token, message: 'Signup successful' });
   } catch (err) {
     console.error('Error during signup:', err);
@@ -101,8 +119,12 @@ const login = async (req, res) => {
       const userData = {
         email: user.email,
         role: user.role,
-        userId: user._id 
+        userId: user._id ,
+        
       };
+
+      
+      
   
    
       if (user.role === 'client') {
@@ -111,12 +133,16 @@ const login = async (req, res) => {
         userData.freelancerId = user._id; 
       }
   
-      res.status(200).json({ message: 'Login successful', token, user: userData });
+      res.status(200).json({ token, message: 'Login successful', user: userData });
     } catch (err) {
       console.error('Error during login:', err);
       res.status(500).json({ message: 'Internal server error' });
     }
   };
+
+
+
+
   const getUserById = async (req, res) => {
     try {
       const user = await User.findById(req.params.userId).select('-password');
@@ -208,3 +234,26 @@ const ChangePass = async (req, res) => {
   
   
   module.exports = { signup, login, hashPassword, checkUserExists,getUserById, getAllUsers,forgotPassword,ChangePass};
+
+
+
+  //@description     Get or Search all users
+//@route           GET /api/user?search=
+//@access          Public
+const SearchallUsers = asyncHandler(async (req, res) => {
+  const keyword = req.query.search
+    ? {
+        $or: [
+          { first_name: { $regex: req.query.search, $options: "i" } },
+          { email: { $regex: req.query.search, $options: "i" } },
+        ],
+      }
+    : {};
+  
+
+  const users = await User.find(keyword).find({ _id: { $ne: req.user.userId } });
+  res.send(users);
+});
+  
+  
+  module.exports = { signup, login, hashPassword, checkUserExists,getUserById, getAllUsers, SearchallUsers };

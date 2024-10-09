@@ -1,174 +1,4 @@
 
-// const express = require('express');
-// const Chat = require('../models/chat.model'); // Assuming the Chat model is in models/Chat.js
-// const router = express.Router();
-
-// // Send a message
-// router.post('/sendMessage', async (req, res) => {
-//   const { client_id, freelancer_id, send_to, send_by, message, attachment } = req.body;
-  
-//   try {
-//     const chatMessage = new Chat({
-//       client_id,
-//       freelancer_id,
-//       send_to,
-//       send_by,
-//       message,
-//       attachment,
-//     });
-
-//     const savedMessage = await chatMessage.save();
-//     res.status(200).json(savedMessage);
-//   } catch (err) {
-//     res.status(500).json({ error: err.message });
-//   }
-// });
-
-// // Fetch chat history between two users
-// router.get('/getChatHistory/:client_id/:freelancer_id', async (req, res) => {
-//   const { client_id, freelancer_id } = req.params;
-
-//   try {
-//     const chatHistory = await Chat.find({
-//       $or: [
-//         { client_id, freelancer_id },
-//         { client_id: freelancer_id, freelancer_id: client_id }
-//       ]
-//     }).sort({ createdAt: 1 }); // Sort by timestamp
-
-//     res.status(200).json(chatHistory);
-//   } catch (err) {
-//     res.status(500).json({ error: err.message });
-//   }
-// });
-
-// module.exports = router;
-
-// ========================================================================================================
-
-// const Chat = require('../models/chat.model');
-
-// // Send a message
-// exports.sendMessage = async (req, res) => {
-//   const { client_id, freelancer_id, send_to, send_by, message, attachment } = req.body;
-
-//   try {
-//     const chatMessage = new Chat({
-//       client_id,
-//       freelancer_id,
-//       send_to,
-//       send_by,
-//       message,
-//       attachment,
-//     });
-
-//     const savedMessage = await chatMessage.save();
-//     res.status(200).json(savedMessage);
-//   } catch (err) {
-//     res.status(500).json({ error: err.message });
-//   }
-// };
-
-// // Fetch chat history between two users
-// exports.getChatHistory = async (req, res) => {
-//   const { client_id, freelancer_id } = req.params;
-
-//   try {
-//     const chatHistory = await Chat.find({
-//       $or: [
-//         { client_id, freelancer_id },
-//         { client_id: freelancer_id, freelancer_id: client_id }
-//       ]
-//     }).sort({ createdAt: 1 }); // Sort by timestamp
-
-//     res.status(200).json(chatHistory);
-//   } catch (err) {
-//     res.status(500).json({ error: err.message });
-//   }
-// };
-
-
-// ===========================================================================================
-// =========================================================================================
-
-// const Chat = require('../models/chat.model');
-
-// // Send a message
-// exports.sendMessage = async (req, res) => {
-//   const { client_id, freelancer_id, send_to, send_by, message, attachment } = req.body;
-
-//   if (!client_id || !freelancer_id || !send_to || !send_by || !message) {
-//     return res.status(400).json({ error: "All fields are required" });
-//   }
-
-//   try {
-//     const chatMessage = new Chat({
-//       client_id,
-//       freelancer_id,
-//       send_to,
-//       send_by,
-//       message,
-//       attachment,
-//     });
-
-//     const savedMessage = await chatMessage.save();
-
-//     if (req.io) {
-//       req.io.to(send_to.toString()).emit('newMessage', savedMessage);
-//     }
-
-//     res.status(200).json(savedMessage);
-//   } catch (err) {
-//     res.status(500).json({ error: err.message });
-//   }
-// };
-
-// // Fetch chat history with pagination
-// exports.getChatHistory = async (req, res) => {
-//   const { client_id, freelancer_id } = req.params;
-//   const { page = 1, limit = 20 } = req.query;
-
-//   try {
-//     const chatHistory = await Chat.find({
-//       $or: [
-//         { client_id, freelancer_id },
-//         { client_id: freelancer_id, freelancer_id: client_id }
-//       ]
-//     })
-//     .sort({ createdAt: 1 })
-//     .limit(limit * 1)
-//     .skip((page - 1) * limit);
-
-//     res.status(200).json({
-//       page,
-//       totalMessages: chatHistory.length,
-//       messages: chatHistory,
-//     });
-//   } catch (err) {
-//     res.status(500).json({ error: err.message });
-//   }
-// };
-
-// // Mark a message as read
-// exports.markAsRead = async (req, res) => {
-//   const { messageId } = req.params;
-
-//   try {
-//     const updatedMessage = await Chat.findByIdAndUpdate(
-//       messageId,
-//       { isRead: true },
-//       { new: true }
-//     );
-
-//     if (!updatedMessage) {
-//       return res.status(404).json({ error: 'Message not found' });
-//     }
-
-//     res.status(200).json(updatedMessage);
-//   } catch (err) {
-//     res.status(500).json({ error: err.message });
-//   }
-// };
 
 
 
@@ -177,92 +7,420 @@
 
 
 
-const Chat = require('../models/chat.model');
-const User = require('../models/user.model'); // Assuming you have a User model
+// const Chat = require('../models/chat.model');
+// const User = require('../models/user.model'); // Assuming you have a User model
 
 // Get chat history between client and freelancer
-exports.getChatHistory = async (req, res) => {
-  try {
-    const { clientId, freelancerId } = req.params;
+// exports.getChatHistory = async (req, res) => {
+//   try {
+//     const { clientId, freelancerId } = req.params;
 
-    // Fetch the chat between the client and freelancer
-    const chat = await Chat.findOne({ client_id: clientId, freelancer_id: freelancerId });
+//     // Fetch the chat between the client and freelancer
+//     const chat = await Chat.findOne({ client_id: clientId, freelancer_id: freelancerId });
 
-    // If no chat exists, return an empty array
-    if (!chat) {
-      return res.status(200).json({ messages: [] });
-    }
+//     // If no chat exists, return an empty array
+//     if (!chat) {
+//       return res.status(200).json({ messages: [] });
+//     }
 
-    res.status(200).json(chat);
-  } catch (error) {
-    console.error("Error fetching chat history:", error);
-    res.status(500).json({ error: "An error occurred while fetching the chat history" });
+//     res.status(200).json(chat);
+//   } catch (error) {
+//     console.error("Error fetching chat history:", error);
+//     res.status(500).json({ error: "An error occurred while fetching the chat history" });
+//   }
+// };
+
+// // Send a new message
+// // exports.sendMessage = async (req, res) => {
+// //   try {
+// //     const { clientId, freelancerId, message, sender, attachment } = req.body;
+
+// //     let chat = await Chat.findOne({ client_id: clientId, freelancer_id: freelancerId });
+
+// //     // If no chat exists between the client and freelancer, create one
+// //     if (!chat) {
+// //       chat = new Chat({
+// //         client_id: clientId,
+// //         freelancer_id: freelancerId,
+// //         messages: [],
+// //       });
+// //     }
+
+// //     // Add the new message to the chat
+// //     const newMessage = {
+// //       sender,
+// //       message,
+// //       timestamp: new Date(),
+// //     };
+
+// //     if (attachment) {
+// //       newMessage.attachment = attachment; // Add attachment if provided
+// //     }
+
+// //     chat.messages.push(newMessage);
+// //     await chat.save();
+
+// //     res.status(200).json(chat);
+// //   } catch (error) {
+// //     console.error("Error sending message:", error);
+// //     res.status(500).json({ error: "An error occurred while sending the message" });
+// //   }
+// // };
+
+
+// // Assuming you have access to the `io` instance here
+
+// exports.sendMessage = async (req, res) => {
+//   const io = req.io; // Access io from req
+//   try {
+//     const { clientId, freelancerId, message, sender, attachment } = req.body;
+
+//     let chat = await Chat.findOne({ client_id: clientId, freelancer_id: freelancerId });
+
+//     // If no chat exists between the client and freelancer, create one
+//     if (!chat) {
+//       chat = new Chat({
+//         client_id: clientId,
+//         freelancer_id: freelancerId,
+//         messages: [],
+//       });
+//     }
+
+//     // Add the new message to the chat
+//     const newMessage = {
+//       sender,
+//       message,
+//       timestamp: new Date(),
+//     };
+
+//     if (attachment) {
+//       newMessage.attachment = attachment; // Add attachment if provided
+//     }
+
+//     chat.messages.push(newMessage);
+//     await chat.save();
+
+//     // Emit the message to the connected clients
+//     io.emit('newMessage', { clientId, freelancerId, ...newMessage }); // Send the message to all connected clients
+
+//     res.status(200).json(chat);
+//   } catch (error) {
+//     console.error("Error sending message:", error);
+//     res.status(500).json({ error: "An error occurred while sending the message" });
+//   }
+// };
+
+
+
+// // Fetch all chat conversations for a specific client (chat overview)
+// exports.getClientChats = async (req, res) => {
+//   try {
+//     const { clientId } = req.params;
+
+//     // Fetch all chat histories for this client
+//     const chats = await Chat.find({ client_id: clientId }).populate('freelancer_id', 'name profilePic');
+
+//     res.status(200).json(chats);
+//   } catch (error) {
+//     console.error("Error fetching client chats:", error);
+//     res.status(500).json({ error: "An error occurred while fetching client chats" });
+//   }
+// };
+
+// // Fetch all chat conversations for a specific freelancer (chat overview)
+// exports.getFreelancerChats = async (req, res) => {
+//   try {
+//     const { freelancerId } = req.params;
+
+//     // Fetch all chat histories for this freelancer
+//     const chats = await Chat.find({ freelancer_id: freelancerId }).populate('client_id', 'name profilePic');
+
+//     res.status(200).json(chats);
+//   } catch (error) {
+//     console.error("Error fetching freelancer chats:", error);
+//     res.status(500).json({ error: "An error occurred while fetching freelancer chats" });
+//   }
+// };
+
+
+
+
+// -----------------------------------------------------------------------------
+const asyncHandler = require("express-async-handler");
+const Chat = require("../models/Chatting.model");
+const User = require("../models/user.model");
+const Message = require("../models/Message.model")
+
+//@description     Create or fetch One to One Chat
+//@route           POST /api/chat/
+//@access          Protected
+const accessChat = asyncHandler(async (req, res) => {
+  const { userId  } = req.body;
+
+  // console.log("userid",req.user.userId)
+
+  
+
+  if (!userId) {
+    console.log("UserId param not sent with request");
+    return res.sendStatus(400);
   }
-};
 
-// Send a new message
-exports.sendMessage = async (req, res) => {
-  try {
-    const { clientId, freelancerId, message, sender, attachment } = req.body;
+  var isChat = await Chat.find({
+    isGroupChat: false,
+    $and: [
+      { users: { $elemMatch: { $eq: req.user.userId } } },
+      { users: { $elemMatch: { $eq: userId } } },
+    ],
+  })
+    .populate("users", "-password")
+    .populate("latestMessage");
 
-    let chat = await Chat.findOne({ client_id: clientId, freelancer_id: freelancerId });
+  isChat = await User.populate(isChat, {
+    path: "latestMessage.sender",
+    select: "first_name last_name email role",
+  });
 
-    // If no chat exists between the client and freelancer, create one
-    if (!chat) {
-      chat = new Chat({
-        client_id: clientId,
-        freelancer_id: freelancerId,
-        messages: [],
-      });
-    }
-
-    // Add the new message to the chat
-    const newMessage = {
-      sender,
-      message,
-      timestamp: new Date(),
+  if (isChat.length > 0) {
+    res.send(isChat[0]);
+  } else {
+    var chatData = {
+      chatName: "sender",
+      isGroupChat: false,
+      users: [req.user.userId, userId],
     };
 
-    if (attachment) {
-      newMessage.attachment = attachment; // Add attachment if provided
+    try {
+      const createdChat = await Chat.create(chatData);
+      const FullChat = await Chat.findOne({ _id: createdChat._id }).populate(
+        "users",
+        "-password"
+      );
+      res.status(200).json(FullChat);
+    } catch (error) {
+      res.status(400);
+      throw new Error(error.message);
     }
-
-    chat.messages.push(newMessage);
-    await chat.save();
-
-    res.status(200).json(chat);
-  } catch (error) {
-    console.error("Error sending message:", error);
-    res.status(500).json({ error: "An error occurred while sending the message" });
   }
-};
+});
 
-// Fetch all chat conversations for a specific client (chat overview)
-exports.getClientChats = async (req, res) => {
+
+//@description     Fetch all chats for a user
+//@route           GET /api/chat/
+//@access          Protected
+const fetchChats = asyncHandler(async (req, res) => {
   try {
-    const { clientId } = req.params;
-
-    // Fetch all chat histories for this client
-    const chats = await Chat.find({ client_id: clientId }).populate('freelancer_id', 'name profilePic');
-
-    res.status(200).json(chats);
+    Chat.find({ users: { $elemMatch: { $eq: req.user.userId } } })
+      .populate("users", "-password")
+      .populate("groupAdmin", "-password")
+      .populate("latestMessage")
+      .sort({ updatedAt: -1 })
+      .then(async (results) => {
+        results = await User.populate(results, {
+          path: "latestMessage.sender",
+          select: "first_name last_name email role",
+        });
+        res.status(200).send(results);
+      });
   } catch (error) {
-    console.error("Error fetching client chats:", error);
-    res.status(500).json({ error: "An error occurred while fetching client chats" });
+    res.status(400);
+    throw new Error(error.message);
   }
-};
+});
 
-// Fetch all chat conversations for a specific freelancer (chat overview)
-exports.getFreelancerChats = async (req, res) => {
+//@description     Create New Group Chat
+//@route           POST /api/chat/group
+//@access          Protected
+const createGroupChat = asyncHandler(async (req, res) => {
+  if (!req.body.users || !req.body.first_name) {
+    return res.status(400).send({ message: "Please Fill all the feilds" });
+  }
+
+
+  var users = JSON.parse(req.body.users);
+  console.log(users);
+
+  if (users.length < 2) {
+    return res
+      .status(400)
+      .send("More than 2 users are required to form a group chat");
+  }
+
+  users.push(req.user.userId);
+  console.log("admin user",req.user.userId);
+  console.log("till here the code is working");
+
   try {
-    const { freelancerId } = req.params;
+    const groupChat = await Chat.create({
+      chatName: req.body.first_name,
+      users: users,
+      isGroupChat: true,
+      groupAdmin: req.user.userId,
+    });
 
-    // Fetch all chat histories for this freelancer
-    const chats = await Chat.find({ freelancer_id: freelancerId }).populate('client_id', 'name profilePic');
+    const fullGroupChat = await Chat.findOne({ _id: groupChat._id })
+    .populate("users", "-password")
+    .populate("groupAdmin", "-password");
 
-    res.status(200).json(chats);
-  } catch (error) {
-    console.error("Error fetching freelancer chats:", error);
-    res.status(500).json({ error: "An error occurred while fetching freelancer chats" });
+  res.status(200).json(fullGroupChat);
+} catch (error) {
+  res.status(400);
+  throw new Error(error.message);
+}
+});
+
+
+// @desc    Rename Group
+// @route   PUT /api/chat/rename
+// @access  Protected
+const renameGroup = asyncHandler(async (req, res) => {
+  const { chatId, chatName } = req.body;
+
+  const updatedChat = await Chat.findByIdAndUpdate(
+    chatId,
+    {
+      chatName: chatName,
+    },
+    {
+      new: true,
+    }
+  )
+    .populate("users", "-password")
+    .populate("groupAdmin", "-password");
+
+  if (!updatedChat) {
+    res.status(404);
+    throw new Error("Chat Not Found");
+  } else {
+    res.json(updatedChat);
   }
+});
+
+
+// @desc    Remove user from Group
+// @route   PUT /api/chat/groupremove
+// @access  Protected
+const removeFromGroup = asyncHandler(async (req, res) => {
+  const { chatId, userId } = req.body;
+
+  // check if the requester is admin
+
+  const removed = await Chat.findByIdAndUpdate(
+    chatId,
+    {
+      $pull: { users: userId },
+    },
+    {
+      new: true,
+    }
+  )
+    .populate("users", "-password")
+    .populate("groupAdmin", "-password");
+
+  if (!removed) {
+    res.status(404);
+    throw new Error("Chat Not Found");
+  } else {
+    res.json(removed);
+  }
+});
+
+// @desc    Add user to Group / Leave
+// @route   PUT /api/chat/groupadd
+// @access  Protected
+const addToGroup = asyncHandler(async (req, res) => {
+  const { chatId, userId } = req.body;
+
+  // check if the requester is admin
+
+  const added = await Chat.findByIdAndUpdate(
+    chatId,
+    {
+      $push: { users: userId },
+    },
+    {
+      new: true,
+    }
+  )
+    .populate("users", "-password")
+    .populate("groupAdmin", "-password");
+
+  if (!added) {
+    res.status(404);
+    throw new Error("Chat Not Found");
+  } else {
+    res.json(added);
+  }
+});
+
+
+
+
+//@description     Get all Messages
+//@route           GET /api/Message/:chatId
+//@access          Protected
+const allMessages = asyncHandler(async (req, res) => {
+  try {
+    const messages = await Message.find({ chat: req.params.chatId })
+      .populate("sender", "name pic email")
+      .populate("chat");
+    res.json(messages);
+  } catch (error) {
+    res.status(400);
+    throw new Error(error.message);
+  }
+});
+
+
+//@description     Create New Message
+//@route           POST /api/Message/
+//@access          Protected
+const sendMessage = asyncHandler(async (req, res) => {
+  const { content, chatId } = req.body;
+
+  if (!content || !chatId) {
+    console.log("Invalid data passed into request");
+    return res.sendStatus(400);
+  }
+
+  var newMessage = {
+    sender: req.user.userId,
+    content: content,
+    chat: chatId,
+  };
+
+  try {
+    var message = await Message.create(newMessage);
+
+    message = await message.populate("sender", "name pic");
+    message = await message.populate("chat");
+    message = await User.populate(message, {
+      path: "chat.users",
+      select: "name pic email",
+    });
+
+    await Chat.findByIdAndUpdate(req.body.chatId, { latestMessage: message });
+
+    res.json(message);
+  } catch (error) {
+    res.status(400);
+    throw new Error(error.message);
+  }
+});
+
+
+
+
+
+module.exports = {
+  accessChat,
+  fetchChats,
+  createGroupChat,
+  renameGroup,
+  addToGroup,
+  removeFromGroup,
+  allMessages ,
+  sendMessage,
 };
+
+

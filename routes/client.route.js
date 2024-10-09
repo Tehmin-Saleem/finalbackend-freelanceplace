@@ -6,6 +6,7 @@ const authMiddleware = require('../middleware/auth.middleware');
 const jobPostController = require('../controllers/post_job.controller');
 const reviewRequestController = require("../controllers/review_request.controller");
 const paymentMethodController = require('../controllers/payment_method.controller');
+const proposalController = require("../controllers/proposal.controller")
 const path = require('path');
 const usercontroller=require ('../controllers/user.controller')
 const { upload } = require('../config/cloudinary.config');// const { forgotPassword, resetPassword } = require('../controllers/user.controller');
@@ -14,9 +15,22 @@ const { upload } = require('../config/cloudinary.config');// const { forgotPassw
 // Import Chat controller
 const chatController = require('../controllers/chat.controller'); // Add this
 
+
 const hireFreelancerController = require('../controllers/hire_freelancer.controller');
 
+const Proposal = require('../models/proposal.model');
+const { getFreelancerDetailsByProposal, getProposalById } = require('../controllers/proposal.controller');
 const router = express.Router();
+
+// Assume io is defined in your server.js file
+const socketIo = require('socket.io'); // Import socket.io
+const io = socketIo(); // Create an io instance
+
+// Use a middleware to attach io to req
+// router.use((req, res, next) => {
+//   req.io = io;
+//   next();
+// });
 
 
 router.post('/signup', signup);
@@ -114,17 +128,37 @@ router.put('/hire/:hireRequestId', hireFreelancerController.updateHireRequest);
 router.delete('/hire/:hireRequestId', hireFreelancerController.deleteHireRequest);
 
 
+// route for getting freelancer details for specific proposal id
+router.get("/proposal/:proposalId", proposalController.getProposalById);
+
+
+
+router.get("/SearchAllUsers", authMiddleware, usercontroller.SearchallUsers);
+
+
+
 
 // Chat-related routes
 
-// Route to get the chat history between client and freelancer
-router.get('/:clientId/:freelancerId', authMiddleware, chatController.getChatHistory);
 
-// Route to send a new message
-router.post('/send',authMiddleware, chatController.sendMessage);
 
-// Route to get all chats for a specific client
-router.get('/:clientId',authMiddleware, chatController.getClientChats);
+router.post('/accesschats',authMiddleware, chatController.accessChat);
+router.get('/fetchchats', authMiddleware, chatController.fetchChats);
+router.post('/group',authMiddleware, chatController.createGroupChat);
+router.put("/rename",authMiddleware, chatController.renameGroup);
+router.put("/groupremove" , authMiddleware, chatController.removeFromGroup);
+router.put("/groupadd", authMiddleware, chatController.addToGroup);
+
+
+// message-related routes
+
+
+router.get("/allMessages/:chatId", authMiddleware, chatController.allMessages);
+router.post("/sendMessage", authMiddleware, chatController.sendMessage);
+
+
+
+
 
 
 module.exports = router;

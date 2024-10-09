@@ -103,13 +103,13 @@ router.get('/profile/:freelancer_id', authMiddleware, freelancerProfileControlle
 
 
 // Route to get all chats for a specific freelancer
-router.get('/freelancer/:freelancerId',authMiddleware, chatController.getFreelancerChats);
+// router.get('/freelancer/:freelancerId',authMiddleware, chatController.getFreelancerChats);
 
-// Route to get the chat history between client and freelancer
-router.get('/:clientId/:freelancerId',authMiddleware, chatController.getChatHistory);
+// // Route to get the chat history between client and freelancer
+// router.get('/:clientId/:freelancerId',authMiddleware, chatController.getChatHistory);
 
-// Route to send a new message
-router.post('/send',authMiddleware, chatController.sendMessage);
+// // Route to send a new message
+// router.post('/send',authMiddleware, chatController.sendMessage);
 
 
 

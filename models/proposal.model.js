@@ -28,6 +28,10 @@ const ProposalSchema = new Schema({
   attachment: {
     type: String,
   },
+  Proposal_id:{
+    type: mongoose.Types.ObjectId,
+
+  },
   client_id: {
     type: mongoose.Types.ObjectId,
     
