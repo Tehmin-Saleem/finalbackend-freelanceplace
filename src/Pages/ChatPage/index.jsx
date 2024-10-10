@@ -1,462 +1,488 @@
-// // // Chat.js
-// // import React, { useState } from 'react';
-// // import './styles.scss';
-// // import dummyData from "../../components/DummyData";
-// // import { Header } from '../../components';
-
-// // const Chat = () => {
-// //   const [selectedChat, setSelectedChat] = useState(dummyData[0]); // Default to the first chat
-// //   const [searchTerm, setSearchTerm] = useState('');
-
-// //   const handleSearch = (e) => {
-// //     setSearchTerm(e.target.value);
-// //     const filteredChats = dummyData.filter(chat =>
-// //       chat.name.toLowerCase().includes(e.target.value.toLowerCase())
-// //     );
-// //     setSelectedChat(filteredChats[0] || dummyData[0]);
-// //   };
-
-// //   return (
-// //     <>
-// //     <Header/>
-// //     <div className="chat-page">
-// //       <div className="left-section">
-// //         <div className="search-bar">
-// //           <input
-// //             type="text"
-// //             placeholder="Search"
-// //             value={searchTerm}
-// //             onChange={handleSearch}
-// //           />
-// //         </div>
-// //         <div className="conversations">
-// //           {dummyData.map(chat => (
-// //             <div
-// //               key={chat.id}
-// //               className={`conversation ${selectedChat.id === chat.id ? 'active' : ''}`}
-// //               onClick={() => setSelectedChat(chat)}
-// //             >
-// //               <img src={chat.profilePicture} alt="Profile" />
-// //               <div>
-// //                 <div className="chat-name">{chat.name}</div>
-// //                 <div className="latest-message">{chat.latestMessage}</div>
-// //               </div>
-// //             </div>
-// //           ))}
-// //         </div>
-// //       </div>
-// //       <div className="right-section">
-// //         <div className="chat-header">
-// //           <div className="job-info">
-// //             <h3>{selectedChat.jobTitle}</h3>
-// //             <p>{selectedChat.date}</p>
-// //           </div>
-// //           <hr />
-// //         </div>
-// //         <div className="chat-messages">
-// //           {selectedChat.messages.map((message, index) => (
-// //             <div key={index} className="message">
-// //               <img src={message.sender.profilePicture} alt="Sender" />
-// //               <div className="message-content">
-// //                 <div className="sender-info">
-// //                   <strong>{message.sender.name}</strong>
-// //                   <span>{message.sender.status}</span>
-// //                 </div>
-// //                 <p>{message.text}</p>
-// //               </div>
-// //             </div>
-// //           ))}
-// //         </div>
-// //         <div className="message-input">
-// //           <input type="text" placeholder="Write a message..." />
-// //           <div className="input-icons">
-// //             <button>📎</button>
-// //             <button>😊</button>
-// //             <button className="send-btn">Send</button>
-// //           </div>
-// //         </div>
-// //       </div>
-// //     </div>
-// //     </>
-// //   );
-// // };
-
-// // export default Chat;
-
-// import React, { useState, useEffect } from "react";
-// import "./styles.scss";
-// import axios from "axios"; // For making API calls
-// import { Header } from "../../components";
-// import dummyData from "../../components/DummyData"; // You may replace this with actual user data
-
-// const Chat = () => {
-//   const [selectedChat, setSelectedChat] = useState(null); // No default chat selected
-//   const [searchTerm, setSearchTerm] = useState("");
-//   const [messages, setMessages] = useState([]); // Store chat messages
-//   const [newMessage, setNewMessage] = useState(""); // Store new message input
-
-//   // Fetch chat history when a user selects a conversation
-//   useEffect(() => {
-//     if (selectedChat) {
-//       axios
-//         .get(`/api/chat/getChatHistory/${selectedChat.id}`, {
-//           headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-//         })
-//         .then((response) => {
-//           if (Array.isArray(response.data)) {
-//             setMessages(response.data);
-//           } else {
-//             console.error("Chat history is not an array", response.data);
-//           }
-//         })
-//         .catch((error) => {
-//           console.error("Error fetching chat history", error);
-//         });
-//     }
-//   }, [selectedChat]);
-
-//   // Handle sending a message
-//   const sendMessage = () => {
-//     axios
-//       .post(
-//         "/api/chat/sendMessage",
-//         { send_to: selectedChat.id, message: newMessage },
-//         {
-//           headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-//         }
-//       )
-//       .then((response) => {
-//         setMessages((prevMessages) => [...prevMessages, response.data]); // Add new message
-//         setNewMessage(""); // Clear the input field
-//       })
-//       .catch((error) => {
-//         console.error("Error sending message", error);
-//       });
-//   };
-
-//   return (
-//     <>
-//       <Header />
-//       <div className="chat-page">
-//         <div className="left-section">
-//           <div className="search-bar">
-//             <input
-//               type="text"
-//               placeholder="Search"
-//               value={searchTerm}
-//               onChange={(e) => setSearchTerm(e.target.value)}
-//             />
-//           </div>
-//           <div className="conversations">
-//             {dummyData.map((chat) => (
-//               <div
-//                 key={chat.id}
-//                 className={`conversation ${
-//                   selectedChat && selectedChat.id === chat.id ? "active" : ""
-//                 }`}
-//                 onClick={() => setSelectedChat(chat)}
-//               >
-//                 <img src={chat.profilePicture} alt="Profile" />
-//                 <div>
-//                   <div className="chat-name">{chat.name}</div>
-//                   <div className="latest-message">{chat.latestMessage}</div>
-//                 </div>
-//               </div>
-//             ))}
-//           </div>
-//         </div>
-//         <div className="right-section">
-//           <div className="chat-header">
-//             {selectedChat && (
-//               <>
-//                 <h3>{selectedChat.jobTitle}</h3>
-//                 <p>{selectedChat.date}</p>
-//               </>
-//             )}
-//           </div>
-
-//           {/* <div className="chat-messages">
-//             {messages.map((message, index) => (
-//               <div key={index} className="message">
-//                 <img src={message.sender.profilePicture} alt="Sender" />
-//                 <div className="message-content">
-//                   <strong>{message.sender.name}</strong>
-//                   <p>{message.text}</p>
-//                 </div>
-//               </div>
-//             ))}
-//           </div> */}
-//           <div className="chat-messages">
-//             {messages.length === 0 ? (
-//               <p>No messages yet</p>
-//             ) : (
-//               messages.map((message, index) => (
-//                 <div key={index} className="message">
-//                   <img src={message.sender.profilePicture} alt="Sender" />
-//                   <div className="message-content">
-//                     <strong>{message.sender.name}</strong>
-//                     <p>{message.text}</p>
-//                   </div>
-//                 </div>
-//               ))
-//             )}
-//           </div>
-
-//           <div className="message-input">
-//             <input
-//               type="text"
-//               placeholder="Write a message..."
-//               value={newMessage}
-//               onChange={(e) => setNewMessage(e.target.value)}
-//             />
-//             <button className="send-btn" onClick={sendMessage}>
-//               Send
-//             </button>
-//           </div>
-//         </div>
-//       </div>
-//     </>
-//   );
-// };
-
-// export default Chat;
-
-// =============================================================================================================
-// ==========================================================================================================
-
 import React, { useState, useEffect } from "react";
 import "./styles.scss";
 import axios from "axios";
-import { Header } from "../../components";
+import {
+  Header,
+  ChatLoading,
+  UserListItems,
+  Spinner,
+} from "../../components/index";
+import { ChatState } from "../../context/ChatProvider";
+import { getSender } from "../../components/chatcomponents/ChatLogic";
+import { BigCross } from "../../svg";
+import Lottie from "react-lottie";
+import ScrollableChat from "../../components/chatcomponents/ScrollableChat";
 import io from "socket.io-client";
+import animationData from "../../animations/typing.json"
 
-const socket = io("http://localhost:5173"); // Replace with your server URL
 
-const Chat = ({ clientId, freelancerId }) => {
-  const [selectedChat, setSelectedChat] = useState(null);
-  const [searchTerm, setSearchTerm] = useState("");
+const ENDPOINT = "http://localhost:5000"; // "https://talk-a-tive.herokuapp.com"; -> After deployment
+var socket, selectedChatCompare;
+
+const Chat = () => {
+  const [search, setSearch] = useState("");
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false); // State to control drawer
+  const [searchResult, setSearchResult] = useState([]);
+  const [loadingChat, setLoadingChat] = useState(false);
+  const [error, setError] = useState(""); // State for error messages
+  const [loggedUser, setLoggedUser] = useState();
+  const [fetchAgain, setFetchAgain] = useState(false);
   const [messages, setMessages] = useState([]);
+  const [loading, setLoading] = useState(false);
   const [newMessage, setNewMessage] = useState("");
-  const [conversations, setConversations] = useState([]); // Initialize as an empty array
+  const [socketConnected, setSocketConnected] = useState(false);
+  const [typing, setTyping] = useState(false);
+  const [istyping, setIsTyping] = useState(false);
 
 
-  const [freelancer, setFreelancer] = useState({});
-  const [chatHistory, setChatHistory] = useState([]);
- 
-
-  const [user, setUser] = useState(null); // Current user data (client)
-  const freelancerData = JSON.parse(localStorage.getItem("freelancerData")); // Get freelancer data
-
-  // const socket = io("http://localhost:5173", {
-  //   transports: ["polling", "websocket"], // Ensure you're using both polling and WebSocket
-  // });
-
-  // ===============================
-
-
-  useEffect(() => {
-    // Fetch freelancer details
-    axios.get(`http://localhost:5173/api/freelancer/profile`)
-      .then((response) => setFreelancer(response.data))
-      .catch((error) => console.error(error));
-
-    // Fetch chat history
-    axios.get(`http://localhost:5173/api/client/${clientId}/${freelancerId}`)
-      .then((response) => {
-        if (response.data && Array.isArray(response.data.messages)) {
-          setChatHistory(response.data.messages); // Only set if messages exist
-        } else {
-          setChatHistory([]);  // Default to empty array if no messages
-        }
-      })
-      .catch((error) => console.error(error));
-
-    // Join the chat room
-    socket.emit('join_room', `${clientId}-${freelancerId}`);
-  }, [clientId, freelancerId]);
-
-  // Load list of conversations
-  const loadConversations = () => {
-    axios
-      .get("/api/client/:clientId/:freelancerId", {
-        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-      })
-      .then((response) => {
-        setConversations(response.data);
-      });
+  const defaultOptions = {
+    loop: true,
+    autoplay: true,
+    animationData: animationData,
+    rendererSettings: {
+      preserveAspectRatio: "xMidYMid slice",
+    },
   };
 
-  useEffect(() => {
-    // Fetch user information (client) and conversations from API
-    axios
-      .get("/api/client/me", {
-        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-      })
-      .then((response) => {
-        setUser(response.data);
-        loadConversations();
-      });
-  }, []);
+  const {
+    user,
+    selectedChat,
+    setSelectedChat,
+    notification,
+    setNotification,
+    chats,
+    setChats,
+  } = ChatState();
 
-  // Fetch chat history when a conversation is selected
-  const handleChatClick = (chat) => {
-    setSelectedChat(chat);
-    axios
-      .get(`/api/chat/history/${chat.freelancerId}`, {
-        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-      })
-      .then((response) => {
-        setMessages(response.data);
-      });
+  // Function to open the drawer
+  const handleSearchClick = () => {
+    setIsDrawerOpen(true);
   };
 
-  // Handle sending a message
-  // const sendMessage = () => {
-  //   if (newMessage && selectedChat) {
-  //     const messageData = {
-  //       text: newMessage,
-  //       senderId: user.id,
-  //       receiverId: selectedChat.freelancerId,
-  //     };
-  //     socket.emit("chat message", messageData); // Send message through socket
-  //     setMessages([...messages, messageData]); // Update local message list
-  //     setNewMessage(""); // Clear input
-  //   }
-  // };
+  // Function to close the drawer
+  const closeDrawer = () => {
+    setIsDrawerOpen(false);
+  };
 
-  // Listen for incoming messages through socket
-  useEffect(() => {
-    socket.on("chat message", (msg) => {
-      if (msg.receiverId === user.id) {
-        // Check if message is for the current client
-        setMessages((prevMessages) => [...prevMessages, msg]);
-      }
-    });
-    return () => {
-      socket.off("chat message");
-    };
-  }, [user]);
-
-  // =============================== this is old below
-
-  useEffect(() => {
-    if (freelancerData) {
-      setSelectedChat({
-        id: freelancerData.id, // You can modify the ID based on your logic
-        name: freelancerData.name,
-        jobTitle: freelancerData.jobTitle,
-        profilePicture: freelancerData.image,
-      });
+  const handleSearch = async () => {
+    if (!search) {
+      setError("Please enter something in the search."); // Show error if input is empty
+      return;
     }
-  }, [freelancerData]);
 
-  // Fetch chat history when a user selects a conversation
-  // useEffect(() => {
-  //   if (selectedChat) {
-  //     axios
-  //       .get(`/api/chat/getChatHistory/${selectedChat.id}`, {
-  //         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-  //       })
-  //       .then((response) => {
-  //         if (Array.isArray(response.data)) {
-  //           setMessages(response.data);
-  //         } else {
-  //           console.error("Chat history is not an array", response.data);
-  //         }
-  //       })
-  //       .catch((error) => {
-  //         console.error("Error fetching chat history", error);
-  //       });
-  //   }
-  // }, [selectedChat]);
+    try {
+      setLoading(true);
+      setError(""); // Clear previous error messages
 
-  // // Listen for incoming messages
-  useEffect(() => {
-    socket.on("chat message", (msg) => {
-      setMessages((prevMessages) => [...prevMessages, msg]);
-    });
+      const config = {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${user.token}`,
+        },
+      };
+      // console.log("token in handle  search", user.token);
 
-    return () => {
-      socket.off("chat message");
-    };
-  }, []);
+      // i have to correct the route here ..........
+      const { data } = await axios.get(
+        `http://localhost:5000/api/client/SearchAllUsers?search=${search}`,
+        config
+      );
 
-  // Handle sending a message
-  const sendMessage = () => {
-    if (newMessage) {
-      const messageData = { text: newMessage, sender: { name: "Client" }, receiver: { name: selectedChat.name }, }; // Update as needed
-      socket.emit("chat message", messageData);
-      setMessages((prevMessages) => [...prevMessages, messageData]); // Add to current message list
-      setNewMessage("");
+      setLoading(false);
+      setSearchResult(data); // Store the search result
+      // console.log(data);
+    } catch (error) {
+      setLoading(false);
+      setError("Failed to load search results. Please try again."); // Handle error
     }
   };
+
+  const accessChat = async (userId) => {
+    console.log(userId);
+
+    // console.log("token in acceschats", user.token);
+
+    try {
+      setLoadingChat(true);
+      const config = {
+        headers: {
+          "Content-type": "application/json",
+          Authorization: `Bearer ${user.token}`,
+        },
+      };
+      const { data } = await axios.post(
+        `http://localhost:5000/api/client/accesschats`,
+        { userId },
+        config
+      );
+
+      if (!chats.find((c) => c._id === data._id)) setChats([data, ...chats]);
+      setSelectedChat(data);
+      // console.log("data in function accesschats", data);
+      setLoadingChat(false);
+      closeDrawer();
+      // onClose(); // close the sidedrawer after this
+    } catch (error) {
+      setError("Failed to fetch chats. Please try again."); // Handle error
+    }
+  };
+
+  // part below the drawer that is Mychats
+  // =============
+
+  const fetchChats = async () => {
+    // console.log(userId);
+
+    // Get userInfo from localStorage and parse it
+    const userInfo = JSON.parse(localStorage.getItem("userInfo"));
+
+    // Extract the token from the userInfo object
+    const token = userInfo?.token;
+
+    try {
+      const config = {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      };
+      
+
+      const { data } = await axios.get(
+        "http://localhost:5000/api/client/fetchchats",
+        config
+      );
+      
+      setChats(data);
+    } catch (error) {
+      setError("Failed to load the chats. Please try again."); // Handle error
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    const userInfo = JSON.parse(localStorage.getItem("userInfo"));
+    setLoggedUser(userInfo);
+    // console.log("loggeduser is" ,loggedUser);
+    fetchChats();
+  }, [fetchAgain]);
+
+
+
+  // messages related integration
+
+
+  const fetchMessages = async () => {
+    if (!selectedChat) return;
+
+    try {
+      const config = {
+        headers: {
+          Authorization: `Bearer ${user.token}`,
+        },
+      };
+
+      setLoading(true);
+
+      const { data } = await axios.get(
+        `http://localhost:5000/api/client/allMessages/${selectedChat._id}`,
+        config
+      );
+      setMessages(data);
+      setLoading(false);
+      console.log(data)
+      socket.emit("join chat", selectedChat._id);
+    } catch (error) {
+      setError("Failed to load all the message"); // Handle error
+        console.log(error);
+    }
+  };
+
+
+
 
   
+  useEffect(() => {
+ 
+    const userInfo = JSON.parse(localStorage.getItem("userInfo"));
+  
+    if (userInfo && userInfo.user) {  // Check if userInfo has a valid user object
+      socket = io(ENDPOINT);
+      console.log("Emitting setup event with user:", userInfo.user);
+      socket.emit("setup", userInfo.user);  // Send only the user object
+      socket.on("connected", () => setSocketConnected(true));
+      socket.on("typing", () => setIsTyping(true));
+      socket.on("stop typing", () => setIsTyping(false));
+
+    } else {
+      console.error("No valid user data found in localStorage");
+      navigate("/");  // Redirect if no valid user
+    }
+
+    // eslint-disable-next-line
+  }, []);
+
+  useEffect(() => {
+    fetchMessages();
+
+    selectedChatCompare = selectedChat;
+    // eslint-disable-next-line
+  }, [selectedChat]);
+
+
+  useEffect(() => {
+    socket.on("message recieved", (newMessageRecieved) => {
+      if (
+        !selectedChatCompare || // if chat is not selected or doesn't match current chat
+        selectedChatCompare._id !== newMessageRecieved.chat._id
+      ) {
+        if (!notification.includes(newMessageRecieved)) {
+          setNotification([newMessageRecieved, ...notification]);
+          setFetchAgain(!fetchAgain);
+        }
+      } else {
+        setMessages([...messages, newMessageRecieved]);
+      }
+    });
+  });
+
+
+  const sendMessage = async (event) => {
+    if (event.key === "Enter" && newMessage) {
+      socket.emit("stop typing", selectedChat._id);
+      try {
+        const config = {
+          headers: {
+            "Content-type": "application/json",
+            Authorization: `Bearer ${user.token}`,
+          },
+        };
+        setNewMessage("");
+        const { data } = await axios.post(
+          "http://localhost:5000/api/client/sendMessage",
+          {
+            content: newMessage,
+            chatId: selectedChat,
+          },
+          config
+        );
+
+        
+        socket.emit("new message", data);
+        setMessages([...messages, data]);
+      } catch (error) {
+        setError("Failed to send the message"); // Handle error
+        console.log(error);
+    }
+
+  }
+};
+
+
+  const typingHandler = (e) => {
+    setNewMessage(e.target.value);
+    if (!socketConnected) return;
+
+    if (!typing) {
+      setTyping(true);
+      socket.emit("typing", selectedChat._id);
+    }
+    let lastTypingTime = new Date().getTime();
+    var timerLength = 3000;
+    setTimeout(() => {
+      var timeNow = new Date().getTime();
+      var timeDiff = timeNow - lastTypingTime;
+      if (timeDiff >= timerLength && typing) {
+        socket.emit("stop typing", selectedChat._id);
+        setTyping(false);
+      }
+    }, timerLength);
+
+  };
 
   return (
     <>
       <Header />
       <div className="chat-page">
-      <div className="chat-header">
-        <img src={freelancer.profilePic} alt="Profile" />
-        <h3>{freelancer.name}</h3>
-        <p>{freelancer.description}</p>
-      </div>
+        {/* <div className="chat-header"></div> */}
         <div className="left-section">
-          <h2>Messages</h2>
+          <h2 className="msg">Messages</h2>
           <div className="search-bar">
             <input
               type="text"
               placeholder="Search"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onClick={handleSearchClick}
             />
           </div>
-          <div className="list">
-            {selectedChat && (
-              <>
-                <div className="chat-header-left">
-                  <img src={selectedChat.profilePicture} alt="Freelancer" />
-                  <h3>{selectedChat.jobTitle}</h3>
+
+          {/* =========================== */}
+          <div
+            className={`mychats-container ${
+              selectedChat ? "hide-on-mobile" : ""
+            }`}
+          >
+            <div className="mychats-header">
+              My Chats
+              <div className="group-chat-modal">
+                <button className="new-group-chat-btn">
+                  New Group Chat <span className="plus-icon">+</span>
+                </button>
+              </div>
+            </div>
+
+            <div className="chat-box">
+              {chats ? (
+                <div className="chat-list">
+                  {chats.map((chat) => (
+                    <div
+                      onClick={() => setSelectedChat(chat)}
+                      className={`chat-item ${
+                        selectedChat === chat ? "selected" : ""
+                      }`}
+                      key={chat._id}
+                    >
+                      <p className="chat-name">
+                        {!chat.isGroupChat
+                          ? getSender(loggedUser, chat.users)
+                          : chat.chatName}
+                      </p>
+                      {chat.latestMessage && (
+                        <p className="chat-latest-message">
+                          <strong>{chat.latestMessage.sender.name}:</strong>{" "}
+                          {chat.latestMessage.content.length > 50
+                            ? chat.latestMessage.content.substring(0, 51) +
+                              "..."
+                            : chat.latestMessage.content}
+                        </p>
+                      )}
+                    </div>
+                  ))}
                 </div>
-              </>
-            )}
+              ) : (
+                <ChatLoading />
+                // <div className="chat-loading">Loading chats...</div>
+              )}
+            </div>
           </div>
+          {/* =========================== */}
         </div>
         <div className="right-section">
-          {selectedChat && (
-            <>
-              <div className="chat-header">
-                {/* <img src={selectedChat.profilePicture} alt="Freelancer" /> */}
-                <h3>{selectedChat.jobTitle}</h3>
-              </div>
-              <div className="chat-messages">
-                {messages.length === 0 ? (
-                  <p>No messages yet</p>
-                ) : (
-                  messages.map((messages, index) => (
-                    <div key={index} className="message">
-                      <strong>
-                        {messages.sender === "client" ? "Client" : "Freelancer"}
-                      </strong>
-                      <p>{messages.message}</p>{" "}
-                      {/* Update to access `message.message` */}
-                    </div>
-                  ))
-                )}
-              </div>
+          <>
+            {selectedChat ? (
+              <>
+                <div className="chat-header">
+                  {/* Back button visible only on smaller screens */}
+                  <button
+                    className="icon-button"
+                    onClick={() => setSelectedChat("")}
+                  >
+                    ←
+                  </button>
 
-              <div className="message-input">
-                <input
-                  type="text"
-                  placeholder="Write a message..."
-                  value={newMessage}
-                  onChange={(e) => setNewMessage(e.target.value)}
-                />
-                <button onClick={sendMessage}>Send</button>
+                  {/* Chat title */}
+                  <span className="chat-title">
+                    {/* {messages && */}
+                    {!selectedChat.isGroupChat ? (
+                      <>{getSender(user, selectedChat.users)}</>
+                    ) : (
+                      <>{selectedChat.chatName.toUpperCase()}</>
+                    )}
+                    {/* } */}
+                  </span>
+                  </div>
+
+                  <div className="mainchat-box">
+                    {loading ? (
+                      <div className="spinner">
+                      </div>
+                    ) : (
+                      <div className="messages">
+                        <ScrollableChat messages={messages} />
+                      </div>
+                    )}
+
+                    <div className="form-control">
+                      {/* Typing animation */}
+
+                      {istyping && (
+                        <div className="typing-animation">
+                          <Lottie options={defaultOptions} width={70} />
+                        </div>
+                       )}
+
+
+                      {/* Message input */}
+                      <input
+                        type="text"
+                        id="first-name"
+                        required
+                        placeholder="Type your message..."
+                        onKeyDown={sendMessage}
+                        className="message-input"
+                        value={newMessage}
+                        onChange={typingHandler}
+                      />
+                    </div>
+                  </div>
+                {/* ); }; */}
+              </>
+            ) : (
+              <div className="rightchat-container">
+                <p className="rightchat-text">
+                  Click on a user to start chatting
+                </p>
               </div>
-            </>
-          )}
+            )}
+
+            {/* <div className="chat-header"> 
+              <h3>jobtitle</h3>
+            </div>
+            <div className="chat-messages"></div>
+
+            <div className="message-input">
+              <input type="text" placeholder="Write a message..." />
+              <button>Send</button>
+            </div> */}
+          </>
+        </div>
+
+        {/* Side Drawer */}
+        <div className={`side-drawer ${isDrawerOpen ? "open" : ""}`}>
+          <div className="drawer-header">
+            <h3 className="drawer_search">Search</h3>
+            {/* <button onClick={closeDrawer}>X</button> Close drawer button */}
+            <button onClick={closeDrawer}>
+              <BigCross />
+            </button>
+          </div>
+          <div className="drawer-search-bar">
+            <input
+              type="text"
+              placeholder="Search Users"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+            <button className="drawer-search-bar-button" onClick={handleSearch}>
+              Go
+            </button>
+
+            {/* Error message */}
+            {error && <div className="error-message">{error}</div>}
+
+            {loading ? (
+              <ChatLoading />
+            ) : (
+              searchResult.map((user) => (
+                <UserListItems
+                  key={user.userId}
+                  user={user}
+                  handleFunction={() => accessChat(user._id)}
+                />
+              ))
+            )}
+
+            {loadingChat && <Spinner />}
+          </div>
         </div>
       </div>
     </>
@@ -464,242 +490,3 @@ const Chat = ({ clientId, freelancerId }) => {
 };
 
 export default Chat;
-// ============================================================================================
-
-// import React, { useState, useEffect } from "react";
-// import "./styles.scss";
-// import axios from "axios";
-// import { Header } from "../../components";
-// import io from "socket.io-client";
-
-// const Chat = () => {
-//   const [selectedChat, setSelectedChat] = useState(null);
-//   const [searchTerm, setSearchTerm] = useState("");
-//   const [messages, setMessages] = useState([]);
-//   const [newMessage, setNewMessage] = useState("");
-//   const [conversations, setConversations] = useState([]);
-//   const [user, setUser] = useState(null);
-//   const freelancerData = JSON.parse(localStorage.getItem("freelancerData"));
-
-// const socket = io("http://localhost:5173", {
-//   transports: ["polling", "websocket"], // Ensure you're using both polling and WebSocket
-// });
-
-//   // Initialize socket connection
-//   // const socket = io("http://localhost:5000"); // Replace with your server URL
-
-// useEffect(() => {
-//   // Fetch user information (client) and conversations from API
-//   axios
-//     .get("/api/user/me", {
-//       headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-//     })
-//     .then((response) => {
-//       setUser(response.data);
-//       loadConversations();
-//     });
-
-//   // Listen for incoming messages through socket
-//   socket.on("chat message", (msg) => {
-//     if (msg.receiverId === user?.id) {
-//       // Ensure user data is available
-//       setMessages((prevMessages) => [...prevMessages, msg]);
-//     }
-//   });
-
-//   // Cleanup socket on component unmount
-//   return () => {
-//     socket.disconnect();
-//   };
-// }, [user]);
-
-//   // useEffect(() => {
-//   //   const fetchConversations = async () => {
-//   //     try {
-//   //       const response = await axios.get('/api/conversations');
-//   //       setConversations(response.data.conversations || []); // Ensure it defaults to an empty array
-//   //     } catch (error) {
-//   //       console.error('Error fetching conversations:', error);
-//   //     }
-//   //   };
-
-//   //   fetchConversations();
-//   // }, []);
-
-//   // Load list of conversations
-//   const loadConversations = () => {
-//     axios
-//       .get("/api/conversations", {
-//         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-//       })
-//       .then((response) => {
-//         setConversations(response.data.conversations || []);
-//       });
-//   };
-
-//   // Fetch chat history when a conversation is selected
-//   const handleChatClick = (chat) => {
-//     setSelectedChat(chat);
-//     axios
-//       .get(`/api/chat/history/${chat.freelancerId}`, {
-//         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-//       })
-//       .then((response) => {
-//         setMessages(response.data);
-//       });
-//   };
-
-//     // Fetch chat history when a user selects a conversation
-//     useEffect(() => {
-//       if (selectedChat) {
-//         axios
-//           .get(`/api/chat/getChatHistory/${selectedChat.id}`, {
-//             headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-//           })
-//           .then((response) => {
-//             if (Array.isArray(response.data)) {
-//               setMessages(response.data);
-//             } else {
-//               console.error("Chat history is not an array", response.data);
-//             }
-//           })
-//           .catch((error) => {
-//             console.error("Error fetching chat history", error);
-//           });
-//       }
-//     }, [selectedChat]);
-
-//   // Handle sending a message
-//   const sendMessage = () => {
-//     if (newMessage && selectedChat) {
-//       const messageData = {
-//         text: newMessage,
-//         senderId: user.id,
-//         receiverId: selectedChat.freelancerId,
-//       };
-
-//       // Emit message via socket
-//       socket.emit("chat message", messageData, (response) => {
-//         if (response.success) {
-//           setMessages((prevMessages) => [...prevMessages, messageData]); // Update message list
-//           setNewMessage("");
-//         } else {
-//           console.error("Failed to send message", response.error);
-//         }
-//       });
-//     }
-//   };
-
-//   // return (
-//     // <>
-//       // <Header />
-//       {/* <div className="chat-page">
-//         <div className="left-section">
-//           <h2>Messages</h2>
-//           <div className="search-bar">
-//             <input
-//               type="text"
-//               placeholder="Search"
-//               value={searchTerm}
-//               onChange={(e) => setSearchTerm(e.target.value)}
-//             />
-//           </div>
-//           <div className="conversations">
-
-//             {conversations.map((chat) => (
-//               <div
-//                 key={chat.freelancerId}
-//                 className={`conversation ${selectedChat?.freelancerId === chat.freelancerId ? "active" : ""}`}
-//                 onClick={() => handleChatClick(chat)}
-//               >
-//                 <img src={chat.profilePicture} alt="Profile" />
-//                 <div>
-//                   <div className="chat-name">{chat.name}</div>
-//                   <div className="latest-message">{chat.latestMessage}</div>
-//                 </div>
-//               </div>
-//             ))}
-//           </div>
-//         </div>
-//         <div className="right-section">
-//           {selectedChat ? (
-//             <>
-//               <div className="chat-header">
-//                 <img src={selectedChat.profilePicture} alt="Freelancer" />
-//                 <h3>{selectedChat.jobTitle}</h3>
-//               </div>
-//               <div className="chat-messages">
-//                 {messages.map((message, index) => (
-//                   <div key={index} className="message">
-//                     <strong>{message.sender.name}</strong>
-//                     <p>{message.text}</p>
-//                   </div>
-//                 ))}
-//               </div>
-//               <div className="message-input">
-//                 <input
-//                   type="text"
-//                   placeholder="Write a message..."
-//                   value={newMessage}
-//                   onChange={(e) => setNewMessage(e.target.value)}
-//                 />
-//                 <button onClick={sendMessage}>Send</button>
-//               </div>
-//             </>
-//           ) : (
-//             <p>Select a chat to start messaging</p>
-//           )}
-//         </div>
-//       </div>
-//     </>
-//   );
-// }; */}
-
-// return (
-//   <>
-//     <Header />
-//     <div className="chat-page">
-//       <div className="left-section">
-//         <h2>Messages</h2>
-//       <div className="search-bar">
-//         <input
-//           type="text"
-//           placeholder="Search"
-//           value={searchTerm}
-//           onChange={(e) => setSearchTerm(e.target.value)}
-//         />
-//       </div>
-//       </div>
-//       <div className="right-section">
-//         {selectedChat && (
-//           <>
-//             <div className="chat-header">
-//               <img src={selectedChat.profilePicture} alt="Freelancer" />
-//               <h3>{selectedChat.jobTitle}</h3>
-//             </div>
-//             <div className="chat-messages">
-//               {messages.map((message, index) => (
-//                 <div key={index} className="message">
-//                   <strong>{message.sender.name}</strong>
-//                   <p>{message.text}</p>
-//                 </div>
-//               ))}
-//             </div>
-//             <div className="message-input">
-//               <input
-//                 type="text"
-//                 placeholder="Write a message..."
-//                 value={newMessage}
-//                 onChange={(e) => setNewMessage(e.target.value)}
-//               />
-//               <button onClick={sendMessage}>Send</button>
-//             </div>
-//           </>
-//         )}
-//       </div>
-//     </div>
-//   </>
-// );
-// };
-
-// export default Chat;

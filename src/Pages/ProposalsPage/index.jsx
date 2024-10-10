@@ -20,7 +20,7 @@ const IndexPage = () => {
     const fetchData = async () => {
       try {
         const token = localStorage.getItem("token");
-        console.log("Token:", token);
+        // console.log("Token:", token);
 
         if (!token) {
           navigate("/signin");
@@ -188,3 +188,12 @@ const IndexPage = () => {
 };
 
 export default IndexPage;
+
+
+
+
+
+
+
+
+

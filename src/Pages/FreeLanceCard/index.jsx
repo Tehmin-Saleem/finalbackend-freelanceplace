@@ -10,6 +10,13 @@ const FreelancerCard = ({ heading, freelancer }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [openDropdown, setOpenDropdown] = useState(null);
+  
+  // New State for Filters
+  const [selectedSkills, setSelectedSkills] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('');
+  const [selectedLocation, setSelectedLocation] = useState('');
+  const [selectedAvailability, setSelectedAvailability] = useState('');
+
   const navigate = useNavigate();
   const [userCountryMap, setUserCountryMap] = useState({});
   useEffect(() => {
@@ -45,7 +52,6 @@ const FreelancerCard = ({ heading, freelancer }) => {
           setLoading(false);
         } catch (err) {
           setError('Failed to fetch freelancer profiles or user data');
-          console.error('Error fetching profiles:', err);
           setLoading(false);
         }
       };
@@ -72,7 +78,36 @@ const FreelancerCard = ({ heading, freelancer }) => {
     });
   };
   
-  const categoriesOptions = ["MERN Stack", "UI/UX Designer", "React Developer", "Backend Developer"];
+  const handleFilterChange = (filterType, value) => {
+    switch (filterType) {
+      case 'Skills':
+        setSelectedSkills(value);
+        break;
+      case 'Categories':
+        setSelectedCategory(value);
+        break;
+      case 'Location':
+        setSelectedLocation(value);
+        break;
+      case 'Availability':
+        setSelectedAvailability(value);
+        break;
+      default:
+        break;
+    }
+  };
+
+  // Filter Logic: Filtering freelancers based on selected options
+  const filteredFreelancers = freelancers.filter((freelancer) => {
+    return (
+      (selectedSkills ? freelancer.skills.includes(selectedSkills) : true) &&
+      (selectedCategory ? freelancer.experience.title === selectedCategory : true) &&
+      (selectedLocation ? freelancer.location === selectedLocation : true) &&
+      (selectedAvailability ? freelancer.availability === selectedAvailability : true)
+    );
+  });
+
+  const categoriesOptions = ["MERN Stack", "UI/UX Designer", "frontend developer", "Backend Developer"];
   const skillsOptions = ["JavaScript", "Python", "CSS", "HTML"];
   const availabilityOptions = ["Full-time", "Part-time", "Contract"];
   const locationOptions = ["Remote", "On-site", "Hybrid"];
@@ -84,72 +119,89 @@ const FreelancerCard = ({ heading, freelancer }) => {
   return (
     <div className="freelancer-card-container">
       <Header />
-      
+
       <h1 className="heading">{heading}</h1>
-      
+
       <div className="filter-options">
+        {/* Skills Filter */}
         <div className="filter-item" onClick={() => handleDropdownClick('Skills')}>
           <span className="filter-label">Skills</span>
           <JobsDropdwon alt="Dropdown Icon" className="dropdown-icon" />
           {openDropdown === 'Skills' && (
             <div className="dropdown-menu">
               {skillsOptions.map((option, index) => (
-                <div key={index} className="dropdown-item">{option}</div>
+                <div 
+                  key={index} 
+                  className="dropdown-item"
+                  onClick={() => handleFilterChange('Skills', option)}
+                >
+                  {option}
+                </div>
               ))}
             </div>
           )}
         </div>
 
+        {/* Categories Filter */}
         <div className="filter-item" onClick={() => handleDropdownClick('Categories')}>
           <span className="filter-label">Categories</span>
           <JobsDropdwon alt="Dropdown Icon" className="dropdown-icon" />
           {openDropdown === 'Categories' && (
             <div className="dropdown-menu">
               {categoriesOptions.map((option, index) => (
-                <div key={index} className="dropdown-item">{option}</div>
+                <div 
+                  key={index} 
+                  className="dropdown-item"
+                  onClick={() => handleFilterChange('Categories', option)}
+                >
+                  {option}
+                </div>
               ))}
             </div>
           )}
         </div>
 
+        {/* Availability Filter */}
         <div className="filter-item" onClick={() => handleDropdownClick('Availability')}>
           <span className="filter-label">Availability</span>
           <JobsDropdwon alt="Dropdown Icon" className="dropdown-icon" />
           {openDropdown === 'Availability' && (
             <div className="dropdown-menu">
               {availabilityOptions.map((option, index) => (
-                <div key={index} className="dropdown-item">{option}</div>
+                <div 
+                  key={index} 
+                  className="dropdown-item"
+                  onClick={() => handleFilterChange('Availability', option)}
+                >
+                  {option}
+                </div>
               ))}
             </div>
           )}
         </div>
 
+        {/* Location Filter */}
         <div className="filter-item" onClick={() => handleDropdownClick('Location')}>
           <span className="filter-label">Location</span>
           <JobsDropdwon alt="Dropdown Icon" className="dropdown-icon" />
           {openDropdown === 'Location' && (
             <div className="dropdown-menu">
               {locationOptions.map((option, index) => (
-                <div key={index} className="dropdown-item">{option}</div>
-              ))}
-            </div>
-          )}
-        </div>
-
-        <div className="filter-item" onClick={() => handleDropdownClick('Ratings')}>
-          <span className="filter-label">Ratings</span>
-          <JobsDropdwon alt="Dropdown Icon" className="dropdown-icon" />
-          {openDropdown === 'Ratings' && (
-            <div className="dropdown-menu">
-              {ratingsOptions.map((option, index) => (
-                <div key={index} className="dropdown-item">{option}</div>
+                <div 
+                  key={index} 
+                  className="dropdown-item"
+                  onClick={() => handleFilterChange('Location', option)}
+                >
+                  {option}
+                </div>
               ))}
             </div>
           )}
         </div>
       </div>
 
-      {freelancers.map((freelancer, index) => (
+      {/* Freelancer Cards */}
+      {filteredFreelancers.map((freelancer, index) => (
         <div key={index} className="freelancer-card">
           <div className="freelancer-profile">
           <img
@@ -159,7 +211,6 @@ const FreelancerCard = ({ heading, freelancer }) => {
           </div>
           <div className="freelancer-details">
             <div className="freelancer-header">
-              <div className="small-box"></div>
               <h2 className="freelancer-name">{freelancer.name}</h2>
               <span className="freelancer-location">
                 {userCountryMap[freelancer.freelancer_id] || 'Unknown'}
@@ -171,9 +222,7 @@ const FreelancerCard = ({ heading, freelancer }) => {
   Invite to job
 </button>
             </div>
-            <div className="freelancer-role">
-              {freelancer.experience.title}
-            </div>
+            <div className="freelancer-role">{freelancer.experience.title}</div>
             <div className="freelancer-meta">
               <span className="freelancer-rate">
                 ${freelancer.rate !== "Not specified" ? freelancer.rate : "Rate not specified"}/hr
@@ -185,9 +234,8 @@ const FreelancerCard = ({ heading, freelancer }) => {
                 <span key={i} className="skill-badge">{skill}</span>
               ))}
             </div>
-            <div className="freelancer-description">
-              {freelancer.experience.description}
-            </div>
+            <div className="freelancer-description">{freelancer.experience.description}</div>
+          
           </div>
         </div>
       ))}

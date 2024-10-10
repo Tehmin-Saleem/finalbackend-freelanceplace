@@ -53,16 +53,28 @@ function SignIn() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          // Authorization: `Bearer ${token}`
+
         },
         body: JSON.stringify({ email, password }),
       });
 
       const data = await response.json();
-
+      
       if (response.ok) {
-       
+        
+        // Store token and user info together in localStorage
         localStorage.setItem("token", data.token);
-        // localStorage.setItem("user", JSON.stringify(data.user));
+      localStorage.setItem(
+        "userInfo",
+        JSON.stringify({
+          user: data.user,  // Store user information
+          token: data.token,  // Store token
+        })
+      );
+
+      console.log("Token received:", data.token);
+
 
         const userType = data.user.role; 
         if (userType === "client") {
@@ -97,6 +109,7 @@ function SignIn() {
           </div>
         </div>
       </div>
+      
 
       {/* Second Half - Form */}
       <div className="md:w-1/2 w-full h-screen  md:mr-9 bg-white flex items-center justify-center shadow-lg">
@@ -175,8 +188,8 @@ function SignIn() {
                 </label>
               </div>
               <div>
-                <a
-                  href="#"
+                <a 
+                  href="/ForgotPass"
                   className="text-[#4BCBEB] font-Poppins text-sm hover:underline"
                 >
                   Forgot Password?

@@ -10,24 +10,29 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@chakra-ui/avatar": "^2.3.0",
+    "@chakra-ui/react": "^2.10.1",
+    "@chakra-ui/tooltip": "^2.3.1",
+    "@emotion/react": "^11.13.3",
+    "@emotion/styled": "^11.13.0",
     "@paypal/react-paypal-js": "^8.6.0",
     "@pdftron/pdfjs-express": "^8.7.5",
-    "@stripe/react-stripe-js": "github:stripe/react-stripe-js",
-    "@stripe/stripe-js": "^4.5.0",
+    "@stripe/react-stripe-js": "^2.8.0",
+    "@stripe/stripe-js": "^4.6.0",
     "@vitejs/plugin-legacy": "^5.4.2",
     "axios": "^1.7.5",
     "cors": "^2.8.5",
     "date-fns": "^3.6.0",
-    "firebase": "^10.13.2",
+    "framer-motion": "^11.11.1",
     "jwt-decode": "^4.0.0",
     "lucide-react": "^0.446.0",
     "multer": "^1.4.5-lts.1",
-    "passport": "^0.7.0",
-    "passport-google-oauth20": "^2.0.0",
     "pdfjs-dist": "^3.8.162",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-lottie": "^1.2.4",
     "react-router-dom": "^6.26.0",
+    "react-scrollable-feed": "^2.0.2",
     "sass": "^1.77.2",
     "socket.io-client": "^4.8.0",
     "valtio": "^1.13.2"
@@ -44,6 +49,6 @@
     "postcss": "^8.4.38",
     "sass": "^1.77.2",
     "tailwindcss": "^3.4.3",
-    "vite": "^5.4.8"
+    "vite": "^5.4.2"
   }
 }

@@ -13,6 +13,10 @@ import TextArea from "./Commoncomponents/TextArea";
 import FreelancerCard from "../Pages/FreeLanceCard/index.jsx";
 import ZoomedImage from "./Zoomed/index.jsx";
 import Alljobs from "./Alljobs/index.jsx";
+import ChatLoading from "./chatcomponents/ChatLoading/index.jsx";
+import Spinner from "./chatcomponents/Spinner/index.jsx"
+import UserListItems from "./chatcomponents/UserListItems/index.jsx";
+
 
 export {default as CommonButton} from "./Commoncomponents/CommonButton"
 export {default as TextField} from "./Commoncomponents/Textfield"
@@ -29,4 +33,8 @@ export {default as TextArea} from "./Commoncomponents/TextArea"
 export {default as FreelancerCards} from "./FreelancerCards"
 export {default as ZoomedImage} from "./Zoomed/index.jsx"
 export {default as Alljobs} from "./Alljobs/index.jsx"
+export {default as ChatLoading} from "./chatcomponents/ChatLoading"
+export {default as Spinner} from "./chatcomponents/Spinner"
+export {default as UserListItems} from "./chatcomponents/UserListItems"
+
 
