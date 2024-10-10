@@ -92,7 +92,7 @@ exports.getFreelancerProposals = async (req, res) => {
         freelancerProfile: profile ? {
           id: profile._id,
           name: `${profile.first_name || ''} ${profile.last_name || ''}`.trim() || 'No Name',
-          image: profile.image ? `/api/freelancer/profile/image/${profile.image}` : null,
+          image: profile.image  || null,
           title: profile.title || '',
           skills: profile.skills || [],
           availability: profile.availability || {},
@@ -108,7 +108,7 @@ exports.getFreelancerProposals = async (req, res) => {
         } : null,
       };
     }));
-
+console.log("proposals",formattedProposals)
     res.status(200).json({ proposals: formattedProposals });
   } catch (err) {
     console.error('Error in getFreelancerProposals:', err);

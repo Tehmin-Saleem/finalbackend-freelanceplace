@@ -11,7 +11,7 @@ const usercontroller=require ('../controllers/user.controller')
 const { upload } = require('../config/cloudinary.config');
 // Import Chat controller
 const chatController = require('../controllers/chat.controller'); // Add this
-
+const offerController = require ('../controllers/offer_form.controller')
 const hireFreelancerController = require('../controllers/hire_freelancer.controller');
 
 const router = express.Router();
@@ -39,7 +39,7 @@ router.post('/uploads', upload.single('File'), (req, res) => {
 });
 router.get('/jobpost/:fileName', (req, res) => {
   const { fileName } = req.params;
-  const filePath = path.join(__dirname, '../uploads', fileName); // Adjust path as necessary
+  const filePath = path.join(__dirname, '../uploads', fileName); 
   res.sendFile(filePath);
 });
 
@@ -63,6 +63,10 @@ router.get('/review-requests', reviewRequestController.getClientReviewRequests);
 
 router.post('/jobpost', upload.single('attachment'), jobPostController.createJobPost);
 
+// router.get('/offerform', reviewRequestController.getClientReviewRequests);
+
+
+router.post('/offerform', upload.single('attachment'), offerController.createoffer);
 
 router.get('/job-posts', jobPostController.getAllJobPosts);
 router.get('/jobposts', jobPostController.getClientJobPosts);
