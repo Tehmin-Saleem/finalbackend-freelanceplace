@@ -24,7 +24,7 @@ const ProposalCard = ({
 
   const handleHireClick = (e) => {
     e.stopPropagation(); // Prevent any other click events
-    navigate("/offerform"); // Navigate to the offer form page
+   
   };
 
   // const handleChatClick = () => {
