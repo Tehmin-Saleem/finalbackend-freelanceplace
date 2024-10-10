@@ -15,9 +15,14 @@ const freelancerRoutes = require("./routes/freelancer.route");
 
 const cors = require("cors");
 const jwt = require('jsonwebtoken');
-const { Server } = require("socket.io");
 
 
+
+
+
+
+// Enable CORS for all routes
+app.use(cors());
 dotenv.config();
 connectDB();
 
@@ -29,7 +34,21 @@ app.use("/api/client", clientRoutes);
 app.use("/api/freelancer", freelancerRoutes);
 
 const server = http.createServer(app);
-const io = new Server(server); 
+
+const PORT = process.env.PORT || 5000;
+server.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+});
+
+
+
+const io = require("socket.io")(server, {
+  pingTimeout: 60000,
+  cors: {
+    origin: "http://localhost:5173",
+    // credentials: true,
+  },
+});
 
 
 // Set up a simple route (optional)
@@ -54,22 +73,39 @@ io.on('connection', (socket) => {
     }
   });
   
+io.on("connection", (socket) => {
+  console.log("Connected to socket.io");
+  socket.on("setup", (userData) => {
 
-  socket.on('join_room', (room) => {
+    socket.join(userData.userId);
+
+    socket.emit("connected");
+  });
+
+  socket.on("join chat", (room) => {
     socket.join(room);
-    console.log(`User joined room: ${room}`);
+    console.log("User Joined Room: " + room);
+  });
+  socket.on("typing", (room) => socket.in(room).emit("typing"));
+  socket.on("stop typing", (room) => socket.in(room).emit("stop typing"));
+
+  socket.on("new message", (newMessageRecieved) => {
+    var chat = newMessageRecieved.chat;
+
+    if (!chat.users) return console.log("chat.users not defined");
+    
+    chat.users.forEach((user) => {
+      if (user._id == newMessageRecieved.sender._id) return;
+      
+    
+
+      socket.in(user._id).emit("message recieved", newMessageRecieved);
+    });
   });
 
-  socket.on('send_message', (data) => {
-    io.to(data.room).emit('receive_message', data);
-  });
-
-  socket.on('disconnect', () => {
-    if (socket.userId) {
-      console.log(`User ${socket.userId} disconnected`);
-    } else {
-      console.log('An unauthenticated user disconnected');
-    }
+  socket.off("setup", () => {
+    console.log("USER DISCONNECTED");
+    socket.leave(userData.userId);
   });
   
 });
@@ -83,7 +119,5 @@ const sendNotification = (userId, notificationData) => {
 };
 
 
-const PORT = process.env.PORT || 5000;
-server.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
-});
+
+
