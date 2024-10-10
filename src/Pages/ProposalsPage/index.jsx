@@ -52,9 +52,8 @@ const IndexPage = () => {
           return {
             ...proposal,
             country: freelancerId ? userCountryMap[freelancerId] || "Unknown" : "Unknown",
-            image: proposal.freelancerProfile?.image
-            ? `https://res.cloudinary.com/de4c3d999ac7ff7fbc37cf48351e5b/image/upload/${proposal.freelancerProfile.image.split('/uploads/')[1]}`
-            : "https://res.cloudinary.com/de4c3d999ac7ff7fbc37cf48351e5b/image/upload/v1/default-profile-image.png"
+            image: proposal.freelancerProfile.image
+          
           
           };
         });
@@ -92,7 +91,7 @@ const IndexPage = () => {
   };
 
   const handleHire = () => {
-    navigate("/offerform");
+    // navigate("/offerform");
   };
 
   if (error) {

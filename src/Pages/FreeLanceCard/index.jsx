@@ -5,13 +5,13 @@ import "./styles.scss";
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
-const FreelancerCard = ({ heading }) => {
+const FreelancerCard = ({ heading, freelancer }) => {
   const [freelancers, setFreelancers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [openDropdown, setOpenDropdown] = useState(null);
   const navigate = useNavigate();
-
+  const [userCountryMap, setUserCountryMap] = useState({});
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (!token) {
@@ -19,17 +19,32 @@ const FreelancerCard = ({ heading }) => {
     } else {
       const fetchFreelancerProfiles = async () => {
         try {
-          const response = await axios.get('http://localhost:5000/api/freelancer/profile', {
-            headers: {
-              'Authorization': `Bearer ${token}`
-            }
-          });
-          setFreelancers(response.data.data);
-          console.log('API response:', response.data);
+          const headers = {
+            'Authorization': `Bearer ${token}`
+          };
+
+          // Fetch freelancers and user countries concurrently
+          const [freelancerResponse, usersResponse] = await Promise.all([
+            axios.get('http://localhost:5000/api/freelancer/profile', { headers }),
+            axios.get('http://localhost:5000/api/client/users', { headers })
+          ]);
+
+          const freelancers = freelancerResponse.data.data;
+          const users = usersResponse.data;
+
+          // Create a map of user IDs to country names
+          const userCountryMap = users.reduce((acc, user) => {
+            acc[user._id] = user.country_name;
+            return acc;
+          }, {});
+
+          // Set freelancers and user country map
+          setFreelancers(freelancers);
+          setUserCountryMap(userCountryMap);
+
           setLoading(false);
-          console.log('profile', response.data.data)
         } catch (err) {
-          setError('Failed to fetch freelancer profiles');
+          setError('Failed to fetch freelancer profiles or user data');
           console.error('Error fetching profiles:', err);
           setLoading(false);
         }
@@ -42,7 +57,21 @@ const FreelancerCard = ({ heading }) => {
   const handleDropdownClick = (filterName) => {
     setOpenDropdown(openDropdown === filterName ? null : filterName);
   };
-
+  
+  const handleInviteClick = (freelancer) => {
+    const country = userCountryMap[freelancer.freelancer_id] || 'Unknown';
+  
+    
+    navigate('/offerform', {
+      state: {
+        freelancerProfile: {
+          ...freelancer, 
+          country 
+        }
+      }
+    });
+  };
+  
   const categoriesOptions = ["MERN Stack", "UI/UX Designer", "React Developer", "Backend Developer"];
   const skillsOptions = ["JavaScript", "Python", "CSS", "HTML"];
   const availabilityOptions = ["Full-time", "Part-time", "Contract"];
@@ -132,8 +161,15 @@ const FreelancerCard = ({ heading }) => {
             <div className="freelancer-header">
               <div className="small-box"></div>
               <h2 className="freelancer-name">{freelancer.name}</h2>
-              <span className="freelancer-location">{localStorage.getItem("country"||'unknown')}</span>
-              <button className="invite-btn">Invite to job</button>
+              <span className="freelancer-location">
+                {userCountryMap[freelancer.freelancer_id] || 'Unknown'}
+              </span>
+              <button 
+  className="invite-btn" 
+  onClick={() => handleInviteClick(freelancer)} // Arrow function prevents immediate invocation
+>
+  Invite to job
+</button>
             </div>
             <div className="freelancer-role">
               {freelancer.experience.title}
