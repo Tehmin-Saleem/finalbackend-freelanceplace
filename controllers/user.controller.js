@@ -256,4 +256,4 @@ const SearchallUsers = asyncHandler(async (req, res) => {
 });
   
   
-  module.exports = { signup, login, hashPassword, checkUserExists,getUserById, getAllUsers, SearchallUsers };
+  module.exports = { signup, login, hashPassword,ChangePass, checkUserExists,getUserById, getAllUsers, SearchallUsers, forgotPassword };
