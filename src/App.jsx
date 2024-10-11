@@ -21,6 +21,8 @@ import ChatProvider from "./context/ChatProvider.jsX";
 
 import OfferDetails from "./Pages/OfferCard";
 import Clientdash from "./Pages/Dashboard";
+import ManageProjects from "./Pages/ManageProjects";
+import ManageProj from "./Pages/DummyProject";
 // import PaymentMethod from './components/PaymentMethod';
 
 // Load your Stripe public key
@@ -142,6 +144,11 @@ function App() {
         <Route path="/ChangePass/:id/:token" element={<ChangePassword/>} /> 
         <Route path="/OfferDetails" element={<OfferDetails/>} /> 
         <Route path="/ClientDash" element={<Clientdash/>} /> 
+
+        <Route path="/ManageProj" element={<ManageProjects/>} /> 
+
+        <Route path="/ManageProject" element={<ManageProj/>} /> 
+
        
         
         
