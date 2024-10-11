@@ -11,6 +11,9 @@ const path = require('path');
 const usercontroller=require ('../controllers/user.controller')
 const { upload } = require('../config/cloudinary.config');// const { forgotPassword, resetPassword } = require('../controllers/user.controller');
 
+const Notification= require ('../controllers/notifications.controller')
+
+
 
 // Import Chat controller
 const chatController = require('../controllers/chat.controller'); // Add this
@@ -22,15 +25,6 @@ const Proposal = require('../models/proposal.model');
 const { getFreelancerDetailsByProposal, getProposalById } = require('../controllers/proposal.controller');
 const router = express.Router();
 
-// Assume io is defined in your server.js file
-const socketIo = require('socket.io'); // Import socket.io
-const io = socketIo(); // Create an io instance
-
-// Use a middleware to attach io to req
-// router.use((req, res, next) => {
-//   req.io = io;
-//   next();
-// });
 
 
 router.post('/signup', signup);
@@ -62,6 +56,11 @@ router.get('/jobpost/:fileName', (req, res) => {
   res.sendFile(filePath);
 });
 
+router.get('/notifications', authMiddleware, Notification.getNotifications);
+router.post('/notifications', authMiddleware, Notification.createNotification);
+router.put('/notifications/:notificationId/read', authMiddleware, Notification.updateNotification);
+router.get('/notifications/unread-count', authMiddleware, Notification.getUnreadNotificationsCount);
+
 router.post('/reviews', ReviewController.createReview);
 
 
@@ -85,8 +84,8 @@ router.post('/jobpost', upload.single('attachment'), jobPostController.createJob
 // router.get('/offerform', reviewRequestController.getClientReviewRequests);
 
 
-router.post('/offerform', upload.single('attachment'), offerController.createoffer);
-
+router.post('/offerform', authMiddleware, upload.single('attachment'), offerController.createoffer);
+ 
 router.get('/job-posts', jobPostController.getAllJobPosts);
 router.get('/jobposts', jobPostController.getClientJobPosts);
 

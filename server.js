@@ -6,7 +6,6 @@ const corsMiddleware = require("./config/cors.config");
 const authMiddleware = require("./middleware/auth.middleware");
 const Chat = require('./models/chat.model');
 const Freelancer = require('./models/freelancer_profile.model');
-const socketIo = require('socket.io');
 
 const app = express();
 const dotenv = require("dotenv");
@@ -16,12 +15,6 @@ const freelancerRoutes = require("./routes/freelancer.route");
 const cors = require("cors");
 const jwt = require('jsonwebtoken');
 
-
-
-
-
-
-// Enable CORS for all routes
 app.use(cors());
 dotenv.config();
 connectDB();
@@ -30,9 +23,6 @@ app.use(corsMiddleware);
 app.use(express.json());
 app.use(bodyParser.json());
 
-app.use("/api/client", clientRoutes);
-app.use("/api/freelancer", freelancerRoutes);
-
 const server = http.createServer(app);
 
 const PORT = process.env.PORT || 5000;
@@ -40,16 +30,18 @@ server.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
 
-
-
 const io = require("socket.io")(server, {
   pingTimeout: 60000,
   cors: {
     origin: "http://localhost:5173",
-    // credentials: true,
   },
 });
 
+// Make io accessible globally
+global.io = io;
+
+app.use("/api/client", clientRoutes);
+app.use("/api/freelancer", freelancerRoutes);
 
 // Set up a simple route (optional)
 app.get("/", (req, res) => {
@@ -57,21 +49,30 @@ app.get("/", (req, res) => {
   console.log("Chat server is running")
 });
 
-// Socket.IO connection handling
-io.on('connection', (socket) => {
-  console.log('A user connected');
+app.set('io', io);
 
+global.io = io;
+
+io.on('connection', (socket) => {
+  console.log('New client connected, ID:', socket.id);
+  
   socket.on('authenticate', (token) => {
     try {
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
       socket.userId = decoded.userId;
       socket.join(decoded.userId.toString());
-      console.log(`User ${decoded.userId} authenticated and joined their room`);
+      console.log(`User ${decoded.userId} authenticated and joined room ${decoded.userId.toString()}`);
     } catch (error) {
       console.error('Authentication failed:', error.message);
-      socket.emit('auth_error', 'Invalid token'); // Emit error to client
+      socket.emit('auth_error', 'Invalid token');
     }
   });
+
+  socket.on('disconnect', () => {
+    console.log('Client disconnected, ID:', socket.id);
+  });
+
+
   
 
 
@@ -103,13 +104,6 @@ io.on('connection', (socket) => {
   
 });
 
-const sendNotification = (userId, notificationData) => {
-  try {
-    io.to(userId.toString()).emit('notification', notificationData);
-  } catch (error) {
-    console.error(`Failed to send notification to user ${userId}:`, error);
-  }
-};
 
 
 
