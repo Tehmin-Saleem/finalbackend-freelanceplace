@@ -96,7 +96,7 @@ const Budget = () => {
               <div className="box-content">
                 <span>
                   <HourlyRate />
-                  <span>Client</span>
+                  
                 </span>
                 <p>Hourly rate</p>
                 <input
@@ -111,7 +111,7 @@ const Budget = () => {
               <div className="box-content">
                 <span>
                   <FixedRate/>
-                  <span>Freelancer</span>
+                 
                 </span>
                 <p>Fixed price</p>
                 <input

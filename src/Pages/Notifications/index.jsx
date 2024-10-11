@@ -1,82 +1,72 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import "./styles.scss";
 import NotificationItem from "../../components/NotificationItem";
 import Header from "../../components/Commoncomponents/Header";
+import SocketManager from './socket';
 
 const Notification = () => {
-  const notifications = [
-    {
-      title: "Pending Task",
-      message: "Lorem Ipsum is simply dummy text of the printing and typesetting industry.",
-      dateTime: "2024-08-29T08:30:00",
-      read: false
-    },
-    {
-      title: "Due Task Date",
-      message: "Lorem Ipsum is simply dummy text of the printing and typesetting industry.",
-      dateTime: "2024-08-29T07:00:00",
-      read: false
-    },
-    {
-      title: "Lorem Ipsum",
-      message: "Lorem Ipsum is simply dummy text of the printing and typesetting industry.",
-      dateTime: "2024-08-28T14:12:00",
-      read: true
-    },
-    {
-      title: "Lorem Ipsum",
-      message: "Lorem Ipsum is simply dummy text of the printing and typesetting industry.",
-      dateTime: "2024-08-28T12:00:00",
-      read: true
-    },
-    {
-      title: "Lorem Ipsum",
-      message: "Lorem Ipsum is simply dummy text of the printing and typesetting industry.",
-      dateTime: "2024-08-25T12:00:00",
-      read: true
-    }
-  ];
+  const [notifications, setNotifications] = useState([]);
 
-  const todayNotifications = notifications.filter(notification => 
-    new Date(notification.dateTime).toDateString() === new Date().toDateString()
-  );
+  useEffect(() => {
+    // Fetch initial notifications
+    fetchNotifications();
 
-  const yesterdayNotifications = notifications.filter(notification => 
-    new Date(notification.dateTime).toDateString() === new Date(Date.now() - 86400000).toDateString()
-  );
+    // Connect to Socket.IO
+    const token = localStorage.getItem('token'); // Assuming you store the JWT in localStorage
+    SocketManager.connect(token);
 
-  const restNotifications = notifications.filter(notification => 
-    new Date(notification.dateTime).toDateString() !== new Date().toDateString() &&
-    new Date(notification.dateTime).toDateString() !== new Date(Date.now() - 86400000).toDateString()
-  );
+    // Listen for new notifications
+    SocketManager.onNotification((newNotification) => {
+      setNotifications(prev => [newNotification, ...prev]);
+    });
+
+    // Listen specifically for new offer notifications
+    SocketManager.onNewOffer((offerNotification) => {
+      // You can handle offer notifications differently if needed
+      setNotifications(prev => [{
+        ...offerNotification,
+        read: false,
+        createdAt: new Date().toISOString()
+      }, ...prev]);
+      
+      // Optionally, you can show a more prominent alert for new offers
+      alert(`New offer received: ${offerNotification.message}`);
+    });
+
+    return () => {
+      SocketManager.disconnect();
+    };
+  }, []);
+
+  const fetchNotifications = async () => {
+    // Fetch notifications from your API
+    // Update the state with the fetched notifications
+  };
+
+  // Function to mark a notification as read
+  const markAsRead = async (notificationId) => {
+    // Implement the logic to mark a notification as read
+    // This might involve an API call to update the notification status
+    // Then update the local state
+    setNotifications(notifications.map(notif =>
+      notif._id === notificationId ? { ...notif, read: true } : notif
+    ));
+  };
 
   return (
     <>
       <Header />
       <div className="notification-page">
-        <h1>Notification</h1>
+        <h1>Notifications</h1>
         <p>You have {notifications.filter(n => !n.read).length} unread notifications.</p>
 
-        <section className="notification-section">
-          <h2>Today</h2>
-          {todayNotifications.map((notification, index) => (
-            <NotificationItem key={index} notification={notification} />
-          ))}
-        </section>
-
-        <section className="notification-section">
-          <h2>Yesterday</h2>
-          {yesterdayNotifications.map((notification, index) => (
-            <NotificationItem key={index} notification={notification} />
-          ))}
-        </section>
-
-        <section className="notification-section">
-          <h2>Earlier</h2>
-          {restNotifications.map((notification, index) => (
-            <NotificationItem key={index} notification={notification} />
-          ))}
-        </section>
+        {notifications.map((notification) => (
+          <NotificationItem
+            key={notification._id}
+            notification={notification}
+            onRead={() => markAsRead(notification._id)}
+          />
+        ))}
       </div>
     </>
   );
