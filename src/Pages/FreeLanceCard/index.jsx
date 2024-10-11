@@ -229,6 +229,13 @@ const FreelancerCard = ({ heading, freelancer }) => {
               </span>
               <span className="freelancer-success">{freelancer.totalJobs} projects completed</span>
             </div>
+            <div className="freelancer-availability">
+               {
+                freelancer.availability.full_time && freelancer.availability.part_time ? 'Full-time & Part-time' :
+                freelancer.availability.full_time ? 'Full-time' :
+                freelancer.availability.part_time ? 'Part-time' : 'Not specified'
+              }
+            </div>
             <div className="freelancer-skills">
               {freelancer.skills.map((skill, i) => (
                 <span key={i} className="skill-badge">{skill}</span>
