@@ -36,21 +36,7 @@ const OfferForm = () => {
     setSelectedSkills([...selectedSkills, skill]);
     setPopularSkills(popularSkills.filter((item) => item !== skill));
   };
-  const validateForm = () => {
-    if (!jobTitle || !description || !budgetType) {
-      setError("Please fill in all required fields");
-      return false;
-    }
-    if (budgetType === 'hourly' && (!hourlyRate.min || !hourlyRate.max)) {
-      setError("Please provide both minimum and maximum hourly rates");
-      return false;
-    }
-    if (budgetType === 'fixed' && !fixedPrice) {
-      setError("Please provide a fixed price");
-      return false;
-    }
-    return true;
-  };
+
   const handleSkillRemove = (skill) => {
     setPopularSkills([...popularSkills, skill]);
     setSelectedSkills(selectedSkills.filter((item) => item !== skill));
@@ -71,6 +57,22 @@ const OfferForm = () => {
     } else {
       setFixedPrice("");
     }
+  };
+
+  const validateForm = () => {
+    if (!jobTitle || !description || !budgetType) {
+      setError("Please fill in all required fields");
+      return false;
+    }
+    if (budgetType === 'hourly' && (!hourlyRate.min || !hourlyRate.max)) {
+      setError("Please provide both minimum and maximum hourly rates");
+      return false;
+    }
+    if (budgetType === 'fixed' && !fixedPrice) {
+      setError("Please provide a fixed price");
+      return false;
+    }
+    return true;
   };
 
   const handleSubmit = async (e) => {
@@ -109,19 +111,13 @@ const OfferForm = () => {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'multipart/form-data'
-        }
+        },
       });
-      console.log('Offer created:', response.data);
+      console.log('Response received:', response.status, response.data);
       navigate('/clientDashboard');
     } catch (error) {
-      console.error('Error creating offer:', error);
-      if (error.response) {
-        setError(error.response.data.message || "Server error occurred");
-      } else if (error.request) {
-        setError("No response from server. Please try again.");
-      } else {
-        setError("An unexpected error occurred");
-      }
+      console.error('Error details:', error);
+      setError(error.response?.data?.message || "An unexpected error occurred");
     } finally {
       setIsLoading(false);
     }
@@ -297,31 +293,30 @@ const OfferForm = () => {
                 </div>
 
                 <div className="field">
-  <label className="attachButton">
-    <span className="icon">📎</span>
-    ATTACH
-    <input
-      type="file"
-      style={{ display: 'none' }} // Hide the input field but keep it clickable
-      onChange={handleFileAttach}
-    />
-  </label>
-  {attachedFile && (
-    <div className="attachedFile">
-      <span>{attachedFile.name}</span>
-      <button type="button" onClick={handleFileRemove}>
-        <span className="icon">✖</span>
-      </button>
-    </div>
-  )}
-</div>
-
+                  <label className="attachButton">
+                    <span className="icon">📎</span>
+                    ATTACH
+                    <input
+                      type="file"
+                      style={{ display: 'none' }}
+                      onChange={handleFileAttach}
+                    />
+                  </label>
+                  {attachedFile && (
+                    <div className="attachedFile">
+                      <span>{attachedFile.name}</span>
+                      <button type="button" onClick={handleFileRemove}>
+                        <span className="icon">✖</span>
+                      </button>
+                    </div>
+                  )}
+                </div>
 
                 <div className="field">
-                {error && <div className="error-message">{error}</div>}
-        <button type="submit" className="buttonWithIcon" disabled={isLoading}>
-          {isLoading ? "Sending..." : "SEND OFFER"}
-        </button>
+                  {error && <div className="error-message">{error}</div>}
+                  <button type="submit" className="buttonWithIcon" disabled={isLoading}>
+                    {isLoading ? "Sending..." : "SEND OFFER"}
+                  </button>
                 </div>
               </div>
             </form>
