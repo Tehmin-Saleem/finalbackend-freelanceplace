@@ -216,7 +216,7 @@ const FreelancerCard = ({ heading, freelancer }) => {
                 {userCountryMap[freelancer.freelancer_id] || 'Unknown'}
               </span>
               <button 
-  className="invite-btn" 
+  className="inviteButton" 
   onClick={() => handleInviteClick(freelancer)} // Arrow function prevents immediate invocation
 >
   Invite to job
