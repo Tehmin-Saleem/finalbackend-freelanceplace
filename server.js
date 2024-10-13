@@ -7,35 +7,21 @@ const authMiddleware = require("./middleware/auth.middleware");
 const Chat = require('./models/chat.model');
 const Freelancer = require('./models/freelancer_profile.model');
 
-
-
-
 const app = express();
 const dotenv = require("dotenv");
 const clientRoutes = require("./routes/client.route");
 const freelancerRoutes = require("./routes/freelancer.route");
+
 const cors = require("cors");
 const jwt = require('jsonwebtoken');
 
-
-
-
-
-
-// Enable CORS for all routes
 app.use(cors());
 dotenv.config();
 connectDB();
 
-
 app.use(corsMiddleware);
 app.use(express.json());
 app.use(bodyParser.json());
-
-
-app.use("/api/client", clientRoutes);
-app.use("/api/freelancer", freelancerRoutes);
-
 
 const server = http.createServer(app);
 
@@ -44,24 +30,55 @@ server.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
 
-
-
 const io = require("socket.io")(server, {
   pingTimeout: 60000,
   cors: {
     origin: "http://localhost:5173",
-    // credentials: true,
   },
 });
 
-io.on("connection", (socket) => {
-  console.log("Connected to socket.io");
-  socket.on("setup", (userData) => {
+// Make io accessible globally
+global.io = io;
 
-    socket.join(userData.userId);
+app.use("/api/client", clientRoutes);
+app.use("/api/freelancer", freelancerRoutes);
 
-    socket.emit("connected");
+// Set up a simple route (optional)
+app.get("/", (req, res) => {
+  res.send("Chat server is running");
+  console.log("Chat server is running")
+});
+
+app.set('io', io);
+
+global.io = io;
+io.use((socket, next) => {
+  const token = socket.handshake.auth.token;
+  if (!token) {
+    return next(new Error('Authentication error: No token provided'));
+  }
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    socket.userId = decoded.userId;
+    socket.userRole = decoded.role;
+    next();
+  } catch (error) {
+    return next(new Error('Authentication error: Invalid token'));
+  }
+});
+
+io.on('connection', (socket) => {
+  console.log(`New user connected, ID: ${socket.id}, User ID: ${socket.userId}, Role: ${socket.userRole}`);
+
+  // Join rooms based on user ID and role
+  socket.join(`${socket.userRole}_${socket.userId}`);
+  socket.join(socket.userRole);
+
+  socket.on('disconnect', () => {
+    console.log(`Client disconnected, ID: ${socket.id}, User ID: ${socket.userId}, Role: ${socket.userRole}`);
   });
+
 
   socket.on("join chat", (room) => {
     socket.join(room);
@@ -88,7 +105,9 @@ io.on("connection", (socket) => {
     console.log("USER DISCONNECTED");
     socket.leave(userData.userId);
   });
+  
 });
+
 
 
 

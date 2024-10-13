@@ -11,10 +11,13 @@ const path = require('path');
 const usercontroller=require ('../controllers/user.controller')
 const { upload } = require('../config/cloudinary.config');// const { forgotPassword, resetPassword } = require('../controllers/user.controller');
 
+const Notification= require ('../controllers/notifications.controller')
+
+
 
 // Import Chat controller
 const chatController = require('../controllers/chat.controller'); // Add this
-
+const offerController = require ('../controllers/offer_form.controller')
 
 const hireFreelancerController = require('../controllers/hire_freelancer.controller');
 
@@ -22,15 +25,6 @@ const Proposal = require('../models/proposal.model');
 const { getFreelancerDetailsByProposal, getProposalById } = require('../controllers/proposal.controller');
 const router = express.Router();
 
-// Assume io is defined in your server.js file
-const socketIo = require('socket.io'); // Import socket.io
-const io = socketIo(); // Create an io instance
-
-// Use a middleware to attach io to req
-// router.use((req, res, next) => {
-//   req.io = io;
-//   next();
-// });
 
 
 router.post('/signup', signup);
@@ -58,9 +52,14 @@ router.post('/uploads', upload.single('File'), (req, res) => {
 });
 router.get('/jobpost/:fileName', (req, res) => {
   const { fileName } = req.params;
-  const filePath = path.join(__dirname, '../uploads', fileName); // Adjust path as necessary
+  const filePath = path.join(__dirname, '../uploads', fileName); 
   res.sendFile(filePath);
 });
+
+router.get('/notifications', authMiddleware, Notification.getNotifications);
+router.post('/notifications', authMiddleware, Notification.createNotification);
+router.put('/notifications/:notificationId/read', authMiddleware, Notification.updateNotification);
+router.get('/notifications/unread-count', authMiddleware, Notification.getUnreadNotificationsCount);
 
 router.post('/reviews', ReviewController.createReview);
 
@@ -82,7 +81,11 @@ router.get('/review-requests', reviewRequestController.getClientReviewRequests);
 
 router.post('/jobpost', upload.single('attachment'), jobPostController.createJobPost);
 
+// router.get('/offerform', reviewRequestController.getClientReviewRequests);
 
+
+router.post('/offerform', authMiddleware, upload.single('attachment'), offerController.createoffer);
+ 
 router.get('/job-posts', jobPostController.getAllJobPosts);
 router.get('/jobposts', jobPostController.getClientJobPosts);
 
