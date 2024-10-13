@@ -7,6 +7,7 @@ const {sendEmail}  = require("../utils/email");
 const { userInfo } = require('os');
 
 
+
 const checkUserExists = async (req, res, next) => {
   try {
     const { email } = req.body;
@@ -182,7 +183,7 @@ const forgotPassword = async (req, res) => {
     const token = jwt.sign({ email: user.email, id: user._id }, JWT_SECRET, { expiresIn: "10m" });
     const link = `http://localhost:5173/ChangePass/${user._id}/${token}`;
     
-    await sendEmail(user.email, 'Password Reset Request', `Click this link to reset your password: ${link}`);
+    await sendEmail(user.email, 'Password Reset Request', link);
     return res.status(200).json({ message: "Password reset link generated and sent to your email.", link });
 
   } catch (error) {
@@ -233,27 +234,28 @@ const ChangePass = async (req, res) => {
   
   
   
-  module.exports = { signup, login, hashPassword, checkUserExists,getUserById, getAllUsers,forgotPassword,ChangePass};
 
 
 
-  //@description     Get or Search all users
+//@description     Get or Search all users
 //@route           GET /api/user?search=
 //@access          Public
 const SearchallUsers = asyncHandler(async (req, res) => {
   const keyword = req.query.search
-    ? {
+  ? {
         $or: [
           { first_name: { $regex: req.query.search, $options: "i" } },
           { email: { $regex: req.query.search, $options: "i" } },
         ],
       }
-    : {};
+      : {};
+      
+      
+      const users = await User.find(keyword).find({ _id: { $ne: req.user.userId } });
+      res.send(users);
+    });
+    
+    
+    
+    module.exports = { signup, login, hashPassword, checkUserExists,getUserById, getAllUsers,forgotPassword,ChangePass, SearchallUsers};
   
-
-  const users = await User.find(keyword).find({ _id: { $ne: req.user.userId } });
-  res.send(users);
-});
-  
-  
-  module.exports = { signup, login, hashPassword, checkUserExists,getUserById, getAllUsers, SearchallUsers };
