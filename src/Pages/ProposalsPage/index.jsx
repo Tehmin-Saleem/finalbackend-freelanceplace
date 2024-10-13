@@ -52,7 +52,7 @@ const IndexPage = () => {
           return {
             ...proposal,
             country: freelancerId ? userCountryMap[freelancerId] || "Unknown" : "Unknown",
-            image: proposal.freelancerProfile.image
+            image: proposal.freelancerProfile?.image
           
           
           };

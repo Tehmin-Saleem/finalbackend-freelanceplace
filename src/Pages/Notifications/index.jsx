@@ -29,16 +29,36 @@ const Notification = () => {
     };
 
     const groupNotificationsByDate = (notifications) => {
-        const groups = {};
+        const today = new Date().toDateString();
+        const yesterday = new Date(Date.now() - 86400000).toDateString();
+        const groups = {
+            'Today': [],
+            'Yesterday': [],
+            'Earlier': []
+        };
+    
         notifications.forEach(notification => {
-            const date = new Date(notification.timestamp).toLocaleDateString();
-            if (!groups[date]) {
-                groups[date] = [];
+            const notificationDate = new Date(notification.timestamp).toDateString();
+            if (notificationDate === today) {
+                groups['Today'].push(notification);
+            } else if (notificationDate === yesterday) {
+                groups['Yesterday'].push(notification);
+            } else {
+                groups['Earlier'].push(notification);
             }
-            groups[date].push(notification);
         });
+    
+        // Remove empty groups
+        Object.keys(groups).forEach(key => {
+            if (groups[key].length === 0) {
+                delete groups[key];
+            }
+        });
+
         return groups;
     };
+
+    const groupedNotifications = groupNotificationsByDate(notifications);
 
     return (
         <>
