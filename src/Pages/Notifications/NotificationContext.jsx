@@ -1,7 +1,6 @@
-
 import React, { createContext, useState, useEffect, useCallback } from 'react';
-import io from 'socket.io-client';
 import axios from 'axios';
+import SocketManager from './socket';
 
 export const NotificationContext = createContext();
 
@@ -47,56 +46,61 @@ export const NotificationProvider = ({ children }) => {
     }, []);
 
     useEffect(() => {
-        fetchNotifications();
-        fetchUnreadCount();
-        console.log('NotificationContext: Fetching initial notifications and unread count');
+        const initializeNotifications = async () => {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                console.error('No token found');
+                return;
+            }
 
-        const token = localStorage.getItem('token');
-        const socket = io('http://localhost:5000', {
-            query: { token }
-        });
+            try {
+                await SocketManager.connect(token);
+                await fetchNotifications();
+                await fetchUnreadCount();
 
-        socket.on('connect', () => {
-            console.log('Connected to socket server');
-            socket.emit('authenticate', token);
-        });
+                SocketManager.onNotification((notification) => {
+                    console.log('New notification received:', notification);
+                    setNotifications(prev => [notification, ...prev]);
+                    setUnreadCount(prevCount => prevCount + 1);
+                  });
+            } catch (error) {
+                console.error('Error initializing notifications:', error);
+            }
+        };
 
-        socket.on('new_offer', (offerNotification) => {
-            console.log('New offer received:', offerNotification);
-            setNotifications(prev => [offerNotification, ...prev]);
-            setUnreadCount(prevCount => prevCount + 1);
-        });
+        initializeNotifications();
 
         const intervalId = setInterval(() => {
-            fetchNotifications();
             fetchUnreadCount();
-        }, 60000);
-
-        return () => {
-            socket.disconnect();
-            clearInterval(intervalId);
-        };
-    }, [fetchNotifications, fetchUnreadCount]);
-
+          }, 60000); 
+        
+          
+          fetchUnreadCount();
+        
+         
+          return () => {
+            SocketManager.disconnect(); 
+            clearInterval(intervalId);   
+          };
+        }, [fetchNotifications, fetchUnreadCount]);
     const markAsRead = async (notificationId) => {
         try {
-          const token = localStorage.getItem('token');
-          await axios.put(`http://localhost:5000/api/freelancer/notifications/${notificationId}/read`, {}, {
-            headers: { Authorization: `Bearer ${token}` }
-          });
-      
-          setNotifications(prevNotifications =>
-            prevNotifications.map(notif =>
-              notif._id === notificationId ? { ...notif, is_read: true } : notif
-            )
-          );
-      
-          setUnreadCount(prevCount => Math.max(0, prevCount - 1));
+            const token = localStorage.getItem('token');
+            await axios.put(`http://localhost:5000/api/freelancer/notifications/${notificationId}/read`, {}, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+        
+            setNotifications(prevNotifications =>
+                prevNotifications.map(notif =>
+                notif._id === notificationId ? { ...notif, is_read: true } : notif
+                )
+            );
+        
+            setUnreadCount(prevCount => Math.max(0, prevCount - 1));
         } catch (error) {
-          console.error('Error marking notification as read:', error);
+            console.error('Error marking notification as read:', error);
         }
-      };
-    
+    };
 
     return (
         <NotificationContext.Provider value={{ notifications, unreadCount, fetchUnreadCount, fetchNotifications, markAsRead }}>
