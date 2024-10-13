@@ -1,6 +1,7 @@
 const Proposal = require('../models/proposal.model');
 const Freelancer_Profile = require('../models/freelancer_profile.model');
-
+const Job = require('../models/post_job.model'); // Import the Job model
+const Notification = require('../controllers/notifications.controller');
 exports.createProposal = async (req, res) => {
   try {
     const {
@@ -8,20 +9,25 @@ exports.createProposal = async (req, res) => {
       job_id,
       project_duration,
       portfolio_link,
-      client_id,
     } = req.body;
 
-    console.log('req.user:', req.user);  // Debug log
+    console.log('req.user:', req.user);
 
-    // Check if req.user exists and has userId
     if (!req.user || !req.user.userId) {
       return res.status(401).json({ message: 'User not authenticated or user ID not found' });
     }
 
     const freelancer_id = req.user.userId;
-
-    // Parse add_requirements from the stringified JSON
+   
     const add_requirements = req.body.add_requirements ? JSON.parse(req.body.add_requirements) : null;
+
+    // Fetch the job details to get the job title and client_id
+    const job = await Job.findById(job_id);
+    if (!job) {
+      return res.status(404).json({ message: 'Job not found' });
+    }
+
+    const client_id = job.client_id; // Use the client_id from the job details
 
     let proposalData = {
       add_requirements,
@@ -41,12 +47,24 @@ exports.createProposal = async (req, res) => {
 
     console.log('Saved Proposal:', newProposal);
 
+    const notificationData = {
+      client_id: client_id,
+      freelancer_id: freelancer_id,
+      job_id: job_id,
+      message: `You have received a new proposal for your job: ${job.job_title}`,
+      type: 'new_proposal'
+    };
+
+    console.log('Creating new proposal notification:', notificationData);
+    await Notification.createNotification(notificationData);
+
     res.status(201).json({ message: 'Proposal created successfully', proposal: newProposal });
   } catch (err) {
     console.error('Error creating proposal:', err);
     res.status(500).json({ message: 'Internal server error', error: err.message });
   }
 };
+
 exports.getFreelancerProposals = async (req, res) => {
   try {
     const jobId = req.query.jobId;
@@ -92,7 +110,7 @@ exports.getFreelancerProposals = async (req, res) => {
         freelancerProfile: profile ? {
           id: profile._id,
           name: `${profile.first_name || ''} ${profile.last_name || ''}`.trim() || 'No Name',
-          image: profile.image  || null,
+          image: profile.image || null,
           title: profile.title || '',
           skills: profile.skills || [],
           availability: profile.availability || {},
@@ -115,50 +133,6 @@ console.log("proposals",formattedProposals)
     res.status(500).json({ message: 'Internal server error', error: err.message });
   }
 };
-
-// exports.getFreelancerProposals = async (req, res) => {
-//   try {
-//     const freelancer_id = req.user._id;
-//     const proposals = await Proposal.find({ freelancer_id }).populate('job_id');
-
-//     console.log('Retrieved Proposals:', proposals);
-
-//     const formattedProposals = await Promise.all(proposals.map(async (proposal) => {
-//       const job = proposal.job_id;
-
-//       if (!job) {
-//         console.error(`Job not found for proposal ID: ${proposal._id}`);
-//         return null;
-//       }
-
-//       let rate;
-//       if (job.budget_type === 'hourly') {
-//         rate = job.hourly_rate ? `$${job.hourly_rate.from || 0} - $${job.hourly_rate.to || 0}/hr` : 'Hourly rate not specified';
-//       } else if (job.budget_type === 'fixed') {
-//         rate = job.fixed_price ? `$${job.fixed_price}` : 'Fixed price not specified';
-//       } else {
-//         rate = 'Budget type not specified';
-//       }
-
-//       return {
-//         id: proposal._id,
-//         coverLetter: proposal.cover_letter,
-//         timeline: job.project_duration,
-//         rate: rate,
-//         jobTitle: job.job_title,
-//         clientLocation: job.client_location || 'Not specified',
-//         proposalStatus: proposal.status || 'Pending',
-//       };
-//     }));
-
-//     console.log('Formatted Proposals:', formattedProposals);
-
-//     res.status(200).json({ proposals: formattedProposals });
-//   } catch (err) {
-//     console.error('Error in getFreelancerProposals:', err);
-//     res.status(500).json({ message: 'Internal server error', error: err.message });
-//   }
-// };
 
 
 exports.getProposalById = async (req, res) => {

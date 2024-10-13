@@ -52,28 +52,32 @@ app.get("/", (req, res) => {
 app.set('io', io);
 
 global.io = io;
+io.use((socket, next) => {
+  const token = socket.handshake.auth.token;
+  if (!token) {
+    return next(new Error('Authentication error: No token provided'));
+  }
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    socket.userId = decoded.userId;
+    socket.userRole = decoded.role;
+    next();
+  } catch (error) {
+    return next(new Error('Authentication error: Invalid token'));
+  }
+});
 
 io.on('connection', (socket) => {
-  console.log('New client connected, ID:', socket.id);
-  
-  socket.on('authenticate', (token) => {
-    try {
-      const decoded = jwt.verify(token, process.env.JWT_SECRET);
-      socket.userId = decoded.userId;
-      socket.join(decoded.userId.toString());
-      console.log(`User ${decoded.userId} authenticated and joined room ${decoded.userId.toString()}`);
-    } catch (error) {
-      console.error('Authentication failed:', error.message);
-      socket.emit('auth_error', 'Invalid token');
-    }
-  });
+  console.log(`New user connected, ID: ${socket.id}, User ID: ${socket.userId}, Role: ${socket.userRole}`);
+
+  // Join rooms based on user ID and role
+  socket.join(`${socket.userRole}_${socket.userId}`);
+  socket.join(socket.userRole);
 
   socket.on('disconnect', () => {
-    console.log('Client disconnected, ID:', socket.id);
+    console.log(`Client disconnected, ID: ${socket.id}, User ID: ${socket.userId}, Role: ${socket.userRole}`);
   });
-
-
-  
 
 
   socket.on("join chat", (room) => {

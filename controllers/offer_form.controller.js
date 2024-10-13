@@ -1,5 +1,5 @@
 const Offer_Form = require('../models/offer_form.model');
-const { createNotification } = require('./notifications.controller');
+const Notification=require("../controllers/notifications.controller")
 
 exports.createoffer = async (req, res) => {
   console.log('Offer Controller: createoffer hit');
@@ -59,10 +59,12 @@ exports.createoffer = async (req, res) => {
       client_id: client_id,
       freelancer_id: freelancer_id,
       job_id: savedOffer._id,
+      type: 'new_offer',
       message: `You have received a new offer for "${job_title}"`
     };
 
-    await createNotification(notificationData);
+    console.log('Creating new offer notification:', notificationData);
+    await Notification.createNotification(notificationData);
 
     res.status(201).json(savedOffer);
   } catch (error) {
@@ -70,6 +72,7 @@ exports.createoffer = async (req, res) => {
     res.status(500).json({ message: 'Error creating offer', error: error.message });
   }
 };
+
 
 exports.getOffers = async (req, res) => {
   try {
