@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import { proxy, useSnapshot } from "valtio";
 import axios from "axios";
 import { useNavigate, Link } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
-
+import { NotificationContext } from '../../../Pages/Notifications/NotificationContext';
 import {
   JobsDropdwon,
   IconSearchBar,
@@ -30,6 +30,8 @@ const Header = () => {
   const snap = useSnapshot(state);
   const navigate = useNavigate();
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
+  const [unreadNotifications, setUnreadNotifications] = useState(0);
+  const { unreadCount } = useContext(NotificationContext);
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -56,6 +58,30 @@ const Header = () => {
       } catch (error) {
         console.error("Error fetching user:", error);
       }
+      const fetchUnreadNotificationsCount = async () => {
+        try {
+          const token = localStorage.getItem("token");
+          if (!token) return;
+  
+          const response = await axios.get(
+            'http://localhost:5000/api/freelancer/notifications/unread-count',
+            {
+              headers: { Authorization: `Bearer ${token}` }
+            }
+          );
+          setUnreadNotifications(response.data.count);
+        } catch (error) {
+          console.error("Error fetching unread notifications count:", error);
+        }
+      };
+  
+      fetchUnreadNotificationsCount();
+      // Set up an interval to fetch the count periodically
+      const interval = setInterval(fetchUnreadNotificationsCount, 60000); // every minute
+  
+      return () => clearInterval(interval);
+    
+  
     };
 
     fetchUser();
@@ -194,10 +220,15 @@ const Header = () => {
           <input type="text" placeholder="Search" className="search-input" />
         </div>
         <div className="icon">
-          <Link to="/notifications">
-            <Notification className="icon" width="20" height="20" />
-          </Link>
-        </div>
+                    <Link to="/notifications">
+                        <div className="notification-icon-container">
+                            <Notification className="icon" width="20" height="20" />
+                            {unreadCount > 0 && (
+                                <span className="notification-badge">{unreadCount}</span>
+                            )}
+                        </div>
+                    </Link>
+                </div>
         <div className="user-info">
           <div
             className="profile-dropdown"

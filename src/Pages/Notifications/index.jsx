@@ -1,75 +1,95 @@
-import React, { useState, useEffect } from 'react';
+
+import React, { useContext, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import "./styles.scss";
 import NotificationItem from "../../components/NotificationItem";
+import { NotificationContext } from './NotificationContext';
 import Header from "../../components/Commoncomponents/Header";
-import SocketManager from './socket';
 
 const Notification = () => {
-  const [notifications, setNotifications] = useState([]);
+    const { notifications, unreadCount, fetchNotifications, markAsRead } = useContext(NotificationContext);
+    const navigate = useNavigate();
 
-  useEffect(() => {
-    // Fetch initial notifications
-    fetchNotifications();
-
-    // Connect to Socket.IO
-    const token = localStorage.getItem('token'); // Assuming you store the JWT in localStorage
-    SocketManager.connect(token);
-
-    // Listen for new notifications
-    SocketManager.onNotification((newNotification) => {
-      setNotifications(prev => [newNotification, ...prev]);
-    });
-
-    // Listen specifically for new offer notifications
-    SocketManager.onNewOffer((offerNotification) => {
-      // You can handle offer notifications differently if needed
-      setNotifications(prev => [{
-        ...offerNotification,
-        read: false,
-        createdAt: new Date().toISOString()
-      }, ...prev]);
-      
-      // Optionally, you can show a more prominent alert for new offers
-      alert(`New offer received: ${offerNotification.message}`);
-    });
-
-    return () => {
-      SocketManager.disconnect();
+    useEffect(() => {
+        fetchNotifications();
+    }, [fetchNotifications]);
+    
+    const handleNotificationClick = async (notification) => {
+        if (notification.job_id) {
+            if (!notification.is_read) {
+                await markAsRead(notification._id);
+            }
+            navigate(`/offerdetails`);
+        }
     };
-  }, []);
 
-  const fetchNotifications = async () => {
-    // Fetch notifications from your API
-    // Update the state with the fetched notifications
-  };
+    const formatNotificationTime = (timestamp) => {
+        const date = new Date(timestamp);
+        return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    };
 
-  // Function to mark a notification as read
-  const markAsRead = async (notificationId) => {
-    // Implement the logic to mark a notification as read
-    // This might involve an API call to update the notification status
-    // Then update the local state
-    setNotifications(notifications.map(notif =>
-      notif._id === notificationId ? { ...notif, read: true } : notif
-    ));
-  };
+    const groupNotificationsByDate = (notifications) => {
+        const today = new Date().toDateString();
+        const yesterday = new Date(Date.now() - 86400000).toDateString();
+        const groups = {
+            'Today': [],
+            'Yesterday': [],
+            'Earlier': []
+        };
+    
+        notifications.forEach(notification => {
+            const notificationDate = new Date(notification.timestamp).toDateString();
+            if (notificationDate === today) {
+                groups['Today'].push(notification);
+            } else if (notificationDate === yesterday) {
+                groups['Yesterday'].push(notification);
+            } else {
+                groups['Earlier'].push(notification);
+            }
+        });
+    
+        // Remove empty groups
+        Object.keys(groups).forEach(key => {
+            if (groups[key].length === 0) {
+                delete groups[key];
+            }
+        });
 
-  return (
-    <>
-      <Header />
-      <div className="notification-page">
-        <h1>Notifications</h1>
-        <p>You have {notifications.filter(n => !n.read).length} unread notifications.</p>
+        return groups;
+    };
 
-        {notifications.map((notification) => (
-          <NotificationItem
-            key={notification._id}
-            notification={notification}
-            onRead={() => markAsRead(notification._id)}
-          />
-        ))}
-      </div>
-    </>
-  );
+    const groupedNotifications = groupNotificationsByDate(notifications);
+
+    return (
+        <>
+        <Header />
+        <div className="notification-page">
+            <h1>Notifications</h1>
+            <p>You have {unreadCount} unread notifications.</p>
+            {notifications.length > 0 ? (
+                Object.entries(groupNotificationsByDate(notifications)).map(([date, notifs]) => (
+                    <div key={date}>
+                        <h2>{date === new Date().toLocaleDateString() ? 'Today' : date}</h2>
+                        {notifs.map((notification) => (
+                            <div
+                                key={notification._id}
+                                onClick={() => handleNotificationClick(notification)}
+                                className={`notification-item ${notification.is_read ? 'read-notification' : 'unread-notification'}`}
+                            >
+                                <NotificationItem
+                                    notification={notification}
+                                    time={formatNotificationTime(notification.timestamp)}
+                                />
+                            </div>
+                        ))}
+                    </div>
+                ))
+            ) : (
+                <p>No notifications to display.</p>
+            )}
+        </div>
+        </>
+    );
 };
 
 export default Notification;

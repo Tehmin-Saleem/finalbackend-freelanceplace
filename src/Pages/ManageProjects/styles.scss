@@ -1,0 +1,143 @@
+.manage-projects {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+      
+      h1 {
+        font-size: 2rem;
+        margin: 0;
+      }
+  
+      .client-profile {
+        display: flex;
+        align-items: center;
+        
+        img {
+          border-radius: 50%;
+          width: 40px;
+          height: 40px;
+          margin-right: 10px;
+        }
+      }
+    }
+  
+    .project-list {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+  
+    .project-card {
+      background-color: #fff;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 20px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      
+      .project-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+  
+        .project-info {
+          h2 {
+            font-size: 1.5rem;
+            margin: 0;
+          }
+  
+          p {
+            color: #555;
+          }
+        }
+  
+        .project-deadline {
+          p {
+            color: #ff9800;
+          }
+        }
+      }
+  
+      .project-progress-bar {
+        background-color: #f0f0f0;
+        border-radius: 5px;
+        overflow: hidden;
+        margin: 10px 0;
+  
+        .progress {
+          height: 10px;
+          background-color: #4caf50;
+          border-radius: 5px;
+        }
+      }
+  
+      .progress-percent {
+        text-align: right;
+        color: #4caf50;
+      }
+  
+      .milestones {
+        margin-top: 20px;
+  
+        h3 {
+          font-size: 1.2rem;
+          margin-bottom: 10px;
+        }
+  
+        .milestone {
+          display: flex;
+          justify-content: space-between;
+          padding: 10px 0;
+          border-bottom: 1px solid #eee;
+          color: #555;
+  
+          .status {
+            &.completed {
+              color: #4caf50;
+            }
+  
+            &.in-progress {
+              color: #ff9800;
+            }
+  
+            &.not-started {
+              color: #f44336;
+            }
+          }
+        }
+      }
+  
+      .project-budget {
+        margin-top: 20px;
+        p {
+          font-weight: bold;
+          color: #333;
+        }
+      }
+    }
+  
+    .timer-btn {
+      background-color: #ff9800;
+      color: #fff;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      
+      i {
+        margin-right: 5px;
+      }
+  
+      &:hover {
+        background-color: #e68900;
+      }
+    }
+  }
+  

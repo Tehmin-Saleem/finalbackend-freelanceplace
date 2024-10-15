@@ -3,12 +3,12 @@ import React from "react";
 import "./styles.scss";
 import { Header } from "../../components";
 
-const ClientDashboard = () => {
+const Clientdash = () => {
   return (
     <>
       <Header />
       <div className="dashboard-container">
-        <h1 className="dashboard-title">Welcome to Your Client Dashboard</h1>
+        <h1 className="dashboard-title">Welcome to Client Dashboard</h1>
         <p className="dashboard-description">
           Easily manage your projects, view freelancer proposals, and track job progress, all from a single dashboard. 
           Explore the functionalities below to elevate your project management experience.
@@ -55,4 +55,4 @@ const ClientDashboard = () => {
   );
 };
 
-export default ClientDashboard;
+export default Clientdash;

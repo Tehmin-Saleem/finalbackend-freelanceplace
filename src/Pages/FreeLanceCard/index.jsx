@@ -10,7 +10,7 @@ const FreelancerCard = ({ heading, freelancer }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [openDropdown, setOpenDropdown] = useState(null);
-  
+
   // New State for Filters
   const [selectedSkills, setSelectedSkills] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
@@ -19,6 +19,7 @@ const FreelancerCard = ({ heading, freelancer }) => {
 
   const navigate = useNavigate();
   const [userCountryMap, setUserCountryMap] = useState({});
+
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (!token) {
@@ -45,7 +46,6 @@ const FreelancerCard = ({ heading, freelancer }) => {
             return acc;
           }, {});
 
-          // Set freelancers and user country map
           setFreelancers(freelancers);
           setUserCountryMap(userCountryMap);
 
@@ -63,11 +63,10 @@ const FreelancerCard = ({ heading, freelancer }) => {
   const handleDropdownClick = (filterName) => {
     setOpenDropdown(openDropdown === filterName ? null : filterName);
   };
-  
+
   const handleInviteClick = (freelancer) => {
     const country = userCountryMap[freelancer.freelancer_id] || 'Unknown';
-  
-    
+
     navigate('/offerform', {
       state: {
         freelancerProfile: {
@@ -77,7 +76,7 @@ const FreelancerCard = ({ heading, freelancer }) => {
       }
     });
   };
-  
+
   const handleFilterChange = (filterType, value) => {
     switch (filterType) {
       case 'Skills':
@@ -99,19 +98,34 @@ const FreelancerCard = ({ heading, freelancer }) => {
 
   // Filter Logic: Filtering freelancers based on selected options
   const filteredFreelancers = freelancers.filter((freelancer) => {
-    return (
-      (selectedSkills ? freelancer.skills.includes(selectedSkills) : true) &&
-      (selectedCategory ? freelancer.experience.title === selectedCategory : true) &&
-      (selectedLocation ? freelancer.location === selectedLocation : true) &&
-      (selectedAvailability ? freelancer.availability === selectedAvailability : true)
-    );
+    const skillsMatch = selectedSkills
+    ? freelancer.skills.some(skill => skill.toLowerCase().includes(selectedSkills.toLowerCase()))
+    : true;
+  
+  const categoryMatch = selectedCategory 
+    ? freelancer.experience.title === selectedCategory 
+    : true;
+
+  const locationMatch = selectedLocation
+    ? freelancer.location === selectedLocation
+    : true;
+
+  const availabilityMatch = selectedAvailability
+    ? (
+      (selectedAvailability === "Full-time" && freelancer.availability.full_time) ||
+      (selectedAvailability === "Part-time" && freelancer.availability.part_time) ||
+      (selectedAvailability === "Contract" && freelancer.availability.contract)
+    )
+    : true;
+
+  // Only return freelancers who match all selected filters
+  return skillsMatch && categoryMatch && locationMatch && availabilityMatch;
   });
 
-  const categoriesOptions = ["MERN Stack", "UI/UX Designer", "frontend developer", "Backend Developer"];
+  const categoriesOptions = ["MERN Stack", "UI/UX Designer", "Frontend Developer", "Backend Developer"];
   const skillsOptions = ["JavaScript", "Python", "CSS", "HTML"];
   const availabilityOptions = ["Full-time", "Part-time", "Contract"];
   const locationOptions = ["Remote", "On-site", "Hybrid"];
-  const ratingsOptions = ["5 stars", "4 stars", "3 stars"];
 
   if (loading) return <div>Loading...</div>;
   if (error) return <div>{error}</div>;
@@ -200,45 +214,54 @@ const FreelancerCard = ({ heading, freelancer }) => {
         </div>
       </div>
 
-      {/* Freelancer Cards */}
-      {filteredFreelancers.map((freelancer, index) => (
-        <div key={index} className="freelancer-card">
-          <div className="freelancer-profile">
-          <img
-              src={freelancer.image}  
-              alt="Profile" className="profile-pic"
-            />
-          </div>
-          <div className="freelancer-details">
-            <div className="freelancer-header">
-              <h2 className="freelancer-name">{freelancer.name}</h2>
-              <span className="freelancer-location">
-                {userCountryMap[freelancer.freelancer_id] || 'Unknown'}
-              </span>
-              <button 
-  className="invite-btn" 
-  onClick={() => handleInviteClick(freelancer)} // Arrow function prevents immediate invocation
->
-  Invite to job
-</button>
-            </div>
-            <div className="freelancer-role">{freelancer.experience.title}</div>
-            <div className="freelancer-meta">
-              <span className="freelancer-rate">
-                ${freelancer.rate !== "Not specified" ? freelancer.rate : "Rate not specified"}/hr
-              </span>
-              <span className="freelancer-success">{freelancer.totalJobs} projects completed</span>
-            </div>
-            <div className="freelancer-skills">
-              {freelancer.skills.map((skill, i) => (
-                <span key={i} className="skill-badge">{skill}</span>
-              ))}
-            </div>
-            <div className="freelancer-description">{freelancer.experience.description}</div>
-          
-          </div>
+      {/* No freelancer found */}
+      {filteredFreelancers.length === 0 ? (
+        <div className="no-freelancer-found">
+          No freelancer found
         </div>
-      ))}
+      ) : (
+        filteredFreelancers.map((freelancer, index) => (
+          <div key={index} className="freelancer-card">
+            <div className="freelancer-profile">
+              <img
+                src={freelancer.image}  
+                alt="Profile" className="profile-pic"
+              />
+            </div>
+            <div className="freelancer-details">
+              <div className="freelancer-header">
+                <h2 className="freelancer-name">{freelancer.name}</h2>
+                <span className="freelancer-location">
+                  {userCountryMap[freelancer.freelancer_id] || 'Unknown'}
+                </span>
+                <button 
+                  className="inviteButton" 
+                  onClick={() => handleInviteClick(freelancer)}
+                >
+                  Invite to job
+                </button>
+              </div>
+              <div className="freelancer-role">{freelancer.experience.title}</div>
+              <div className="freelancer-meta">
+                <span className="freelancer-rate">
+                  ${freelancer.rate !== "Not specified" ? freelancer.rate : "Rate not specified"}/hr
+                </span>
+                <span className="freelancer-success">{freelancer.totalJobs} projects completed</span>
+              </div>
+              <div className="freelancer-availability">
+                {freelancer.availability.full_time && freelancer.availability.part_time ? 'Full-time & Part-time' :
+                freelancer.availability.full_time ? 'Full-time' :
+                freelancer.availability.part_time ? 'Part-time' : 'Not specified'}
+              </div>
+              <div className="freelancer-skills">
+                {freelancer.skills.map((skill, i) => (
+                  <span key={i} className="skill-badge">{skill}</span>
+                ))}
+              </div>
+            </div>
+          </div>
+        ))
+      )}
     </div>
   );
 };

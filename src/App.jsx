@@ -18,9 +18,11 @@ import JobPostedPopup from "./components/PopUps/JobPosted";
 import ForgotPassword from "./Pages/ResetPass";
 import ChangePassword from "./Pages/ForgotPass";
 import ChatProvider from "./context/ChatProvider.jsX";
-
+import { NotificationProvider } from './Pages/Notifications/NotificationContext';
 import OfferDetails from "./Pages/OfferCard";
 import Clientdash from "./Pages/Dashboard";
+import ManageProjects from "./Pages/ManageProjects";
+import ManageProj from "./Pages/DummyProject";
 // import PaymentMethod from './components/PaymentMethod';
 
 // Load your Stripe public key
@@ -86,7 +88,10 @@ const freelancers = [
 
 function App() {
   return (
+    
+    <NotificationProvider>
     <Router>
+    
       <Routes>
         <Route path="/" element={<SignUpSection />} />
         <Route path="/notifications" element={<Notification />} />
@@ -99,6 +104,7 @@ function App() {
         <Route path="/freelancedashboard" element={<FreelanceDashboardPage />} />
         <Route path="/applyjob" element={<ApplyJob />} />
         <Route path="/applyjob/:jobPostId" element={<ApplyJob />} />
+        <Route path="/profile/:userId" element={<ProfileView />} />
         <Route
           path="/freelancercard"
           element={<FreeLancerCard heading="UI/UX Designer" freelancers={freelancers} />}
@@ -143,6 +149,11 @@ function App() {
         <Route path="/ChangePass/:id/:token" element={<ChangePassword/>} /> 
         <Route path="/OfferDetails" element={<OfferDetails/>} /> 
         <Route path="/ClientDash" element={<Clientdash/>} /> 
+
+        <Route path="/ManageProj" element={<ManageProjects/>} /> 
+
+        <Route path="/ManageProject" element={<ManageProj/>} /> 
+
        
         
         
@@ -153,7 +164,9 @@ function App() {
 
 
       </Routes>
+      
     </Router>
+    </NotificationProvider>
     );
 }
 

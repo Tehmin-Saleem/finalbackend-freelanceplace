@@ -21,6 +21,12 @@ $bg-color: #f7f8fa;
   // margin: 0 2rem; /* Right and left margins for the container */
   // padding: 2rem; /* Padding inside the container */
 }
+.no-freelancer-found {
+  text-align: center;
+  font-size: 1.5rem;
+  margin-top: 2rem;
+  color: $color-accent;
+}
 
 .heading {
   font-size: 24px;
@@ -148,10 +154,10 @@ $bg-color: #f7f8fa;
   margin-top: 1.5rem;
 }
 
-.invite-btn {
+.inviteButton {
   background-color: $color-accent;
   color: white;
-  padding: 0rem 2.5rem;  /* Smaller padding for a shorter button */
+  padding: 1rem 3.5rem;  /* Smaller padding for a shorter button */
   border: none;
   border-radius: 8px;
   cursor: pointer;

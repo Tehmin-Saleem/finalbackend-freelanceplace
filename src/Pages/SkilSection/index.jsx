@@ -25,13 +25,16 @@ const SkillManagement = () => {
   const [availableSkills, setAvailableSkills] = useState([
     "HTML", "CSS", "JavaScript", "React", "Figma", "Mobile App Design", "Prototyping", "Mockups"
   ]);
-  const [filteredSkills, setFilteredSkills] = useState(availableSkills);
+  const [filteredSkills, setFilteredSkills] = useState([...availableSkills]);
   const [searchTerm, setSearchTerm] = useState("");
 
   const handleAddSkill = (skill) => {
-    setSkills([...skills, skill]);
-    setAvailableSkills(availableSkills.filter((s) => s !== skill));
-    setFilteredSkills(filteredSkills.filter((s) => s !== skill));
+    if (!skills.includes(skill)) {
+      setSkills([...skills, skill]);
+      // Remove the added skill from available skills and filtered skills
+      setAvailableSkills(availableSkills.filter((s) => s !== skill));
+      setFilteredSkills(filteredSkills.filter((s) => s !== skill));
+    }
   };
 
   const handleRemoveSkill = (skill) => {
@@ -58,7 +61,20 @@ const SkillManagement = () => {
     const filtered = availableSkills.filter((skill) =>
       skill.toLowerCase().includes(value)
     );
-    setFilteredSkills(filtered);
+
+    // If the input is not empty, include previously selected skills
+    if (value) {
+      setFilteredSkills([...filtered, ...skills]);
+    } else {
+      setFilteredSkills(availableSkills);
+    }
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter" && searchTerm.trim()) {
+      handleAddSkill(searchTerm.trim());
+      setSearchTerm(""); // Clear the search input
+    }
   };
 
   const steps = [
@@ -109,6 +125,7 @@ const SkillManagement = () => {
               placeholder="Search skills or add your own"
               value={searchTerm}
               onChange={handleSearchChange} // Search handler
+              onKeyDown={handleKeyDown} // Handle Enter key
             />
             <SearchIcon />
           </div>
