@@ -51,19 +51,57 @@ const io = require("socket.io")(server, {
 });
 
 
-// Set up a simple route (optional)
-app.get("/", (req, res) => {
-  res.send("Chat server is running");
-  console.log("Chat server is running")
-});
+
+
+
+
+
+io.on("connection", (socket) => {
+  // console.log("Connected to socket.io");
+
+  socket.on("setup", (userData) => {
+
+    
+
+    // Check if userData is valid
+    if (!userData) {
+      console.error("Invalid user data received:", userData);
+      return;
+    }
+   
+
+    // Check if the user is a freelancer or client based on the presence of freelancer_id or _id
+    if (userData.freelancer_id) {
+      socket.join(userData.freelancer_id); // Join room using freelancer_id for freelancers
+      // console.log(`Freelancer joined room: ${userData.freelancer_id}`);
+    } else if (userData._id) {
+      socket.join(userData._id); // Join room using _id for clients
+      // console.log(`Client joined room: ${userData._id}`);
+    } else {
+      console.error("Neither _id nor freelancer_id found in user data:", userData);
+      return;
+    }
+
+    socket.emit("connected");
+  });
+
+
+
+
+
+
+
+
+
 
 // Socket.IO connection handling
 io.on('connection', (socket) => {
-  console.log('A user connected');
+  // console.log('A user connected');
 
   socket.on('authenticate', (token) => {
     try {
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      console.log(decoded.userId)
       socket.userId = decoded.userId;
       socket.join(decoded.userId.toString());
       console.log(`User ${decoded.userId} authenticated and joined their room`);
@@ -71,7 +109,7 @@ io.on('connection', (socket) => {
       console.error('Authentication failed:', error.message);
       socket.emit('auth_error', 'Invalid token'); // Emit error to client
     }
-  });
+  });})
   
 
 
@@ -103,13 +141,7 @@ io.on('connection', (socket) => {
   
 });
 
-const sendNotification = (userId, notificationData) => {
-  try {
-    io.to(userId.toString()).emit('notification', notificationData);
-  } catch (error) {
-    console.error(`Failed to send notification to user ${userId}:`, error);
-  }
-};
+
 
 
 
