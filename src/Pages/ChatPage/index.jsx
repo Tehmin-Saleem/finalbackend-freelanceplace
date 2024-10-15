@@ -9,12 +9,12 @@ import {
 } from "../../components/index";
 import { ChatState } from "../../context/ChatProvider";
 import { getSender } from "../../components/chatcomponents/ChatLogic";
-import { BigCross } from "../../svg";
+import { BigCross, Attachment } from "../../svg";
 import Lottie from "react-lottie";
 import ScrollableChat from "../../components/chatcomponents/ScrollableChat";
 import io from "socket.io-client";
-import animationData from "../../animations/typing.json"
-
+import animationData from "../../animations/typing.json";
+import { jwtDecode } from "jwt-decode";
 
 const ENDPOINT = "http://localhost:5000"; // "https://talk-a-tive.herokuapp.com"; -> After deployment
 var socket, selectedChatCompare;
@@ -25,7 +25,7 @@ const Chat = () => {
   const [searchResult, setSearchResult] = useState([]);
   const [loadingChat, setLoadingChat] = useState(false);
   const [error, setError] = useState(""); // State for error messages
-  const [loggedUser, setLoggedUser] = useState();
+  // const [loggedUser, setLoggedUser] = useState();
   const [fetchAgain, setFetchAgain] = useState(false);
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -33,7 +33,14 @@ const Chat = () => {
   const [socketConnected, setSocketConnected] = useState(false);
   const [typing, setTyping] = useState(false);
   const [istyping, setIsTyping] = useState(false);
-
+  const [attachment, setAttachment] = useState(null);
+  const [preview, setPreview] = useState(null);
+  const [contextMenu, setContextMenu] = useState({
+    visible: false,
+    x: 0,
+    y: 0,
+    chatId: null,
+  });
 
   const defaultOptions = {
     loop: true,
@@ -52,7 +59,90 @@ const Chat = () => {
     setNotification,
     chats,
     setChats,
+    loggedUser,
+    setLoggedUser,
+    selectFreelancer,
   } = ChatState();
+
+
+  // const fetchChatDetails = async () => {
+  //   try {
+  //     const token = localStorage.getItem("token");
+  //     if (!token) throw new Error("No token found");
+
+  //     const decodedToken = jwtDecode(token);
+  //     const userRole = decodedToken.role;
+
+  //     // Get freelancer or client based on user role
+  //     const client = selectedChat.users[1]?._id;
+  //     const freelancer = selectedChat.users[0]?._id;
+  //     console.log("Selected Freelancer:", freelancer);
+  //     console.log("Selected Client:", client);
+     
+      
+      
+  //     if (userRole === "client") {
+  //       selectFreelancer(freelancer); // Set the selected freelancer
+  //     } else if (userRole === "freelancer") {
+  //       selectFreelancer(client); // Set the selected client
+  //     }
+  //   } catch (error) {
+  //     console.error("Error during chat selection:", error);
+  //   }
+  // };
+
+
+
+
+  const handleChatSelect = (chat) => {
+
+    const token = localStorage.getItem("token");
+    if (!token) {
+      throw new Error("No token found");
+    }
+
+    const decodedToken = jwtDecode(token);  
+   const userRole = decodedToken.role;
+
+
+    const freelancer = chat.users[1]?._id; // Assuming 'chat' contains freelancer details
+    const client = chat.users[0]?._id;
+  
+    console.log("freelancer",chat.users[1]?._id);
+    console.log("client", chat.users[0]?._id );
+    if (userRole === "client") {
+      selectFreelancer(freelancer);       // Set the selected freelancer
+      
+    } else if( userRole === "freelancer"){
+
+      selectFreelancer(client)
+      
+    }
+    // Continue with your chat selection logic...
+  };  
+
+
+
+  const handleRightClick = (e, chatId) => {
+    e.preventDefault(); // Prevent the default context menu
+    setContextMenu({
+      visible: true,
+      x: e.clientX,
+      y: e.clientY,
+      chatId: chatId,
+    });
+  };
+
+  const handleDeleteChat = async () => {
+    if (contextMenu.chatId) {
+      await deleteChat(contextMenu.chatId); // Call the deleteChat function
+      setContextMenu({ visible: false, x: 0, y: 0, chatId: null });
+    }
+  };
+
+  const closeContextMenu = () => {
+    setContextMenu({ visible: false, x: 0, y: 0, chatId: null });
+  };
 
   // Function to open the drawer
   const handleSearchClick = () => {
@@ -64,11 +154,29 @@ const Chat = () => {
     setIsDrawerOpen(false);
   };
 
+  // ===========
   const handleSearch = async () => {
     if (!search) {
       setError("Please enter something in the search."); // Show error if input is empty
       return;
     }
+
+    // Check if user is undefined
+    if (!user) {
+      console.error("User data is not available yet.");
+      setError("User data is not available yet. Please try again.");
+      return;
+    }
+
+    const token = localStorage.getItem("token");
+    if (!token) {
+      throw new Error("No token found");
+    }
+
+    const decodedToken = jwtDecode(token);
+    const userRole = decodedToken.role;
+
+    //
 
     try {
       setLoading(true);
@@ -77,28 +185,85 @@ const Chat = () => {
       const config = {
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${user.token}`,
+          Authorization: `Bearer ${token}`,
         },
       };
-      // console.log("token in handle  search", user.token);
 
-      // i have to correct the route here ..........
-      const { data } = await axios.get(
-        `http://localhost:5000/api/client/SearchAllUsers?search=${search}`,
-        config
-      );
+      // Define search route based on user role
+      let route;
+      if (userRole === "client") {
+        // Clients should search for freelancers
+        route = `http://localhost:5000/api/client/searchFreelancers?search=${search}`;
+      } else if (userRole === "freelancer") {
+        // Freelancers should search for clients
+        route = `http://localhost:5000/api/freelancer/searchClients?search=${search}`;
+      } else {
+        setError("Invalid user role. Please log in again.");
+        setLoading(false);
+        return;
+      }
+
+      const { data } = await axios.get(route, config); // Use the correct route based on role
 
       setLoading(false);
       setSearchResult(data); // Store the search result
-      // console.log(data);
     } catch (error) {
       setLoading(false);
       setError("Failed to load search results. Please try again."); // Handle error
     }
   };
 
+  // ===========
+
+  // const handleSearch = async () => {
+  //   if (!search) {
+  //     setError("Please enter something in the search."); // Show error if input is empty
+  //     return;
+  //   }
+
+  //   // Check if user is undefined
+  //   if (!user) {
+  //     console.error("User data is not available yet.");
+  //     setError("User data is not available yet. Please try again.");
+  //     return;
+  //   }
+
+  //   console.log("user data in chat page", user);
+
+  //   try {
+  //     setLoading(true);
+  //     setError(""); // Clear previous error messages
+
+  //     const config = {
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //         Authorization: `Bearer ${user.token}`,
+  //       },
+  //     };
+  //     // console.log("token in handle  search", user.token);
+
+  //     // i have to correct the route here ..........
+  //     const { data } = await axios.get(
+  //       `http://localhost:5000/api/client/SearchAllUsers?search=${search}`,
+  //       config
+  //     );
+
+  //     setLoading(false);
+  //     setSearchResult(data); // Store the search result
+  //     // console.log(data);
+  //   } catch (error) {
+  //     setLoading(false);
+  //     setError("Failed to load search results. Please try again."); // Handle error
+  //   }
+  // };
+
+  // =======================
+
   const accessChat = async (userId) => {
-    console.log(userId);
+    const token = localStorage.getItem("token");
+    if (!token) {
+      throw new Error("No token found");
+    }
 
     // console.log("token in acceschats", user.token);
 
@@ -107,7 +272,7 @@ const Chat = () => {
       const config = {
         headers: {
           "Content-type": "application/json",
-          Authorization: `Bearer ${user.token}`,
+          Authorization: `Bearer ${token}`,
         },
       };
       const { data } = await axios.post(
@@ -134,10 +299,10 @@ const Chat = () => {
     // console.log(userId);
 
     // Get userInfo from localStorage and parse it
-    const userInfo = JSON.parse(localStorage.getItem("userInfo"));
-
-    // Extract the token from the userInfo object
-    const token = userInfo?.token;
+    const token = localStorage.getItem("token");
+    if (!token) {
+      throw new Error("No token found");
+    }
 
     try {
       const config = {
@@ -146,13 +311,12 @@ const Chat = () => {
           Authorization: `Bearer ${token}`,
         },
       };
-      
 
       const { data } = await axios.get(
         "http://localhost:5000/api/client/fetchchats",
         config
       );
-      
+
       setChats(data);
     } catch (error) {
       setError("Failed to load the chats. Please try again."); // Handle error
@@ -161,24 +325,29 @@ const Chat = () => {
   };
 
   useEffect(() => {
-    const userInfo = JSON.parse(localStorage.getItem("userInfo"));
-    setLoggedUser(userInfo);
-    // console.log("loggeduser is" ,loggedUser);
+    // Check if the user is a freelancer (has freelancer_id) or a client
+    const loggedInUserId = user.data?.freelancer_id || user._id;
+
+    // Set loggedUser to freelancer_id if freelancer, otherwise to _id (client)
+    setLoggedUser(loggedInUserId);
+
     fetchChats();
-  }, [fetchAgain]);
-
-
+  }, [fetchAgain, user]); // Combine the dependencies in one array
 
   // messages related integration
-
 
   const fetchMessages = async () => {
     if (!selectedChat) return;
 
+    const token = localStorage.getItem("token");
+    if (!token) {
+      throw new Error("No token found");
+    }
+
     try {
       const config = {
         headers: {
-          Authorization: `Bearer ${user.token}`,
+          Authorization: `Bearer ${token}`,
         },
       };
 
@@ -190,37 +359,37 @@ const Chat = () => {
       );
       setMessages(data);
       setLoading(false);
-      console.log(data)
+      console.log(data);
       socket.emit("join chat", selectedChat._id);
     } catch (error) {
       setError("Failed to load all the message"); // Handle error
-        console.log(error);
+      console.log(error);
     }
   };
 
-
-
-
-  
   useEffect(() => {
- 
-    const userInfo = JSON.parse(localStorage.getItem("userInfo"));
-  
-    if (userInfo && userInfo.user) {  // Check if userInfo has a valid user object
-      socket = io(ENDPOINT);
-      console.log("Emitting setup event with user:", userInfo.user);
-      socket.emit("setup", userInfo.user);  // Send only the user object
-      socket.on("connected", () => setSocketConnected(true));
-      socket.on("typing", () => setIsTyping(true));
-      socket.on("stop typing", () => setIsTyping(false));
-
-    } else {
-      console.error("No valid user data found in localStorage");
-      navigate("/");  // Redirect if no valid user
+    const token = localStorage.getItem("token");
+    if (!token) {
+      throw new Error("No token found");
     }
 
+    const decodedToken = jwtDecode(token);
+    const userRole = decodedToken.role;
+
+    socket = io(ENDPOINT);
+
+    if (userRole === "client") {
+      socket.emit("setup", user); // Emit only when the user data is available
+    } else if (userRole === "freelancer") {
+      socket.emit("setup", user.data);
+    }
+
+    socket.on("connected", () => setSocketConnected(true));
+    socket.on("typing", () => setIsTyping(true));
+    socket.on("stop typing", () => setIsTyping(false));
+
     // eslint-disable-next-line
-  }, []);
+  }, [user]); // Add 'user' as a dependency to ensure useEffect runs after user is set
 
   useEffect(() => {
     fetchMessages();
@@ -228,7 +397,6 @@ const Chat = () => {
     selectedChatCompare = selectedChat;
     // eslint-disable-next-line
   }, [selectedChat]);
-
 
   useEffect(() => {
     socket.on("message recieved", (newMessageRecieved) => {
@@ -246,15 +414,20 @@ const Chat = () => {
     });
   });
 
-
   const sendMessage = async (event) => {
     if (event.key === "Enter" && newMessage) {
       socket.emit("stop typing", selectedChat._id);
+
+      const token = localStorage.getItem("token");
+      if (!token) {
+        throw new Error("No token found");
+      }
+
       try {
         const config = {
           headers: {
             "Content-type": "application/json",
-            Authorization: `Bearer ${user.token}`,
+            Authorization: `Bearer ${token}`,
           },
         };
         setNewMessage("");
@@ -267,17 +440,16 @@ const Chat = () => {
           config
         );
 
-        
         socket.emit("new message", data);
         setMessages([...messages, data]);
       } catch (error) {
         setError("Failed to send the message"); // Handle error
         console.log(error);
+      }
     }
+  };
 
-  }
-};
-
+  
 
   const typingHandler = (e) => {
     setNewMessage(e.target.value);
@@ -297,7 +469,73 @@ const Chat = () => {
         setTyping(false);
       }
     }, timerLength);
+  };
 
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      if (file.size > 100 * 1024 * 1024) {
+        // 100MB limit
+        alert("File size exceeds 100MB limit.");
+        return;
+      }
+
+      setAttachment({ name: file.name, file });
+
+      // Create a preview for images
+      if (file.type.startsWith("image/")) {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          setPreview(reader.result);
+        };
+        reader.readAsDataURL(file);
+      } else {
+        setPreview(null);
+      }
+    }
+  };
+
+  const deleteChat = async (chatId) => {
+    try {
+      const token = localStorage.getItem("token");
+
+      
+    if (!token) {
+      throw new Error("No token found");
+    }
+
+    // Decode the token to get user role
+    const decodedToken = jwtDecode(token);
+    const userRole = decodedToken.role;
+
+    let route;
+    if (userRole === "client") {
+      // Clients use this route to delete chats
+      route = `http://localhost:5000/api/client/deletechat/${chatId}`;
+    } else if (userRole === "freelancer") {
+      // Freelancers use this route to delete chats
+      route = `http://localhost:5000/api/freelancer/deletechat/${chatId}`;
+    } else {
+      console.error("Invalid user role.");
+      setError("Invalid user role. Please log in again.");
+      return;
+    }
+
+    const config = {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    };
+
+    await axios.delete(route, config); // Use the correct route based on role
+
+      // Update UI after chat is deleted
+      setChats(chats.filter((chat) => chat._id !== chatId));
+      setSelectedChat(null); // Optionally clear the selected chat
+    } catch (error) {
+      console.error("Error deleting chat", error);
+      setError("Failed to delete the chat");
+    }
   };
 
   return (
@@ -321,27 +559,25 @@ const Chat = () => {
               selectedChat ? "hide-on-mobile" : ""
             }`}
           >
-            <div className="mychats-header">
-              My Chats
-              <div className="group-chat-modal">
-                <button className="new-group-chat-btn">
-                  New Group Chat <span className="plus-icon">+</span>
-                </button>
-              </div>
-            </div>
+            <div className="mychats-header">My Chats</div>
 
-            <div className="chat-box">
+            <div className="chat-box" onClick={closeContextMenu}>
               {chats ? (
                 <div className="chat-list">
                   {chats.map((chat) => (
                     <div
                       onClick={() => setSelectedChat(chat)}
+                      onContextMenu={(e) => handleRightClick(e, chat._id)} // Right-click event
+                      onDoubleClick={() => handleRightClick(e, chat._id)} // Optional: for double-click
                       className={`chat-item ${
                         selectedChat === chat ? "selected" : ""
                       }`}
                       key={chat._id}
                     >
-                      <p className="chat-name">
+                      <p
+                        className="chat-name"
+                        onClick={() => handleChatSelect(chat)}
+                      >
                         {!chat.isGroupChat
                           ? getSender(loggedUser, chat.users)
                           : chat.chatName}
@@ -362,6 +598,20 @@ const Chat = () => {
                 <ChatLoading />
                 // <div className="chat-loading">Loading chats...</div>
               )}
+
+              {/* Context menu for chat deletion */}
+              {contextMenu.visible && (
+                <div
+                  className="context-menu"
+                  style={{
+                    top: contextMenu.y,
+                    left: contextMenu.x,
+                    position: "absolute",
+                  }}
+                >
+                  <button onClick={handleDeleteChat}>Delete Chat</button>
+                </div>
+              )}
             </div>
           </div>
           {/* =========================== */}
@@ -379,38 +629,34 @@ const Chat = () => {
                     ←
                   </button>
 
-                  {/* Chat title */}
                   <span className="chat-title">
-                    {/* {messages && */}
                     {!selectedChat.isGroupChat ? (
                       <>{getSender(user, selectedChat.users)}</>
                     ) : (
                       <>{selectedChat.chatName.toUpperCase()}</>
                     )}
-                    {/* } */}
                   </span>
-                  </div>
+                </div>
 
-                  <div className="mainchat-box">
-                    {loading ? (
-                      <div className="spinner">
-                      </div>
-                    ) : (
-                      <div className="messages">
-                        <ScrollableChat messages={messages} />
+                <div className="mainchat-box">
+                  {loading ? (
+                    <div className="spinner"></div>
+                  ) : (
+                    <div className="messages">
+                      <ScrollableChat messages={messages} />
+                    </div>
+                  )}
+
+                  <div className="form-control">
+                    {/* Typing animation */}
+
+                    {istyping && (
+                      <div className="typing-animation">
+                        <Lottie options={defaultOptions} width={70} />
                       </div>
                     )}
 
-                    <div className="form-control">
-                      {/* Typing animation */}
-
-                      {istyping && (
-                        <div className="typing-animation">
-                          <Lottie options={defaultOptions} width={70} />
-                        </div>
-                       )}
-
-
+                    <div className="message-input-container">
                       {/* Message input */}
                       <input
                         type="text"
@@ -422,8 +668,36 @@ const Chat = () => {
                         value={newMessage}
                         onChange={typingHandler}
                       />
+
+                      <input
+                        type="file"
+                        id="fileInput"
+                        onChange={handleFileChange}
+                        accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+                        style={{ display: "none" }}
+                      />
+                      <label htmlFor="fileInput" className="attach-button">
+                        <Attachment />
+                        {/* You can replace this with an SVG icon similar to your Attachment component */}
+                      </label>
                     </div>
+
+                    {/* Display attached file info */}
+
+                    {attachment && (
+                      <div className="file-info">
+                        <p>Attached file: {attachment.name}</p>
+                        {preview && (
+                          <img
+                            src={preview}
+                            alt="Preview"
+                            style={{ maxWidth: "200px", maxHeight: "200px" }}
+                          />
+                        )}
+                      </div>
+                    )}
                   </div>
+                </div>
                 {/* ); }; */}
               </>
             ) : (
@@ -433,16 +707,6 @@ const Chat = () => {
                 </p>
               </div>
             )}
-
-            {/* <div className="chat-header"> 
-              <h3>jobtitle</h3>
-            </div>
-            <div className="chat-messages"></div>
-
-            <div className="message-input">
-              <input type="text" placeholder="Write a message..." />
-              <button>Send</button>
-            </div> */}
           </>
         </div>
 

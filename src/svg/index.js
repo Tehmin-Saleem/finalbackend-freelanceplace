@@ -51,6 +51,7 @@ import DollarIcon from "./Sammar's-SVG-Components/DollarIcon";
 import Cross from "./Myprofile/Cross";
 import Notifications from "./Sammar's-SVG-Components/Notifications";
 import BigCross from "./ChatPage/BigCross"
+import Attachment from "./ChatPage/Attachment"
 
 
 export { default as BackgroundLining } from "./Sammar's-SVG-Components/BackgroundLining";
@@ -104,3 +105,4 @@ export {default as Filter} from "./FreelanceDoneJobs/Filter"
 export {default as Cross} from "./Myprofile/Cross"
 export {default as Notifications} from "./Sammar's-SVG-Components/Notifications"
 export {default as BigCross} from "./ChatPage/BigCross"
+export {default as Attachment} from "./ChatPage/Attachment"

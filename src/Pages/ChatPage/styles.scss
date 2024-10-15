@@ -295,14 +295,17 @@ $bg-color: #f7f8fa;
 
 /* Header for the chats section */
 .mychats-header {
-  padding-bottom: 1rem;
+  padding-right: 1rem;
   padding-inline: 1rem;
+  background-color: #4bcbeb;
+  color: white;
   font-size: 28px;
   font-family: "Work Sans", sans-serif;
   display: flex;
-  justify-content: space-between;
-  width: 100%;
-  align-items: center;
+  // justify-content: space-between;
+  width: 40%;
+  align-items: self-start;
+  border-radius: 0.5rem;
 }
 
 /* Group Chat button */
@@ -312,8 +315,6 @@ $bg-color: #f7f8fa;
   padding: 0.5rem 1rem;
   border-radius: 0.25rem;
   border: none;
-  background-color: #4bcbeb;
-  color: white;
   cursor: pointer;
   align-items: center;
 }
@@ -466,5 +467,46 @@ $bg-color: #f7f8fa;
   width: 100%;
   background-color: white;
   border: none;
+  border-radius: 8px;
   
 }
+
+
+.message-input-container {
+  display: flex;
+  align-items: center;
+}
+
+.attach-button {
+  margin-left: 10px;
+  // background-color: white;
+  cursor: pointer;
+  /* Add additional styles as needed */
+}
+
+.file-info {
+  margin-top: 10px;
+  /* Add styles for file info display */
+}
+
+
+.context-menu {
+  background-color: white;
+  border: 1px solid #ccc;
+  padding: 10px;
+  z-index: 1000;
+}
+
+.context-menu button {
+  border: none;
+  background-color: transparent;
+  cursor: pointer;
+  padding: 5px;
+  width: 100%;
+  text-align: left;
+}
+
+.context-menu button:hover {
+  background-color: #f2f2f2;
+}
+

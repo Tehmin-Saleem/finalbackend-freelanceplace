@@ -1,6 +1,50 @@
+
+
+// export const getSender = (loggedUser, users) => {
+//   console.log("users in getsender",users)
+//   // Check if the logged-in user is a freelancer or a client
+//   let loggedInUserId;
+
+//   if(loggedInUserId === loggedUser._id){
+//     return users[0]._id === loggedInUserId ? users[0].first_name : users[1].first_name;
+
+//   }else if (loggedInUserId === loggedUser.freelancer_id ){
+//     return users[0]._id === loggedInUserId ? users[1].first_name : users[0].first_name;
+//   }
+ 
+
+
+//   // Return the name of the other user
+// };
+
+
 export const getSender = (loggedUser, users) => {
-    return users[0]?._id === loggedUser?.user.userId ? users[1].first_name  : users[0].first_name;
-  };
+  // Log the received loggedUser and users array for debugging
+  console.log("Logged User:", loggedUser);
+  console.log("Users Array:", users);
+
+  // Get the logged-in user's ID (either _id or freelancer_id)
+  const loggedInUserId = loggedUser?._id || loggedUser?.freelancer_id;
+
+  // Log the extracted loggedInUserId
+  console.log("Logged In User ID:", loggedInUserId);
+
+  // If loggedInUserId is not defined or the users array is not of length 2
+  if (!loggedInUserId || users.length !== 2) {
+    console.log("No match found for logged-in user, returning 'Unknown User'");
+    return "Unknown User";
+  }
+
+  // Return the name of the user who is NOT the logged-in user
+  const senderName = users[0]._id === loggedInUserId ? users[1].first_name : users[0].first_name;
+
+  // Log the result for clarity
+  console.log("Sender Name:", senderName);
+
+  return senderName;
+};
+
+
 
 
 
