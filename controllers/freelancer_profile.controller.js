@@ -3,7 +3,7 @@ const { cloudinary } = require('../config/cloudinary.config');
 
 exports.createOrUpdateProfile = async (req, res) => {
   try {
-    console.log('Received data:', req.body);
+    
     console.log('Received files:', req.files);
 
     const freelancerId = req.user && (req.user.userId || req.user);

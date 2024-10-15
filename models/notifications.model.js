@@ -25,6 +25,10 @@ const notificationsSchema = new Schema({
     type: Date,
     default: Date.now,
   }, 
+  message: {
+    type: String,
+    required: true,
+  },
 });
 
 const Notifications = mongoose.model("Notifications", notificationsSchema);

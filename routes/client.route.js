@@ -11,6 +11,9 @@ const path = require('path');
 const usercontroller=require ('../controllers/user.controller')
 const { upload } = require('../config/cloudinary.config');// const { forgotPassword, resetPassword } = require('../controllers/user.controller');
 
+const Notification= require ('../controllers/notifications.controller')
+
+
 
 // Import Chat controller
 const chatController = require('../controllers/chat.controller'); // Add this
@@ -58,6 +61,11 @@ router.get('/jobpost/:fileName', (req, res) => {
   res.sendFile(filePath);
 });
 
+router.get('/notifications', authMiddleware, Notification.getNotifications);
+router.post('/notifications', authMiddleware, Notification.createNotification);
+router.put('/notifications/:notificationId/read', authMiddleware, Notification.updateNotification);
+router.get('/notifications/unread-count', authMiddleware, Notification.getUnreadNotificationsCount);
+
 router.post('/reviews', ReviewController.createReview);
 
 
@@ -81,8 +89,8 @@ router.post('/jobpost', upload.single('attachment'), jobPostController.createJob
 // router.get('/offerform', reviewRequestController.getClientReviewRequests);
 
 
-router.post('/offerform', upload.single('attachment'), offerController.createoffer);
-
+router.post('/offerform', authMiddleware, upload.single('attachment'), offerController.createoffer);
+ 
 router.get('/job-posts', jobPostController.getAllJobPosts);
 router.get('/jobposts', jobPostController.getClientJobPosts);
 

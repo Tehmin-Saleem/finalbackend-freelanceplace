@@ -10,6 +10,8 @@ const authMiddleware = require('../middleware/auth.middleware');
 const freelancerProfileController = require('../controllers/freelancer_profile.controller');
 const { upload } = require('../config/cloudinary.config');//import forgot and rest password
 // const { forgotPassword, resetPassword } = require('../controllers/user.controller');
+const Notification= require ('../controllers/notifications.controller')
+
 
 
 // Import Chat controller
@@ -56,6 +58,10 @@ router.get('/profile/image/:fileName', (req, res) => {
     });
   });
 });
+router.get('/notifications', authMiddleware, Notification.getNotifications);
+router.post('/notifications', authMiddleware, Notification.createNotification);
+router.put('/notifications/:notificationId/read', authMiddleware, Notification.updateNotification);
+router.get('/notifications/unread-count', authMiddleware, Notification.getUnreadNotificationsCount);
 
 router.get('/profile/portfolios/:fileName', (req, res) => {
   const { fileName } = req.params;

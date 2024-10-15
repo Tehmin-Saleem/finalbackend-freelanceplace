@@ -6,7 +6,6 @@ const corsMiddleware = require("./config/cors.config");
 const authMiddleware = require("./middleware/auth.middleware");
 const Chat = require('./models/chat.model');
 const Freelancer = require('./models/freelancer_profile.model');
-const socketIo = require('socket.io');
 
 const app = express();
 const dotenv = require("dotenv");
@@ -16,12 +15,6 @@ const freelancerRoutes = require("./routes/freelancer.route");
 const cors = require("cors");
 const jwt = require('jsonwebtoken');
 
-
-
-
-
-
-// Enable CORS for all routes
 app.use(cors());
 dotenv.config();
 connectDB();
@@ -30,9 +23,6 @@ app.use(corsMiddleware);
 app.use(express.json());
 app.use(bodyParser.json());
 
-app.use("/api/client", clientRoutes);
-app.use("/api/freelancer", freelancerRoutes);
-
 const server = http.createServer(app);
 
 const PORT = process.env.PORT || 5000;
@@ -40,16 +30,18 @@ server.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
 
-
-
 const io = require("socket.io")(server, {
   pingTimeout: 60000,
   cors: {
     origin: "http://localhost:5173",
-    // credentials: true,
   },
 });
 
+// Make io accessible globally
+global.io = io;
+
+app.use("/api/client", clientRoutes);
+app.use("/api/freelancer", freelancerRoutes);
 
 
 
@@ -94,23 +86,35 @@ io.on("connection", (socket) => {
 
 
 
-// Socket.IO connection handling
-io.on('connection', (socket) => {
-  // console.log('A user connected');
+app.set('io', io);
 
-  socket.on('authenticate', (token) => {
-    try {
-      const decoded = jwt.verify(token, process.env.JWT_SECRET);
-      console.log(decoded.userId)
-      socket.userId = decoded.userId;
-      socket.join(decoded.userId.toString());
-      console.log(`User ${decoded.userId} authenticated and joined their room`);
-    } catch (error) {
-      console.error('Authentication failed:', error.message);
-      socket.emit('auth_error', 'Invalid token'); // Emit error to client
-    }
-  });})
-  
+global.io = io;
+io.use((socket, next) => {
+  const token = socket.handshake.auth.token;
+  if (!token) {
+    return next(new Error('Authentication error: No token provided'));
+  }
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    socket.userId = decoded.userId;
+    socket.userRole = decoded.role;
+    next();
+  } catch (error) {
+    return next(new Error('Authentication error: Invalid token'));
+  }
+});
+
+io.on('connection', (socket) => {
+  console.log(`New user connected, ID: ${socket.id}, User ID: ${socket.userId}, Role: ${socket.userRole}`);
+
+  // Join rooms based on user ID and role
+  socket.join(`${socket.userRole}_${socket.userId}`);
+  socket.join(socket.userRole);
+
+  socket.on('disconnect', () => {
+    console.log(`Client disconnected, ID: ${socket.id}, User ID: ${socket.userId}, Role: ${socket.userRole}`);
+  });
 
 
   socket.on("join chat", (room) => {
