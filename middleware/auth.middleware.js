@@ -4,7 +4,7 @@
 const jwt = require('jsonwebtoken');
 
 
-
+// 
 const authMiddleware = (req, res, next) => {
   const authHeader = req.headers['authorization']; // Capture the authorization header
   // console.log('Authorization header:', authHeader); // Log the header to see if it's present

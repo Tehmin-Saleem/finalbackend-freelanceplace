@@ -43,11 +43,48 @@ global.io = io;
 app.use("/api/client", clientRoutes);
 app.use("/api/freelancer", freelancerRoutes);
 
-// Set up a simple route (optional)
-app.get("/", (req, res) => {
-  res.send("Chat server is running");
-  console.log("Chat server is running")
-});
+
+
+
+
+
+io.on("connection", (socket) => {
+  // console.log("Connected to socket.io");
+
+  socket.on("setup", (userData) => {
+
+    
+
+    // Check if userData is valid
+    if (!userData) {
+      console.error("Invalid user data received:", userData);
+      return;
+    }
+   
+
+    // Check if the user is a freelancer or client based on the presence of freelancer_id or _id
+    if (userData.freelancer_id) {
+      socket.join(userData.freelancer_id); // Join room using freelancer_id for freelancers
+      // console.log(`Freelancer joined room: ${userData.freelancer_id}`);
+    } else if (userData._id) {
+      socket.join(userData._id); // Join room using _id for clients
+      // console.log(`Client joined room: ${userData._id}`);
+    } else {
+      console.error("Neither _id nor freelancer_id found in user data:", userData);
+      return;
+    }
+
+    socket.emit("connected");
+  });
+
+
+
+
+
+
+
+
+
 
 app.set('io', io);
 
@@ -107,8 +144,4 @@ io.on('connection', (socket) => {
   });
   
 });
-
-
-
-
-
+})

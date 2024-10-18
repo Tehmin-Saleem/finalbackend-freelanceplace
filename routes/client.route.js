@@ -25,6 +25,11 @@ const Proposal = require('../models/proposal.model');
 const { getFreelancerDetailsByProposal, getProposalById } = require('../controllers/proposal.controller');
 const router = express.Router();
 
+// Assume io is defined in your server.js file
+const socketIo = require('socket.io'); // Import socket.io
+const io = socketIo(); // Create an io instance
+
+
 
 
 router.post('/signup', signup);
@@ -137,7 +142,8 @@ router.get("/proposal/:proposalId", proposalController.getProposalById);
 
 
 
-router.get("/SearchAllUsers", authMiddleware, usercontroller.SearchallUsers);
+// router.get("/SearchAllUsers", authMiddleware, usercontroller.SearchallUsers);
+router.get("/SearchFreelancers", authMiddleware, usercontroller.searchFreelancers);
 
 
 
@@ -148,10 +154,9 @@ router.get("/SearchAllUsers", authMiddleware, usercontroller.SearchallUsers);
 
 router.post('/accesschats',authMiddleware, chatController.accessChat);
 router.get('/fetchchats', authMiddleware, chatController.fetchChats);
-router.post('/group',authMiddleware, chatController.createGroupChat);
-router.put("/rename",authMiddleware, chatController.renameGroup);
-router.put("/groupremove" , authMiddleware, chatController.removeFromGroup);
-router.put("/groupadd", authMiddleware, chatController.addToGroup);
+router.delete('/deletechat/:chatId',authMiddleware, chatController.deleteChat);
+
+
 
 
 // message-related routes
