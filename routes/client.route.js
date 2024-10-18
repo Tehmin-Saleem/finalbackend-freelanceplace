@@ -116,7 +116,8 @@ router.delete('/payment-methods/:paymentMethodId', paymentMethodController.delet
 
 
 
-router.post('/hire', hireFreelancerController.createHireRequest);
+router.post('/hire/:proposalId', authMiddleware, hireFreelancerController.hireFreelancer);
+
 
 
 router.get('/hire', hireFreelancerController.getClientHireRequests);
