@@ -18,8 +18,8 @@ const ProposalCard = ({
   status
 }) => {
 
-  console.log('Proposal ID:', ProposalID); // Log to check the id value
-  console.log('Proposal name:', name); // Log to check the id value
+  
+  console.log('Job name:', title); // Log to check the id value
   const navigate = useNavigate();
 
   const handleHireClick = (e) => {
@@ -27,16 +27,7 @@ const ProposalCard = ({
    
   };
 
-  // const handleChatClick = () => {
-  //   const freelancerData = {
-  //     id,
-  //     name,
-  //     jobTitle,
-  //     image,
-  //   };
-  //   localStorage.setItem("freelancerData", JSON.stringify(freelancerData));
-  //   navigate("/chat");  // Navigate to chat page
-  // };
+
 
 
 
