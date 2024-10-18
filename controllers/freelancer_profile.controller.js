@@ -188,14 +188,14 @@ exports.getProfileByFreelancerId = async (req, res) => {
     const { freelancer_id } = req.params;
 
     // Log freelancer_id to check if it's correct
-    console.log('Requested freelancer_id:', freelancer_id);
+    // console.log('Requested freelancer_id:', freelancer_id);
 
     // Fetch the profile that matches the freelancer_id from the database
     const profile = await Freelancer_Profile.findOne({ freelancer_id })
       .select('-__v -createdAt -updatedAt'); // Exclude unnecessary fields
 
     // Log the fetched profile
-    console.log('Fetched profile:', profile);
+    // console.log('Fetched profile:', profile);
 
     if (!profile) {
       return res.status(404).json({ success: false, message: 'Profile not found' });
@@ -228,8 +228,8 @@ exports.getProfileByFreelancerId = async (req, res) => {
       image: profile.image || null
     }
 
-    console.log('profile image:', formattedProfile.image);
-    console.log('Formatted profile data:', formattedProfile);
+    // console.log('profile image:', formattedProfile.image);
+    // console.log('Formatted profile data:', formattedProfile);
 
     res.status(200).json({ success: true, data: formattedProfile });
   } catch (err) {
