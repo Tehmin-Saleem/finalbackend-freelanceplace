@@ -20,8 +20,6 @@ const IndexPage = () => {
     const fetchData = async () => {
       try {
         const token = localStorage.getItem("token");
-        // console.log("Token:", token);
-
         if (!token) {
           navigate("/signin");
           return;
@@ -31,7 +29,6 @@ const IndexPage = () => {
           'Authorization': `Bearer ${token}`
         };
 
-        // Fetch proposals and user data concurrently
         const [proposalsResponse, userResponse] = await Promise.all([
           axios.get(`http://localhost:5000/api/freelancer/getproposals?jobId=${jobId}`, { headers }),
           axios.get(`http://localhost:5000/api/client/users`, { headers })
@@ -40,21 +37,18 @@ const IndexPage = () => {
         console.log("Proposals Response:", proposalsResponse.data);
         console.log("Users Response:", userResponse.data);
 
-        // Create a map of user IDs to country names
         const userCountryMap = userResponse.data.reduce((acc, user) => {
           acc[user._id] = user.country_name;
           return acc;
         }, {});
 
-        // Combine proposal data with country name
         const proposalsWithCountry = proposalsResponse.data.proposals.map(proposal => {
           const freelancerId = proposal.freelancerProfile?.userId;
           return {
             ...proposal,
             country: freelancerId ? userCountryMap[freelancerId] || "Unknown" : "Unknown",
-            image: proposal.freelancerProfile?.image
-          
-          
+            image: proposal.freelancerProfile?.image,
+            status: proposal.status || "Available" // Add this line to include the status
           };
         });
 
@@ -62,7 +56,6 @@ const IndexPage = () => {
 
         setProposals(proposalsWithCountry);
       } catch (err) {
-
         console.error("Error fetching data:", err.response ? err.response.data : err.message);
         setError(`Error fetching data: ${err.message}`);
       }
@@ -89,14 +82,28 @@ const IndexPage = () => {
     setIsModalOpen(false);
     setSelectedProposal(null);
   };
-
-  const handleHire = () => {
-    // navigate("/offerform");
+  const handleHire = async (proposal) => {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await axios.post(`${API_URL}/client/hire/${proposal.id}`, {}, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      console.log("Hire response:", response.data);
+      
+      // Update the status of the hired proposal
+      setProposals(prevProposals => 
+        prevProposals.map(p => 
+          p.id === proposal.id ? { ...p, status: 'Hired' } : p
+        )
+      );
+  
+      // Optionally, you can show a success message to the user
+     alert('you have hired the freelancer')
+    } catch (error) {
+      console.error("Error hiring freelancer:", error);
+      // Optionally, show an error message to the user
+    }
   };
-
-  if (error) {
-    return <div className="error-message">{error}</div>;
-  }
 
   const indexOfLastProposal = currentPage * rowsPerPage;
   const indexOfFirstProposal = indexOfLastProposal - rowsPerPage;
@@ -105,37 +112,34 @@ const IndexPage = () => {
 
   return (
     <div className="proposals-page">
-    <Header />
-    
-    <h1 className="proposals-heading">Proposals</h1>
-    <div className="profiles-container">
-      {currentProposals.map((proposal) => (
-        <div key={proposal.id} onClick={() => handleProposalClick(proposal)} className="profile-card">
-          <Proposalscard
-            name={proposal.freelancerProfile?.name || "No Name"}
-            title={proposal.freelancerProfile?.experience?.title || ""}
-            location={proposal.country || "Unknown"}
-            rate= {proposal.rate 
-              ? `${proposal.rate}$` 
-              : proposal.add_requirements?.by_project?.bid_amount 
-                ? `${proposal.add_requirements.by_project.bid_amount}$` 
-                : "Not specified"
-            }
-            earned={`$${proposal.freelancerProfile?.totalHours + (proposal.freelancerProfile?.totalJobs || 0)}+ earned`}
-            timeline={proposal.timeline || "Not specified"}
-            // image={proposal.freelancerProfile?.image 
-            //   ? `http://localhost:5000${proposal.freelancerProfile.image}`
-            //   : "/images/Profile.png"}
-            image={proposal.image}
-            coverLetter={proposal.coverLetter || "No cover letter available"}
-            jobTitle={proposal.jobTitle || "No job title"}
-            status={proposal.proposalStatus || "Available"}
-            isAuthenticatedUser={proposal.isAuthenticatedUser}
-            onHire={() => handleHire(proposal)}
-          />
-        </div>
-      ))}
-    </div>
+      <Header />
+      
+      <h1 className="proposals-heading">Proposals</h1>
+      <div className="profiles-container">
+        {currentProposals.map((proposal) => (
+          <div key={proposal.id} onClick={() => handleProposalClick(proposal)} className="profile-card">
+            <Proposalscard
+              name={proposal.freelancerProfile?.name || "No Name"}
+              title={proposal.freelancerProfile?.experience?.title || ""}
+              location={proposal.country || "Unknown"}
+              rate={proposal.rate 
+                ? `${proposal.rate}$` 
+                : proposal.add_requirements?.by_project?.bid_amount 
+                  ? `${proposal.add_requirements.by_project.bid_amount}$` 
+                  : "Not specified"
+              }
+              earned={`$${proposal.freelancerProfile?.totalHours + (proposal.freelancerProfile?.totalJobs || 0)}+ earned`}
+              timeline={proposal.timeline || "Not specified"}
+              image={proposal.image}
+              coverLetter={proposal.coverLetter || "No cover letter available"}
+              jobTitle={proposal.jobTitle || "No job title"}
+              status={proposal.status} // Use the status from the proposal
+              isAuthenticatedUser={proposal.isAuthenticatedUser}
+              onHire={() => handleHire(proposal)}
+            />
+          </div>
+        ))}
+      </div>
 
 
       <div className="pagination">
