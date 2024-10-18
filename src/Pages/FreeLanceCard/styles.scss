@@ -21,6 +21,22 @@ $bg-color: #f7f8fa;
   // margin: 0 2rem; /* Right and left margins for the container */
   // padding: 2rem; /* Padding inside the container */
 }
+.selected {
+  background-color: #007bff; /* Example selected color */
+  color: white;
+}
+
+.search-bar {
+  padding: 8px;
+  margin-bottom: 10px;
+  width: 100%;
+  box-sizing: border-box;
+}
+.selected-filter {
+  background-color: #f0f0f0; // Example color
+  color: #000; // Example text color
+}
+
 .no-freelancer-found {
   text-align: center;
   font-size: 1.5rem;

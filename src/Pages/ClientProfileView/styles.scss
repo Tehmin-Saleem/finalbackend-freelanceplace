@@ -1,0 +1,135 @@
+// src/components/ClientProfile/ClientProfile.scss
+
+$primary-color: #4bcbeb;
+$secondary-color: #ff7f50;
+$gray-color: #f7fafc;
+$text-color: #4a5568;
+$border-color: #e2e8f0;
+$dark-background: #333;
+$font-poppins: "Poppins", sans-serif;
+
+.client-profile {
+  background-color: $gray-color;
+  min-height: 100vh;
+//   padding: 4rem 2rem;
+  padding-left: 4rem;
+  padding-right: 4rem;
+  padding-top: 2rem;
+  padding-bottom: 1rem;
+  font-family: $font-poppins;
+
+  .profile-header {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    background-color: #fff;
+    padding: 1.5rem;
+    border: 1px solid $border-color;
+    border-radius: 8px;
+    margin-bottom: 2rem;
+
+    .profile-image {
+      img {
+        width: 150px;
+        height: 150px;
+        object-fit: cover;
+        border-radius: 50%;
+        background-color: #d7d7d8;
+      }
+    }
+
+    .profile-info {
+      h1 {
+        font-family: $font-poppins;
+        font-size: 30px;
+        color: $dark-background;
+        margin-bottom: 0.5rem;
+      }
+
+      p {
+        font-family: $font-poppins;
+        font-size: 14px;
+        color: $text-color;
+        margin: 0.2rem 0;
+      }
+    }
+  }
+
+  .about-section,
+  .projects-posted,
+  .reviews,
+  .hire-history,
+  .preferred-qualifications {
+    background-color: #fff;
+    padding: 1.5rem;
+    border: 1px solid $border-color;
+    border-radius: 10px;
+    margin-bottom: 2rem;
+
+    h2 {
+      font-family: $font-poppins;
+      font-size: 20px;
+      font-weight: 600;
+      color: $dark-background;
+      margin-bottom: 1rem;
+    }
+
+    p {
+      font-family: $font-poppins;
+      font-size: 14px;
+      color: $text-color;
+      margin-bottom: 0.5rem;
+    }
+
+    .project,
+    .review,
+    .history-item {
+      margin-bottom: 1rem;
+
+      h3 {
+        font-family: $font-poppins;
+        font-size: 18px;
+        color: $dark-background;
+        margin-bottom: 0.3rem;
+      }
+
+      strong {
+        color: $dark-background;
+      }
+
+      .rating {
+        color: $secondary-color;
+      }
+    }
+  }
+
+  .reviews {
+    .review {
+      border-top: 1px solid $border-color;
+      padding-top: 1rem;
+
+      &:first-child {
+        border-top: none;
+        padding-top: 0;
+      }
+    }
+  }
+
+  .hire-history {
+    .history-item {
+      border-bottom: 1px solid $border-color;
+      padding-bottom: 1rem;
+
+      &:last-child {
+        border-bottom: none;
+        padding-bottom: 0;
+      }
+    }
+  }
+
+  .preferred-qualifications {
+    p {
+      margin-bottom: 0.3rem;
+    }
+  }
+}
