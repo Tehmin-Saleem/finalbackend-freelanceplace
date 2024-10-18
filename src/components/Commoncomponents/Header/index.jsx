@@ -108,7 +108,7 @@ const Header = () => {
       navigate("/jobPosting");
     } 
     else if (option === "Explore Freelancers") {
-      navigate("/FreelanceCard");  
+      navigate("/freelancercard");  
     }else if (option === "All Jobs Post") {
       navigate("/alljobs");
     } else if (option === "Add Payment") {

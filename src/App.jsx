@@ -128,6 +128,7 @@ function App() {
         <Route path="/jobpopup" element={<JobPostedPopup />} />
         <Route path="/signin" element={<SignIn />} />
         <Route path="/signup" element={<Signup />} />
+        <Route path="/profile/:userId" element={<ProfileView />} />
 
         {/* Chat Route with ChatProvider */}
         <Route

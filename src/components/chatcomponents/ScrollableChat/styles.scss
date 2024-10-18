@@ -50,10 +50,46 @@
   
   .user-message {
     background-color: #bee3f8;
+    padding: 8px 12px;
+    border-radius: 8px;
+    max-width: 70%;
   }
   
   .other-message {
     background-color: #b9f5d0;
+    padding: 8px 12px;
+    border-radius: 8px;
+    max-width: 70%;
   }
+
+
+
+
+  .scrollable-chat {
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+  }
+  
+  .message-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+  
+
+  
+  .attachment img {
+    border-radius: 5px;
+  }
+  
+  .attachment a {
+    color: #007bff;
+    text-decoration: none;
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+  
   
   

@@ -2,11 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import "./styles.scss";
 import { jwtDecode } from "jwt-decode";
-import {
-  UserReview,
-  CommonButton,
-  Header,
-} from "../../components/index";
+import { UserReview, CommonButton, Header } from "../../components/index";
 
 import {
   Australia,
@@ -34,22 +30,24 @@ function ProfileView() {
         const decodedToken = jwtDecode(token);
         const userId = decodedToken.userId;
         const headers = {
-          'Authorization': `Bearer ${token}`
+          Authorization: `Bearer ${token}`,
         };
         const [response, userResponse] = await Promise.all([
-           axios.get(`http://localhost:5000/api/freelancer/profile/${userId}`, { headers }),
-           axios.get(`http://localhost:5000/api/client/users`, { headers }),
-          ]);
-        
+          axios.get(`http://localhost:5000/api/freelancer/profile/${userId}`, {
+            headers,
+          }),
+          axios.get(`http://localhost:5000/api/client/users`, { headers }),
+        ]);
+
         setProfileData(response.data.data);
-        const userInfo = userResponse.data.find(user => user._id === userId);
+        const userInfo = userResponse.data.find((user) => user._id === userId);
         setCountry(userInfo ? userInfo.country_name : "Not specified");
-       
+
         setLoading(false);
         // console.log('profile:', profileData.image)
       } catch (err) {
-        console.error('Error fetching profile data:', err);
-        setError(err.message || 'Failed to fetch profile data');
+        console.error("Error fetching profile data:", err);
+        setError(err.message || "Failed to fetch profile data");
         setLoading(false);
       }
     };
@@ -57,16 +55,16 @@ function ProfileView() {
     fetchProfileData();
     setCountry(localStorage.getItem("country") || "Not specified");
   }, []);
-  
+
   if (loading) return <div>Loading...</div>;
   if (error) return <div>{error}</div>;
   if (!profileData) return <div>No profile data found</div>;
 
-//   console.log('Profile data:', profileData);
-  
-// console.log('Profile image path:', `http://localhost:5000${profileData.image}`);
-// console.log('Profile data:', profileData.image);
-// console.log('Portfolio path:', `http://localhost:5000/api/freelancer/profile/portfolios/${profileData.attachment}`);
+  //   console.log('Profile data:', profileData);
+
+  // console.log('Profile image path:', `http://localhost:5000${profileData.image}`);
+  // console.log('Profile data:', profileData.image);
+  // console.log('Portfolio path:', `http://localhost:5000/api/freelancer/profile/portfolios/${profileData.attachment}`);
 
   const userReviews = [
     {
@@ -104,9 +102,9 @@ function ProfileView() {
       <div className="m-20 p-8 absolute">
         <div className="upper-part">
           <div className="container">
-          <div className="flex items-center mb-16 pl-8">
-          <img
-                src={profileData.image}  // Image URL from Cloudinary
+            <div className="flex items-center mb-16 pl-8">
+              <img
+                src={profileData.image} // Image URL from Cloudinary
                 alt={profileData.name}
                 className="w-18 h-20 rounded-full aspect-square"
               />
@@ -116,7 +114,6 @@ function ProfileView() {
                   {profileData.name}
                 </div>
                 <div className="flex items-center">
-                
                   <div className="text-[#2C3E50] text-[20px] font-Poppins mb-5 location">
                     {country}
                   </div>
@@ -212,35 +209,39 @@ function ProfileView() {
               </div>
 
               <div className="PortfolioSection">
-        <h2 className="PortfolioTitle">Portfolio</h2>
-        <div className="grid grid-cols-3 gap-4 ml-4">
-          {profileData.portfolios.map((portfolio, index) => (
-            <div key={index} className="border rounded p-4">
-            {portfolio.attachment && (
-  portfolio.attachment.toLowerCase().endsWith('.pdf') ? (
-    <div className="w-full h-40 flex items-center justify-center bg-gray-200 mb-2">
-      <a 
-        href={portfolio.attachment}
-        target="_blank" 
-        rel="noopener noreferrer"
-        className="text-blue-500 underline"
-      >
-        View PDF
-      </a>
-    </div>
-  ) : (
-    <img 
-      src={portfolio.attachment}
-      alt={portfolio.project_title || `Portfolio item ${index + 1}`} 
-      className="w-full h-40 object-cover mb-2" 
-    />
-  )
-)}
-              <h3 className="font-Poppins text-[16px] text-[#2C3E50]">{portfolio.project_title}</h3>
-            </div>
-          ))}
-        </div>
-      </div>
+                <h2 className="PortfolioTitle">Portfolio</h2>
+                <div className="grid grid-cols-3 gap-4 ml-4">
+                  {profileData.portfolios.map((portfolio, index) => (
+                    <div key={index} className="border rounded p-4">
+                      {portfolio.attachment &&
+                        (portfolio.attachment.toLowerCase().endsWith(".pdf") ? (
+                          <div className="w-full h-40 flex items-center justify-center bg-gray-200 mb-2">
+                            <a
+                              href={portfolio.attachment}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-blue-500 underline"
+                            >
+                              View PDF
+                            </a>
+                          </div>
+                        ) : (
+                          <img
+                            src={portfolio.attachment}
+                            alt={
+                              portfolio.project_title ||
+                              `Portfolio item ${index + 1}`
+                            }
+                            className="w-full h-40 object-cover mb-2"
+                          />
+                        ))}
+                      <h3 className="font-Poppins text-[16px] text-[#2C3E50]">
+                        {portfolio.project_title}
+                      </h3>
+                    </div>
+                  ))}
+                </div>
+              </div>
 
               <div className="">
                 <div className="review">
@@ -266,4 +267,3 @@ function ProfileView() {
 }
 
 export default ProfileView;
-

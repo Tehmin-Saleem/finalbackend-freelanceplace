@@ -1,31 +1,81 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom"; // Use useNavigate instead of useHistory
+
+import { jwtDecode } from "jwt-decode";
+import axios from "axios";
 
 const ChatContext = createContext();
 
 const ChatProvider = ({ children }) => {
   const [selectedChat, setSelectedChat] = useState();
-  const [user, setUser] = useState();
+  const [user, setUser] = useState([]);
   const [notification, setNotification] = useState([]);
-  // const [token, settoken] = useState();
   const [chats, setChats] = useState([]);
+  const [error, setError] = useState();
+  const [loggedUser, setLoggedUser] = useState();
+  const [selectedFreelancer, setSelectedFreelancer] = useState(null); 
+  const [selectedClient, setSelectedClient] = useState(null); 
 
-  const navigate = useNavigate(); // Use navigate from react-router-dom
+
 
   useEffect(() => {
-    const userInfo = JSON.parse(localStorage.getItem("userInfo"));
-    // const token = (localStorage.getItem("token"));
-    console.log(userInfo);
-    setUser(userInfo);
-    
+  const fetchProfileData = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        throw new Error("No token found");
+      }
+  
+      const decodedToken = jwtDecode(token);
+      const userId = decodedToken.userId;
+      const userRole = decodedToken.role; // Assuming role is included in the token (client/freelancer)
 
-    
+  
+      
+      const headers = {
+        Authorization: `Bearer ${token}`,
+      };
+  
+      let userData;
+  
+      if (userRole === 'freelancer') {
+        // If the user is a freelancer, fetch freelancer profile details
+        const response = await axios.get(`http://localhost:5000/api/freelancer/profile/${userId}`, {
+          headers,
+        });
+        userData = response.data;
+        setUser(userData); // Set profile data specifically for freelancers
+      } else if (userRole === 'client') {
+        // If the user is a client, fetch client-specific data
+        const response = await axios.get(`http://localhost:5000/api/client/users/${userId}`, {
+          headers,
+        });
+        userData = response.data;
+        
+        // Set user data specifically for clients
+        setUser(userData);
+      }
+  
+      // Pass the fetched data to setUser based on the role
+  
+      
+    } catch (err) {
+      console.error("Error fetching user data:", err);
+      setError(err.message || "Failed to fetch user data");
+     
+    }
+  };
+  
+  fetchProfileData();
+}, []);
 
 
+// Function to set the selected freelancer when a chat is selected
+const selectFreelancer = (freelancer, client) => {
+  setSelectedFreelancer(freelancer);
+  setSelectedClient(client);
+  
+};
 
-    if (!userInfo) navigate("/"); // Replace history.push with navigate
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [navigate]);
 
   return (
     <ChatContext.Provider
@@ -34,12 +84,14 @@ const ChatProvider = ({ children }) => {
         setSelectedChat,
         user,
         setUser,
-        // token,
-        // settoken,
         notification,
         setNotification,
         chats,
         setChats,
+        loggedUser,
+        setLoggedUser,
+        selectedFreelancer, // Include selectedFreelancer in the context
+        selectFreelancer,    // Include the function to select the freelancer
       }}
     >
       {children}

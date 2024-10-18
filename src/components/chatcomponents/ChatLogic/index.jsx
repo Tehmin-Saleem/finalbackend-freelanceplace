@@ -1,10 +1,23 @@
 export const getSender = (loggedUser, users) => {
-    return users[0]?._id === loggedUser?.user.userId ? users[1].first_name  : users[0].first_name;
-  };
 
 
+  // Ensure both `loggedInUserId` and `users` array are valid
+  if (!loggedUser || !users || users.length < 2) {
+    return null;  // or handle the error as per your logic
+  }
 
+  // Check if the first user is the logged-in user
+  if (users[0]._id === loggedUser) {
+    // Return the name of the other user (user 1 in the array)
+    return users[1].first_name;
+  } else if (users[1]._id === loggedUser) {
+    // Return the name of the other user (user 0 in the array)
+    return users[0].first_name;
+  }
 
+  // If no match is found, return null or handle appropriately
+  return null;
+};
 
   export const isSameSender = (messages, m, i, userId) => {
     return (
