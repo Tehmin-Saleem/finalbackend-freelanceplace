@@ -65,61 +65,62 @@ const Chat = () => {
   } = ChatState();
 
 
-  // const fetchChatDetails = async () => {
-  //   try {
-  //     const token = localStorage.getItem("token");
-  //     if (!token) throw new Error("No token found");
-
-  //     const decodedToken = jwtDecode(token);
-  //     const userRole = decodedToken.role;
-
-  //     // Get freelancer or client based on user role
-  //     const client = selectedChat.users[1]?._id;
-  //     const freelancer = selectedChat.users[0]?._id;
-  //     console.log("Selected Freelancer:", freelancer);
-  //     console.log("Selected Client:", client);
-     
-      
-      
-  //     if (userRole === "client") {
-  //       selectFreelancer(freelancer); // Set the selected freelancer
-  //     } else if (userRole === "freelancer") {
-  //       selectFreelancer(client); // Set the selected client
-  //     }
-  //   } catch (error) {
-  //     console.error("Error during chat selection:", error);
-  //   }
-  // };
-
-
-
-
   const handleChatSelect = (chat) => {
-
     const token = localStorage.getItem("token");
     if (!token) {
       throw new Error("No token found");
     }
-
-    const decodedToken = jwtDecode(token);  
-   const userRole = decodedToken.role;
-
-
-    const freelancer = chat.users[1]?._id; // Assuming 'chat' contains freelancer details
-    const client = chat.users[0]?._id;
   
-    console.log("freelancer",chat.users[1]?._id);
-    console.log("client", chat.users[0]?._id );
+    const decodedToken = jwtDecode(token);  
+    const userRole = decodedToken.role;
+  
+    const user1 = chat.users[0];
+    const user2 = chat.users[1];
+  
+    // Ensure roles are correctly assigned based on actual user roles, not array index
+    const freelancer = user1?.role === 'freelancer' ? user1._id : user2._id;
+    const client = user1?.role === 'client' ? user1._id : user2._id;
+  
+    console.log("freelancer in function handleChatSelect", freelancer);
+    console.log("client in function handleChatSelect", client);
+    
     if (userRole === "client") {
-      selectFreelancer(freelancer);       // Set the selected freelancer
-      
-    } else if( userRole === "freelancer"){
-
-      selectFreelancer(client)
-      
+      selectFreelancer(freelancer);  // Set the selected freelancer
+    } else if (userRole === "freelancer") {
+      selectFreelancer(client);      // Set the selected client
     }
-    // Continue with your chat selection logic...
-  };  
+  };
+  
+
+
+
+
+  // const handleChatSelect = (chat) => {
+
+  //   const token = localStorage.getItem("token");
+  //   if (!token) {
+  //     throw new Error("No token found");
+  //   }
+
+  //   const decodedToken = jwtDecode(token);  
+  //  const userRole = decodedToken.role;
+
+
+  //   const freelancer = chat.users[1]?._id; // Assuming 'chat' contains freelancer details
+  //   const client = chat.users[0]?._id;
+  
+  //   console.log("freelancer in function handleChatSelect",chat.users[1]?._id);
+  //   console.log("client", chat.users[0]?._id );
+  //   if (userRole === "client") {
+  //     selectFreelancer(freelancer);       // Set the selected freelancer
+      
+  //   } else if( userRole === "freelancer"){
+
+  //     selectFreelancer(client)
+      
+  //   }
+  //   // Continue with your chat selection logic...
+  // };  
 
 
 
@@ -631,7 +632,8 @@ const Chat = () => {
 
                   <span className="chat-title">
                     {!selectedChat.isGroupChat ? (
-                      <>{getSender(user, selectedChat.users)}</>
+                      <>{getSender(user, selectedChat.users)}
+                      </>
                     ) : (
                       <>{selectedChat.chatName.toUpperCase()}</>
                     )}

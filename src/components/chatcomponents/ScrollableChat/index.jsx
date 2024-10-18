@@ -3,7 +3,6 @@ import React, { useEffect, useState } from "react";
 import { Tooltip } from "@chakra-ui/tooltip";
 import ScrollableFeed from "react-scrollable-feed";
 import { jwtDecode } from "jwt-decode";
-import { proxy, useSnapshot } from "valtio";
 import axios from "axios";
 import {
   isLastMessage,
@@ -14,82 +13,79 @@ import {
 import { ChatState } from "../../../context/ChatProvider";
 import "./styles.scss";
 
-const state = proxy({
-  user: {
-    first_name: "",
-    last_name: "",
-    email: "",
-    role: "",
-    country_name: "",
-  },
-  dropdownOpen: false,
-  selectedOption: "",
-  hoveredOption: "",
-});
+
 
 const ScrollableChat = ({ messages }) => {
-  const snap = useSnapshot(state);
-  const [error, setError] = useState(""); // State for error messages
   const [userData, setuserData] = useState("");
+  const [error, setError] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  
+ 
   const { user, selectedFreelancer } = ChatState();
-
+ 
+ 
   const getInitials = (firstName, lastName) => {
     return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
   };
-
-  // const initials = getInitials(snap.user.first_name, snap.user.last_name);
-
-  const retryFetch = async (url, options, retries = 3, delay = 1000) => {
-    try {
-      const response = await axios.get(url, options);
-      return response;
-    } catch (err) {
-      if (retries === 0) throw err;
-      await new Promise((res) => setTimeout(res, delay)); // Wait before retrying
-      return retryFetch(url, options, retries - 1, delay * 2); // Retry with exponential backoff
-    }
-  };
-
   useEffect(() => {
     const fetchFreelancerProfileData = async () => {
+      // Clear previous data before fetching new data
+      setuserData("");
+      setIsLoading(true);
+      setError(null);
+
       try {
         const token = localStorage.getItem("token");
         if (!token) throw new Error("No token found");
 
         const decodedToken = jwtDecode(token);
-        const userRole = decodedToken.role; // Assuming role is included in the token (client/freelancer)
-        const userId = selectedFreelancer;
-        console.log("user ", selectedFreelancer);
+        const userRole = decodedToken.role;
+
+        if (!userRole) {
+          throw new Error("No role found in token");
+        }
+
+        if (!selectedFreelancer) {
+          console.warn("No selected freelancer");
+          setIsLoading(false); // Stop loading since no selection
+          return;
+        }
 
         const headers = { Authorization: `Bearer ${token}` };
-
+        let response;
         if (userRole === "client") {
-          const response = await retryFetch(
+          response = await axios.get(
             `http://localhost:5000/api/freelancer/profilebyfreelancerid/${selectedFreelancer}`,
             { headers }
           );
+          console.log("Freelancer data fetched successfully:", response.data);
           setuserData(response.data);
         } else if (userRole === "freelancer") {
-          const response = await axios.get(
-            `http://localhost:5000/api/client/users/${userId}`
+          response = await axios.get(
+            `http://localhost:5000/api/client/users/${selectedFreelancer}`,
+            { headers }
           );
-          state.user = response.data;
-
-          // Calculate initials after fetching the data
+          console.log("Client data fetched successfully:", response.data);
           const fetchedInitials = getInitials(
             response.data.first_name,
             response.data.last_name
           );
-          setuserData({ initials: fetchedInitials });
+          setuserData({ ...response.data, initials: fetchedInitials });
+        } else {
+          throw new Error("Unknown user role");
         }
+
       } catch (err) {
-        console.error("Error fetching freelancer data:", err);
-        setError(err.message || "Failed to fetch freelancer data");
+        console.error("Error fetching data:", err);
+        setError(err.message || "Failed to fetch data");
+      } finally {
+        setIsLoading(false); // Stop loading once fetching is done
       }
     };
 
     fetchFreelancerProfileData();
   }, [selectedFreelancer]);
+
 
   return (
     <ScrollableFeed>
