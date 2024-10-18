@@ -67,8 +67,9 @@ class SocketManager {
   
       const isRelevantNotification = 
         (notification.type === 'new_offer' && notification.freelancer_id === this.userId) ||
-        (notification.type === 'new_proposal' && notification.client_id === this.userId);
-
+        (notification.type === 'new_proposal' && notification.client_id === this.userId) ||
+        (notification.type === 'hired' && notification.freelancer_id === this.userId);
+  
       if (isRelevantNotification) {
         console.log(`SocketManager: Processing notification for user ${this.userId}`);
         callback(notification);
@@ -77,5 +78,6 @@ class SocketManager {
       }
     });
   }
+
 }
 export default new SocketManager();
