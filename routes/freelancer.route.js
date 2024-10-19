@@ -119,7 +119,8 @@ router.get('/searchClients',authMiddleware, usercontroller.searchClients);
 
 router.post('/accesschats',authMiddleware, chatController.accessChat);
 router.get('/fetchchats', authMiddleware, chatController.fetchChats);
-router.delete('/:chatId',authMiddleware, chatController.deleteChat);
+router.delete('/deletechat/:chatId',authMiddleware, chatController.deleteChat);
+router.delete('/Message/:id', authMiddleware, chatController.deleteMessage);
 
 
 

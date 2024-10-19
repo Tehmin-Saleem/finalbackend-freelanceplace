@@ -205,6 +205,149 @@ const sendMessage = asyncHandler(async (req, res) => {
 });
 
 
+//@description     Delete Message
+// //@route           DELETE /api/Message/:id
+// //@access          Protected
+// const deleteMessage = asyncHandler(async (req, res) => {
+//   const { id } = req.params;
+//   // Validate message ID
+//   if (!id) {
+//     console.log("Message ID not provided");
+//     return res.sendStatus(400);
+//   }
+
+//   try {
+//     // Find the message by ID
+//     const message = await Message.findById(id);
+
+//     // Check if message exists
+//     if (!message) {
+//       return res.status(404).json({ message: "Message not found" });
+//     }
+
+//     // Check if the user is the sender of the message
+//     if (message.sender.toString() !== req.user.userId) {
+//       return res.status(403).json({ message: "You are not authorized to delete this message" });
+//     }
+
+//     // Delete the message
+//     await Message.findByIdAndDelete(id);
+
+//     // Find the related chat
+//     const chat = await Chat.findById(message.chat);
+
+
+//     if (!chat) {
+//       return res.status(404).json({ message: "Chat not found" });
+//     }
+    
+//     // Check if the deleted message is the latest message in the chat
+//     if (!chat.latestMessage) {
+//       return res.status(400).json({ message: "Chat does not have a latest message" });
+//     }
+
+//     // Check if the deleted message is the latest message in the chat
+//     if (chat.latestMessage.toString() === message._id.toString()) {
+//       // Find the new latest message for the chat
+//       const latestMessage = await Message.findOne({ chat: chat._id })
+//         .sort({ createdAt: -1 }) // Sort by the latest created message
+//         .exec();
+
+//       // Update the latest message in the chat
+//       chat.latestMessage = latestMessage ? latestMessage._id : null;
+//       await chat.save();
+//     }
+
+//     // Emit a 'messageDeleted' event to the chat room
+//     const io = req.app.get("io"); // Access the Socket.io instance
+//     io.to(chat._id).emit("messageDeleted", {
+//       messageId: id,
+//       chatId: chat._id,
+//       latestMessage: chat.latestMessage,
+//     });
+
+//     res.json({ message: "Message deleted successfully" });
+//   } catch (error) {
+//     res.status(500);
+//     throw new Error(error.message);
+//   }
+// });
+
+
+
+
+
+//@description     Delete Message
+//@route           DELETE /api/Message/:id
+//@access          Protected
+const deleteMessage = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+ 
+
+  // Validate message ID
+  if (!id) {
+    console.log("Message ID not provided");
+    return res.sendStatus(400); // Bad request
+  }
+
+  try {
+    // Find the message by ID
+    const message = await Message.findById(id);
+
+    // Check if message exists
+    if (!message) {
+      return res.status(404).json({ message: "Message not found" }); // Not found
+    }
+
+    // Check if the user is the sender of the message
+    if (message.sender.toString() !== req.user.userId) {
+      return res.status(403).json({ message: "You are not authorized to delete this message" }); // Forbidden
+    }
+
+    // Delete the message
+    await Message.findByIdAndDelete(id);
+
+    // Find the related chat
+    const chat = await Chat.findById(message.chat);
+
+    if (!chat) {
+      return res.status(404).json({ message: "Chat not found" }); // Chat not found
+    }
+
+    // Check if the deleted message is the latest message in the chat
+    if (chat.latestMessage && chat.latestMessage.toString() === message._id.toString()) {
+      // Find the new latest message for the chat
+      const latestMessage = await Message.findOne({ chat: chat._id })
+        .sort({ createdAt: -1 }) // Sort by the latest created message
+        .exec();
+
+      // Update the latest message in the chat
+      chat.latestMessage = latestMessage ? latestMessage._id : null;
+      await chat.save();
+    }
+
+    // Emit a 'messageDeleted' event to the chat room
+    const io = req.app.get("io"); // Access the Socket.io instance
+    io.to(chat._id.toString()).emit("message deleted", {
+      messageId: id, // ID of the deleted message
+      chatId: chat._id, // ID of the chat
+      latestMessage: chat.latestMessage, // Updated latest message, if applicable
+    });
+
+    // Send success response to the client
+    res.json({
+      message: "Message deleted successfully",
+      latestMessage: chat.latestMessage, // Return the latest message in the response
+    });
+
+  } catch (error) {
+    // Send a server error response if something goes wrong
+    res.status(500);
+    throw new Error(error.message);
+  }
+});
+
+
 
 
 
@@ -214,6 +357,7 @@ module.exports = {
   allMessages ,
   sendMessage,
   deleteChat,
+  deleteMessage,
 };
 
 

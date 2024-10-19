@@ -4,8 +4,9 @@ const bodyParser = require("body-parser");
 const connectDB = require("./config/db.config");
 const corsMiddleware = require("./config/cors.config");
 const authMiddleware = require("./middleware/auth.middleware");
-const Chat = require("./models/chat.model");
+const Chat = require("./models/Chatting.model");
 const Freelancer = require("./models/freelancer_profile.model");
+const {deleteMessage} = require("./controllers/chat.controller")
 
 const app = express();
 const dotenv = require("dotenv");
@@ -34,7 +35,7 @@ const io = require("socket.io")(server, {
   pingTimeout: 60000,
   cors: {
     origin: "http://localhost:5173",
-    methods: ["GET", "POST"],
+    // methods: ["GET", "POST"],
   },
 });
 
@@ -84,7 +85,7 @@ io.on("connection", (socket) => {
   // if i comment this section then my code for chat works-----
 
 
-  // app.set("io", io);
+  app.set("io", io);
 
   // io.use((socket, next) => {
   //   const token = socket.handshake.auth.token;
@@ -144,6 +145,30 @@ io.on("connection", (socket) => {
 
       socket.in(user._id).emit("message recieved", newMessageRecieved);
     });
+  });
+
+
+
+  // New message deletion logic
+  socket.on("delete message", async (messageId) => {
+    try {
+      // Assuming you have a function to delete the message from the DB
+      const deletedMessage = await deleteMessage(messageId); 
+
+      if (!deletedMessage) {
+        return console.log(`Message with ID ${messageId} not found or already deleted`);
+      }
+
+      // Emit a message deletion event to all users in the chat room
+      const chat = deletedMessage.chat;
+      chat.users.forEach((user) => {
+        socket.in(user._id).emit("message deleted", { messageId });
+      });
+
+      console.log(`Message with ID ${messageId} deleted successfully`);
+    } catch (error) {
+      console.error("Error deleting message:", error);
+    }
   });
 
   socket.off("setup", () => {

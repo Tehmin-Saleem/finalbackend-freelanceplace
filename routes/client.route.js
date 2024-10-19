@@ -155,6 +155,7 @@ router.get("/SearchFreelancers", authMiddleware, usercontroller.searchFreelancer
 router.post('/accesschats',authMiddleware, chatController.accessChat);
 router.get('/fetchchats', authMiddleware, chatController.fetchChats);
 router.delete('/deletechat/:chatId',authMiddleware, chatController.deleteChat);
+router.delete('/Message/:id',authMiddleware, chatController.deleteMessage);
 
 
 
