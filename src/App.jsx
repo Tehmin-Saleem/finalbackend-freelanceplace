@@ -22,7 +22,9 @@ import { NotificationProvider } from './Pages/Notifications/NotificationContext'
 import OfferDetails from "./Pages/OfferCard";
 import Clientdash from "./Pages/Dashboard";
 import ManageProjects from "./Pages/ManageProjects";
-import ManageProj from "./Pages/DummyProject";
+import ManageProj from "./Pages/ManageProjectUi";
+import ClientProfile from "./Pages/ClientProfileView";
+import ClientProfilePage from "./Pages/ClientProfileForm";
 // import PaymentMethod from './components/PaymentMethod';
 
 // Load your Stripe public key
@@ -150,9 +152,16 @@ function App() {
         <Route path="/OfferDetails" element={<OfferDetails/>} /> 
         <Route path="/ClientDash" element={<Clientdash/>} /> 
 
-        <Route path="/ManageProj" element={<ManageProjects/>} /> 
+        {/* <Route path="/ManageProj" element={<ManageProjects/>} /> 
 
-        <Route path="/ManageProject" element={<ManageProj/>} /> 
+        <Route path="/ManageProject" element={<ManageProj/>} />  */}
+
+
+
+        {/* //View your profile page// */}
+        <Route path="/ClientProfile" element={<ClientProfile/>} /> 
+        {/* //make your profile by fiiling the form  */}
+        <Route path="/ClientProfileForm" element={<ClientProfilePage/>} /> 
 
        
         

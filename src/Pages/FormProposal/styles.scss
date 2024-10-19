@@ -217,7 +217,7 @@ textarea {
       transition: all 0.3s ease;
      
       &.selected {
-        border-color: #007bff;
+        border-color: $color-accent;
         background-color: #f0f8ff;
       }
 

@@ -19,6 +19,48 @@ const OfferForm = () => {
     "JavaScript",
     "React",
   ]);
+  
+  const [filteredSkills, setFilteredSkills] = useState(popularSkills);
+  const [inputValue, setInputValue] = useState('');
+
+  // Handle search input changes
+  const handleSearch = (e) => {
+    const value = e.target.value;
+    setInputValue(value);
+    if (value) {
+      const filtered = popularSkills.filter((skill) =>
+        skill.toLowerCase().includes(value.toLowerCase())
+      );
+      setFilteredSkills(filtered);
+    } else {
+      setFilteredSkills(popularSkills);
+    }
+  };
+
+  // Handle adding new skills
+  const handleSkillAdd = (skill) => {
+    if (!selectedSkills.includes(skill)) {
+      setSelectedSkills([...selectedSkills, skill]);
+    }
+  };
+
+  // Handle removing selected skills
+  const handleSkillRemove = (skill) => {
+    const updatedSkills = selectedSkills.filter((selectedSkill) => selectedSkill !== skill);
+    setSelectedSkills(updatedSkills);
+  };
+
+  // Handle adding skills via input
+  const handleAddCustomSkill = (e) => {
+    if (e.key === 'Enter' && inputValue.trim() !== '') {
+      if (!selectedSkills.includes(inputValue)) {
+        setSelectedSkills([...selectedSkills, inputValue]);
+      }
+      setInputValue('');
+      setFilteredSkills(popularSkills); // Reset popular skills after adding custom skill
+    }
+  };
+
   const location = useLocation();
   const navigate = useNavigate();
   const { freelancerProfile } = location.state || {};
@@ -32,15 +74,15 @@ const OfferForm = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
 
-  const handleSkillAdd = (skill) => {
-    setSelectedSkills([...selectedSkills, skill]);
-    setPopularSkills(popularSkills.filter((item) => item !== skill));
-  };
+  // const handleSkillAdd = (skill) => {
+  //   setSelectedSkills([...selectedSkills, skill]);
+  //   setPopularSkills(popularSkills.filter((item) => item !== skill));
+  // };
 
-  const handleSkillRemove = (skill) => {
-    setPopularSkills([...popularSkills, skill]);
-    setSelectedSkills(selectedSkills.filter((item) => item !== skill));
-  };
+  // const handleSkillRemove = (skill) => {
+  //   setPopularSkills([...popularSkills, skill]);
+  //   setSelectedSkills(selectedSkills.filter((item) => item !== skill));
+  // };
 
   const handleFileAttach = (event) => {
     setAttachedFile(event.target.files[0]);
@@ -161,76 +203,103 @@ const OfferForm = () => {
 
               {/* Skills section */}
               <div className="field">
-                <label>Search skills or add your own:</label>
-                <div>
-                  <input type="text" className="inputWithIcon" />
-                  <span>
-                    <SearchIcon className="searchIcon" />
-                  </span>
-                </div>
-              </div>
+        <label>Search skills or add your own:</label>
+        <div className="inputWrapper">
+          <input
+            type="text"
+            className="inputWithIcon"
+            value={inputValue}
+            onChange={handleSearch}
+            onKeyDown={handleAddCustomSkill}
+            placeholder="Search skill "
+          />
+          {/* <span>
+            <SearchIcon className="searchIcon" />
+          </span> */}
+        </div>
+      </div>
 
-              <h3 className="field">Selected skills</h3>
-              <div className="skill">
-                {selectedSkills.map((skill) => (
-                  <button
-                    key={skill}
-                    type="button"
-                    className="skillButton"
-                    onClick={() => handleSkillRemove(skill)}
-                  >
-                    {skill}{" "}
-                    <span>
-                      <CrossIcon />
-                    </span>
-                  </button>
-                ))}
-              </div>
+      {/* Selected Skills */}
+      <h3 className="field">Selected skills</h3>
+      <div className="skill">
+        {selectedSkills.map((skill) => (
+          <button
+            key={skill}
+            type="button"
+            className="skillButton"
+            onClick={() => handleSkillRemove(skill)}
+          >
+            {skill}
+            <span>
+              <CrossIcon />
+            </span>
+          </button>
+        ))}
+      </div>
 
-              <h3 className="field">Popular skills for UI/UX Design</h3>
-              <div className="skills">
-                {popularSkills.map((skill) => (
-                  <button
-                    key={skill}
-                    type="button"
-                    className="skillButton"
-                    onClick={() => handleSkillAdd(skill)}
-                  >
-                    {skill}{" "}
-                    <span>
-                      <PlusIcon />
-                    </span>
-                  </button>
-                ))}
-              </div>
+      {/* Filtered or Popular Skills */}
+      <h3 className="field">Popular skills for UI/UX Design</h3>
+      <div className="skills">
+        {filteredSkills.map((skill) => (
+          <button
+            key={skill}
+            type="button"
+            className="skillButton"
+            onClick={() => handleSkillAdd(skill)}
+          >
+            {skill}
+            <span>
+              <PlusIcon />
+            </span>
+          </button>
+        ))}
+      </div>
 
               {/* Budget section */}
-              <h3 className="field">Budget</h3>
-              <div className="budget-section">
-                <div className="pricing-options">
-                  <div 
-                    className={`option-box ${budgetType === 'hourly' ? 'selected' : ''}`} 
-                    onClick={() => handleBudgetTypeChange('hourly')}
-                  >
-                    <div className="box-content">
-                      <span className="icon">
-                        <HourlyRate />
-                      </span>
-                      <p>Hourly rate</p>
-                    </div>
-                  </div>
-                  <div 
-                    className={`option-box ${budgetType === 'fixed' ? 'selected' : ''}`} 
-                    onClick={() => handleBudgetTypeChange('fixed')}
-                  >
-                    <div className="box-content">
-                      <span className="icon">
-                        <FixedRate />
-                      </span>
-                      <p>Fixed price</p>
-                    </div>
-                  </div>
-                </div>
+  <h3 className="field">Budget</h3>
+<div className="budget-section">
+  <div className="pricing-options">
+    <div
+      className={`option-box ${budgetType === 'hourly' ? 'selected' : ''}`}
+      onClick={() => handleBudgetTypeChange('hourly')}
+    >
+      <div className="box-content">
+        <input
+          type="radio"
+          name="budgetType"
+          value="hourly"
+          checked={budgetType === 'hourly'}
+          onChange={() => handleBudgetTypeChange('hourly')}
+          className="radio-button"
+        />
+        <span className="icon">
+          <HourlyRate />
+        </span>
+        <p>Hourly rate</p>
+      </div>
+    </div>
+    <div
+      className={`option-box ${budgetType === 'fixed' ? 'selected' : ''}`}
+      onClick={() => handleBudgetTypeChange('fixed')}
+    >
+      <div className="box-content">
+        <input
+          type="radio"
+          name="budgetType"
+          value="fixed"
+          checked={budgetType === 'fixed'}
+          onChange={() => handleBudgetTypeChange('fixed')}
+          className="radio-button"
+        />
+        <span className="icon">
+          <FixedRate />
+        </span>
+        <p>Fixed price</p>
+      </div>
+    </div>
+  </div>
+
+
 
                 {budgetType === 'hourly' && (
                   <div className="rate-inputs">
