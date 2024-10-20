@@ -130,12 +130,12 @@ exports.getProfileByUserId = async (req, res) => {
   console.log('Starting getProfileByUserId function');
   try {
     const userId = req.user.userId || req.user;
-    console.log('Fetching profile for user ID:', userId);
+    // console.log('Fetching profile for user ID:', userId);
     
     const profile = await Freelancer_Profile.findOne({ freelancer_id: userId })
       .select('-__v -createdAt -updatedAt');
 
-    console.log('Found profile:', profile);
+    // console.log('Found profile:', profile);
 
     if (!profile) {
       console.log('No profile found for user ID:', userId);
