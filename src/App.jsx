@@ -25,6 +25,8 @@ import ManageProjects from "./Pages/ManageProjects";
 import ManageProj from "./Pages/ManageProjectUi";
 import ClientProfile from "./Pages/ClientProfileView";
 import ClientProfilePage from "./Pages/ClientProfileForm";
+import AdminDashboard from "./Pages/AdminDashboard";
+import QueryForm from "./components/Commoncomponents/QueryForm";
 // import PaymentMethod from './components/PaymentMethod';
 
 // Load your Stripe public key
@@ -144,6 +146,8 @@ function App() {
         <Route path="*" element={<ErrorPage />} />
         <Route path="/Payment" element={ <PaymentMethod/>}/>
         <Route path="/propsalPopUp" element={<Popup/>} />
+        <Route path="/QueryForm" element={<QueryForm/>} />
+
         <Route path="/ReviewPopUp" element={<ReviewPopup/>} />
         <Route path="/Alljobspage" element={<AllJobsPage/>} /> 
         <Route path="/JobPopUp" element={<JobPostedPopup/>} /> 
@@ -162,6 +166,8 @@ function App() {
         <Route path="/ClientProfile" element={<ClientProfile/>} /> 
         {/* //make your profile by fiiling the form  */}
         <Route path="/ClientProfileForm" element={<ClientProfilePage/>} /> 
+
+        <Route path="/AdminDashboard" element={<AdminDashboard/>} /> 
 
        
         

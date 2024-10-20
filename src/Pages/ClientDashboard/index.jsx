@@ -6,10 +6,12 @@ import "./styles.scss";
 import { useNavigate } from 'react-router-dom';
 import axios from "axios";
 import { jwtDecode } from 'jwt-decode';
+import { FaEnvelope } from 'react-icons/fa';
 
 const DashboardPage = () => {
-  const [user, setUser] = useState({ first_name: '' });
+  // const [user, setUser] = useState({ first_name: '' });
   const navigate = useNavigate();
+  const [user, setUser] = useState({ first_name: '', email: '' });
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -44,6 +46,9 @@ const DashboardPage = () => {
     navigate('/JobPosting');
   };
 
+  const openQueryForm = () => {
+    navigate('/QueryForm', { state: user });
+  };
   return (
     <div className="dashboard-page">
       <Header />
@@ -98,6 +103,10 @@ const DashboardPage = () => {
           <img src={Illustration} alt="Placeholder" className="illustration" />
         </div>
       </main>
+      <button className="contact-btn-fixed" onClick={openQueryForm}>
+        <FaEnvelope className="contact-icon" />
+        Contact Us
+      </button>
     </div>
   );
 };

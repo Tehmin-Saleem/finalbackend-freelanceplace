@@ -1,0 +1,124 @@
+$color-primary: #4a90e2;
+$color-accent: #4bcdeb;
+$color-bg: #f5f7fa;
+$color-text: #333;
+$input-bg: #fff;
+$input-border: #ccc;
+$box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+$font-kodchasan: 'Kodchasan', sans-serif;
+$font-poppins: 'Poppins', sans-serif;
+$color-gray: #64748b;
+$color-dark: #2c3e50;
+
+$query-form-shadow-hover: 0 8px 20px rgba(0, 0, 0, 0.15);
+$query-form-border-radius: 12px;
+$input-border-radius: 8px;
+$transition-speed: 0.3s;
+
+.query-form-container {
+  max-width: 600px;
+  margin: 50px auto;
+  background-color: $color-bg;
+  padding: 40px;
+  border-radius: $query-form-border-radius;
+  box-shadow: $box-shadow;
+  text-align: center;
+  transition: transform $transition-speed ease, box-shadow $transition-speed ease;
+  font-family: $font-poppins;
+
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: $query-form-shadow-hover;
+  }
+
+  h2 {
+    margin-bottom: 30px;
+    color: $color-accent;
+    font-size: 28px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  .query-form {
+    display: flex;
+    flex-direction: column;
+
+    .form-group {
+      margin-bottom: 20px;
+      text-align: left;
+
+      label {
+        display: block;
+        margin-bottom: 10px;
+        font-weight: 500;
+        color: $color-text;
+        font-size: 14px;
+      }
+
+      input,
+      select,
+      textarea {
+        width: 100%;
+        padding: 14px 16px;
+        border: 1px solid $input-border;
+        border-radius: $input-border-radius;
+        background-color: $input-bg;
+        color: $color-text;
+        font-size: 16px;
+        transition: border-color $transition-speed ease, box-shadow $transition-speed ease;
+
+        &:focus {
+          border-color: $color-accent;
+          outline: none;
+          box-shadow: 0 0 5px rgba($color-accent, 0.5);
+        }
+      }
+
+      textarea {
+        height: 150px;
+        resize: vertical;
+      }
+    }
+
+    .submit-btn {
+      background-color: $color-accent;
+      color: white;
+      padding: 12px 25px;
+      border: none;
+      border-radius: $input-border-radius;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background-color $transition-speed ease, box-shadow $transition-speed ease;
+
+      &:hover {
+        background-color: darken($color-accent, 10%);
+        box-shadow: 0 4px 12px rgba($color-accent, 0.4);
+      }
+
+      &:active {
+        background-color: lighten($color-accent, 5%);
+        box-shadow: 0 2px 8px rgba($color-accent, 0.3);
+        transform: translateY(2px);
+      }
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .query-form-container {
+    padding: 30px;
+  }
+
+  .query-form {
+    .form-group {
+      input, textarea {
+        padding: 10px 12px;
+      }
+    }
+
+    .submit-btn {
+      padding: 10px 20px;
+    }
+  }
+}

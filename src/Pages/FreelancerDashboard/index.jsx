@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { Header, ZoomedImage } from "../../components/index"; // Adjust the import path as needed
 import { BackgroundLining } from "../../svg/index";
+import { FaEnvelope } from 'react-icons/fa'; // Using an envelope icon
 import "./styles.scss";
 import { useNavigate } from 'react-router-dom';
 import axios from "axios";
 import { jwtDecode } from 'jwt-decode';
 
 const FreelanceDashboardPage = () => {
-  const [user, setUser] = useState({ first_name: '' });
+  const [user, setUser] = useState({ first_name: '', email: '' });
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -43,6 +44,10 @@ const FreelanceDashboardPage = () => {
     navigate('/myProfile'); 
   };
 
+  const openQueryForm = () => {
+    navigate('/QueryForm', { state: user });
+  };
+
   return (
     <div className="dashboard-page">
       <Header />
@@ -55,7 +60,7 @@ const FreelanceDashboardPage = () => {
               Let's begin by finding
               <br />
               work that matches
-              <br/>
+              <br />
               your skills.
             </h1>
             <p className="description-text">
@@ -74,6 +79,12 @@ const FreelanceDashboardPage = () => {
           <ZoomedImage alt="Placeholder" className="illustration" />
         </div>
       </main>
+
+      {/* Fixed Contact Us Button with Icon */}
+      <button className="contact-btn-fixed" onClick={openQueryForm}>
+        <FaEnvelope className="contact-icon" />
+        Contact Us
+      </button>
     </div>
   );
 };
