@@ -10,7 +10,7 @@ const proposalController = require("../controllers/proposal.controller")
 const path = require('path');
 const usercontroller=require ('../controllers/user.controller')
 const { upload } = require('../config/cloudinary.config');// const { forgotPassword, resetPassword } = require('../controllers/user.controller');
-
+const ClientProfile= require('../controllers/client_profile.controller')
 const Notification= require ('../controllers/notifications.controller')
 
 
@@ -60,6 +60,9 @@ router.get('/jobpost/:fileName', (req, res) => {
   const filePath = path.join(__dirname, '../uploads', fileName); 
   res.sendFile(filePath);
 });
+router.post('/clientprofile', authMiddleware, upload.single('image'), ClientProfile.createProfile);
+router.get('/profile', authMiddleware, ClientProfile.getProfile);
+router.put('/clientprofile', authMiddleware, upload.single('image'), ClientProfile.updateProfile);
 
 router.get('/notifications', authMiddleware, Notification.getNotifications);
 router.post('/notifications', authMiddleware, Notification.createNotification);
