@@ -14,6 +14,7 @@ const Notification= require ('../controllers/notifications.controller')
 const queryController = require('../controllers/query.controller');
 
 
+
 // Import Chat controller
 const chatController = require('../controllers/chat.controller'); // Add this
 
@@ -106,17 +107,29 @@ router.get('/profile', authMiddleware, freelancerProfileController.getAuthentica
 router.delete('/profile/:freelancerId', freelancerProfileController.deleteProfile);
 // router.get('/profile', authMiddleware, freelancerProfileController.getProfileByUserId);
 router.get('/profile/:userId', authMiddleware, freelancerProfileController.getProfileByUserId);
-router.get('/profile/:freelancer_id', authMiddleware, freelancerProfileController.getProfileByFreelancerId);
+router.get('/profilebyfreelancerid/:freelancer_id', authMiddleware, freelancerProfileController.getProfileByFreelancerId);
 
 
 // Route to get all chats for a specific freelancer
-// router.get('/freelancer/:freelancerId',authMiddleware, chatController.getFreelancerChats);
+// Chat-related routes
 
-// // Route to get the chat history between client and freelancer
-// router.get('/:clientId/:freelancerId',authMiddleware, chatController.getChatHistory);
 
-// // Route to send a new message
-// router.post('/send',authMiddleware, chatController.sendMessage);
+router.get('/searchClients',authMiddleware, usercontroller.searchClients);
+
+
+
+router.post('/accesschats',authMiddleware, chatController.accessChat);
+router.get('/fetchchats', authMiddleware, chatController.fetchChats);
+router.delete('/deletechat/:chatId',authMiddleware, chatController.deleteChat);
+router.delete('/Message/:id', authMiddleware, chatController.deleteMessage);
+
+
+
+// message-related routes
+
+
+router.get("/allMessages/:chatId", authMiddleware, chatController.allMessages);
+router.post("/sendMessage", authMiddleware, chatController.sendMessage);
 
 
 

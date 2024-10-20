@@ -10,7 +10,7 @@ const proposalController = require("../controllers/proposal.controller")
 const path = require('path');
 const usercontroller=require ('../controllers/user.controller')
 const { upload } = require('../config/cloudinary.config');// const { forgotPassword, resetPassword } = require('../controllers/user.controller');
-
+const ClientProfile= require('../controllers/client_profile.controller')
 const Notification= require ('../controllers/notifications.controller')
 
 const queryController = require('../controllers/query.controller');
@@ -24,6 +24,11 @@ const hireFreelancerController = require('../controllers/hire_freelancer.control
 const Proposal = require('../models/proposal.model');
 const { getFreelancerDetailsByProposal, getProposalById } = require('../controllers/proposal.controller');
 const router = express.Router();
+
+// Assume io is defined in your server.js file
+const socketIo = require('socket.io'); // Import socket.io
+const io = socketIo(); // Create an io instance
+
 
 
 
@@ -55,6 +60,9 @@ router.get('/jobpost/:fileName', (req, res) => {
   const filePath = path.join(__dirname, '../uploads', fileName); 
   res.sendFile(filePath);
 });
+router.post('/clientprofile', authMiddleware, upload.single('image'), ClientProfile.createProfile);
+router.get('/profile', authMiddleware, ClientProfile.getProfile);
+router.put('/clientprofile', authMiddleware, upload.single('image'), ClientProfile.updateProfile);
 
 router.get('/notifications', authMiddleware, Notification.getNotifications);
 router.post('/notifications', authMiddleware, Notification.createNotification);
@@ -116,7 +124,8 @@ router.delete('/payment-methods/:paymentMethodId', paymentMethodController.delet
 
 
 
-router.post('/hire', hireFreelancerController.createHireRequest);
+router.post('/hire/:proposalId', authMiddleware, hireFreelancerController.hireFreelancer);
+
 
 
 router.get('/hire', hireFreelancerController.getClientHireRequests);
@@ -136,7 +145,8 @@ router.get("/proposal/:proposalId", proposalController.getProposalById);
 
 
 
-router.get("/SearchAllUsers", authMiddleware, usercontroller.SearchallUsers);
+// router.get("/SearchAllUsers", authMiddleware, usercontroller.SearchallUsers);
+router.get("/SearchFreelancers", authMiddleware, usercontroller.searchFreelancers);
 
 
 
@@ -147,10 +157,10 @@ router.get("/SearchAllUsers", authMiddleware, usercontroller.SearchallUsers);
 
 router.post('/accesschats',authMiddleware, chatController.accessChat);
 router.get('/fetchchats', authMiddleware, chatController.fetchChats);
-router.post('/group',authMiddleware, chatController.createGroupChat);
-router.put("/rename",authMiddleware, chatController.renameGroup);
-router.put("/groupremove" , authMiddleware, chatController.removeFromGroup);
-router.put("/groupadd", authMiddleware, chatController.addToGroup);
+router.delete('/deletechat/:chatId',authMiddleware, chatController.deleteChat);
+router.delete('/Message/:id',authMiddleware, chatController.deleteMessage);
+
+
 
 
 // message-related routes

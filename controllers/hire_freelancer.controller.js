@@ -1,26 +1,49 @@
 const HireFreelancer = require('../models/hire_freelancer.model');
 
-// Create a new hire request
-exports.createHireRequest = async (req, res) => {
+const Notification = require('../models/notifications.model')
+const Proposal = require('../models/proposal.model');
+
+
+exports.hireFreelancer = async (req, res) => {
   try {
-    const { freelancerId, clientId, jobId } = req.body;
+    const { proposalId } = req.params;
+    const clientId = req.user.userId;
 
-    // Create a new hire request
-    const newHireRequest = new HireFreelancer({
-      freelancerId,
-      clientId,
-      jobId,
-    });
+    console.log('Hiring freelancer for proposal:', proposalId);
+    console.log('Client ID:', clientId);
 
-    await newHireRequest.save();
+    const proposal = await Proposal.findById(proposalId).populate('job_id');
+    if (!proposal) {
+      console.log('Proposal not found:', proposalId);
+      return res.status(404).json({ message: 'Proposal not found' });
+    }
 
-    res.status(201).json({ message: 'Hire request created successfully', hireRequest: newHireRequest });
+    console.log('Found proposal:', proposal);
+
+    // Update proposal status to 'hired'
+    proposal.status = 'Hired';
+    await proposal.save();
+    console.log('Updated proposal status to Hired');
+
+    // Create a notification for the freelancer
+    const notificationData = {
+      freelancer_id: proposal.freelancer_id,
+      client_id: clientId,
+      job_id: proposal.job_id._id,
+      message: `You have been hired for the job: ${proposal.job_id.job_title}`,
+      type: 'hired'
+    };
+
+    console.log('Creating hired notification:', notificationData);
+    const newNotification = await notificationController.createNotification(notificationData);
+    console.log('Created hired notification:', newNotification);
+
+    res.status(200).json({ message: 'Freelancer hired successfully', notification: newNotification });
   } catch (err) {
-    console.error('Error creating hire request:', err);
-    res.status(500).json({ message: 'Internal server error' });
+    console.error('Error hiring freelancer:', err);
+    res.status(500).json({ message: 'Internal server error', error: err.message });
   }
 };
-
 // Get all hire requests for a specific client
 exports.getClientHireRequests = async (req, res) => {
   try {

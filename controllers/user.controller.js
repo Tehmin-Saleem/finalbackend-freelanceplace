@@ -273,19 +273,67 @@ const SearchallUsers = asyncHandler(async (req, res) => {
           { email: { $regex: req.query.search, $options: "i" } },
         ],
       }
-      : {};
-      
-      
-      const users = await User.find(keyword).find({ _id: { $ne: req.user.userId } });
-      res.send(users);
-    });
-
-
-
-
-
-    
-    
-    
-    module.exports = { signup, login, hashPassword,ChangePass, checkUserExists,getUserById, getAllUsers,forgotPassword,ChangePass, SearchallUsers, forgotPassword,getAllClient,getallfreelancer};
+    : {};
   
+
+  const users = await User.find(keyword).find({ _id: { $ne: req.user.userId } });
+  res.send(users);
+});
+
+
+//@description     Get or Search only freelancers
+
+const searchFreelancers = asyncHandler(async (req, res) => {
+  const { search } = req.query;
+
+  if (!search) {
+    return res.status(400).json({ message: "Search query is required" });
+  }
+
+  try {
+    const freelancers = await User.find({
+      role: 'freelancer', // Search only users with the role of freelancer
+      $or: [
+        { first_name: { $regex: search, $options: "i" } },
+        { last_name: { $regex: search, $options: "i" } },
+        { email: { $regex: search, $options: "i" } }
+      ]
+    }).select("-password");
+
+    res.status(200).json(freelancers);
+  } catch (error) {
+    res.status(500);
+    throw new Error("Failed to search for freelancers");
+  }
+});
+
+
+
+const searchClients = asyncHandler(async (req, res) => {
+  const { search } = req.query;
+
+  if (!search) {
+    return res.status(400).json({ message: "Search query is required" });
+  }
+
+  try {
+    const clients = await User.find({
+      role: 'client', // Search only users with the role of client
+      $or: [
+        { first_name: { $regex: search, $options: "i" } },
+        { last_name: { $regex: search, $options: "i" } },
+        { email: { $regex: search, $options: "i" } }
+      ]
+    }).select("-password");
+
+    res.status(200).json(clients);
+  } catch (error) {
+    res.status(500);
+    throw new Error("Failed to search for clients");
+  }
+});
+
+
+
+  
+module.exports = { signup, login, hashPassword,ChangePass, checkUserExists,getUserById, getAllUsers, SearchallUsers, forgotPassword, searchFreelancers, searchClients };

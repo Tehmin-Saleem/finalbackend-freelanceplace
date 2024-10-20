@@ -4,7 +4,7 @@ exports.createNotification = async (notificationData) => {
   try {
     console.log('Creating notification with data:', notificationData);
     const { client_id, freelancer_id, job_id, message, type } = notificationData;
-
+    
     if (!job_id || !type || (!client_id && !freelancer_id)) {
       console.error('Missing required fields:', { client_id, freelancer_id, job_id, type });
       throw new Error('Missing required fields');
@@ -20,34 +20,35 @@ exports.createNotification = async (notificationData) => {
 
     const savedNotification = await newNotification.save();
     console.log('Notification saved successfully:', savedNotification);
-
+    
     if (global.io) {
       let recipientId, recipientType;
       if (type === 'new_offer') {
         recipientId = freelancer_id;
         recipientType = 'freelancer';
+        console.log('Emitting new_offer notification to freelancer:', freelancer_id);
+      } else if (type === 'hired') {
+        recipientId = freelancer_id;
+        recipientType = 'freelancer';
+        console.log('Emitting hired notification to freelancer:', freelancer_id);
       } else if (type === 'new_proposal') {
         recipientId = client_id;
         recipientType = 'client';
+        console.log('Emitting new_proposal notification to client:', client_id);
       }
 
       if (recipientId) {
         console.log(`Emitting ${type} to ${recipientType}:`, recipientId);
-        global.io.to(`${recipientType}_${recipientId}`).emit('notification', {
-          ...savedNotification.toObject(),
-          type 
-        });
+        global.io.to(`${recipientType}_${recipientId}`).emit('notification', savedNotification);
       }
     }
-
+    
     return savedNotification;
   } catch (error) {
     console.error('Error creating notification:', error);
     throw error;
   }
 };
-
-
 exports.getNotifications = async (req, res) => {
   try {
     const userId = req.user.userId;
