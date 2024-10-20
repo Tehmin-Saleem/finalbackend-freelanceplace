@@ -3,10 +3,92 @@
 import React from 'react';
 import './styles.scss';
 import { Header } from '../../components';
+import axios from 'axios';
+import  { useState, useEffect } from 'react';
 
 const ClientProfile = () => {
+  const [profileData, setProfileData] = useState({
+    name: '',
+    country: '',
+    image: '',
+    about: '',
+    email: '',
+    languages: []
+  });
+  const [jobPosts, setJobPosts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      try {
+        const token = localStorage.getItem('token');
+        console.log('Token:', token);
+  
+        const [profileResponse, jobPostsResponse] = await Promise.all([
+          axios.get("http://localhost:5000/api/client/profile", {
+            headers: { 'Authorization': `Bearer ${token}` }
+          }),
+          axios.get("http://localhost:5000/api/client/job-posts", {
+            headers: { 'Authorization': `Bearer ${token}` }
+          })
+        ]);
+  
+        const clientProfile = profileResponse.data.data;
+     
+  
+        const clientId = clientProfile.client_id; 
+       
+  
+        const allJobPosts = jobPostsResponse.data.jobPosts;
+       
+      
+       
+  
+        
+        const filteredJobPosts = allJobPosts.filter((job) => {
+         
+  
+         
+          if (job.client_id && typeof job.client_id === 'object' && job.client_id._id) {
+            return String(job.client_id?._id) === String(clientId);
+          }
+  
+        
+        });
+  
+      
+        setProfileData(clientProfile);
+        setJobPosts(filteredJobPosts); 
+        setLoading(false);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+        setError(error.message || 'An error occurred while fetching data');
+        setLoading(false);
+      }
+    };
+  
+    fetchData();
+  }, []);
+  
+  
+
+
+
+  const formatBudget = (project) => {
+    if (project.budget_type === 'hourly') {
+      return `$${project.hourly_rate?.from || 'Unknown'} - $${project.hourly_rate?.to || 'Unknown'}/hour`;
+    } else if (project.budget_type === 'fixed') {
+      return `$${project.fixed_price || 'Unknown'}`;
+    }
+    return 'Unknown';
+  };
+
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div>Error: {error}</div>;
   const clientData = {
-    profilePicture: 'https://via.placeholder.com/150', // Placeholder image
+    profilePicture: 'https://via.placeholder.com/150', 
     name: 'Acme Corp',
     location: 'New York, USA',
     Email: 'zahrasamar88@gmail.com',
@@ -51,45 +133,64 @@ const ClientProfile = () => {
         amountSpent: '$7,500 (Ongoing)'
       }
     ],
-    preferredQualifications: {
-      skills: ['React.js', 'Node.js', 'UI/UX Design'],
-      languages: ['English', 'Spanish'],
-      locationPreference: 'North America'
-    }
+ 
   };
 
   return (
     <>
-    <Header/>
-    <div className="client-profile">
-      <div className="profile-header">
-        <div className="profile-image">
-          <img src={clientData.profilePicture} alt="Client Profile" />
-        </div>
-        <div className="profile-info">
-          <h1>{clientData.name}</h1>
-          <p>{clientData.location}</p>
-          <p>Email: {clientData.Email}</p>
-        </div>
-      </div>
-
-      <div className="about-section">
-        <h2>About {clientData.name}</h2>
-        <p>{clientData.aboutMe}</p>
-      </div>
-
-      <div className="projects-posted">
-        <h2>Projects Posted</h2>
-        {clientData.projectsPosted.map((project, index) => (
-          <div key={index} className="project">
-            <h3>{project.projectName}</h3>
-            <p>{project.description}</p>
-            <p><strong>Budget:</strong> {project.budget}</p>
-            <p><strong>Status:</strong> {project.status}</p>
-            <p><strong>Hired Freelancer:</strong> {project.hiredFreelancer}</p>
+      <Header/>
+      <div className="client-profile">
+        <div className="profile-header">
+          <div className="profile-image">
+            <img src={profileData.image || 'https://via.placeholder.com/150'} alt="Client Profile" />
           </div>
-        ))}
+          <div className="profile-info">
+            <h1>{profileData.name}</h1>
+            <p>{profileData.country}</p>
+            <p>Email: {profileData.email}</p>
+          </div>
+        </div>
+
+        <div className="about-section">
+          <h2>About {profileData.name}</h2>
+          <p>{profileData.about}</p>
+        </div>
+
+      
+
+      
+      <div className="projects-posted">
+  <h2>Projects Posted</h2>
+
+  {Array.isArray(jobPosts) ? (
+    jobPosts.length > 0 ? (
+      jobPosts.map((project, index) => (
+        <div key={index} className="project">
+          <h3>{project.job_title || 'Unknown'}</h3>
+          <p>{project.description || 'Unknown'}</p>
+          <p><strong>Budget:</strong> {formatBudget(project)}</p>
+          <p><strong>Status:</strong> {project.status || 'Unknown'}</p>
+          <p><strong>Hired Freelancer:</strong> {project.hiredFreelancer}</p>
+        </div>
+      ))
+    ) : (
+      <p>No job posts found.</p>
+    )
+  ) : (
+   
+    jobPosts ? (
+      <div className="projects-posted">
+        <h3>{jobPosts.job_title || 'Unknown'}</h3>
+        <p>{jobPosts.description || 'Unknown'}</p>
+        <p><strong>Budget:</strong> {formatBudget(jobPosts)}</p>
+        <p><strong>Status:</strong> {jobPosts.status || 'Unknown'}</p>
       </div>
+    ) : (
+      <p>No job post found.</p>
+    )
+  )}
+</div>
+
 
       <div className="reviews">
         <h2>Reviews from Freelancers</h2>
@@ -112,12 +213,7 @@ const ClientProfile = () => {
         ))}
       </div>
 
-      <div className="preferred-qualifications">
-        <h2>Preferred Freelancer Qualifications</h2>
-        <p><strong>Skills:</strong> {clientData.preferredQualifications.skills.join(', ')}</p>
-        <p><strong>Languages:</strong> {clientData.preferredQualifications.languages.join(', ')}</p>
-        <p><strong>Location Preference:</strong> {clientData.preferredQualifications.locationPreference}</p>
-      </div>
+     
     </div>
     </>
   );

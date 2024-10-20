@@ -14,6 +14,7 @@ const ChatProvider = ({ children }) => {
   const [loggedUser, setLoggedUser] = useState();
   const [selectedFreelancer, setSelectedFreelancer] = useState(null); 
   const [selectedClient, setSelectedClient] = useState(null); 
+  const [messages, setMessages] = useState([]);
 
 
 
@@ -92,6 +93,8 @@ const selectFreelancer = (freelancer, client) => {
         setLoggedUser,
         selectedFreelancer, // Include selectedFreelancer in the context
         selectFreelancer,    // Include the function to select the freelancer
+        messages, 
+        setMessages
       }}
     >
       {children}

@@ -271,8 +271,7 @@ const MyProfile = () => {
       });
       
       console.log('Profile updated successfully:', response.data);
-    
-    // Save profileId in local storage
+  
    
       navigate('/FreelanceDashBoard'); 
     } catch (error) {

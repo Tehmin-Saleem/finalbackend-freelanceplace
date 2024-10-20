@@ -27,7 +27,7 @@ const Chat = () => {
   const [error, setError] = useState(""); // State for error messages
   // const [loggedUser, setLoggedUser] = useState();
   const [fetchAgain, setFetchAgain] = useState(false);
-  const [messages, setMessages] = useState([]);
+  // const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(false);
   const [newMessage, setNewMessage] = useState("");
   const [socketConnected, setSocketConnected] = useState(false);
@@ -62,67 +62,35 @@ const Chat = () => {
     loggedUser,
     setLoggedUser,
     selectFreelancer,
+    messages,
+    setMessages,
   } = ChatState();
-
 
   const handleChatSelect = (chat) => {
     const token = localStorage.getItem("token");
     if (!token) {
       throw new Error("No token found");
     }
-  
-    const decodedToken = jwtDecode(token);  
+
+    const decodedToken = jwtDecode(token);
     const userRole = decodedToken.role;
-  
+
     const user1 = chat.users[0];
     const user2 = chat.users[1];
-  
+
     // Ensure roles are correctly assigned based on actual user roles, not array index
-    const freelancer = user1?.role === 'freelancer' ? user1._id : user2._id;
-    const client = user1?.role === 'client' ? user1._id : user2._id;
-  
+    const freelancer = user1?.role === "freelancer" ? user1._id : user2._id;
+    const client = user1?.role === "client" ? user1._id : user2._id;
+
     console.log("freelancer in function handleChatSelect", freelancer);
     console.log("client in function handleChatSelect", client);
-    
+
     if (userRole === "client") {
-      selectFreelancer(freelancer);  // Set the selected freelancer
+      selectFreelancer(freelancer); // Set the selected freelancer
     } else if (userRole === "freelancer") {
-      selectFreelancer(client);      // Set the selected client
+      selectFreelancer(client); // Set the selected client
     }
   };
-  
-
-
-
-
-  // const handleChatSelect = (chat) => {
-
-  //   const token = localStorage.getItem("token");
-  //   if (!token) {
-  //     throw new Error("No token found");
-  //   }
-
-  //   const decodedToken = jwtDecode(token);  
-  //  const userRole = decodedToken.role;
-
-
-  //   const freelancer = chat.users[1]?._id; // Assuming 'chat' contains freelancer details
-  //   const client = chat.users[0]?._id;
-  
-  //   console.log("freelancer in function handleChatSelect",chat.users[1]?._id);
-  //   console.log("client", chat.users[0]?._id );
-  //   if (userRole === "client") {
-  //     selectFreelancer(freelancer);       // Set the selected freelancer
-      
-  //   } else if( userRole === "freelancer"){
-
-  //     selectFreelancer(client)
-      
-  //   }
-  //   // Continue with your chat selection logic...
-  // };  
-
-
 
   const handleRightClick = (e, chatId) => {
     e.preventDefault(); // Prevent the default context menu
@@ -389,6 +357,14 @@ const Chat = () => {
     socket.on("typing", () => setIsTyping(true));
     socket.on("stop typing", () => setIsTyping(false));
 
+    // Listen for message deletion event
+    socket.on("message deleted", (data) => {
+      // data will contain messageId
+      setMessages((prevMessages) =>
+        prevMessages.filter((msg) => msg._id !== data.messageId)
+      );
+    });
+
     // eslint-disable-next-line
   }, [user]); // Add 'user' as a dependency to ensure useEffect runs after user is set
 
@@ -443,14 +419,27 @@ const Chat = () => {
 
         socket.emit("new message", data);
         setMessages([...messages, data]);
+
+
+
+        // Update the chats state with the latest message
+      setChats((prevChats) =>
+        prevChats.map((chat) =>
+          chat._id === data.chat._id // Ensure you're checking the correct chat ID
+            ? { ...chat, latestMessage: data.message } // Update latestMessage
+            : chat
+        )
+      );
+
+      // Clear the input after sending
+      setNewMessage("");
+
       } catch (error) {
         setError("Failed to send the message"); // Handle error
         console.log(error);
       }
     }
   };
-
-  
 
   const typingHandler = (e) => {
     setNewMessage(e.target.value);
@@ -500,35 +489,34 @@ const Chat = () => {
     try {
       const token = localStorage.getItem("token");
 
-      
-    if (!token) {
-      throw new Error("No token found");
-    }
+      if (!token) {
+        throw new Error("No token found");
+      }
 
-    // Decode the token to get user role
-    const decodedToken = jwtDecode(token);
-    const userRole = decodedToken.role;
+      // Decode the token to get user role
+      const decodedToken = jwtDecode(token);
+      const userRole = decodedToken.role;
 
-    let route;
-    if (userRole === "client") {
-      // Clients use this route to delete chats
-      route = `http://localhost:5000/api/client/deletechat/${chatId}`;
-    } else if (userRole === "freelancer") {
-      // Freelancers use this route to delete chats
-      route = `http://localhost:5000/api/freelancer/deletechat/${chatId}`;
-    } else {
-      console.error("Invalid user role.");
-      setError("Invalid user role. Please log in again.");
-      return;
-    }
+      let route;
+      if (userRole === "client") {
+        // Clients use this route to delete chats
+        route = `http://localhost:5000/api/client/deletechat/${chatId}`;
+      } else if (userRole === "freelancer") {
+        // Freelancers use this route to delete chats
+        route = `http://localhost:5000/api/freelancer/deletechat/${chatId}`;
+      } else {
+        console.error("Invalid user role.");
+        setError("Invalid user role. Please log in again.");
+        return;
+      }
 
-    const config = {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    };
+      const config = {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      };
 
-    await axios.delete(route, config); // Use the correct route based on role
+      await axios.delete(route, config); // Use the correct route based on role
 
       // Update UI after chat is deleted
       setChats(chats.filter((chat) => chat._id !== chatId));
@@ -569,7 +557,7 @@ const Chat = () => {
                     <div
                       onClick={() => setSelectedChat(chat)}
                       onContextMenu={(e) => handleRightClick(e, chat._id)} // Right-click event
-                      onDoubleClick={() => handleRightClick(e, chat._id)} // Optional: for double-click
+                      // onDoubleClick={() => handleRightClick(e, chat._id)} // Optional: for double-click
                       className={`chat-item ${
                         selectedChat === chat ? "selected" : ""
                       }`}
@@ -583,9 +571,10 @@ const Chat = () => {
                           ? getSender(loggedUser, chat.users)
                           : chat.chatName}
                       </p>
-                      {chat.latestMessage && (
+                      {console.log("Latest message:", chat.latestMessage)}
+                      {chat.latestMessage && chat.latestMessage.sender && (
                         <p className="chat-latest-message">
-                          <strong>{chat.latestMessage.sender.name}:</strong>{" "}
+                          <strong>{chat.latestMessage.sender.first_name}:</strong>{" "}
                           {chat.latestMessage.content.length > 50
                             ? chat.latestMessage.content.substring(0, 51) +
                               "..."
@@ -632,8 +621,7 @@ const Chat = () => {
 
                   <span className="chat-title">
                     {!selectedChat.isGroupChat ? (
-                      <>{getSender(user, selectedChat.users)}
-                      </>
+                      <>{getSender(user, selectedChat.users)}</>
                     ) : (
                       <>{selectedChat.chatName.toUpperCase()}</>
                     )}
