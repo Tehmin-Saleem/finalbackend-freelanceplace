@@ -10,10 +10,10 @@ const proposalController = require("../controllers/proposal.controller")
 const path = require('path');
 const usercontroller=require ('../controllers/user.controller')
 const { upload } = require('../config/cloudinary.config');// const { forgotPassword, resetPassword } = require('../controllers/user.controller');
-
+const ClientProfile= require('../controllers/client_profile.controller')
 const Notification= require ('../controllers/notifications.controller')
 
-
+const queryController = require('../controllers/query.controller');
 
 // Import Chat controller
 const chatController = require('../controllers/chat.controller'); // Add this
@@ -60,6 +60,9 @@ router.get('/jobpost/:fileName', (req, res) => {
   const filePath = path.join(__dirname, '../uploads', fileName); 
   res.sendFile(filePath);
 });
+router.post('/clientprofile', authMiddleware, upload.single('image'), ClientProfile.createProfile);
+router.get('/profile', authMiddleware, ClientProfile.getProfile);
+router.put('/clientprofile', authMiddleware, upload.single('image'), ClientProfile.updateProfile);
 
 router.get('/notifications', authMiddleware, Notification.getNotifications);
 router.post('/notifications', authMiddleware, Notification.createNotification);
@@ -167,8 +170,24 @@ router.get("/allMessages/:chatId", authMiddleware, chatController.allMessages);
 router.post("/sendMessage", authMiddleware, chatController.sendMessage);
 
 
+// router.get('/api/queries', async (req, res) => {
+//   try {
+//       const queries = await Query.find(); // Adjust according to your database
+//       res.json(queries);
+//   } catch (error) {
+//       res.status(500).json({ message: 'Server error' });
+//   }
+// });
+router.post('/query',authMiddleware, queryController.createQuery);
+
+// Route to get all queries (optional, for admin or dashboard)
+router.get('/queries', queryController.getAllQueries);
 
 
+router.get('/users' ,authMiddleware,queryController.getUser);
+
+
+router.get('/count',usercontroller.getAllClient);
 
 
 module.exports = router;

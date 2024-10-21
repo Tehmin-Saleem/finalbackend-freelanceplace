@@ -230,10 +230,35 @@ const ChangePass = async (req, res) => {
 
 
 
+const getAllClient = async (req, res) => {
+  try {
+    // Fetch the client count based on the role 'client'
+    const clientCount = await User.countDocuments({ role: 'client' });
+    
+    // Send the count in response
+    res.status(200).json({ count: clientCount });
+
+    // Optional: Log the count for debugging purposes
+    console.log("Client count:", clientCount);
+    
+  } catch (error) {
+    // Log the error and return a 500 Internal Server Error
+    console.error("Error fetching client count:", error);
+    return res.status(500).json({ error: 'Failed to fetch client count' });
+  }
+};
+  
 
   
   
-  
+const getallfreelancer=async (req, res) => {
+  try {
+    const freelancerCount = await User.countDocuments({ role: 'freelancer' });
+    res.json({ count: freelancerCount });
+  } catch (error) {
+   return  res.status(500).json({ error: 'Failed to fetch freelancer count' });
+  }
+};
 
 
 
