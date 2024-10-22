@@ -1,11 +1,11 @@
 import { useState } from "react";
 import React from "react";
-import { useNavigate } from "react-router-dom"; // Import useNavigate for navigation
+import { useNavigate } from "react-router-dom";
 import CHARACTER from "../../images/CHARACTER.png";
 import Group from "../../images/Group.png";
 
 import { CommonButton, TextField } from "../../components/index";
-import { Mail, Password, PassEye, Google, Apple ,LogoName} from "../../svg/index";
+import { Mail, Password, PassEye, LogoName } from "../../svg/index";
 
 function SignIn() {
   const [password, setPassword] = useState("");
@@ -14,8 +14,9 @@ function SignIn() {
   const [email, setEmail] = useState("");
   const [emailError, setEmailError] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+  const [rememberMe, setRememberMe] = useState(false); // State for "Remember me"
 
-  const navigate = useNavigate(); // Initialize useNavigate for navigation
+  const navigate = useNavigate();
 
   const handlePasswordChange = (e) => {
     const newPassword = e.target.value;
@@ -48,35 +49,33 @@ function SignIn() {
       return;
     }
 
+    // Check if "Remember me" is checked
+    if (!rememberMe) {
+      setErrorMessage('You must check the "Remember me" box to continue.');
+      return;
+    }
+
     try {
       const response = await fetch("http://localhost:5000/api/client/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          // Authorization: `Bearer ${token}`
-
         },
         body: JSON.stringify({ email, password }),
       });
 
       const data = await response.json();
-      
+
       if (response.ok) {
-        
-        // Store token and user info together in localStorage
-        localStorage.setItem("token", data.token);
-      localStorage.setItem(
-        "userInfo",
-        JSON.stringify({
-          user: data.user,  // Store user information
-          token: data.token,  // Store token
-        })
-      );
+        localStorage.setItem(
+          "userInfo",
+          JSON.stringify({
+            user: data.user,
+            token: data.token,
+          })
+        );
 
-      console.log("Token received:", data.token);
-
-
-        const userType = data.user.role; 
+        const userType = data.user.role;
         if (userType === "client") {
           navigate("/ClientDashboard");
         } else if (userType === "freelancer") {
@@ -94,7 +93,7 @@ function SignIn() {
   };
 
   return (
-    <div className="md:flex md:flex-row  h-auto">
+    <div className="md:flex md:flex-row h-auto">
       {/* First Half - Logo and Picture */}
       <div className="md:w-1/2 h-screen bg-white hidden md:block">
         <div className="flex flex-col items-center justify-center h-full">
@@ -109,11 +108,10 @@ function SignIn() {
           </div>
         </div>
       </div>
-      
 
       {/* Second Half - Form */}
-      <div className="md:w-1/2 w-full h-screen  md:mr-9 bg-white flex items-center justify-center shadow-lg">
-        <div className="w-full max-w-lg p-16 shadow-2xl ">
+      <div className="md:w-1/2 w-full h-screen md:mr-9 bg-white flex items-center justify-center shadow-lg">
+        <div className="w-full max-w-lg p-16 shadow-2xl">
           <form onSubmit={handleLogin}>
             <h1 className="text-[24px] font-Poppins font-medium text-center px-16 py-2">
               Sign in to your account
@@ -179,6 +177,7 @@ function SignIn() {
                   id="rememberMe"
                   name="rememberMe"
                   className="mr-2 leading-tight"
+                  onChange={(e) => setRememberMe(e.target.checked)} // Track checkbox
                 />
                 <label
                   htmlFor="rememberMe"
@@ -188,7 +187,7 @@ function SignIn() {
                 </label>
               </div>
               <div>
-                <a 
+                <a
                   href="/ForgotPass"
                   className="text-[#4BCBEB] font-Poppins text-sm hover:underline"
                 >
@@ -223,37 +222,6 @@ function SignIn() {
                   Sign Up
                 </a>
               </span>
-            </div>
-
-            
-            {/* Google and Apple Sign-In Options */}
-            <div className="mt-5 mx-auto max-w-xs flex flex-row">
-              <div className="flex justify-center mb-4 shadow-xl p-3">
-                <div className="mr-3">
-                  <Google />
-                </div>
-                <div>
-                  <a
-                    href="https://www.google.com"
-                    className="mr-4 text-[12px] text-[#3498DB] font-Poppins font-semibold text-center"
-                  >
-                    Continue with Google
-                  </a>
-                </div>
-              </div>
-              <div className="flex justify-center mb-4 shadow-xl  p-3">
-                <div className="mr-3">
-                  <Apple />
-                </div>
-                <div>
-                  <a
-                    href="https://www.apple.com"
-                    className="mr-4 text-[12px] text-[#3498DB] font-Poppins font-semibold text-center"
-                  >
-                    Continue with Apple
-                  </a>
-                </div>
-              </div>
             </div>
           </form>
         </div>
