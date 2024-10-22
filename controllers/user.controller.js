@@ -336,4 +336,4 @@ const searchClients = asyncHandler(async (req, res) => {
 
 
   
-module.exports = { signup, login, hashPassword,ChangePass, checkUserExists,getUserById, getAllUsers, SearchallUsers, forgotPassword, searchFreelancers, searchClients };
+module.exports = { signup, login, hashPassword,ChangePass, checkUserExists,getUserById, getAllUsers, SearchallUsers, forgotPassword, searchFreelancers, searchClients, getallfreelancer,getAllClient };
