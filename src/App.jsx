@@ -27,6 +27,8 @@ import ClientProfile from "./Pages/ClientProfileView";
 import ClientProfilePage from "./Pages/ClientProfileForm";
 import AdminDashboard from "./Pages/AdminDashboard";
 import QueryForm from "./components/Commoncomponents/QueryForm";
+import FreelancerList from "./components/FreelancersList";
+import ClientList from "./components/ClientLists";
 // import PaymentMethod from './components/PaymentMethod';
 
 // Load your Stripe public key
@@ -109,6 +111,7 @@ function App() {
         <Route path="/applyjob" element={<ApplyJob />} />
         <Route path="/applyjob/:jobPostId" element={<ApplyJob />} />
         <Route path="/profile/:userId" element={<ProfileView />} />
+
         <Route
           path="/freelancercard"
           element={<FreeLancerCard heading="UI/UX Designer" freelancers={freelancers} />}
@@ -168,6 +171,10 @@ function App() {
         <Route path="/ClientProfileForm" element={<ClientProfilePage/>} /> 
 
         <Route path="/AdminDashboard" element={<AdminDashboard/>} /> 
+        <Route path="/freelancerslist" element={<FreelancerList/>} /> 
+        <Route path="/clientslist" element={<ClientList/>} /> 
+
+
 
        
         
