@@ -143,10 +143,6 @@ const AdminDashboard = () => {
    
 };
 
-
-
-
-
   return (
     <div className="admin-dashboard">
     <aside className={isSidebarOpen ? 'sidebar open' : 'sidebar closed'}>
