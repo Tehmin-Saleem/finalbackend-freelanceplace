@@ -1,5 +1,3 @@
-// signUpSection.scss
-
 // Variables
 $primary-color: #4BCBEB;
 $secondary-color: #2C3E50;
@@ -46,7 +44,6 @@ $box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
       background: linear-gradient(168.57deg, #6d7cc9 33.49%, #50adca 64.06%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
-
     }
 
     .join-section {
@@ -69,11 +66,12 @@ $box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
       .options-container {
         display: flex;
         flex-direction: column;
-        gap: 2rem;
-        margin-left: 10rem;
+        gap: 1.5rem;
+        align-items: center;
 
         @media (min-width: 768px) {
           flex-direction: row;
+          justify-content: space-evenly;
         }
 
         .option {
@@ -82,46 +80,60 @@ $box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
           border-radius: $border-radius;
           padding: 1.5rem;
           position: relative;
+          width: 100%;
+          max-width: 250px;
+          height: 200px;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          text-align: center;
           transition: box-shadow 0.3s ease;
-          width: 35%;
-
+        
           &.selected {
-            box-shadow: 0 0 0 2px $primary-color;
+            box-shadow: 0 0 0 2px $primary-color; // Keeps the primary color outline
+            // No background color change
+        
+            .option-label,
+            .option-description {
+              color: $primary-color; // Change text color to primary color or another contrasting color
+            }
           }
-
+        
           .radio-input {
             position: absolute;
             top: 1rem;
             right: 1rem;
           }
-
+        
           .option-content {
             display: flex;
             align-items: center;
-
+            margin-bottom: 0.5rem;
+        
             .frame-icon {
+              width: 50px;
+              height: 50px;
               margin-right: 0.5rem;
-
+        
               @media (min-width: 768px) {
                 margin-right: 1rem;
               }
             }
-
+        
             .option-label {
-              @include font($font-primary, 0.75rem, 500);
-
-              @media (min-width: 768px) {
-                font-size: 1rem;
-              }
+              @include font($font-primary, 1rem, 500);
+              color: $text-color; // Ensure a default color for non-selected state
             }
           }
-
+        
           .option-description {
             @include font($font-primary, 0.875rem, 400);
-            color: $text-color;
+            color: $text-color; // Ensure a default color for non-selected state
             margin-top: 0.5rem;
           }
         }
+        
+        
       }
     }
 

@@ -1,0 +1,162 @@
+$primary-color: #3b82f6;
+$secondary-color: #6b7280;
+$gray-color: #f7fafc;
+$text-color: #4a5568;
+$border-color: #e2e8f0;
+$hover-darken: 10%;
+$font-kodchasan: 'Kodchasan', sans-serif;
+$font-poppins: 'Poppins', sans-serif;
+$color-gray: #64748b;
+$color-dark: #2c3e50;
+$color-white: #ffffff;
+$color-accent: #4bcdeb;
+$bg-color: #f7f8fa;
+
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh; // Full height of the viewport
+    margin: 0; // Reset margin for body
+}
+
+.consultant-profile-form {
+    max-width: 800px;
+    margin-top: 4rem; // Optional, adjust as needed
+    padding: 2.5rem;
+    background-color: $gray-color;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    font-family: $font-poppins;
+
+    // Add this if you want to prevent the form from being too close to the edges on smaller screens
+    // @media (max-width: 768px) {
+    //     margin-left: 1rem;
+    //     margin-right: 1rem;
+    // }
+
+    .profile-heading{
+        color: $color-accent;
+        font-size: 2rem;
+        margin-bottom: 1.5rem;
+        text-align: center;
+        font-weight: 600;
+        font-family: $font-poppins;
+
+    }
+
+    h1 {
+      color: $primary-color;
+      font-size: 2rem;
+      margin-bottom: 1.5rem;
+      text-align: center;
+    }
+
+    .form-group {
+      margin-bottom: 1.5rem;
+
+      label {
+        font-weight: bold;
+        color: $text-color;
+        display: block;
+        margin-bottom: 0.5rem;
+        font-family: $font-kodchasan;
+      }
+
+      input[type="text"],
+      input[type="tel"],
+      input[type="url"],
+      textarea {
+        width: 100%;
+        padding: 0.75rem;
+        border: 1px solid $border-color;
+        border-radius: 5px;
+        transition: border-color 0.3s;
+
+        &:focus {
+          border-color: $color-accent;
+          outline: none;
+        }
+      }
+
+      textarea {
+        resize: none;
+      }
+
+      .experience-item, .education-item {
+        display: flex;
+        gap: 0.5rem;
+        margin-top: 0.5rem;
+
+        input {
+          flex: 1;
+        }
+
+        button {
+          background-color: $color-accent;
+          color: $color-white;
+          border: none;
+          padding: 0.5rem 1rem;
+          border-radius: 5px;
+          cursor: pointer;
+          transition: background-color 0.3s;
+
+          &:hover {
+            background-color: darken($color-accent, $hover-darken);
+          }
+        }
+      }
+
+      .skills-input {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+
+        .skill-tag {
+          background-color: $color-gray;
+          padding: 0.25rem 0.5rem;
+          border-radius: 5px;
+          display: inline-flex;
+          align-items: center;
+          color: $color-dark;
+
+          button {
+            background: none;
+            border: none;
+            color: $color-dark;
+            margin-left: 0.25rem;
+            cursor: pointer;
+            font-size: 1rem;
+
+            &:hover {
+              color: $color-accent;
+            }
+          }
+        }
+      }
+
+      .submit-button {
+        width: 100%;
+        padding: 0.75rem;
+        border: none;
+        border-radius: 5px;
+        background-color: $primary-color;
+        color: $color-white;
+        font-size: 1.2rem;
+        cursor: pointer;
+        transition: background-color 0.3s;
+
+        &:hover {
+          background-color: darken($primary-color, $hover-darken);
+        }
+      }
+
+      .profile-preview {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        margin-top: 0.5rem;
+        object-fit: cover;
+      }
+    }
+}

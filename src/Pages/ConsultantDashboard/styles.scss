@@ -1,0 +1,143 @@
+$primary-color: #3b82f6;
+$secondary-color: #6b7280;
+$gray-color: #f7fafc;
+$text-color: #4a5568;
+$border-color: #e2e8f0;
+$hover-darken: 10%;
+$font-kodchasan: 'Kodchasan', sans-serif;
+$font-poppins: 'Poppins', sans-serif;
+$color-gray: #64748b;
+$color-dark: #2c3e50;
+$color-white: #ffffff;
+$color-accent: #4bcdeb;
+$bg-color: #f7f8fa;
+
+// .dashboard-header {
+//   text-align: center;
+//   margin-bottom: 30px;
+//   padding: 20px;
+//   background-color: $color-accent;
+//   border-radius: 12px;
+//   color: $color-white;
+//   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+//   width: 100%;
+// }
+
+.consultant-dashboard {
+  background-color: $bg-color;
+  font-family: $font-poppins;
+  color: $text-color;
+//   width: 90%;        // Responsive width
+//   max-width: none; // Set maximum width
+//   margin: 0 auto;
+  width: 100%;
+  max-width: none; // To allow full width usage without restriction
+  margin: 0 auto;
+//   padding: 0 20px ;
+  
+.dashboard-header {
+    // display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color:#4bcdeb;
+    padding: 20px;
+    border-radius: 8px;
+    color: white;
+    text-align: center;
+  }
+  
+  .profile-icon {
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+
+  }
+  
+  .profile-icon:hover {
+    color: #e5e5e5;
+  }
+  
+  // Center the dashboard
+
+  h1 {
+    font-family: $font-kodchasan;
+    font-size: 2.2rem;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+
+  p {
+    font-size: 1rem;
+    color: lighten($color-white, 10%);
+    margin: 0;
+  }
+
+  .dashboard-sections {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+    padding: 0 20px; // Add padding for better spacing on sides
+  }
+
+  .dashboard-card {
+    background-color: $color-white;
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    cursor: pointer;
+
+    &:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+    }
+
+    h2 {
+      font-size: 1.5rem;  // Adjust font size for better visibility
+      color: $color-dark;
+      margin-bottom: 12px;
+      font-weight: 600;
+    }
+
+    ul {
+      list-style-type: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    li {
+      padding: 12px 0;
+      border-bottom: 1px solid $border-color;
+
+      &:last-child {
+        border-bottom: none;
+      }
+
+      strong {
+        color: $color-dark;
+        font-weight: 500;
+      }
+
+      p {
+        margin: 5px 0;
+        color: $color-gray;
+      }
+
+      .status {
+        font-weight: 600;
+        color: $primary-color;
+      }
+
+      .submitted {
+        font-weight: 600;
+        color: $color-accent;
+      }
+
+      .date {
+        font-size: 0.85rem;
+        color: $secondary-color;
+      }
+    }
+  }
+}

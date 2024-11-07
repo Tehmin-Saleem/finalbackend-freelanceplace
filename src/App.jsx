@@ -27,6 +27,11 @@ import ClientProfile from "./Pages/ClientProfileView";
 import ClientProfilePage from "./Pages/ClientProfileForm";
 import AdminDashboard from "./Pages/AdminDashboard";
 import QueryForm from "./components/Commoncomponents/QueryForm";
+import FreelancerList from "./components/FreelancersList";
+import ClientList from "./components/ClientLists";
+import ConsultantDashboard from "./Pages/ConsultantDashboard";
+import ConsultantProfileForm from "./components/ConsultantProfileForm";
+import ConsultantProfileView from "./components/ConsultantProfileView";
 // import PaymentMethod from './components/PaymentMethod';
 
 
@@ -109,6 +114,7 @@ function App() {
         <Route path="/applyjob" element={<ApplyJob />} />
         <Route path="/applyjob/:jobPostId" element={<ApplyJob />} />
         <Route path="/profile/:userId" element={<ProfileView />} />
+
         <Route
           path="/freelancercard"
           element={<FreeLancerCard heading="UI/UX Designer" freelancers={freelancers} />}
@@ -167,6 +173,19 @@ function App() {
         <Route path="/ClientProfileForm" element={<ClientProfilePage/>} /> 
 
         <Route path="/AdminDashboard" element={<AdminDashboard/>} /> 
+        <Route path="/freelancerslist" element={<FreelancerList/>} /> 
+        <Route path="/clientslist" element={<ClientList/>} />
+
+        <Route path="/ConsultantDash" element={<ConsultantDashboard/>} />
+
+        <Route path="/ConsultantProfileForm" element={<ConsultantProfileForm/>} />
+        <Route path="/ConsultantProfileView" element={<ConsultantProfileView/>} />
+
+
+
+
+
+
 
        
         

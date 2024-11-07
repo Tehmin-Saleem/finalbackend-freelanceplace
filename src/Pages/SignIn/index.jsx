@@ -14,6 +14,7 @@ function SignIn() {
   const [email, setEmail] = useState("");
   const [emailError, setEmailError] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+  const [rememberMe, setRememberMe] = useState(false);
 
   const navigate = useNavigate(); // Initialize useNavigate for navigation
 
@@ -47,6 +48,10 @@ function SignIn() {
       setErrorMessage("Please fix the errors before submitting.");
       return;
     }
+    if (!rememberMe) {
+      setErrorMessage('You must check the "Remember me" box to continue.');
+      return;
+    }
 
     try {
       const response = await fetch("http://localhost:5000/api/client/login", {
@@ -62,6 +67,12 @@ function SignIn() {
       const data = await response.json();
       
       if (response.ok) {
+
+        if (data.softBanned) {
+          // If the user is soft banned, display the message and do not proceed
+          setErrorMessage("Your account is soft banned. Please contact support.");
+          return;
+        }
         
         // Store token and user info together in localStorage
         localStorage.setItem("token", data.token);
@@ -79,9 +90,14 @@ function SignIn() {
         const userType = data.user.role; 
         if (userType === "client") {
           navigate("/ClientDashboard");
-        } else if (userType === "freelancer") {
+        } 
+        else if (userType === "freelancer") {
           navigate("/FreelanceDashBoard");
-        }else if (userType === "admin") {
+        }
+        else if (userType === "consultant") {
+          navigate("/ConsultantDash");
+        }
+        else if (userType === "admin") {
           navigate("/AdminDashboard");
         }
          else {
@@ -182,6 +198,7 @@ function SignIn() {
                   id="rememberMe"
                   name="rememberMe"
                   className="mr-2 leading-tight"
+                  onChange={(e) => setRememberMe(e.target.checked)}
                 />
                 <label
                   htmlFor="rememberMe"
@@ -215,6 +232,7 @@ function SignIn() {
               </div>
             )}
 
+
             {/* Sign Up Link */}
             <div className="mt-8 mx-[20%] font-Poppins text-[14px] text-[#0F172A] text-center">
               Don't have an account?
@@ -230,7 +248,7 @@ function SignIn() {
 
             
             {/* Google and Apple Sign-In Options */}
-            <div className="mt-5 mx-auto max-w-xs flex flex-row">
+            {/* <div className="mt-5 mx-auto max-w-xs flex flex-row">
               <div className="flex justify-center mb-4 shadow-xl p-3">
                 <div className="mr-3">
                   <Google />
@@ -257,7 +275,7 @@ function SignIn() {
                   </a>
                 </div>
               </div>
-            </div>
+            </div> */}
           </form>
         </div>
       </div>
