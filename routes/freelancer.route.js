@@ -3,6 +3,7 @@ const router = express.Router();
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
+const jobPostController = require('../controllers/post_job.controller');
 // Import controllers and middleware
 const usercontroller = require('../controllers/user.controller');
 const proposalController = require('../controllers/proposal.controller');
@@ -11,7 +12,7 @@ const freelancerProfileController = require('../controllers/freelancer_profile.c
 const { upload } = require('../config/cloudinary.config');//import forgot and rest password
 // const { forgotPassword, resetPassword } = require('../controllers/user.controller');
 const Notification= require ('../controllers/notifications.controller')
-
+const manageProject = require('../controllers/Manageproj.controller')
 
 
 // Import Chat controller
@@ -62,7 +63,7 @@ router.get('/notifications', authMiddleware, Notification.getNotifications);
 router.post('/notifications', authMiddleware, Notification.createNotification);
 router.put('/notifications/:notificationId/read', authMiddleware, Notification.updateNotification);
 router.get('/notifications/unread-count', authMiddleware, Notification.getUnreadNotificationsCount);
-
+router.get('/jobs', authMiddleware, jobPostController.getAllJobPosts);
 router.get('/profile/portfolios/:fileName', (req, res) => {
   const { fileName } = req.params;
   const filePath = path.join(__dirname, '..', 'uploads', fileName);
@@ -87,6 +88,7 @@ router.post('/login', usercontroller.login);
 
 router.use(authMiddleware);
 
+router.post('/manageproj',authMiddleware, manageProject.createProject);
 // Proposal routes
 router.post('/proposal/:jobPostId', upload.single('attachment'), proposalController.createProposal);
 router.get('/getproposals', proposalController.getFreelancerProposals);

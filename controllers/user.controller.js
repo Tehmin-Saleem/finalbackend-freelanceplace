@@ -2,12 +2,9 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user.model');
 const asyncHandler = require("express-async-handler");
-const crypto = require('crypto');
-const {sendEmail}  = require("../utils/email");
-const { userInfo } = require('os');
+const { sendEmail } = require("../utils/email");
 
-
-
+// Middleware to check if the user already exists
 const checkUserExists = async (req, res, next) => {
   try {
     const { email } = req.body;
@@ -21,6 +18,7 @@ const checkUserExists = async (req, res, next) => {
   }
 };
 
+// Middleware to hash password before saving
 const hashPassword = async (req, res, next) => {
   try {
     const { password } = req.body;
@@ -34,12 +32,12 @@ const hashPassword = async (req, res, next) => {
     res.status(500).json(err);
   }
 };
+
+// Signup function
 const signup = async (req, res) => {
   try {
-    console.log('Request Body:', req.body);
     const { email, first_name, last_name, password, role, country_name } = req.body;
 
-    // Create user in the database
     const newUser = new User({
       email,
       password,
@@ -49,44 +47,22 @@ const signup = async (req, res) => {
       country_name,
     });
 
-    // Hash the password before saving
     const salt = await bcrypt.genSalt(10);
     newUser.password = await bcrypt.hash(password, salt);
 
-    // Save the user initially
     await newUser.save();
 
-    // Update the user with the correct ID based on role
     if (role === 'freelancer') {
       newUser.freelancer_id = newUser._id;
     } else if (role === 'client') {
       newUser.client_id = newUser._id;
     }
 
-    // Save the updated user
     await newUser.save();
 
-    // Generate JWT token
-    const token = jwt.sign({ userId: newUser._id, role: newUser.role  }, process.env.JWT_SECRET, {
+    const token = jwt.sign({ userId: newUser._id, role: newUser.role }, process.env.JWT_SECRET, {
       expiresIn: '5h',
     });
-
-    const userData = {
-      email: newUser.email,
-      role: newUser.role,
-      userId: newUser._id,
-      first_name: newUser.first_name, 
-      last_name: newUser.last_name,
-      country_name: newUser.country_name,
-      token,
-      
-    };
-
-   
-
-
-  
-
 
     res.status(201).json({ token, message: 'Signup successful' });
   } catch (err) {
@@ -95,80 +71,119 @@ const signup = async (req, res) => {
   }
 };
 
+// Login function with admin and regular user handling
 const login = async (req, res) => {
-    try {
-      const { email, password } = req.body;
-      const user = await User.findOne({ email });
-  
-      if (!user) {
+  try {
+    const { email, password } = req.body;
+    const adminEmails = process.env.ADMIN_EMAILS ? process.env.ADMIN_EMAILS.split(',') : [];
+    const isAdmin = adminEmails.includes(email);
+
+    if (isAdmin) {
+      // Hash the incoming password for admin and compare directly with plain text in env
+      const saltRounds = 10;
+      const hashedPassword = await bcrypt.hash(process.env.ADMIN_PASSWORD, saltRounds);
+      const isAdminPasswordCorrect = await bcrypt.compare(password, hashedPassword);
+
+      if (!isAdminPasswordCorrect) {
         return res.status(401).json({ message: 'Invalid email or password' });
       }
-  
-      const isMatch = await bcrypt.compare(password, user.password);
-      if (!isMatch) {
-        return res.status(401).json({ message: 'Invalid email or password' });
-      }
-  
-     
+
       const token = jwt.sign(
-        { userId: user._id, email: user.email, role: user.role },
+        { email, role: 'admin' },
         process.env.JWT_SECRET,
         { expiresIn: '5h' }
       );
-  
-      
-      const userData = {
-        email: user.email,
-        role: user.role,
-        userId: user._id ,
-        
-      };
 
-      
-      
-  
-   
-      if (user.role === 'client') {
-        userData.clientId = user._id; 
-      } else if (user.role === 'freelancer') {
-        userData.freelancerId = user._id; 
-      }
-  
-      res.status(200).json({ token, message: 'Login successful', user: userData });
-    } catch (err) {
-      console.error('Error during login:', err);
-      res.status(500).json({ message: 'Internal server error' });
+      return res.status(200).json({
+        token,
+        message: 'Admin login successful',
+        user: { email, role: 'admin' }
+      });
     }
-  };
 
-
-
-
-  const getUserById = async (req, res) => {
-    try {
-      const user = await User.findById(req.params.userId).select('-password');
-      if (!user) {
-        return res.status(404).json({ message: 'User not found' });
-      }
-      res.json(user);
-    } catch (err) {
-      console.error('Error fetching user:', err);
-      res.status(500).json({ message: 'Internal server error' });
+    // User Login Flow
+    const user = await User.findOne({ email });
+    if (!user) {
+      console.log("User not found.");
+      return res.status(401).json({ message: 'Invalid email or password' });
     }
-  };
-  const getAllUsers = async (req, res) => {
-    try {
-      const users = await User.find(); // Retrieve all users with all fields
-      res.json(users);
-    } catch (err) {
-      console.error('Error fetching users:', err);
-      res.status(500).json({ message: 'Internal server error' });
+
+    // Verify user password
+    const isPasswordCorrect = await bcrypt.compare(password, user.password);
+    if (!isPasswordCorrect) {
+      console.log("User password mismatch.");
+      return res.status(401).json({ message: 'Invalid email or password' });
     }
-  };
 
-/////////////////////////////Sammar adding the forgot password functionlaity///////
+    // Create user token and respond
+    const token = jwt.sign(
+      { userId: user._id, email: user.email, role: user.role },
+      process.env.JWT_SECRET,
+      { expiresIn: '5h' }
+    );
+
+    console.log("User login successful.");
+    res.status(200).json({
+      token,
+      message: 'Login successful',
+      user: { email: user.email, role: user.role, userId: user._id }
+    });
+  } catch (err) {
+    console.error("Error during login:", err);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
 
 
+
+
+const getUserById = async (req, res) => {
+  try {
+    const user = await User.findById(req.params.userId).select('-password');
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    res.json(user);
+  } catch (err) {
+    console.error('Error fetching user:', err);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+};
+const getAllUsers = async (req, res) => {
+  try {
+    const users = await User.find(); // Retrieve all users with all fields
+    res.json(users);
+  } catch (err) {
+    console.error('Error fetching users:', err);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+};
+// Function to create an admin user
+const createAdminUser = async (req, res) => {
+  try {
+    const { email, first_name, last_name, country_name } = req.body;
+    const adminPassword = process.env.ADMIN_PASSWORD;
+
+    const salt = await bcrypt.genSalt(10);
+    const hashedAdminPassword = await bcrypt.hash(adminPassword, salt);
+
+    const newAdminUser = new User({
+      email,
+      first_name,
+      last_name,
+      country_name,
+      password: hashedAdminPassword,
+      role: 'admin',
+      isAdmin: true,
+    });
+
+    await newAdminUser.save();
+    res.status(201).json({ message: 'Admin user created' });
+  } catch (err) {
+    console.error('Error creating admin user:', err);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+};
 
 const forgotPassword = async (req, res) => {
   const { email } = req.body;
@@ -191,8 +206,6 @@ const forgotPassword = async (req, res) => {
     return res.status(500).json({ message: 'Something went wrong.' });
   }
 };
-
-
 
 const ChangePass = async (req, res) => {
   const { newPassword, confirmPassword } = req.body;
