@@ -18,6 +18,9 @@ const queryController = require('../controllers/query.controller');
 // Import Chat controller
 const chatController = require('../controllers/chat.controller'); // Add this
 
+const  aiCoverLetter  = require('../controllers/aiCoverLetter.controller');
+
+
 // Set up multer for file uploads
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -149,6 +152,12 @@ router.get('/users' ,authMiddleware,queryController.getUser);
 
 router.get('/count',usercontroller.getallfreelancer);
 
+
+
+
+router.post('/generate-cover-letter', aiCoverLetter.generateCoverLetter);
+router.post('/save-cover-letter', aiCoverLetter.saveCoverLetter);
+router.get('/get-cover-letter/:freelancerId/:jobPostId', aiCoverLetter.getCoverLetter);
 
 // Separate route for searching users by name and email
 // router.get('/api/users/search', async (req, res) => {

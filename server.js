@@ -50,6 +50,9 @@ app.use("/api/freelancer", freelancerRoutes);
 
 
 
+
+
+
 io.on("connection", (socket) => {
   // console.log("Connected to socket.io");
 

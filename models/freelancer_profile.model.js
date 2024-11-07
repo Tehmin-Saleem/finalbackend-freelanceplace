@@ -46,6 +46,13 @@ const freelancer_ProfileSchema = new Schema({
   profile_overview: {
     type: String,
   },
+
+  email: {
+    type: String,
+    required: true,
+    match: /.+\@.+\..+/  
+  },
+  
   experience: {
     completed_projects: {
       type: Number,
