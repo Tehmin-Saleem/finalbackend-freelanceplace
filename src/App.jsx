@@ -8,8 +8,7 @@ import SubmitProposal from "./Pages/SubmitProposal";
 import Notification from "./Pages/Notifications";
 import Chat from "./Pages/ChatPage";
 // import OfferForm from "./components/FormProposal/OfferForm";
-// import { Elements } from '@stripe/react-stripe-js';
-import { loadStripe } from '@stripe/stripe-js';
+
 import PaymentMethod from "./Pages/PaymentMethod";
 import ProposalPopup from "./components/PopUps/PropsalSubmit";
 import Popup from "./components/PopUps/PropsalSubmit";
@@ -19,6 +18,7 @@ import ForgotPassword from "./Pages/ResetPass";
 import ChangePassword from "./Pages/ForgotPass";
 import ChatProvider from "./context/ChatProvider.jsX";
 import { NotificationProvider } from './Pages/Notifications/NotificationContext';
+
 import OfferDetails from "./Pages/OfferCard";
 import Clientdash from "./Pages/Dashboard";
 import ManageProjects from "./Pages/ManageProjects";
@@ -27,10 +27,14 @@ import ClientProfile from "./Pages/ClientProfileView";
 import ClientProfilePage from "./Pages/ClientProfileForm";
 import AdminDashboard from "./Pages/AdminDashboard";
 import QueryForm from "./components/Commoncomponents/QueryForm";
+import FreelancerList from "./components/FreelancersList";
+import ClientList from "./components/ClientLists";
+import ConsultantDashboard from "./Pages/ConsultantDashboard";
+import ConsultantProfileForm from "./components/ConsultantProfileForm";
+import ConsultantProfileView from "./components/ConsultantProfileView";
 // import PaymentMethod from './components/PaymentMethod';
 
-// Load your Stripe public key
-const stripePromise = loadStripe('your-stripe-publishable-key-here');
+
 
 
 const freelancers = [
@@ -94,6 +98,7 @@ function App() {
   return (
     
     <NotificationProvider>
+      
     <Router>
     
       <Routes>
@@ -109,6 +114,7 @@ function App() {
         <Route path="/applyjob" element={<ApplyJob />} />
         <Route path="/applyjob/:jobPostId" element={<ApplyJob />} />
         <Route path="/profile/:userId" element={<ProfileView />} />
+
         <Route
           path="/freelancercard"
           element={<FreeLancerCard heading="UI/UX Designer" freelancers={freelancers} />}
@@ -155,10 +161,9 @@ function App() {
         <Route path="/ChangePass/:id/:token" element={<ChangePassword/>} /> 
         <Route path="/OfferDetails" element={<OfferDetails/>} /> 
         <Route path="/ClientDash" element={<Clientdash/>} /> 
+ <Route path="/ManageProj" element={<ManageProjects/>} /> 
 
-        {/* <Route path="/ManageProj" element={<ManageProjects/>} /> 
-
-        <Route path="/ManageProject" element={<ManageProj/>} />  */}
+        <Route path="/ManageProject" element={<ManageProj/>} />  
 
 
 
@@ -168,6 +173,19 @@ function App() {
         <Route path="/ClientProfileForm" element={<ClientProfilePage/>} /> 
 
         <Route path="/AdminDashboard" element={<AdminDashboard/>} /> 
+        <Route path="/freelancerslist" element={<FreelancerList/>} /> 
+        <Route path="/clientslist" element={<ClientList/>} />
+
+        <Route path="/ConsultantDash" element={<ConsultantDashboard/>} />
+
+        <Route path="/ConsultantProfileForm" element={<ConsultantProfileForm/>} />
+        <Route path="/ConsultantProfileView" element={<ConsultantProfileView/>} />
+
+
+
+
+
+
 
        
         
@@ -181,7 +199,9 @@ function App() {
       </Routes>
       
     </Router>
+    
     </NotificationProvider>
+   
     );
 }
 

@@ -1,8 +1,10 @@
 import React from 'react';
 import './styles.scss'; // Assuming you're using SCSS
-
+import Header from "../../components/Commoncomponents/Header";
 const ManageProj = () => {
   return (
+    <>
+        <Header />
     <div className="manage-projects">
       {/* Header Section */}
       <header className="header">
@@ -44,12 +46,14 @@ const ManageProj = () => {
         />
       </div>
     </div>
+    </>
   );
 };
 
 // Project Card Component
 const ProjectCard = ({ projectName, freelancerName, deadline, progress, milestones, budget }) => {
   return (
+  
     <div className="project-card">
       {/* Project Header */}
       <div className="project-header">
@@ -101,7 +105,9 @@ const TimerButton = () => {
     <button className="timer-btn">
       <i className="bell-icon">🔔</i> Set Notification
     </button>
+   
   );
+
 };
 
 export default ManageProj;

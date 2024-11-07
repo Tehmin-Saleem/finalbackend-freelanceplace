@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { ClientFrame, FreelancerFrame } from "../../svg/index";
+import { ClientFrame, FreelancerFrame, ConsultantFrame } from "../../svg/index"; // Import Consultant SVG
 import "./styles.scss";
 import { useNavigate } from 'react-router-dom';
 
@@ -13,28 +13,22 @@ const SignUpSection = () => {
 
   const handleCreateAccountButtonClick = () => {
     if (selectedUserType) {
-      localStorage.setItem("userType", selectedUserType); // Save selectedUserType to local storage
-      console.log(`User type stored in localStorage: ${localStorage.getItem("userType")}`); // Log to check if it's stored
-      navigate('/signup'); // Replace with your target route
+      localStorage.setItem("userType", selectedUserType);
+      navigate('/signup');
     } else {
-      alert("Please select a user type."); // Alert if no user type is selected
+      alert("Please select a user type.");
     }
   };
 
   return (
     <div className="sign-up-section">
       <div className="main-container">
-        <div className="title">
-          Freelance Marketplace
-          {/* <ProjectName/> */}
-        </div>
+        <div className="title">Freelance Marketplace</div>
         <div className="join-section">
-          <h2 className="join-title">Join as a Client or Freelancer</h2>
+          <h2 className="join-title">Join as a Client, Consultant, or Freelancer</h2>
           <div className="options-container">
             <div
-              className={`option ${
-                selectedUserType === "client" ? "selected" : ""
-              }`}
+              className={`option ${selectedUserType === "client" ? "selected" : ""}`}
             >
               <input
                 type="radio"
@@ -53,15 +47,37 @@ const SignUpSection = () => {
                 </label>
               </div>
               <p className="option-description">
-                I’m a client, hiring
-                <br />
-                for a project.
+                I’m a client, hiring for a project.
               </p>
             </div>
+
+            {/* Consultant Option */}
             <div
-              className={`option ${
-                selectedUserType === "freelancer" ? "selected" : ""
-              }`}
+              className={`option ${selectedUserType === "consultant" ? "selected" : ""}`}
+            >
+              <input
+                type="radio"
+                name="userType"
+                value="consultant"
+                id="consultant"
+                className="radio-input"
+                onChange={handleChange}
+                checked={selectedUserType === "consultant"}
+                required
+              />
+              <div className="option-content">
+                <ConsultantFrame className="frame-icon" />
+                <label htmlFor="consultant" className="option-label">
+                  Consultant
+                </label>
+              </div>
+              <p className="option-description">
+                I’m a consultant, offering advice and expertise.
+              </p>
+            </div>
+
+            <div
+              className={`option ${selectedUserType === "freelancer" ? "selected" : ""}`}
             >
               <input
                 type="radio"
@@ -80,9 +96,7 @@ const SignUpSection = () => {
                 </label>
               </div>
               <p className="option-description">
-                I’m a freelancer,
-                <br />
-                looking for work.
+                I’m a freelancer, looking for work.
               </p>
             </div>
           </div>

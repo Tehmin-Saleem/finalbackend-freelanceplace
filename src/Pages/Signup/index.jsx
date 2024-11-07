@@ -43,6 +43,7 @@ function Signup() {
   const [signupError, setSignupError] = useState("");
   const [country, setCountry] = useState(""); // State for country
   const [isChecked, setIsChecked] = useState(false);
+  const [checkboxError, setCheckboxError] = useState("");
 
   const navigate = useNavigate(); // Initialize useNavigate
 
@@ -173,7 +174,10 @@ function Signup() {
       } else if (error.request) {
         console.error("Error request:", error.request);
         setSignupError("No response received from server");
-      } else {
+      } else if (response.status === 403) {
+        setSignupError(data.message);}
+      else {
+        
         console.error("Error message:", error.message);
         setSignupError("Error setting up the request");
       }
