@@ -1,32 +1,22 @@
 .editable-project-card {
-    background-color: #fff;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    padding: 20px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    max-width: 500px;
-    margin-bottom: 20px;
-  
+  width: 100%; /* Make each card fill the width of .project-list */
+  max-width: 100%; /* Avoid max-width limitations */
+  background-color: #ffffff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px; /* Space between cards */
+
     .project-info, .project-progress, .project-budget {
       margin-bottom: 20px;
   
-      label {
-        font-weight: bold;
-      }
-  
-      input {
-        width: 100%;
-        padding: 8px;
-        margin-top: 5px;
-        border: 1px solid #ddd;
-        border-radius: 5px;
-      }
     }
   
     .progress-bar {
       background-color: #f0f0f0;
       border-radius: 5px;
-      margin-top: 5px;
+      margin-top: 25px;
       overflow: hidden;
   
       .progress {
@@ -39,9 +29,11 @@
     .milestones {
       margin-bottom: 20px;
   
-      h3 {
-        font-size: 1.2rem;
+      h5 {
+        font-size: 1.5rem;
         margin-bottom: 10px;
+        color:#1fb6d8 ;
+        font-weight:600;
       }
   
       .milestone-item {
@@ -57,19 +49,129 @@
         }
       }
     }
+    .buttons-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 24px;
+    }
+  
+    .pending-btn {
+      background-color: #1aa3c2;
+      color: #fff;
+      border: none;
+      padding: 10px 5px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 1rem;
+      margin-left: 12px;
+  
+      &:hover {
+        background-color: #098eac;
+      }
+  
+      &:disabled {
+        background-color: #ccc;
+        cursor: not-allowed;
+      }
+    }
   
     .save-btn {
       background-color: #4caf50;
       color: #fff;
       border: none;
-      padding: 10px 20px;
+      padding: 20px 10px;
       border-radius: 5px;
       cursor: pointer;
-      font-size: 1rem;
+      font-size: 2rem;
+    }
   
-      &:hover {
-        background-color: #45a049;
+    .save-btn:hover {
+      background-color: #45a049;
+    }
+  
+  }
+.editable-project-card {
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 24px;
+  width: 100%;
+  margin-bottom: 24px;
+
+  .project-info,
+  .project-progress,
+  .milestones,
+  .project-description,
+  .client-info,
+  .project-budget {
+    margin-bottom: 24px;
+
+    label {
+      font-weight: 600;
+      margin-bottom: 8px;
+      display: block;
+    }
+
+    input,
+    textarea {
+      width: 100%;
+      padding: 8px 12px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 14px;
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 100px;
+    }
+  }
+
+  .project-progress {
+    .progress-bar {
+      height: 16px;
+      background-color: #f1f1f1;
+      border-radius: 8px;
+      overflow: hidden;
+
+      .progress {
+        height: 100%;
+        background-color: #4caf50;
+        transition: width 0.3s ease-in-out;
       }
     }
   }
-  
+
+  .milestone-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+
+    p {
+      margin: 0;
+    }
+
+    select {
+      padding: 4px 8px;
+      font-size: 14px;
+    }
+  }
+
+  .save-btn {
+    display: block;
+    margin-left: auto;
+    padding: 8px 16px;
+    background-color: #1aa3c2;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    font-size: 14px;
+    cursor: pointer;
+
+    &:hover {
+      background-color: #1092af;
+    }
+  }
+}

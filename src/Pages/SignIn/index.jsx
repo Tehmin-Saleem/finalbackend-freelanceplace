@@ -81,7 +81,10 @@ function SignIn() {
           navigate("/ClientDashboard");
         } else if (userType === "freelancer") {
           navigate("/FreelanceDashBoard");
-        } else {
+        }else if (userType === "admin") {
+          navigate("/AdminDashboard");
+        }
+         else {
           setErrorMessage("Unknown user type.");
         }
       } else {

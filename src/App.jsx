@@ -8,8 +8,7 @@ import SubmitProposal from "./Pages/SubmitProposal";
 import Notification from "./Pages/Notifications";
 import Chat from "./Pages/ChatPage";
 // import OfferForm from "./components/FormProposal/OfferForm";
-// import { Elements } from '@stripe/react-stripe-js';
-import { loadStripe } from '@stripe/stripe-js';
+
 import PaymentMethod from "./Pages/PaymentMethod";
 import ProposalPopup from "./components/PopUps/PropsalSubmit";
 import Popup from "./components/PopUps/PropsalSubmit";
@@ -19,6 +18,7 @@ import ForgotPassword from "./Pages/ResetPass";
 import ChangePassword from "./Pages/ForgotPass";
 import ChatProvider from "./context/ChatProvider.jsX";
 import { NotificationProvider } from './Pages/Notifications/NotificationContext';
+
 import OfferDetails from "./Pages/OfferCard";
 import Clientdash from "./Pages/Dashboard";
 import ManageProjects from "./Pages/ManageProjects";
@@ -29,8 +29,7 @@ import AdminDashboard from "./Pages/AdminDashboard";
 import QueryForm from "./components/Commoncomponents/QueryForm";
 // import PaymentMethod from './components/PaymentMethod';
 
-// Load your Stripe public key
-const stripePromise = loadStripe('your-stripe-publishable-key-here');
+
 
 
 const freelancers = [
@@ -94,6 +93,7 @@ function App() {
   return (
     
     <NotificationProvider>
+      
     <Router>
     
       <Routes>
@@ -155,10 +155,9 @@ function App() {
         <Route path="/ChangePass/:id/:token" element={<ChangePassword/>} /> 
         <Route path="/OfferDetails" element={<OfferDetails/>} /> 
         <Route path="/ClientDash" element={<Clientdash/>} /> 
+ <Route path="/ManageProj" element={<ManageProjects/>} /> 
 
-        {/* <Route path="/ManageProj" element={<ManageProjects/>} /> 
-
-        <Route path="/ManageProject" element={<ManageProj/>} />  */}
+        <Route path="/ManageProject" element={<ManageProj/>} />  
 
 
 
@@ -181,7 +180,9 @@ function App() {
       </Routes>
       
     </Router>
+    
     </NotificationProvider>
+   
     );
 }
 
