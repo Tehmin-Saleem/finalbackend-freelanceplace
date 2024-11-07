@@ -90,9 +90,14 @@ function SignIn() {
         const userType = data.user.role; 
         if (userType === "client") {
           navigate("/ClientDashboard");
-        } else if (userType === "freelancer") {
+        } 
+        else if (userType === "freelancer") {
           navigate("/FreelanceDashBoard");
-        } else {
+        }
+        else if (userType === "consultant") {
+          navigate("/ConsultantDash");
+        }
+         else {
           setErrorMessage("Unknown user type.");
         }
       } else {

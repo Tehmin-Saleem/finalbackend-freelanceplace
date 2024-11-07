@@ -29,6 +29,9 @@ import AdminDashboard from "./Pages/AdminDashboard";
 import QueryForm from "./components/Commoncomponents/QueryForm";
 import FreelancerList from "./components/FreelancersList";
 import ClientList from "./components/ClientLists";
+import ConsultantDashboard from "./Pages/ConsultantDashboard";
+import ConsultantProfileForm from "./components/ConsultantProfileForm";
+import ConsultantProfileView from "./components/ConsultantProfileView";
 // import PaymentMethod from './components/PaymentMethod';
 
 // Load your Stripe public key
@@ -172,7 +175,16 @@ function App() {
 
         <Route path="/AdminDashboard" element={<AdminDashboard/>} /> 
         <Route path="/freelancerslist" element={<FreelancerList/>} /> 
-        <Route path="/clientslist" element={<ClientList/>} /> 
+        <Route path="/clientslist" element={<ClientList/>} />
+
+        <Route path="/ConsultantDash" element={<ConsultantDashboard/>} />
+
+        <Route path="/ConsultantProfileForm" element={<ConsultantProfileForm/>} />
+        <Route path="/ConsultantProfileView" element={<ConsultantProfileView/>} />
+
+
+
+
 
 
 
