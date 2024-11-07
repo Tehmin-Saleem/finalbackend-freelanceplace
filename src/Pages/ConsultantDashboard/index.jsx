@@ -3,16 +3,14 @@ import './styles.scss';
 import { FaUserCircle, FaEye } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import ConsultantProfileView from "../../components/ConsultantProfileView";
-import ConsultantProfileForm from '../../components/ConsultantProfileForm';
 
 const ConsultantDashboard = () => {
     const [profileSaved, setProfileSaved] = useState(false);
     const [savedProfile, setSavedProfile] = useState(null);
     const [isProfileViewOpen, setIsProfileViewOpen] = useState(false);
     const navigate = useNavigate();
-    const [user, setUser] = useState(null);  // Store the logged-in user data
+    const [user, setUser] = useState(null);
 
-    // Get saved profile data from localStorage on mount
     useEffect(() => {
         const token = localStorage.getItem('authToken');
         if (token) {
@@ -25,7 +23,7 @@ const ConsultantDashboard = () => {
                     });
                     if (response.ok) {
                         const data = await response.json();
-                        setUser(data);  // Store user profile
+                        setUser(data);
                         setProfileSaved(true);
                         setSavedProfile(data);
                     } else {
@@ -41,11 +39,10 @@ const ConsultantDashboard = () => {
     }, []);
 
     const handleProfileClick = () => {
-        // Toggle the profile view if profile is saved
         if (profileSaved) {
-            setIsProfileViewOpen(!isProfileViewOpen);  // Toggle view visibility
+            setIsProfileViewOpen(!isProfileViewOpen);
         } else {
-            navigate('/ConsultantProfileForm');  // Navigate to form if profile not saved
+            navigate('/ConsultantProfileForm');
         }
     };
 
@@ -59,17 +56,10 @@ const ConsultantDashboard = () => {
                 </button>
             </header>
 
-            {/* Conditionally render the profile form or view */}
-            {user ? (
-                !isProfileViewOpen ? (
-                    <ConsultantProfileView profile={user} />
-                ) : (
-                    <div className="profile-view-container">
-                        <ConsultantProfileView profile={user} />
-                    </div>
-                )
+            {isProfileViewOpen && profileSaved ? (
+                <ConsultantProfileView profile={savedProfile} />
             ) : (
-                <p>Loading...</p>
+                <p>{!profileSaved && "Profile not saved yet."}</p>
             )}
 
             {/* Dashboard sections */}
