@@ -48,6 +48,7 @@ const IndexPage = () => {
             ...proposal,
             country: freelancerId ? userCountryMap[freelancerId] || "Unknown" : "Unknown",
             image: proposal.freelancerProfile?.image,
+            ProposalID: proposal._id,
             status: proposal.status || "Available" // Add this line to include the status
           };
         });
@@ -63,6 +64,24 @@ const IndexPage = () => {
 
     fetchData();
   }, [jobId, navigate]);
+  const formatRate = (proposal) => {
+    if (!proposal.add_requirements) return "Not specified";
+    
+    // Handle by_project rate
+    if (proposal.add_requirements.by_project?.bid_amount) {
+      return `By Project: $${proposal.add_requirements.by_project.bid_amount}`;
+    }
+    
+    // Handle milestone rate - sum all milestone amounts
+    if (proposal.add_requirements.by_milestones) {
+      const total = proposal.add_requirements.by_milestones.reduce((sum, milestone) => 
+        sum + (parseFloat(milestone.amount) || 0), 0
+      );
+      return `By Milestone: $${total}`;
+    }
+    
+    return "Not specified";
+  };
 
   const handlePageChange = (page) => {
     setCurrentPage(page);
@@ -82,27 +101,12 @@ const IndexPage = () => {
     setIsModalOpen(false);
     setSelectedProposal(null);
   };
-  const handleHire = async (proposal) => {
-    try {
-      const token = localStorage.getItem("token");
-      const response = await axios.post(`${API_URL}/client/hire/${proposal.id}`, {}, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      console.log("Hire response:", response.data);
-      
-      // Update the status of the hired proposal
-      setProposals(prevProposals => 
-        prevProposals.map(p => 
-          p.id === proposal.id ? { ...p, status: 'Hired' } : p
-        )
-      );
-  
-      // Optionally, you can show a success message to the user
-     alert('you have hired the freelancer')
-    } catch (error) {
-      console.error("Error hiring freelancer:", error);
-      // Optionally, show an error message to the user
-    }
+  const handleHireSuccess = (proposalId) => {
+    setProposals(prevProposals => 
+      prevProposals.map(p => 
+        p.ProposalID === proposalId ? { ...p, status: 'Hired' } : p
+      )
+    );
   };
 
   const indexOfLastProposal = currentPage * rowsPerPage;
@@ -113,27 +117,32 @@ const IndexPage = () => {
   return (
     <div className="proposals-page">
       <Header />
-      
       <h1 className="proposals-heading">Proposals</h1>
       <div className="profiles-container">
         {currentProposals.map((proposal) => (
           <div key={proposal.id} onClick={() => handleProposalClick(proposal)} className="profile-card">
             <Proposalscard
+              ProposalID={proposal.id}
+              onHireSuccess={handleHireSuccess}
               name={proposal.freelancerProfile?.name || "No Name"}
               title={proposal.freelancerProfile?.experience?.title || ""}
               location={proposal.country || "Unknown"}
               rate={proposal.rate 
                 ? `${proposal.rate}$` 
                 : proposal.add_requirements?.by_project?.bid_amount 
-                  ? `${proposal.add_requirements.by_project.bid_amount}$` 
-                  : "Not specified"
+                  ? `${proposal.add_requirements.by_project.bid_amount}$`
+                  : proposal.add_requirements?.by_milestones
+                    ? `${proposal.add_requirements.by_milestones.reduce((sum, milestone) => 
+                        sum + (parseFloat(milestone.amount) || 0), 0)}$`
+                    : "Not specified"
               }
+              // due_date={proposal.due_date}
               earned={`$${proposal.freelancerProfile?.totalHours + (proposal.freelancerProfile?.totalJobs || 0)}+ earned`}
               timeline={proposal.timeline || "Not specified"}
               image={proposal.image}
               coverLetter={proposal.coverLetter || "No cover letter available"}
               jobTitle={proposal.jobTitle || "No job title"}
-              status={proposal.status} // Use the status from the proposal
+              status={proposal.status}
               isAuthenticatedUser={proposal.isAuthenticatedUser}
               onHire={() => handleHire(proposal)}
             />
@@ -180,9 +189,19 @@ const IndexPage = () => {
             <p><strong>Job Title:</strong> {selectedProposal.jobTitle}</p>
             <p><strong>Cover Letter:</strong> {selectedProposal.coverLetter}</p>
             <p><strong>Timeline:</strong> {selectedProposal.timeline}</p>
-            <p><strong>Rate:</strong> {selectedProposal.rate}</p>
+            <p><strong>Rate:</strong> {formatRate(selectedProposal)}</p>
+            {selectedProposal.add_requirements?.by_milestones && (
+              <div>
+                <h3>Milestone Breakdown:</h3>
+                {selectedProposal.add_requirements.by_milestones.map((milestone, index) => (
+                  <p key={index}>
+                    <strong>Milestone {index + 1}:</strong> ${milestone.amount}
+                    {milestone.description && ` - ${milestone.description}`}
+                  </p>
+                ))}
+              </div>
+            )}
             <p><strong>Location:</strong> {selectedProposal.country}</p>
-            {/* <p><strong>Status:</strong> {selectedProposal.proposalStatus}</p> */}
             <button onClick={handleCloseModal}>Close</button>
           </div>
         </div>
@@ -190,7 +209,6 @@ const IndexPage = () => {
     </div>
   );
 };
-
 export default IndexPage;
 
 

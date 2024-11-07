@@ -97,6 +97,9 @@ function SignIn() {
         else if (userType === "consultant") {
           navigate("/ConsultantDash");
         }
+        else if (userType === "admin") {
+          navigate("/AdminDashboard");
+        }
          else {
           setErrorMessage("Unknown user type.");
         }
