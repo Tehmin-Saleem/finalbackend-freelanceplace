@@ -12,6 +12,7 @@ const usercontroller=require ('../controllers/user.controller')
 const { upload } = require('../config/cloudinary.config');// const { forgotPassword, resetPassword } = require('../controllers/user.controller');
 const ClientProfile= require('../controllers/client_profile.controller')
 const Notification= require ('../controllers/notifications.controller')
+const consultantProfileController=require ('../controllers/consultantprofile.controller')
 
 const queryController = require('../controllers/query.controller');
 
@@ -189,6 +190,18 @@ router.get('/users' ,authMiddleware,queryController.getUser);
 
 router.get('/count',usercontroller.getAllClient);
 
+router.get('/clientslist',usercontroller.getallclientlist);
 
+router.get('/queries/:id', authMiddleware, queryController.getQueryById);
+
+router.patch('/queries/:id', authMiddleware, queryController.updatequery);
+router.patch('/softban/:id',authMiddleware,usercontroller.clientsoftban);
+router.delete('/ban/:id',authMiddleware,usercontroller.clientban);
+router.patch('/unban/:id', authMiddleware,usercontroller.ClientUnban);
+
+// const upload = multer({ dest: 'uploads/' });
+
+router.post('/profile', upload.single('profilePicture'), consultantProfileController.createProfile);
+router.get('/profile/:id',  consultantProfileController.getProfile);
 module.exports = router;
 

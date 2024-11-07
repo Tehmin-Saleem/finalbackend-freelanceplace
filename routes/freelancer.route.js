@@ -148,8 +148,10 @@ router.get('/users' ,authMiddleware,queryController.getUser);
 
 
 router.get('/count',usercontroller.getallfreelancer);
+router.get('/freelancerslist',usercontroller.getallfreelancerlist);
+router.get('/queries/:id', authMiddleware, queryController.getQueryById);
 
-
+router.patch('/queries/:id', authMiddleware, queryController.updatequery);
 // Separate route for searching users by name and email
 // router.get('/api/users/search', async (req, res) => {
 //   const { name, email } = req.query;
@@ -169,5 +171,8 @@ router.get('/count',usercontroller.getallfreelancer);
 
 // Reset Password Route (handles when the user clicks the link from email)
 // router.post('/ChangePass/:token', usercontroller.resetPassword);
+router.patch('/softban/:id',authMiddleware,usercontroller.freelancersoftban);
+router.delete('/ban/:id',authMiddleware,usercontroller.freelancerban);
+router.patch('/unban/:id', authMiddleware,usercontroller.freelancerUnban);
 
 module.exports = router;

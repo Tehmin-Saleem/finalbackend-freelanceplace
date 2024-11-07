@@ -87,21 +87,21 @@ io.on("connection", (socket) => {
 
   app.set("io", io);
 
-  // io.use((socket, next) => {
-  //   const token = socket.handshake.auth.token;
-  //   if (!token) {
-  //     return next(new Error("Authentication error: No token provided"));
-  //   }
+  io.use((socket, next) => {
+    const token = socket.handshake.auth.token;
+    if (!token) {
+      return next(new Error("Authentication error: No token provided"));
+    }
 
-  //   try {
-  //     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-  //     socket.userId = decoded.userId;
-  //     socket.userRole = decoded.role;
-  //     next();
-  //   } catch (error) {
-  //     return next(new Error("Authentication error: Invalid token"));
-  //   }
-  // });
+    try {
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      socket.userId = decoded.userId;
+      socket.userRole = decoded.role;
+      next();
+    } catch (error) {
+      return next(new Error("Authentication error: Invalid token"));
+    }
+  });
 
   // ==================
 
