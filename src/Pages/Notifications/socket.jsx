@@ -1,83 +1,95 @@
-import io from 'socket.io-client';
-import axios from 'axios';
-import { jwtDecode } from 'jwt-decode';
-
-const SOCKET_URL = 'http://localhost:5000';
-const API_URL = 'http://localhost:5000/api';
-
 class SocketManager {
   socket;
   userId;
+  userRole;
+  notificationListeners = new Set();
 
   async connect() {
     try {
       const token = localStorage.getItem('token');
-      if (!token) {
-        throw new Error('Token not found in localStorage');
-      }
+      if (!token) throw new Error('No token found');
 
       const decodedToken = jwtDecode(token);
       this.userId = decodedToken?.userId;
-      if (!this.userId) {
-        throw new Error('Invalid token: userId not found');
-      }
-
-      console.log(`Decoded userId from token: ${this.userId}`);
-
-      this.socket = io(SOCKET_URL, {
-        auth: { token }
+      this.userRole = decodedToken?.role;
+      
+      this.socket = io('http://localhost:5000', {
+        auth: {
+          token,
+          userId: this.userId,
+          role: this.userRole
+        }
       });
-
+      
       this.socket.on('connect', () => {
-        console.log("SocketManager: Connected to server");
-        this.socket.emit('authenticate', { token, userId: this.userId });
+        console.log('Socket connected');
+        // Join role-specific and user-specific rooms
+        this.socket.emit('join-rooms', {
+          userId: this.userId,
+          role: this.userRole
+        });
       });
 
-      this.socket.on('disconnect', () => {
-        console.log('SocketManager: Disconnected from server');
+      this.socket.on('connected', () => {
+        console.log(`Setup confirmed for ${this.userRole} ${this.userId}`);
       });
 
-      this.socket.on('auth_error', (error) => {
-        console.error('SocketManager: Authentication error', error);
-      });
-
-      this.socket.onAny((eventName, ...args) => {
-        console.log(`SocketManager: Received event "${eventName}"`, args);
-      });
-
+      // Set up notification listener with role-based filtering
+      this.setupNotificationListener();
     } catch (error) {
-      console.error('SocketManager: Error during connection setup', error);
-      throw error;
+      console.error('Socket connection error:', error);
     }
   }
 
-  disconnect() {
-    if (this.socket) {
-      console.log('SocketManager: Disconnecting from server');
-      this.socket.disconnect();
-    }
-  }
-  onNotification(callback) {
+  setupNotificationListener() {
+    if (!this.socket) return;
+    
     this.socket.on('notification', (notification) => {
-      console.log(`SocketManager: Received notification`, notification);
-      console.log(`SocketManager: Current user ID: ${this.userId}`);
-      console.log(`SocketManager: Notification type: ${notification.type}`);
-      console.log(`SocketManager: Freelancer ID in notification: ${notification.freelancer_id}`);
-      console.log(`SocketManager: Client ID in notification: ${notification.client_id}`);
-  
-      const isRelevantNotification = 
-        (notification.type === 'new_offer' && notification.freelancer_id === this.userId) ||
-        (notification.type === 'new_proposal' && notification.client_id === this.userId) ||
-        (notification.type === 'hired' && notification.freelancer_id === this.userId);
-  
-      if (isRelevantNotification) {
-        console.log(`SocketManager: Processing notification for user ${this.userId}`);
-        callback(notification);
-      } else {
-        console.log(`SocketManager: Ignoring notification (userId: ${this.userId}, type: ${notification.type})`);
+      console.log('Received notification:', notification);
+      
+      // Check if the notification is meant for the current user based on role and type
+      if (this.shouldReceiveNotification(notification)) {
+        this.notifyListeners([notification]);
       }
     });
   }
 
+  shouldReceiveNotification(notification) {
+    // Define notification routing rules
+    const routingRules = {
+      'hired': { role: 'freelancer', idField: 'freelancer_id' },
+      'new_proposal': { role: 'client', idField: 'client_id' },
+      'new_offer': { role: 'freelancer', idField: 'freelancer_id' },
+      'milestone_completed': { role: 'client', idField: 'client_id' },
+      'payment_received': { role: 'freelancer', idField: 'freelancer_id' }
+    };
+
+    const rule = routingRules[notification.type];
+    if (!rule) return false;
+
+    // Check if user role matches and the ID matches
+    return this.userRole === rule.role && 
+           notification[rule.idField]?.toString() === this.userId?.toString();
+  }
+
+  addNotificationListener(callback) {
+    this.notificationListeners.add(callback);
+  }
+
+  removeNotificationListener(callback) {
+    this.notificationListeners.delete(callback);
+  }
+
+  notifyListeners(notifications) {
+    this.notificationListeners.forEach(listener => listener(notifications));
+  }
+
+  disconnect() {
+    if (this.socket) {
+      this.socket.disconnect();
+      this.notificationListeners.clear();
+    }
+  }
 }
+
 export default new SocketManager();

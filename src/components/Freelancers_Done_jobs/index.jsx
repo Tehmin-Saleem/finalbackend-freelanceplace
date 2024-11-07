@@ -1,9 +1,12 @@
 import React from "react";
-import "./styles.scss"; // Import the SCSS file
-import StarRating from "../ProfileView/starrating"; // Import the StarRating component
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import "./styles.scss";
+import StarRating from "../ProfileView/starrating";
 import { JobSucces } from "../../svg";
 
 const JobsCard = ({
+  id,
   type,
   title,
   rate,
@@ -15,14 +18,71 @@ const JobsCard = ({
   rating,
   location,
   postedTime,
+  proposalId // Add this prop if you have a specific proposal ID to view
 }) => {
+  const navigate = useNavigate();
+
+  const handleViewClick = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        throw new Error('No authentication token found');
+      }
+
+      const headers = {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      };
+
+      // Fetch specific proposal data
+      const response = await axios.get(
+        `http://localhost:5000/api/freelancer/getproposals?jobId=${id}`,
+        { headers }
+      );
+
+      // Find the specific proposal for this job
+      const specificProposal = response.data.proposals.find(
+        proposal => proposal.isAuthenticatedUser
+      );
+
+      if (!specificProposal) {
+        throw new Error('No proposal found for this job');
+      }
+
+      // Navigate to ManageProj page with job and specific proposal data
+      navigate("/manageproj", {
+        state: {
+          jobData: {
+            id,
+            type,
+            title,
+            rate,
+            timeline,
+            level,
+            description,
+            tags,
+            verified,
+            rating,
+            location,
+            postedTime
+          },
+          proposalData: specificProposal // Pass only the specific proposal
+        }
+      });
+    } catch (error) {
+      console.error('Error fetching proposal data:', error);
+      alert('Failed to fetch proposal data. Please try again.');
+    }
+  };
+
+  
   return (
     <div className="job-card">
       <div className="job-card__content">
         <div className="job-card__header">
           <span className="job-card__title">{title}</span>
           <span className="job-card__posted-time">Posted {postedTime}</span>
-          <button className="job-card__view-button">View</button>
+          <button className="job-card__view-button" onClick={handleViewClick}>View</button>
         </div>
         <div className="job-card__information">
           <span className="job-card__rate-head">{type}:</span>
@@ -51,5 +111,3 @@ const JobsCard = ({
 };
 
 export default JobsCard;
-
-

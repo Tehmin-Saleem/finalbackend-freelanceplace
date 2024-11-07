@@ -1,8 +1,22 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import "./styles.scss";
 import { CommonButton } from "../../components/index";
 import { Chat } from "../../svg/index";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import { X } from "lucide-react";
+
+const Toast = ({ message, onClose }) => (
+  <div className="fixed bottom-4 left-4 z-50 bg-white shadow-lg rounded-lg p-4 flex items-center justify-between min-w-[200px] max-w-md border border-gray-200">
+    <span className="text-gray-800">{message}</span>
+    <button
+      onClick={onClose}
+      className="ml-4 text-gray-500 hover:text-gray-700"
+    >
+      <X size={16} />
+    </button>
+  </div>
+);
 
 const ProposalCard = ({
   ProposalID,
@@ -14,75 +28,157 @@ const ProposalCard = ({
   timeline,
   coverLetter,
   image,
+  due_date,
   jobTitle,
-  status
+  initialStatus,
+  onHireSuccess
 }) => {
-
-  
-  console.log('Job name:', title); // Log to check the id value
   const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [status, setStatus] = useState(null); // Initialize as null instead of initialStatus
+  const [showToast, setShowToast] = useState(false);
+  const [toastMessage, setToastMessage] = useState("");
+  const [freelancerData, setFreelancerData] = useState(null);
 
-  const handleHireClick = (e) => {
-    e.stopPropagation(); // Prevent any other click events
-   
+  // Fetch current proposal status when component mounts
+  useEffect(() => {
+    fetchProposalStatus();
+  }, [ProposalID]);
+
+  const fetchProposalStatus = async () => {
+    if (!ProposalID) return;
+
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        throw new Error('No authentication token found');
+      }
+
+      const response = await axios.get(
+        `http://localhost:5000/api/client/hire/${ProposalID}`,
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+
+      // Update the status based on the response from the database
+      if (response.data && response.data.status) {
+        setStatus(response.data.status);
+      } else {
+        // If no status is returned, set it to the default status
+        setStatus('pending');
+      }
+
+    } catch (error) {
+      const errorMessage = error.response?.data?.message || 'Failed to fetch current status';
+      console.error('Error fetching proposal status:', error);
+      console.error('Error details:', error.response?.data);
+      setError(errorMessage);
+      showNotification(errorMessage);
+      // Set a default status in case of error
+      setStatus('pending');
+    }
   };
 
+  const showNotification = (message) => {
+    setToastMessage(message);
+    setShowToast(true);
+    setTimeout(() => setShowToast(false), 5000);
+  };
 
+  const handleHireClick = async (e) => {
+    e.stopPropagation();
+    
+    if (!ProposalID) {
+      setError('Invalid proposal ID');
+      console.error('ProposalID is undefined');
+      return;
+    }
 
-
-
-
-  // Function to fetch freelancer details by proposal ID (from backend)
-  async function getFreelancerDetails(ProposalID) {
-
-    const token = localStorage.getItem('token');  // Assuming you store the JWT token in localStorage
-  
+    setIsLoading(true);
+    setError(null);
+    
     try {
-      const response = await fetch(`http://localhost:5000/api/client/proposal/${ProposalID}`, {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${token}`,  // Add your token for authentication
-          'Content-Type': 'application/json'
+      const token = localStorage.getItem('token');
+      const response = await axios.post(
+        `http://localhost:5000/api/client/hire/${ProposalID}`,
+        { status: 'hired' }, // Send the status in the request body
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
         }
-      });
-  
-      if (!response.ok) {
-        throw new Error(`Error: ${response.status} ${response.statusText}`);
+      );
+
+      if (response.status === 200) {
+        onHireSuccess?.(ProposalID);
+        setStatus('hired');
+        showNotification('Freelancer hired successfully!');
       }
-  
-      const freelancerDetails = await response.json();
-      console.log('Freelancer details:', freelancerDetails);
-  
-      return freelancerDetails;
+    } catch (error) {
+      const errorMessage = error.response?.data?.message || 'Failed to hire freelancer. Please try again.';
+      setError(errorMessage);
+      console.error('Error hiring freelancer:', error);
+      showNotification(errorMessage);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleChatClick = async () => {
+    if (!ProposalID) {
+      console.error('Invalid proposal ID for chat');
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem('token');
+      const response = await axios.get(
+        `http://localhost:5000/api/client/proposal/${ProposalID}`,
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+
+      if (response.data) {
+        setFreelancerData(response.data);
+        navigate("/chat", { 
+          state: { 
+            proposalId: ProposalID,
+            freelancerData: response.data 
+          }
+        });
+      } else {
+        showNotification("Failed to load chat. Please try again.");
+      }
     } catch (error) {
       console.error('Failed to fetch freelancer details:', error);
-      return null;
-    }
-  }
-
-  // Function to handle the chat button click
-  const handleChatClick = async (ProposalID) => {
-    console.log('Proposal ID:', ProposalID); // Add this line
-    const freelancerDetails = await getFreelancerDetails(ProposalID);
-  
-    if (freelancerDetails) {
-      localStorage.setItem("proposalId", ProposalID);
-      localStorage.setItem("freelancerDetails", JSON.stringify(freelancerDetails));
-      navigate("/chat");  // Now using navigate here is valid
-    } else {
-      console.error("Failed to fetch freelancer details");
+      showNotification("Failed to load chat. Please try again.");
     }
   };
-  
 
-  // const handleChatClick = () => {
-  //   localStorage.setItem("proposalId", id); // Store the proposal ID in localStorage
-  //   navigate("/chat");
-  // };
-  
+  // Show loading state while initial status is being fetched
+  if (status === null) {
+    return <div>Loading...</div>;
+  }
 
   return (
-    <div className="proposal-card">
+    <div className="proposal-card relative">
+      {showToast && (
+        <Toast 
+          message={toastMessage} 
+          onClose={() => setShowToast(false)} 
+        />
+      )}
+      
       <img src={image} alt={`${name}'s profile`} className="proposal-card__image" />
       <div className="proposal-card__content">
         <div className="proposal-card__header">
@@ -90,14 +186,13 @@ const ProposalCard = ({
           <span className="proposal-card__status">{status}</span>
         </div>
         <p className="proposal-card__title">{title}</p>
+        <p className="proposal-card__due_date">{due_date}</p>
         <p className="proposal-card__location">{location}</p>
         <div className="proposal-card__details">
           <span className="proposal-card__rate">{rate}</span>
           <span className="proposal-card__earned">{earned}</span>
         </div>
         <div className="proposal-card__extra">
-          {/* <span className="proposal-card__qualification-head">Qualification: </span> */}
-          {/* <span className="proposal-card__qualification">{qualification}</span> */}
           <span className="proposal-card__timeline-head">Estimated timeline:</span>
           <span className="proposal-card__timeline">{timeline}</span>
         </div>
@@ -113,14 +208,27 @@ const ProposalCard = ({
           <CommonButton
             text={<Chat />}
             className="bg-[#FFFFFF] border border-[#4BCBEB] text-[18px] font-Poppins text-[#FFFFFF] rounded-lg font-semibold font-Poppins py-1 px-6 w-full focus:outline-none focus:shadow-outline"
-            onClick={() => handleChatClick(ProposalID)} // Add click handler
-         />
-        <CommonButton
-            text="Hire"
-            className="bg-[#4BCBEB] text-[18px] font-Poppins text-[#FFFFFF] rounded-lg font-semibold font-Poppins py-2 px-6 w-full focus:outline-none focus:shadow-outline"
-            onClick={handleHireClick}
+            onClick={handleChatClick}
+            disabled={isLoading}
           />
+          {status !== 'hired' ? (
+            <CommonButton
+              text={isLoading ? "Hiring..." : "Hire"}
+              className="bg-[#4BCBEB] text-[18px] font-Poppins text-[#FFFFFF] rounded-lg font-semibold font-Poppins py-2 px-6 w-full focus:outline-none focus:shadow-outline disabled:opacity-50"
+              onClick={handleHireClick}
+              disabled={isLoading}
+            />
+          ) : (
+            <CommonButton
+              text="Hired"
+              className="bg-gray-400 text-[18px] font-Poppins text-[#FFFFFF] rounded-lg font-semibold font-Poppins py-2 px-6 w-full cursor-not-allowed"
+              disabled={true}
+            />
+          )}
         </div>
+        {error && (
+          <div className="text-red-500 mt-2 text-sm">{error}</div>
+        )}
       </div>
     </div>
   );
