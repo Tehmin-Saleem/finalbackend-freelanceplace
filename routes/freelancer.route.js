@@ -3,6 +3,7 @@ const router = express.Router();
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
+const jobPostController = require('../controllers/post_job.controller');
 // Import controllers and middleware
 const usercontroller = require('../controllers/user.controller');
 const proposalController = require('../controllers/proposal.controller');
@@ -12,7 +13,7 @@ const { upload } = require('../config/cloudinary.config');//import forgot and re
 // const { forgotPassword, resetPassword } = require('../controllers/user.controller');
 const Notification= require ('../controllers/notifications.controller')
 const queryController = require('../controllers/query.controller');
-
+const manageProject = require('../controllers/Manageproj.controller')
 
 
 // Import Chat controller
@@ -66,7 +67,7 @@ router.get('/notifications', authMiddleware, Notification.getNotifications);
 router.post('/notifications', authMiddleware, Notification.createNotification);
 router.put('/notifications/:notificationId/read', authMiddleware, Notification.updateNotification);
 router.get('/notifications/unread-count', authMiddleware, Notification.getUnreadNotificationsCount);
-
+router.get('/jobs', authMiddleware, jobPostController.getAllJobPosts);
 router.get('/profile/portfolios/:fileName', (req, res) => {
   const { fileName } = req.params;
   const filePath = path.join(__dirname, '..', 'uploads', fileName);
@@ -91,6 +92,7 @@ router.post('/login', usercontroller.login);
 
 router.use(authMiddleware);
 
+router.post('/manageproj',authMiddleware, manageProject.createProject);
 // Proposal routes
 router.post('/proposal/:jobPostId', upload.single('attachment'), proposalController.createProposal);
 router.get('/getproposals', proposalController.getFreelancerProposals);
@@ -151,8 +153,10 @@ router.get('/users' ,authMiddleware,queryController.getUser);
 
 
 router.get('/count',usercontroller.getallfreelancer);
+router.get('/freelancerslist',usercontroller.getallfreelancerlist);
+router.get('/queries/:id', authMiddleware, queryController.getQueryById);
 
-
+router.patch('/queries/:id', authMiddleware, queryController.updatequery);
 
 
 router.post('/generate-cover-letter', aiCoverLetter.generateCoverLetter);
@@ -178,5 +182,8 @@ router.get('/get-cover-letter/:freelancerId/:jobPostId', aiCoverLetter.getCoverL
 
 // Reset Password Route (handles when the user clicks the link from email)
 // router.post('/ChangePass/:token', usercontroller.resetPassword);
+router.patch('/softban/:id',authMiddleware,usercontroller.freelancersoftban);
+router.delete('/ban/:id',authMiddleware,usercontroller.freelancerban);
+router.patch('/unban/:id', authMiddleware,usercontroller.freelancerUnban);
 
 module.exports = router;

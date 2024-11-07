@@ -60,3 +60,41 @@ exports.getUser = async (req, res) => {
     const users = await User.findAll(); // Adjust this query based on your requirements
     res.json(users);
 };
+
+
+
+exports.getQueryById = async (req, res) => {
+    const { id } = req.params;
+    try {
+      const query = await Query.findById(id);
+      if (!query) {
+        return res.status(404).json({ message: 'Query not found' });
+      }
+      res.json(query);
+    } catch (error) {
+       return res.status(500).json({ message: 'Error fetching query', error });
+    }
+  };
+
+
+  exports.updatequery= async (req, res) => {
+    const queryId = req.params.id;
+    const { status } = req.body;  // Get new status from the request body
+
+    try {
+        const updatedQuery = await Query.findByIdAndUpdate(
+            queryId,
+            { status },  // Update the status field
+            { new: true }  // Return the updated document
+        );
+
+        if (!updatedQuery) {
+            return res.status(404).json({ message: 'Query not found' });
+        }
+
+        res.json(updatedQuery);  // Return the updated query
+    } catch (error) {
+        console.error(error);
+         return res.status(500).json({ message: 'Server error' });
+    }
+};

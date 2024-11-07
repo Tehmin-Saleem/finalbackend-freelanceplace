@@ -12,6 +12,7 @@ const notificationsSchema = new Schema({
     required: true,
     ref: "User",
   }, 
+  
   is_read: {
     type: Boolean,
     default: false,
