@@ -197,12 +197,56 @@ io.on("connection", (socket) => {
       console.log("chat.users not defined");
       return;
     }
+    socket.emit("connected");
 
-    chat.users.forEach((user) => {
-      if (user._id === newMessageReceived.sender._id) return;
-      
-      // Emit to chat-specific room
-      socket.in(`chat_${chat._id}`).emit("message received", newMessageReceived);
+    
+
+  });
+
+
+  // if i comment this section then my code for chat works-----
+
+
+  app.set("io", io);
+
+  io.use((socket, next) => {
+    const token = socket.handshake.auth.token;
+    if (!token) {
+      return next(new Error("Authentication error: No token provided"));
+    }
+
+    try {
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      socket.userId = decoded.userId;
+      socket.userRole = decoded.role;
+      next();
+    } catch (error) {
+      return next(new Error("Authentication error: Invalid token"));
+    }
+  });
+
+  // ==================
+
+  
+
+  socket.on("join chat", (room) => {
+    socket.join(room);
+    console.log("User Joined Room: " + room);
+    
+
+
+    console.log(
+      `New user connected, ID: ${socket.id}, User ID: ${socket.userId}, Role: ${socket.userRole}`
+    );
+
+    // Join rooms based on user ID and role
+    socket.join(`${socket.userRole}_${socket.userId}`);
+    socket.join(socket.userRole);
+
+    socket.on("disconnect", () => {
+      console.log(
+        `Client disconnected, ID: ${socket.id}, User ID: ${socket.userId}, Role: ${socket.userRole}`
+      );
     });
   });
 

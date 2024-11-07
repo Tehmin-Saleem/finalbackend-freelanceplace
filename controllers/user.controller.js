@@ -10,6 +10,9 @@ const checkUserExists = async (req, res, next) => {
     const { email } = req.body;
     const existingUser = await User.findOne({ email });
     if (existingUser) {
+      if (existingUser.banned) {
+        return res.status(403).json({ message: 'This account is banned. Please contact support.' });
+    }
       return res.status(400).json({ message: 'User already exists' });
     }
     next();
@@ -36,38 +39,61 @@ const hashPassword = async (req, res, next) => {
 // Signup function
 const signup = async (req, res) => {
   try {
-    const { email, first_name, last_name, password, role, country_name } = req.body;
+        const { email, first_name, last_name, password, role, country_name } = req.body;
 
-    const newUser = new User({
-      email,
-      password,
-      first_name,
-      last_name,
-      role,
-      country_name,
-    });
+      const existingUser = await User.findOne({ email });
 
-    const salt = await bcrypt.genSalt(10);
-    newUser.password = await bcrypt.hash(password, salt);
+      if (existingUser) {
+          if (existingUser.banned) {
+              return res.status(403).json({ message: 'This account is banned. Please contact support.' });
+          }
+          return res.status(400).json({ message: 'Email already in use.' });
+      }
 
-    await newUser.save();
+        const newUser = new User({
+          email,
+          password,
+          first_name,
+          last_name,
+          role, // This is now handled from request body
+          country_name,
+      });
 
-    if (role === 'freelancer') {
-      newUser.freelancer_id = newUser._id;
-    } else if (role === 'client') {
-      newUser.client_id = newUser._id;
-    }
+        const salt = await bcrypt.genSalt(10);
+      newUser.password = await bcrypt.hash(password, salt);
 
-    await newUser.save();
+        await newUser.save();
 
-    const token = jwt.sign({ userId: newUser._id, role: newUser.role }, process.env.JWT_SECRET, {
-      expiresIn: '5h',
-    });
+      // Set role-specific IDs based on the role
+      if (role === 'freelancer') {
+          newUser.freelancer_id = newUser._id;
+      } else if (role === 'client') {
+          newUser.client_id = newUser._id;
+      } else if (role === 'consultant') {
+          newUser.consultant_id = newUser._id;
+      }
 
-    res.status(201).json({ token, message: 'Signup successful' });
+        await newUser.save();
+
+      // Generate JWT token
+      const token = jwt.sign({ userId: newUser._id, role: newUser.role }, process.env.JWT_SECRET, {
+          expiresIn: '5h',
+      });
+
+      const userData = {
+          email: newUser.email,
+          role: newUser.role,
+          userId: newUser._id,
+          first_name: newUser.first_name, 
+          last_name: newUser.last_name,
+          country_name: newUser.country_name,
+          token,
+      };
+
+      res.status(201).json({ token, message: 'Signup successful', user: userData });
   } catch (err) {
-    console.error('Error during signup:', err);
-    res.status(500).json({ message: 'Internal server error' });
+      console.error('Error during signup:', err);
+      res.status(500).json({ message: 'Internal server error' });
   }
 };
 
@@ -75,64 +101,58 @@ const signup = async (req, res) => {
 const login = async (req, res) => {
   try {
     const { email, password } = req.body;
-    const adminEmails = process.env.ADMIN_EMAILS ? process.env.ADMIN_EMAILS.split(',') : [];
-    const isAdmin = adminEmails.includes(email);
-
-    if (isAdmin) {
-      // Hash the incoming password for admin and compare directly with plain text in env
-      const saltRounds = 10;
-      const hashedPassword = await bcrypt.hash(process.env.ADMIN_PASSWORD, saltRounds);
-      const isAdminPasswordCorrect = await bcrypt.compare(password, hashedPassword);
-
-      if (!isAdminPasswordCorrect) {
-        return res.status(401).json({ message: 'Invalid email or password' });
-      }
-
-      const token = jwt.sign(
-        { email, role: 'admin' },
-        process.env.JWT_SECRET,
-        { expiresIn: '5h' }
-      );
-
-      return res.status(200).json({
-        token,
-        message: 'Admin login successful',
-        user: { email, role: 'admin' }
-      });
-    }
-
-    // User Login Flow
     const user = await User.findOne({ email });
+
+    // Check if the user exists
     if (!user) {
-      console.log("User not found.");
       return res.status(401).json({ message: 'Invalid email or password' });
     }
 
-    // Verify user password
-    const isPasswordCorrect = await bcrypt.compare(password, user.password);
-    if (!isPasswordCorrect) {
-      console.log("User password mismatch.");
+    // Check if the user is soft-banned
+    if (user.softBanned) {
+      return res.status(403).json({ message: 'Your account has been soft-banned. Please contact support.' });
+    }
+
+    // Check if the password matches
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
       return res.status(401).json({ message: 'Invalid email or password' });
     }
 
-    // Create user token and respond
+    // Generate JWT token
     const token = jwt.sign(
       { userId: user._id, email: user.email, role: user.role },
       process.env.JWT_SECRET,
       { expiresIn: '5h' }
     );
 
-    console.log("User login successful.");
-    res.status(200).json({
-      token,
-      message: 'Login successful',
-      user: { email: user.email, role: user.role, userId: user._id }
-    });
+    // Prepare user data for the response
+    const userData = {
+      email: user.email,
+      role: user.role,
+      userId: user._id,
+    };
+
+    // Assign specific IDs based on user role
+    if (user.role === 'client') {
+      userData.clientId = user._id; 
+    } else if (user.role === 'freelancer') {
+      userData.freelancerId = user._id; 
+    } else if (user.role === 'consultant') { // Added for consultant
+      userData.consultantId = user._id; 
+    }
+
+    // Respond with the token and user data
+    res.status(200).json({ token, message: 'Login successful', user: userData });
   } catch (err) {
-    console.error("Error during login:", err);
-    res.status(500).json({ message: "Internal server error" });
+    console.error('Error during login:', err);
+    res.status(500).json({ message: 'Internal server error' });
   }
 };
+
+
+
+
 
 
 
@@ -243,10 +263,51 @@ const ChangePass = async (req, res) => {
 
 
 
+const getAllClient = async (req, res) => {
+  try {
+    // Fetch the client count based on the role 'client'
+    const clientCount = await User.countDocuments({ role: 'client' });
+    
+    // Send the count in response
+    res.status(200).json({ count: clientCount });
+
+    // Optional: Log the count for debugging purposes
+    console.log("Client count:", clientCount);
+    
+  } catch (error) {
+    // Log the error and return a 500 Internal Server Error
+    console.error("Error fetching client count:", error);
+    return res.status(500).json({ error: 'Failed to fetch client count' });
+  }
+};
+  
 
   
   
-  
+const getallfreelancer=async (req, res) => {
+  try {
+    const freelancerCount = await User.countDocuments({ role: 'freelancer' });
+    res.json({ count: freelancerCount });
+  } catch (error) {
+   return  res.status(500).json({ error: 'Failed to fetch freelancer count' });
+  }
+};
+const getallfreelancerlist= async (req, res) => {
+  try {
+    const freelancers = await User.find({ role: 'freelancer' });
+    res.status(200).json(freelancers);
+  } catch (error) {
+    return res.status(500).json({ message: 'Error fetching freelancers' });
+  }
+};
+const getallclientlist= async (req, res) => {
+  try {
+    const freelancers = await User.find({ role: 'client' });
+    res.status(200).json(freelancers);
+  } catch (error) {
+    return res.status(500).json({ message: 'Error fetching freelancers' });
+  }
+};
 
 
 
@@ -321,7 +382,107 @@ const searchClients = asyncHandler(async (req, res) => {
   }
 });
 
+const freelancersoftban= async (req, res) => {
+  try {
+    const freelancer = await User.findById(req.params.id);
+    if (!freelancer) return res.status(404).send({ message: "Freelancer not found" });
+
+    // Toggle soft-banned status
+    freelancer.softBanned = !freelancer.softBanned;
+    await freelancer.save();
+
+    res.status(200).send({ message: freelancer.softBanned ? "Freelancer soft-banned" : "Freelancer unbanned" });
+  } catch (error) {
+     return res.status(500).send({ message: "Error toggling soft ban status" });
+  }
+};
+
+const clientsoftban= async (req, res) => {
+  try {
+    const client = await User.findById(req.params.id);
+    if (!client) return res.status(404).send({ message: "Client not found" });
+
+    // Toggle soft-banned status
+    client.softBanned = !freelancer.softBanned;
+    await client.save();
+
+    res.status(200).send({ message: client.softBanned ? "Client soft-banned" : "Client unbanned" });
+  } catch (error) {
+     return res.status(500).send({ message: "Error toggling soft ban status" });
+  }
+};
+
+const freelancerban=async (req, res) => {
+  try {
+    const freelancer = await User.findById(req.params.id);
+    if (!freelancer) return res.status(404).send({ message: "Freelancer not found" });
+
+    // Full ban (mark as banned, or delete)
+    freelancer.banned = true;
+    await freelancer.save();
+    
+    // Optionally delete the freelancer data if required
+    //  await User.findByIdAndDelete(req.params.id);
+
+    res.status(200).send({ message: "Freelancer fully banned and removed" });
+  } catch (error) {
+    return res.status(500).send({ message: "Error banning freelancer" });
+  }
+};
+
+const clientban=async (req, res) => {
+  try {
+    const client = await User.findById(req.params.id);
+    if (!client) return res.status(404).send({ message: "client not found" });
+
+    // Full ban (mark as banned, or delete)
+    client.banned = true;
+    await client.save();
+    
+    // Optionally delete the freelancer data if required
+    // await Freelancer.findByIdAndDelete(req.params.id);
+
+    res.status(200).send({ message: "client fully banned and removed" });
+  } catch (error) {
+    return res.status(500).send({ message: "Error banning freelancer" });
+  }
+};
+
+
+const freelancerUnban=async (req, res) => {
+  try {
+    const freelancer = await User.findById(req.params.id);
+    if (!freelancer) return res.status(404).send({ message: "Freelancer not found" });
+
+    freelancer.softBanned = false;
+    freelancer.banned = false;
+    await freelancer.save();
+
+    res.status(200).send({ message: "Freelancer unbanned" });
+  } catch (error) {
+    return res.status(500).send({ message: "Error unbanning freelancer" });
+  }
+};
+
+const ClientUnban=async (req, res) => {
+  try {
+    const client = await User.findById(req.params.id);
+    if (!client) return res.status(404).send({ message: "Client not found" });
+
+    client.softBanned = false;
+    client.banned = false;
+    await client.save();
+
+    res.status(200).send({ message: "Client unbanned" });
+  } catch (error) {
+    return res.status(500).send({ message: "Error unbanning freelancer" });
+  }
+};
+// controllers/consultantProfileController.js
+
+
+
 
 
   
-module.exports = { signup, login, hashPassword,ChangePass, checkUserExists,getUserById, getAllUsers, SearchallUsers, forgotPassword, searchFreelancers, searchClients };
+module.exports = { signup, login, hashPassword,ChangePass, checkUserExists,getUserById, getAllUsers, SearchallUsers, forgotPassword, searchFreelancers, searchClients, getallfreelancer,getAllClient,getallfreelancerlist,getallclientlist,freelancersoftban,clientsoftban,freelancerban,clientban,freelancerUnban,ClientUnban };

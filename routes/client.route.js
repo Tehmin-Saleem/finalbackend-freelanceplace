@@ -12,8 +12,9 @@ const usercontroller=require ('../controllers/user.controller')
 const { upload } = require('../config/cloudinary.config');// const { forgotPassword, resetPassword } = require('../controllers/user.controller');
 const ClientProfile= require('../controllers/client_profile.controller')
 const Notification= require ('../controllers/notifications.controller')
+const consultantProfileController=require ('../controllers/consultantprofile.controller')
 
-
+const queryController = require('../controllers/query.controller');
 
 // Import Chat controller
 const chatController = require('../controllers/chat.controller'); // Add this
@@ -169,9 +170,37 @@ router.get("/allMessages/:chatId", authMiddleware, chatController.allMessages);
 router.post("/sendMessage", authMiddleware, chatController.sendMessage);
 
 
+// router.get('/api/queries', async (req, res) => {
+//   try {
+//       const queries = await Query.find(); // Adjust according to your database
+//       res.json(queries);
+//   } catch (error) {
+//       res.status(500).json({ message: 'Server error' });
+//   }
+// });
+router.post('/query',authMiddleware, queryController.createQuery);
+
+// Route to get all queries (optional, for admin or dashboard)
+router.get('/queries', queryController.getAllQueries);
 
 
+router.get('/users' ,authMiddleware,queryController.getUser);
 
 
+router.get('/count',usercontroller.getAllClient);
+
+router.get('/clientslist',usercontroller.getallclientlist);
+
+router.get('/queries/:id', authMiddleware, queryController.getQueryById);
+
+router.patch('/queries/:id', authMiddleware, queryController.updatequery);
+router.patch('/softban/:id',authMiddleware,usercontroller.clientsoftban);
+router.delete('/ban/:id',authMiddleware,usercontroller.clientban);
+router.patch('/unban/:id', authMiddleware,usercontroller.ClientUnban);
+
+// const upload = multer({ dest: 'uploads/' });
+
+router.post('/profile', upload.single('profilePicture'), consultantProfileController.createProfile);
+router.get('/profile/:id',  consultantProfileController.getProfile);
 module.exports = router;
 

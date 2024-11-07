@@ -12,6 +12,7 @@ const freelancerProfileController = require('../controllers/freelancer_profile.c
 const { upload } = require('../config/cloudinary.config');//import forgot and rest password
 // const { forgotPassword, resetPassword } = require('../controllers/user.controller');
 const Notification= require ('../controllers/notifications.controller')
+const queryController = require('../controllers/query.controller');
 const manageProject = require('../controllers/Manageproj.controller')
 
 
@@ -139,7 +140,41 @@ router.get('/ChangePass/:id/:token',usercontroller.ChangePass);
 router.post('/ChangePass/:id/:token', usercontroller.ChangePass);
 
 
+router.post('/query',authMiddleware, queryController.createQuery);
+
+// Route to get all queries (optional, for admin or dashboard)
+router.get('/queries', queryController.getAllQueries);
+
+
+router.get('/users' ,authMiddleware,queryController.getUser);
+
+
+router.get('/count',usercontroller.getallfreelancer);
+router.get('/freelancerslist',usercontroller.getallfreelancerlist);
+router.get('/queries/:id', authMiddleware, queryController.getQueryById);
+
+router.patch('/queries/:id', authMiddleware, queryController.updatequery);
+// Separate route for searching users by name and email
+// router.get('/api/users/search', async (req, res) => {
+//   const { name, email } = req.query;
+
+//   if (!name || !email) {
+//     return res.status(400).json({ message: 'Name and email are required' });
+//   }
+
+//   const user = await User.findOne({ where: { name, email } });
+
+//   if (!user) {
+//     return res.status(404).json({ message: 'User not found' });
+//   }
+
+//   res.json(user);
+// });
+
 // Reset Password Route (handles when the user clicks the link from email)
 // router.post('/ChangePass/:token', usercontroller.resetPassword);
+router.patch('/softban/:id',authMiddleware,usercontroller.freelancersoftban);
+router.delete('/ban/:id',authMiddleware,usercontroller.freelancerban);
+router.patch('/unban/:id', authMiddleware,usercontroller.freelancerUnban);
 
 module.exports = router;

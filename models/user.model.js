@@ -23,42 +23,37 @@ const userSchema = new Schema({
   },
   role: {
     type: String,
-    enum: ["freelancer", "client", "admin"],
+    enum: ["freelancer", "client", "admin", "consultant"], // Added consultant
+    required: true,
   },
-
-
   isAdmin: {
     type: Boolean,
     required: true,
     default: false,
   },
+  softBanned: {
+    type: Boolean,
+    default: false,
+  },
+  banned: {
+    type: Boolean,
+    default: false,
+  },
+  freelancer_id: {
+    type: Schema.Types.ObjectId,
+    ref: 'User', // Self-referencing
+  },
+  client_id: {
+    type: Schema.Types.ObjectId,
+    ref: 'User', // Self-referencing
+  },
+  consultant_id: {
+    type: Schema.Types.ObjectId,
+    ref: 'User', // Self-referencing
+  },
   resetPasswordToken: String,
   resetPasswordExpires: Date
- 
-},
-{ timestaps: true }
-);
-
-// userSchema.methods.createPasswordResetToken = function () {
-//   const resetToken = crypto.randomBytes(32).toString('hex');
-
-//   // Hash the token before saving to the database
-//   this.passwordResetToken = crypto.createHash('sha256').update(resetToken).digest('hex');
-  
-//   // Set expiration (10 minutes from now)
-//   this.passwordResetExpires = Date.now() + 10 * 60 * 1000;
-
-//   return resetToken; // Return the plain token (not hashed) to send via email
-// };
-  // image: {
-  //   type: "String",
-  //   required: true,
-  //   default:
-  //     "https://icon-library.com/images/anonymous-avatar-icon/anonymous-avatar-icon-25.jpg",
-  // },
-
- 
-
+}, { timestamps: true });
 
 const User = mongoose.model("User", userSchema);
 
