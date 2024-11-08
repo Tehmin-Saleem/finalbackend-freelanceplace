@@ -1,4 +1,3 @@
-
 import React, { useContext, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import "./styles.scss";
@@ -15,13 +14,29 @@ const Notification = () => {
     }, [fetchNotifications]);
     
     const handleNotificationClick = async (notification) => {
-        if (notification.job_id) {
-            if (!notification.is_read) {
-                await markAsRead(notification._id);
-            }
-            navigate(`/offerdetails`);
+        if (!notification.is_read) {
+            await markAsRead(notification._id);
+        }
+
+        const message = notification.message.toLowerCase();
+
+        // Check message content for navigation
+        if (message.includes('hired')) {
+            navigate('/freelancersjobpage', {
+                state: { jobId: notification.job_id }
+            });
+            const offerId = notification._id;
+        } else if (message.includes('received a new offer')) {
+            navigate(`/OfferDetails/${offerId}`, {
+                state: { 
+                    jobId: notification.job_id 
+                }
+            });
+        } else {
+            console.log('Notification message not mapped to any route:', notification.message);
         }
     };
+
 
     const formatNotificationTime = (timestamp) => {
         const date = new Date(timestamp);
@@ -58,8 +73,6 @@ const Notification = () => {
         return groups;
     };
 
-    const groupedNotifications = groupNotificationsByDate(notifications);
-
     return (
         <>
         <Header />
@@ -68,8 +81,8 @@ const Notification = () => {
             <p>You have {unreadCount} unread notifications.</p>
             {notifications.length > 0 ? (
                 Object.entries(groupNotificationsByDate(notifications)).map(([date, notifs]) => (
-                    <div key={date}>
-                        <h2>{date === new Date().toLocaleDateString() ? 'Today' : date}</h2>
+                    <div key={date} className="notification-group">
+                        <h2 className="notification-date-header">{date}</h2>
                         {notifs.map((notification) => (
                             <div
                                 key={notification._id}
@@ -85,7 +98,7 @@ const Notification = () => {
                     </div>
                 ))
             ) : (
-                <p>No notifications to display.</p>
+                <p className="no-notifications">No notifications to display.</p>
             )}
         </div>
         </>
