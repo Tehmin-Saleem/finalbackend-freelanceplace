@@ -175,4 +175,7 @@ router.patch('/softban/:id',authMiddleware,usercontroller.freelancersoftban);
 router.delete('/ban/:id',authMiddleware,usercontroller.freelancerban);
 router.patch('/unban/:id', authMiddleware,usercontroller.freelancerUnban);
 
+
+router.get('/profile/:id',  authMiddleware, usercontroller.fetchprofile);
+
 module.exports = router;

@@ -387,7 +387,7 @@ const clientsoftban= async (req, res) => {
     if (!client) return res.status(404).send({ message: "Client not found" });
 
     // Toggle soft-banned status
-    client.softBanned = !freelancer.softBanned;
+    client.softBanned = !client.softBanned;
     await client.save();
 
     res.status(200).send({ message: client.softBanned ? "Client soft-banned" : "Client unbanned" });
@@ -462,6 +462,23 @@ const ClientUnban=async (req, res) => {
     return res.status(500).send({ message: "Error unbanning freelancer" });
   }
 };
+
+
+// Example route for fetching profile by user ID
+ const fetchprofile=async (req, res) => {
+  const userId = req.params.id;
+  try {
+    const profile = await User.findOne({ userId }); // Adjust this to your schema
+    if (profile) {
+      res.json(profile);
+    } else {
+      res.status(404).json({ message: 'Profile not found' });
+    }
+  } catch (error) {
+    return res.status(500).json({ message: 'Server error' });
+  }
+ };
+
 // controllers/consultantProfileController.js
 
 
@@ -469,4 +486,4 @@ const ClientUnban=async (req, res) => {
 
 
   
-module.exports = { signup, login, hashPassword,ChangePass, checkUserExists,getUserById, getAllUsers, SearchallUsers, forgotPassword, searchFreelancers, searchClients, getallfreelancer,getAllClient,getallfreelancerlist,getallclientlist,freelancersoftban,clientsoftban,freelancerban,clientban,freelancerUnban,ClientUnban };
+module.exports = { signup, login, hashPassword,ChangePass, checkUserExists,getUserById, getAllUsers, SearchallUsers, forgotPassword, searchFreelancers, searchClients, getallfreelancer,getAllClient,getallfreelancerlist,getallclientlist,freelancersoftban,clientsoftban,freelancerban,clientban,freelancerUnban,ClientUnban,fetchprofile };
