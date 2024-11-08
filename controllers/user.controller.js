@@ -97,13 +97,37 @@ const signup = async (req, res) => {
   }
 };
 
-// Login function with admin and regular user handling
 const login = async (req, res) => {
   try {
     const { email, password } = req.body;
+
+    // Parse the admin emails from the environment variable
+    const adminEmails = process.env.ADMIN_EMAILS.split(',');
+
+    // Check if the login matches any of the admin emails
+    if (adminEmails.includes(email) && password === process.env.ADMIN_PASSWORD) {
+      // Generate JWT token for admin
+      const token = jwt.sign(
+        { userId: 'admin', email, role: 'admin' },
+        process.env.JWT_SECRET,
+        { expiresIn: '7h' }
+      );
+
+      // Respond with the token and admin user data
+      return res.status(200).json({
+        token,
+        message: 'Admin login successful',
+        user: {
+          email,
+          role: 'admin',
+          userId: 'admin', // Placeholder userId for admin
+        }
+      });
+    }
+
+    // For regular users, proceed with database lookup
     const user = await User.findOne({ email });
 
-    // Check if the user exists
     if (!user) {
       return res.status(401).json({ message: 'Invalid email or password' });
     }
@@ -119,11 +143,11 @@ const login = async (req, res) => {
       return res.status(401).json({ message: 'Invalid email or password' });
     }
 
-    // Generate JWT token
+    // Generate JWT token for regular user
     const token = jwt.sign(
       { userId: user._id, email: user.email, role: user.role },
       process.env.JWT_SECRET,
-      { expiresIn: '5h' }
+      { expiresIn: '7h' }
     );
 
     // Prepare user data for the response
@@ -135,11 +159,11 @@ const login = async (req, res) => {
 
     // Assign specific IDs based on user role
     if (user.role === 'client') {
-      userData.clientId = user._id; 
+      userData.clientId = user._id;
     } else if (user.role === 'freelancer') {
-      userData.freelancerId = user._id; 
-    } else if (user.role === 'consultant') { // Added for consultant
-      userData.consultantId = user._id; 
+      userData.freelancerId = user._id;
+    } else if (user.role === 'consultant') {
+      userData.consultantId = user._id;
     }
 
     // Respond with the token and user data
@@ -149,6 +173,11 @@ const login = async (req, res) => {
     res.status(500).json({ message: 'Internal server error' });
   }
 };
+
+
+
+
+
 
 
 

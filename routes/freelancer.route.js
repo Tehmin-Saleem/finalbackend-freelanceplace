@@ -15,7 +15,7 @@ const Notification= require ('../controllers/notifications.controller')
 const queryController = require('../controllers/query.controller');
 const manageProject = require('../controllers/Manageproj.controller')
 
-
+const offerController = require ('../controllers/offer_form.controller')
 // Import Chat controller
 const chatController = require('../controllers/chat.controller'); // Add this
 
@@ -113,7 +113,7 @@ router.delete('/profile/:freelancerId', freelancerProfileController.deleteProfil
 // router.get('/profile', authMiddleware, freelancerProfileController.getProfileByUserId);
 router.get('/profile/:userId', authMiddleware, freelancerProfileController.getProfileByUserId);
 router.get('/profilebyfreelancerid/:freelancer_id', authMiddleware, freelancerProfileController.getProfileByFreelancerId);
-
+router.get('/offers/:offerId', offerController.getOfferById);
 
 // Route to get all chats for a specific freelancer
 // Chat-related routes
