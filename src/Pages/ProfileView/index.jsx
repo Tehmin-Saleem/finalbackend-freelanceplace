@@ -3,7 +3,6 @@ import axios from "axios";
 import "./styles.scss";
 import { jwtDecode } from "jwt-decode";
 import { UserReview, CommonButton, Header } from "../../components/index";
-
 import {
   Australia,
   UStates,

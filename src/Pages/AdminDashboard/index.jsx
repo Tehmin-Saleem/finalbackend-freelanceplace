@@ -168,7 +168,7 @@ const AdminDashboard = () => {
                     alt="Admin Profile"
                     className="admin-avatar"
                 />
-                <span>Admin Name</span>
+                <span>Admin</span>
             </div>
         </header>
 
