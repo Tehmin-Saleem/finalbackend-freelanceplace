@@ -300,6 +300,7 @@ const getallfreelancerlist= async (req, res) => {
     return res.status(500).json({ message: 'Error fetching freelancers' });
   }
 };
+
 const getallclientlist= async (req, res) => {
   try {
     const freelancers = await User.find({ role: 'client' });
