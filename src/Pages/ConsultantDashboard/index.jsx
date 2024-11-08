@@ -10,11 +10,17 @@ const ConsultantDashboard = () => {
     const [savedProfile, setSavedProfile] = useState(null);
     const [isProfileViewOpen, setIsProfileViewOpen] = useState(false);
     const navigate = useNavigate();
-    const [user, setUser] = useState(null);  // Store the logged-in user data
+    const [user, setUser] = useState(null);
 
-    // Get saved profile data from localStorage on mount
+    const handleProfileSave = (profileData) => {
+        console.log('Profile saved:', profileData);
+        setSavedProfile(profileData);
+        setProfileSaved(true);
+        setIsProfileViewOpen(true);
+    };
+
     useEffect(() => {
-        const token = localStorage.getItem('authToken');
+        const token = localStorage.getItem('token');
         if (token) {
             const fetchUserProfile = async () => {
                 try {
@@ -25,7 +31,7 @@ const ConsultantDashboard = () => {
                     });
                     if (response.ok) {
                         const data = await response.json();
-                        setUser(data);  // Store user profile
+                        setUser(data);
                         setProfileSaved(true);
                         setSavedProfile(data);
                     } else {
@@ -41,11 +47,10 @@ const ConsultantDashboard = () => {
     }, []);
 
     const handleProfileClick = () => {
-        // Toggle the profile view if profile is saved
         if (profileSaved) {
-            setIsProfileViewOpen(!isProfileViewOpen);  // Toggle view visibility
+            setIsProfileViewOpen(!isProfileViewOpen);
         } else {
-            navigate('/ConsultantProfileForm');  // Navigate to form if profile not saved
+            navigate('/ConsultantProfileForm');
         }
     };
 
@@ -59,17 +64,15 @@ const ConsultantDashboard = () => {
                 </button>
             </header>
 
-            {/* Conditionally render the profile form or view */}
-            {user ? (
-                !isProfileViewOpen ? (
-                    <ConsultantProfileView profile={user} />
-                ) : (
-                    <div className="profile-view-container">
-                        <ConsultantProfileView profile={user} />
-                    </div>
-                )
+            {isProfileViewOpen && profileSaved ? (
+                <ConsultantProfileView profile={savedProfile} />
             ) : (
-                <p>Loading...</p>
+                <p>{!profileSaved && "Profile not saved yet."}</p>
+            )}
+
+            {/* Uncomment the following to show ConsultantProfileForm when profile is not saved */}
+            {!profileSaved && (
+                <ConsultantProfileForm onSave={handleProfileSave} />
             )}
 
             {/* Dashboard sections */}
@@ -109,5 +112,6 @@ const ConsultantDashboard = () => {
         </div>
     );
 };
+
 
 export default ConsultantDashboard;

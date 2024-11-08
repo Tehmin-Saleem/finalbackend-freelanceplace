@@ -198,6 +198,7 @@ function App() {
             }
           />
 
+<<<<<<< HEAD
           <Route
             path="/proposals"
             element={
@@ -206,6 +207,16 @@ function App() {
               </JobStatusProvider>
             }
           />
+=======
+        <Route path="/ReviewPopUp" element={<ReviewPopup/>} />
+        <Route path="/Alljobspage" element={<AllJobsPage/>} /> 
+        <Route path="/JobPopUp" element={<JobPostedPopup/>} /> 
+        <Route path="/ForgotPass" element={<ForgotPassword/>} /> 
+        <Route path="/ChangePass/:id/:token" element={<ChangePassword/>} /> 
+        <Route path="/OfferDetails/:id" element={<OfferDetails/>} /> 
+        <Route path="/ClientDash" element={<Clientdash/>} /> 
+ <Route path="/ManageProj" element={<ManageProjects/>} /> 
+>>>>>>> 7814305f4dc3c9dacbe1b72e1c2cbc9c11c552ca
 
           <Route path="/proposals/:jobId" element={<JobStatusProvider>
             <Proposal />
