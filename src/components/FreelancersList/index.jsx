@@ -1,11 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import "./styles.scss";
 
 const FreelancerList = () => {
   const [freelancers, setFreelancers] = useState([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+  // const { id } = useParams(); // Retrieve user ID from URL parameters
+  // const [profile, setProfile] = useState(null);
+
 
   useEffect(() => {
     const fetchFreelancers = async () => {
@@ -108,9 +112,41 @@ const FreelancerList = () => {
 
 //   if (loading) return <div>Loading...</div>;
 
-  const handleProfileClick = (id) => {
-    navigate(`/profile/${id}`); // Adjusted route to match your frontend routing
-  };
+// useEffect(() => {
+//   const fetchProfile = async () => {
+//     try {
+//       const token = localStorage.getItem('token');
+      
+//       if (!token) {
+//         throw new Error('No token found');
+//       }
+
+//       const response = await fetch(`http://localhost:5000/api/freelancers/profile/${id}`, {
+//         method: 'GET',
+//         headers: {
+//           'Authorization': `Bearer ${token}`,
+//           'Content-Type': 'application/json',
+//         },
+//       });
+
+//       const data = await response.json();
+//       if (response.ok) {
+//         setProfile(data);
+//       } else {
+//         console.error('Error fetching profile:', data.message);
+//       }
+//     } catch (error) {
+//       console.error('Error fetching profile:', error);
+//     } finally {
+//       setLoading(false);
+//     }
+//   };
+
+//   fetchProfile();
+// }, [id]);
+
+// if (loading) return <div>Loading profile...</div>;
+// if (!profile) return <div>Profile not found</div>;
 
   if (loading) {
     return <div>Loading freelancers...</div>;

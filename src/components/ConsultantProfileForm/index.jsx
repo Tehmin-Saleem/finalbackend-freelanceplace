@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './styles.scss';
+// import jwt_decode from 'jwt-decode';
 
 function ConsultantProfileForm({ onSave }) {
     const [profile, setProfile] = useState({
@@ -19,29 +20,32 @@ function ConsultantProfileForm({ onSave }) {
     useEffect(() => {
         const fetchEmailFromToken = async () => {
             const token = localStorage.getItem('authToken');
-            if (token) {
-                try {
-                    const jwt_decode = (await import('jwt-decode')).default;
-                    const decodedToken = jwt_decode(token);
-                    cosnole.log(decodedToken);
-                    if (decodedToken && decodedToken.email) {
-                        setProfile((prevProfile) => ({
-                            ...prevProfile,
-                            email: decodedToken.email,
-                        }));
-                    } else {
-                        console.error('No email found in token');
-                    }
-                } catch (error) {
-                    console.error('Error decoding token:', error);
-                }
-            } else {
+            if (!token) {
                 console.error('Token not found');
+                return; // Stop further execution if token is missing
+            }
+    
+            try {
+                const jwt_decode = (await import('jwt-decode')).default;
+                const decodedToken = jwt_decode(token);
+                console.log(decodedToken);
+                if (decodedToken && decodedToken.email) {
+                    setProfile((prevProfile) => ({
+                        ...prevProfile,
+                        email: decodedToken.email,
+                    }));
+                } else {
+                    console.error('No email found in token');
+                }
+            } catch (error) {
+                console.error('Error decoding token:', error);
             }
         };
-
+    
         fetchEmailFromToken();
     }, []);
+    
+    
 
     // Handle changes to input fields
     const handleInputChange = (e) => {
@@ -136,8 +140,8 @@ function ConsultantProfileForm({ onSave }) {
             }
         }
 
-        const token = localStorage.getItem('authToken');
-        console.log(token); 
+        const token = localStorage.getItem('token');
+        console.log("tokennnnnnnn",token); 
         try {
             const response = await fetch('http://localhost:5000/api/client/profile', {
                 method: 'POST',
@@ -148,14 +152,17 @@ function ConsultantProfileForm({ onSave }) {
             });
 
             if (response.ok) {
-                onSave(profile); // Notify parent on save
+              
+                    // console.log('Error:', response.status, response.statusText);
+                
+                    onSave(profile); // Notify parent on save
                 window.location.href = '/ConsultantDash'; // Redirect to dashboard
             } else {
                 const errorText = await response.text();
-                console.error('Error saving profile:', errorText);
+                console.log('Error saving profile:', errorText);
             }
         } catch (error) {
-            console.error('Network or server error:', error);
+            console.log('Network or server error:', error);
         }
     };
 

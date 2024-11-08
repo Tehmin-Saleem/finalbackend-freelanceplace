@@ -3,6 +3,7 @@ import './styles.scss';
 import { FaUserCircle, FaEye } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import ConsultantProfileView from "../../components/ConsultantProfileView";
+import ConsultantProfileForm from '../../components/ConsultantProfileForm';
 
 const ConsultantDashboard = () => {
     const [profileSaved, setProfileSaved] = useState(false);
@@ -11,8 +12,15 @@ const ConsultantDashboard = () => {
     const navigate = useNavigate();
     const [user, setUser] = useState(null);
 
+    const handleProfileSave = (profileData) => {
+        console.log('Profile saved:', profileData);
+        setSavedProfile(profileData);
+        setProfileSaved(true);
+        setIsProfileViewOpen(true);
+    };
+
     useEffect(() => {
-        const token = localStorage.getItem('authToken');
+        const token = localStorage.getItem('token');
         if (token) {
             const fetchUserProfile = async () => {
                 try {
@@ -62,6 +70,11 @@ const ConsultantDashboard = () => {
                 <p>{!profileSaved && "Profile not saved yet."}</p>
             )}
 
+            {/* Uncomment the following to show ConsultantProfileForm when profile is not saved */}
+            {!profileSaved && (
+                <ConsultantProfileForm onSave={handleProfileSave} />
+            )}
+
             {/* Dashboard sections */}
             <div className="dashboard-sections">
                 <div className="dashboard-card assigned-jobs">
@@ -99,5 +112,6 @@ const ConsultantDashboard = () => {
         </div>
     );
 };
+
 
 export default ConsultantDashboard;
