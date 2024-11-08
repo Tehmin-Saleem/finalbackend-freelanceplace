@@ -95,6 +95,8 @@ const DashboardPage = () => {
             <button className="start-button" onClick={handleJobPostingButtonClick}>
               Get started with job posting
             </button>
+
+           
           </div>
           <BackgroundLining className="background-lining" />
         </div>

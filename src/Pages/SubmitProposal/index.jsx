@@ -246,8 +246,8 @@ const SubmitProposal = () => {
       if (formData.attachment) {
         formDataToSend.append("attachment", formData.attachment);
       }
-      if (formData.freelancerCoverLetter) {
-        formDataToSend.append("cover_letter", formData.freelancerCoverLetter);
+      if (freelancerCoverLetter) {
+        formDataToSend.append("cover_letter", freelancerCoverLetter);
       }
 
       formDataToSend.append("job_id", jobPostId);
@@ -587,7 +587,7 @@ const SubmitProposal = () => {
                     {showCoverLetter && (
                       <CoverLetter
                         formData={formData}
-                        freelancerCoverLetter={formData.freelancerCoverLetter}
+                        // freelancerCoverLetter={formData.freelancerCoverLetter}
                         setFreelancerCoverLetter={(value) =>
                           handleInputChange("freelancerCoverLetter", value)
                         }
@@ -595,10 +595,11 @@ const SubmitProposal = () => {
                         generateCoverLetter={generateCoverLetter}
                         handleSubmitCoverLetter={handleSubmitCoverLetter}
                         generatedCoverLetter={generatedCoverLetter}
-                        // freelancerCoverLetter={freelancerCoverLetter}
+                        freelancerCoverLetter={freelancerCoverLetter}
                         // setFreelancerCoverLetter={setFreelancerCoverLetter}
                         additionalSkills={additionalSkills}
                         handleSkillsChange={handleSkillsChange}
+                        handleInputChange={handleInputChange}
                       />
                     )}
                   </div>

@@ -5,6 +5,7 @@ import { Chat } from "../../svg/index";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { X } from "lucide-react";
+import { useJobStatus } from '../../context/JobStatus'; // Import the context
 
 const Toast = ({ message, onClose }) => (
   <div className="fixed bottom-4 left-4 z-50 bg-white shadow-lg rounded-lg p-4 flex items-center justify-between min-w-[200px] max-w-md border border-gray-200">
@@ -34,9 +35,10 @@ const ProposalCard = ({
   onHireSuccess
 }) => {
   const navigate = useNavigate();
+  const { jobStatuses, updateJobStatus } = useJobStatus();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [status, setStatus] = useState(null); // Initialize as null instead of initialStatus
+  const [status, setStatus] = useState(jobStatuses[ProposalID] || 'pending'); // Initialize as null instead of initialStatus
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
   const [freelancerData, setFreelancerData] = useState(null);
@@ -68,6 +70,7 @@ const ProposalCard = ({
       // Update the status based on the response from the database
       if (response.data && response.data.status) {
         setStatus(response.data.status);
+        updateJobStatus(ProposalID, response.data.status); // Update context with fetched status
       } else {
         // If no status is returned, set it to the default status
         setStatus('pending');
@@ -118,6 +121,7 @@ const ProposalCard = ({
       if (response.status === 200) {
         onHireSuccess?.(ProposalID);
         setStatus('hired');
+        updateJobStatus(ProposalID, 'hired'); 
         showNotification('Freelancer hired successfully!');
       }
     } catch (error) {
@@ -131,6 +135,7 @@ const ProposalCard = ({
   };
 
   const handleChatClick = async () => {
+    navigate("/chat");
     if (!ProposalID) {
       console.error('Invalid proposal ID for chat');
       return;

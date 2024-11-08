@@ -12,13 +12,7 @@ $color-white: #ffffff;
 $color-accent: #4bcdeb;
 $bg-color: #f7f8fa;
 
-body {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh; // Full height of the viewport
-    margin: 0; // Reset margin for body
-}
+
 
 .consultant-profile-form {
     max-width: 800px;

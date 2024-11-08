@@ -67,6 +67,13 @@ const AllJobsPage = () => {
     }
     navigate(`/proposals/${jobId}`);
   };
+
+
+
+  
+    // const handleClick = () => {
+    //   navigate('./jobposting');
+    // };
   
   return (
     <div className="jobs-Page">
@@ -107,7 +114,7 @@ const AllJobsPage = () => {
             <button className="filter-done-Button">Done</button>
           </div>
         </div>
-        <button className="post-job-Button">Post a new job</button>
+        <button  className="post-job-Button" >Post a new job</button>
       </div>
 
       {/* Jobs List */}

@@ -48,9 +48,9 @@ const CoverLetterComponent = ({
               <textarea
                 rows="10"
 
-                value={formData.freelancerCoverLetter}
-                onChange={(e) => setFreelancerCoverLetter(e.target.value)}
-                // onChange={handleInputChange}
+                value={freelancerCoverLetter}
+                // onChange={(e) => setFreelancerCoverLetter(e.target.value)}
+                onChange={handleInputChange}
                 // value={formdata.freelancerCoverLetter}
                 
               />
