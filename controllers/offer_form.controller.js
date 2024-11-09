@@ -1,6 +1,7 @@
 const Offer_Form = require('../models/offer_form.model');
-const Notification=require("../controllers/notifications.controller")
+const Notification = require("../controllers/notifications.controller");
 const mongoose = require('mongoose');
+const NotificationModel = require('../models/notifications.model');
 exports.createoffer = async (req, res) => {
   console.log('Offer Controller: createoffer hit');
   console.log('Request body:', req.body);
@@ -15,7 +16,6 @@ exports.createoffer = async (req, res) => {
       detailed_description,
       freelancer_id,
       job_title,
-      offerId,
       preferred_skills,
       status
     } = req.body;
@@ -37,6 +37,7 @@ exports.createoffer = async (req, res) => {
       };
     }
 
+    // Create the new offer first
     const newOffer = new Offer_Form({
       attachment,
       budget_type,
@@ -47,7 +48,6 @@ exports.createoffer = async (req, res) => {
       detailed_description,
       freelancer_id,
       job_title,
-      offerId,
       preferred_skills: preferred_skills ? JSON.parse(preferred_skills) : [],
       status
     });
@@ -55,77 +55,102 @@ exports.createoffer = async (req, res) => {
     console.log('New Offer to be saved:', newOffer);
 
     const savedOffer = await newOffer.save();
+    console.log('Saved offer:', savedOffer);
 
-    // Create a notification
+    // Create a notification using the correct offer ID (_id from saved offer)
     const notificationData = {
       client_id: client_id,
       freelancer_id: freelancer_id,
-      job_id: savedOffer._id,
+      job_id: savedOffer._id, // This is the correct offer ID
       type: 'new_offer',
       message: `You have received a new offer for "${job_title}"`
     };
 
-    console.log('Creating new offer notification:', notificationData);
+    console.log('Creating new offer notification with correct offer ID:', notificationData);
     await Notification.createNotification(notificationData);
 
-    res.status(201).json(savedOffer);
+    // Return the saved offer with its ID
+    res.status(201).json({
+      ...savedOffer.toObject(),
+      offerId: savedOffer._id // Include the offer ID explicitly in the response
+    });
+
   } catch (error) {
     console.error('Error creating offer:', error);
     res.status(500).json({ message: 'Error creating offer', error: error.message });
   }
 };
 
-
-
-
+// Update the getOfferById to look for both _id and job_id
 exports.getOfferById = async (req, res) => {
-  try {
-    // Assuming `offerId` is provided in the frontend URL as a query parameter
-    const offerId = req.query.offerId; 
+  console.log('getOfferById called with params:', req.params);
 
-    if (!offerId) {
-      return res.status(400).json({ message: 'Offer ID is required' });
+  try {
+    const { notificationId } = req.params;
+    console.log('Extracted notificationId:', notificationId);
+
+    // Validate that notificationId is present
+    if (!notificationId) {
+      console.log('No notificationId provided in request');
+      return res.status(400).json({ message: 'Notification ID is required' });
     }
 
-    // Fetch the offer using `offerId`
-    const offer = await Offer_Form.findById(offerId);
+    // Validate that notificationId is a valid ObjectId
+    if (!mongoose.Types.ObjectId.isValid(notificationId)) {
+      console.log('Invalid ObjectId format:', notificationId);
+      return res.status(400).json({ message: 'Invalid Notification ID format' });
+    }
+
+    // Find the notification first using the NotificationModel
+    const notification = await NotificationModel.findById(notificationId);
+    
+    if (!notification) {
+      console.log('No notification found for ID:', notificationId);
+      return res.status(404).json({ message: 'Notification not found' });
+    }
+
+    console.log('Found notification:', notification);
+
+    // Use the job_id from notification to find the offer
+    const offer = await Offer_Form.findById(notification.job_id);
+    console.log('Database query result:', offer);
+
+    // If no offer is found, return 404
     if (!offer) {
+      console.log('No offer found for job_id:', notification.job_id);
       return res.status(404).json({ message: 'Offer not found' });
     }
 
-    // Get client profile details based on `offer.client_id`
-    const clientProfile = await Client_Profile.findOne({ client_id: offer.client_id });
-    const clientDetails = clientProfile
-      ? {
-          name: `${clientProfile.first_name} ${clientProfile.last_name}`.trim(),
-          country: clientProfile.country,
-          image: clientProfile.image,
-          email: clientProfile.email,
-          languages: clientProfile.languages,
-          about: clientProfile.about,
-          gender: clientProfile.gender,
-          DOB: clientProfile.DOB,
-        }
-      : null;
-
-    // Get freelancer details based on `offer.freelancer_id`
-    const freelancerDetails = await User.findById(offer.freelancer_id).select(
-      'name email location ratings totalProjects earnings skills'
-    );
-
-    // Combine all details into a single response
-    const completeOffer = {
-      ...offer.toObject(),
-      client_details: clientDetails,
-      freelancer_details: freelancerDetails,
+    // Structure the response with the relevant offer details
+    const formattedOffer = {
+      _id: offer._id,
+      job_title: offer.job_title,
+      description: offer.description,
+      detailed_description: offer.detailed_description,
+      budget_type: offer.budget_type,
+      hourly_rate: offer.hourly_rate || null,
+      fixed_price: offer.fixed_price || null,
+      client_id: offer.client_id,
+      freelancer_id: offer.freelancer_id,
+      preferred_skills: offer.preferred_skills,
+      status: offer.status,
+      attachment: offer.attachment,
+      createdAt: offer.createdAt,
+      updatedAt: offer.updatedAt
     };
 
-    res.status(200).json(completeOffer);
+    console.log('Sending formatted response:', formattedOffer);
+    res.status(200).json(formattedOffer);
+
   } catch (error) {
-    console.error('Error fetching offer details:', error);
-    res.status(500).json({ message: 'Error fetching offer details', error: error.message });
+    console.error('Error in getOfferById:', {
+      message: error.message,
+      stack: error.stack,
+      notificationId: req.params.notificationId
+    });
+    res.status(500).json({ 
+      message: 'Error fetching offer details', 
+      error: error.message 
+    });
   }
 };
-
-
-
