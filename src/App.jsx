@@ -211,7 +211,12 @@ function App() {
         <Route path="/JobPopUp" element={<JobPostedPopup/>} /> 
         <Route path="/ForgotPass" element={<ForgotPassword/>} /> 
         <Route path="/ChangePass/:id/:token" element={<ChangePassword/>} /> 
+<<<<<<< HEAD
         <Route path="/OfferDetails/:id" element={<OfferDetails/>} /> 
+=======
+        <Route path="/OfferDetails/:notificationId" element={<OfferDetails/>} /> 
+        <Route path="/ClientDash" element={<Clientdash/>} /> 
+>>>>>>> 94a1da6d7f4e9ee592e5b5feb633cd54ae48bd48
 
           <Route path="/proposals/:jobId" element={<JobStatusProvider>
             <Proposal />

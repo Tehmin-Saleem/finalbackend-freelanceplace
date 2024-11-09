@@ -25,9 +25,9 @@ const Notification = () => {
             navigate('/freelancersjobpage', {
                 state: { jobId: notification.job_id }
             });
-            const offerId = notification._id;
         } else if (message.includes('received a new offer')) {
-            navigate(`/OfferDetails/${offerId}`, {
+            // Use notification._id for the offerId
+            navigate(`/OfferDetails/${notification._id}`, {
                 state: { 
                     jobId: notification.job_id 
                 }
@@ -36,7 +36,6 @@ const Notification = () => {
             console.log('Notification message not mapped to any route:', notification.message);
         }
     };
-
 
     const formatNotificationTime = (timestamp) => {
         const date = new Date(timestamp);

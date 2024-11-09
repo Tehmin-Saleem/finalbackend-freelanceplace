@@ -489,7 +489,7 @@ const SubmitProposal = () => {
                               <label>{index + 1}. Milestone Description:</label>
                               <input
                                 type="text"
-                                placeholder="Lorem ipsum"
+                                placeholder=""
                                 value={milestone.description}
                                 onChange={(e) =>
                                   handleMilestoneChange(
@@ -571,7 +571,7 @@ const SubmitProposal = () => {
                     name="project_duration"
                     value={formData.project_duration}
                     onChange={handleInputChange}
-                    placeholder="2 months"
+                    placeholder="Hours, Days or Months"
                     className="project-duration"
                   />
 
@@ -580,7 +580,7 @@ const SubmitProposal = () => {
                     name="cover_letter"
                     value={formData.cover_letter}
                     onChange={handleInputChange}
-                    placeholder="Lorem ipsum dolor sit amet consectetur..."
+                    placeholder="Write your cover letter here"
                   ></textarea> */}
                   <div>
                     <Button variant="primary" onClick={handleShowModal}>

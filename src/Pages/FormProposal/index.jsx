@@ -121,18 +121,18 @@ const OfferForm = () => {
     e.preventDefault();
     setIsLoading(true);
     setError("");
-
+  
     const token = localStorage.getItem('token');
     if (!token) {
       navigate('/signin');
       return;
     }
-
+  
     if (!validateForm()) {
       setIsLoading(false);
       return;
     }
-
+  
     const formData = new FormData();
     formData.append('budget_type', budgetType);
     formData.append('hourly_rate', JSON.stringify(hourlyRate));
@@ -143,11 +143,11 @@ const OfferForm = () => {
     formData.append('job_title', jobTitle);
     formData.append('preferred_skills', JSON.stringify(selectedSkills));
     formData.append('status', 'pending');
-
+  
     if (attachedFile) {
       formData.append('attachment', attachedFile);
     }
-
+  
     try {
       const response = await axios.post('http://localhost:5000/api/client/offerform', formData, {
         headers: {
@@ -155,10 +155,15 @@ const OfferForm = () => {
           'Content-Type': 'multipart/form-data'
         },
       });
-      console.log('Response received:', response.status, response.data);
+      
+      console.log('Offer created successfully:', response.data);
+      // Store the correct offer ID for later use if needed
+      const offerId = response.data._id || response.data.offerId;
+      console.log('Generated offer ID:', offerId);
+      
       navigate('/clientDashboard');
     } catch (error) {
-      console.error('Error details:', error);
+      console.error('Error creating offer:', error);
       setError(error.response?.data?.message || "An unexpected error occurred");
     } finally {
       setIsLoading(false);
