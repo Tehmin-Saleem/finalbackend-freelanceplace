@@ -16,7 +16,7 @@ import Alljobs from "./Alljobs/index.jsx";
 import ChatLoading from "./chatcomponents/ChatLoading/index.jsx";
 import Spinner from "./chatcomponents/Spinner/index.jsx"
 import UserListItems from "./chatcomponents/UserListItems/index.jsx";
-
+import CoverLetter from "./CoverLetter/index.jsx";
 
 export {default as CommonButton} from "./Commoncomponents/CommonButton"
 export {default as TextField} from "./Commoncomponents/Textfield"
@@ -36,5 +36,6 @@ export {default as Alljobs} from "./Alljobs/index.jsx"
 export {default as ChatLoading} from "./chatcomponents/ChatLoading"
 export {default as Spinner} from "./chatcomponents/Spinner"
 export {default as UserListItems} from "./chatcomponents/UserListItems"
+export {default as CoverLetter} from "./CoverLetter"
 
 

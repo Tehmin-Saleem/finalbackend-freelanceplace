@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { JobsCard, Header } from "../../components/index";
+import { JobsCard, Header, Spinner } from "../../components/index";
 import "./styles.scss";
 import { useNavigate } from 'react-router-dom';
 import {jwtDecode} from "jwt-decode"; // Corrected jwtDecode import
@@ -97,13 +97,13 @@ const JobsPage = () => {
     }
   };
 
-  if (loading) return <div>Loading...</div>;
+  if (loading) return <Spinner size={100} alignCenter />;
   if (error) return <div>{error}</div>;
 
   return (
     <div className="jobs-page">
       <Header />
-      <h1 className="jobs-heading">Jobs matching your skills</h1>
+      <h1 className="jobs-heading">All Jobs</h1>
       <div className="jobs-container">
         {jobs.map((job) => (
           <JobsCard
