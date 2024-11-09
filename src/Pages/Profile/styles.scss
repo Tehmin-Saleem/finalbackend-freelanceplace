@@ -305,6 +305,21 @@ $font-poppins: "Poppins", sans-serif;
           }
         }
       }
+
+
+      .form-group-email{
+        display: flex;
+        flex-direction: column;
+
+        textarea {
+          padding: 0.75rem;
+          border: 10px solid #1f1f70;
+          border-radius: 0.5rem;
+        }
+
+
+      }
+
       .languages-group {
         margin-bottom: 1.5rem;
 
