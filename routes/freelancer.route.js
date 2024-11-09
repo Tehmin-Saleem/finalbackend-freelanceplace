@@ -110,7 +110,7 @@ router.delete('/profile/:freelancerId', freelancerProfileController.deleteProfil
 // router.get('/profile', authMiddleware, freelancerProfileController.getProfileByUserId);
 router.get('/profile/:userId', authMiddleware, freelancerProfileController.getProfileByUserId);
 router.get('/profilebyfreelancerid/:freelancer_id', authMiddleware, freelancerProfileController.getProfileByFreelancerId);
-router.get('/offers/:offerId', offerController.getOfferById);
+router.get('/offers/:notificationId', offerController.getOfferById);
 
 // Route to get all chats for a specific freelancer
 // Chat-related routes
