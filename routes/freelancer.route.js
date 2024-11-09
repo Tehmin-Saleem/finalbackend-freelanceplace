@@ -19,6 +19,9 @@ const offerController = require ('../controllers/offer_form.controller')
 // Import Chat controller
 const chatController = require('../controllers/chat.controller'); // Add this
 
+const  aiCoverLetter  = require('../controllers/aiCoverLetter.controller');
+
+
 // Set up multer for file uploads
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -154,6 +157,12 @@ router.get('/freelancerslist',usercontroller.getallfreelancerlist);
 router.get('/queries/:id', authMiddleware, queryController.getQueryById);
 
 router.patch('/queries/:id', authMiddleware, queryController.updatequery);
+
+
+router.post('/generate-cover-letter', aiCoverLetter.generateCoverLetter);
+router.post('/save-cover-letter', aiCoverLetter.saveCoverLetter);
+router.get('/get-cover-letter/:freelancerId/:jobPostId', aiCoverLetter.getCoverLetter);
+
 // Separate route for searching users by name and email
 // router.get('/api/users/search', async (req, res) => {
 //   const { name, email } = req.query;
@@ -176,5 +185,8 @@ router.patch('/queries/:id', authMiddleware, queryController.updatequery);
 router.patch('/softban/:id',authMiddleware,usercontroller.freelancersoftban);
 router.delete('/ban/:id',authMiddleware,usercontroller.freelancerban);
 router.patch('/unban/:id', authMiddleware,usercontroller.freelancerUnban);
+
+
+router.get('/profile/:id',  authMiddleware, usercontroller.fetchprofile);
 
 module.exports = router;
