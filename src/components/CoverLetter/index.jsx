@@ -1,5 +1,6 @@
-import React from 'react';
-import './styles.scss';
+import React from "react";
+import "./styles.scss";
+import Spinner from "../chatcomponents/Spinner";
 
 const CoverLetterComponent = ({
   handleClose,
@@ -11,7 +12,8 @@ const CoverLetterComponent = ({
   setFreelancerCoverLetter,
   additionalSkills,
   handleSkillsChange,
-  handleInputChange
+  handleInputChange,
+  loading,
 }) => {
   return (
     <div className="cover-letter-overlay">
@@ -22,7 +24,7 @@ const CoverLetterComponent = ({
             &times;
           </button>
         </div>
-        
+
         <div className="cover-letter-body">
           <label>Additional Skills (Optional)</label>
           <input
@@ -36,9 +38,21 @@ const CoverLetterComponent = ({
             Generate Cover Letter
           </button>
 
-          {generatedCoverLetter ? (
+          {/* {generatedCoverLetter ? (
+           
             <pre className="generated-letter">{generatedCoverLetter}</pre>
           ) : (
+            <p>No cover letter available</p>
+          )} */}
+
+          {loading ? (
+            // Show Spinner if loading is true
+            <Spinner size={50} alignCenter />
+          ) : generatedCoverLetter ? (
+            // Show generated cover letter if available
+            <pre className="generated-letter">{generatedCoverLetter}</pre>
+          ) : (
+            // Show fallback message if no cover letter is available
             <p>No cover letter available</p>
           )}
 
@@ -47,12 +61,10 @@ const CoverLetterComponent = ({
               <label>Generated Cover Letter</label>
               <textarea
                 rows="10"
-
                 value={freelancerCoverLetter}
                 // onChange={(e) => setFreelancerCoverLetter(e.target.value)}
                 onChange={handleInputChange}
                 // value={formdata.freelancerCoverLetter}
-                
               />
             </div>
           )}

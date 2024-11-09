@@ -4,6 +4,7 @@ import {
   Header,
   FreelancersJobsCard,
   CommonButton,
+  Spinner
 } from "../../components/index";
 import "./styles.scss"; // Import the SCSS file
 import { Filter, IconSearchBar } from "../../svg";
@@ -121,7 +122,7 @@ const FreelancersJobsPage = () => {
       </div>
 
       {loading ? (
-        <div className="loading">Loading jobs...</div>
+        <Spinner size={100} alignCenter />
       ) : error ? (
         <div className="error-message">{error}</div>
       ) : (

@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { Header, Alljobs } from "../../components";
+import { Header, Alljobs,  Spinner, } from "../../components";
 import { Filter, IconSearchBar } from "../../svg";
 import axios from "axios";
 import "./styles.scss";
 import { useNavigate } from "react-router-dom";
+
 
 const AllJobsPage = () => {
   const [jobs, setJobs] = useState([]);
@@ -120,7 +121,9 @@ const AllJobsPage = () => {
       {/* Jobs List */}
       <div className="jobs-containers">
         {loading ? (
-          <p>Loading job posts...</p>
+          // <Spinner/>
+          <Spinner size={100} alignCenter />
+          // <p>Loading job posts...</p>
         ) : error ? (
           <p>{error}</p>
         ) : currentJobs.length > 0 ? (

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Header } from "../../components/index";
+import { Header , Spinner} from "../../components/index";
 import { JobsDropdwon } from '../../svg/index';
 import "./styles.scss";
 import axios from 'axios';
@@ -139,7 +139,7 @@ const FreelancerCard = ({ heading, freelancer }) => {
   const availabilityOptions = ["Full-time", "Part-time", "Contract"];
   const locationOptions = ["Remote", "On-site", "Hybrid"];
 
-  if (loading) return <div>Loading...</div>;
+  if (loading) return <Spinner size={100} alignCenter />;
   if (error) return <div>{error}</div>;
 
   return (

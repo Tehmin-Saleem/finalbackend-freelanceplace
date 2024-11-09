@@ -298,6 +298,8 @@ const SubmitProposal = () => {
 
   // Fetch cover letter from the backend
   const generateCoverLetter = async () => {
+
+    setLoading(true);
     try {
       const token = localStorage.getItem("token");
       if (!token) {
@@ -330,6 +332,7 @@ const SubmitProposal = () => {
         // Access the correct nested property
         setGeneratedCoverLetter(response.data.data.generated_cover_letter);
         setFreelancerCoverLetter(response.data.data.generated_cover_letter);
+        setLoading(false); // Set loading to false once done
       } else {
         console.error(
           "Generated cover letter data is missing from the response"
@@ -600,6 +603,7 @@ const SubmitProposal = () => {
                         additionalSkills={additionalSkills}
                         handleSkillsChange={handleSkillsChange}
                         handleInputChange={handleInputChange}
+                        loading = {loading}
                       />
                     )}
                   </div>
