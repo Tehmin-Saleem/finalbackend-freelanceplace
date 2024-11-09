@@ -1,5 +1,6 @@
 import { jwtDecode } from "jwt-decode";
-import io from 'socket.io-client';
+import io from "socket.io-client";
+
 class SocketManager {
   socket;
   userId;

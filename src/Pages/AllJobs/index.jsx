@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { Header, Alljobs } from "../../components";
+import { Header, Alljobs,  Spinner, } from "../../components";
 import { Filter, IconSearchBar } from "../../svg";
 import axios from "axios";
 import "./styles.scss";
 import { useNavigate } from "react-router-dom";
+
 
 const AllJobsPage = () => {
   const [jobs, setJobs] = useState([]);
@@ -67,6 +68,13 @@ const AllJobsPage = () => {
     }
     navigate(`/proposals/${jobId}`);
   };
+
+
+
+  
+    // const handleClick = () => {
+    //   navigate('./jobposting');
+    // };
   
   return (
     <div className="jobs-Page">
@@ -107,13 +115,15 @@ const AllJobsPage = () => {
             <button className="filter-done-Button">Done</button>
           </div>
         </div>
-        <button className="post-job-Button">Post a new job</button>
+        <button  className="post-job-Button" >Post a new job</button>
       </div>
 
       {/* Jobs List */}
       <div className="jobs-containers">
         {loading ? (
-          <p>Loading job posts...</p>
+          // <Spinner/>
+          <Spinner size={100} alignCenter />
+          // <p>Loading job posts...</p>
         ) : error ? (
           <p>{error}</p>
         ) : currentJobs.length > 0 ? (

@@ -1,145 +1,372 @@
-.manage-projects {
-    width: 50%;
-    margin: 0 auto;
-    padding: 20px;
+// .manage-projects {
+//     width: 50%;
+//     margin: 0 auto;
+//     padding: 20px;
     
-    .header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 30px;
+//     .header {
+//       display: flex;
+//       justify-content: space-between;
+//       align-items: center;
+//       margin-bottom: 30px;
       
-      h1 {
-        font-size: 2rem;
-        margin: 0;
-        color:#1aa3c2;
-        font-weight: 600;
-      }
+//       h1 {
+//         font-size: 2rem;
+//         margin: 0;
+//         color:#1aa3c2;
+//         font-weight: 600;
+//       }
   
-      .client-profile {
-        display: flex;
-        align-items: center;
+//       .client-profile {
+//         display: flex;
+//         align-items: center;
         
-        img {
-          border-radius: 50%;
-          width: 40px;
-          height: 40px;
-          margin-right: 10px;
-        }
-      }
-    }
+//         img {
+//           border-radius: 50%;
+//           width: 40px;
+//           height: 40px;
+//           margin-right: 10px;
+//         }
+//       }
+//     }
   
-    .project-list {
-      display: flex;
+//     .project-list {
+//       display: flex;
      
-      gap: 20px;
+//       gap: 20px;
+//     }
+  
+//     .project-card {
+//       background-color: #fff;
+//       border: 1px solid #ddd;
+//       border-radius: 8px;
+//       padding: 20px;
+//       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      
+//       .project-header {
+//         display: flex;
+//         justify-content: space-between;
+//         align-items: center;
+//         margin-bottom: 20px;
+  
+//         .project-info {
+//           h2 {
+//             font-size: 1.5rem;
+//             margin: 0;
+//           }
+  
+//           p {
+//             color: #555;
+//           }
+//         }
+  
+//         .project-deadline {
+//           p {
+//             color: #ff9800;
+//           }
+//         }
+//       }
+  
+//       .project-progress-bar {
+//         background-color: #f0f0f0;
+//         border-radius: 5px;
+//         overflow: hidden;
+//         margin: 10px 0;
+  
+//         .progress {
+//           height: 10px;
+//           background-color: #4caf50;
+//           border-radius: 5px;
+//         }
+//       }
+  
+//       .progress-percent {
+//         text-align: right;
+//         color: #4caf50;
+//       }
+  
+//       .milestones {
+//         margin-top: 20px;
+  
+//         h3 {
+//           font-size: 1.2rem;
+//           margin-bottom: 10px;
+//         }
+  
+//         .milestone {
+//           display: flex;
+//           justify-content: space-between;
+//           padding: 10px 0;
+//           border-bottom: 1px solid #eee;
+//           color: #555;
+  
+//           .status {
+//             &.completed {
+//               color: #4caf50;
+//             }
+  
+//             &.in-progress {
+//               color: #ff9800;
+//             }
+  
+//             &.not-started {
+//               color: #f44336;
+//             }
+//           }
+//         }
+//       }
+  
+//       .project-budget {
+//         margin-top: 20px;
+//         p {
+//           font-weight: bold;
+//           color: #333;
+//         }
+//       }
+//     }
+  
+//     .timer-btn {
+//       background-color: #ff9800;
+//       color: #fff;
+//       border: none;
+//       padding: 8px 16px;
+//       border-radius: 5px;
+//       cursor: pointer;
+//       font-size: 0.9rem;
+      
+//       i {
+//         margin-right: 5px;
+//       }
+  
+//       &:hover {
+//         background-color: #e68900;
+//       }
+//     }
+//   }
+  
+
+// ==============================
+
+
+// styles.scss
+
+// Color variables
+$primary-color: #4BCBEB;
+$secondary-color: #4BCBEB;
+$background-color: #f9f9f9;
+$card-background: #ffffff;
+$text-color: #333;
+$light-gray: #e0e0e0;
+$progress-color: #4BCBEB;
+$border-radius: 8px;
+$shadow-color: rgba(0, 0, 0, 0.1);
+
+// Global container styling
+.manage-projects {
+  padding: 30px;
+  background-color: $background-color;
+  font-family: Arial, sans-serif;
+  color: $text-color;
+
+  // Centering the page content
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  // Unified header section
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    margin: 0 auto 30px;
+    background-color: $card-background;
+    box-shadow: 0 4px 8px $shadow-color;
+    border-radius: $border-radius;
+    width: 100%;
+    max-width: 800px;
+  
+    /* Title and description styling */
+    .header-content {
+      flex: 1;
+      text-align: left;
+  
+      h1 {
+        font-size: 2.5rem;
+        color: $primary-color;
+        margin: 0;
+        line-height: 1.2;
+      }
+  
+      p {
+        font-size: 1.2rem;
+        color: darken($primary-color, 15%);
+        margin-top: 10px;
+        line-height: 1.4;
+      }
     }
   
-    .project-card {
-      background-color: #fff;
-      border: 1px solid #ddd;
-      border-radius: 8px;
-      padding: 20px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-      
-      .project-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 20px;
+    /* Client profile styling */
+    .client-profile {
+      display: flex;
+      align-items: center;
+      gap: 10px;
   
-        .project-info {
-          h2 {
-            font-size: 1.5rem;
-            margin: 0;
-          }
-  
-          p {
-            color: #555;
-          }
-        }
-  
-        .project-deadline {
-          p {
-            color: #ff9800;
-          }
-        }
+      img {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        border: 2px solid $primary-color;
       }
   
-      .project-progress-bar {
-        background-color: #f0f0f0;
-        border-radius: 5px;
-        overflow: hidden;
-        margin: 10px 0;
-  
-        .progress {
-          height: 10px;
-          background-color: #4caf50;
-          border-radius: 5px;
-        }
-      }
-  
-      .progress-percent {
-        text-align: right;
-        color: #4caf50;
-      }
-  
-      .milestones {
-        margin-top: 20px;
-  
-        h3 {
-          font-size: 1.2rem;
-          margin-bottom: 10px;
-        }
-  
-        .milestone {
-          display: flex;
-          justify-content: space-between;
-          padding: 10px 0;
-          border-bottom: 1px solid #eee;
-          color: #555;
-  
-          .status {
-            &.completed {
-              color: #4caf50;
-            }
-  
-            &.in-progress {
-              color: #ff9800;
-            }
-  
-            &.not-started {
-              color: #f44336;
-            }
-          }
-        }
-      }
-  
-      .project-budget {
-        margin-top: 20px;
-        p {
-          font-weight: bold;
-          color: #333;
-        }
-      }
-    }
-  
-    .timer-btn {
-      background-color: #ff9800;
-      color: #fff;
-      border: none;
-      padding: 8px 16px;
-      border-radius: 5px;
-      cursor: pointer;
-      font-size: 0.9rem;
-      
-      i {
-        margin-right: 5px;
-      }
-  
-      &:hover {
-        background-color: #e68900;
+      span {
+        font-size: 1.1rem;
+        font-weight: bold;
+        color: $primary-color;
       }
     }
   }
   
+
+  // Project Cards container with single column layout
+  .project-list {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+    width: 100%;
+    max-width: 800px;
+  }
+}
+
+// Project Card Styling
+.project-card {
+  background-color: $card-background;
+  border-radius: $border-radius;
+  box-shadow: 0 4px 8px $shadow-color;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+
+  // Header for each project
+  .project-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    .project-info {
+      h2 {
+        font-size: 1.4rem;
+        color: $primary-color;
+        margin: 0;
+      }
+
+      p {
+        font-size: 1rem;
+        color: $text-color;
+        margin: 5px 0;
+      }
+    }
+
+    .project-deadline {
+      text-align: right;
+      p {
+        font-size: 0.9rem;
+        color: darken($primary-color, 10%);
+      }
+
+      .timer-btn {
+        background-color: $secondary-color;
+        color: #fff;
+        border: none;
+        border-radius: $border-radius;
+        padding: 5px 10px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+        margin-top: 5px;
+
+        .bell-icon {
+          margin-right: 5px;
+        }
+
+        &:hover {
+          background-color: darken($secondary-color, 10%);
+        }
+      }
+    }
+  }
+
+  // Progress bar section
+  .project-progress-bar {
+    width: 100%;
+    height: 8px;
+    background-color: $light-gray;
+    border-radius: $border-radius;
+
+    .progress {
+      width: 0; // Default width; should be dynamically updated
+      height: 100%;
+      background-color: $progress-color;
+      border-radius: inherit;
+      transition: width 0.4s ease;
+    }
+  }
+
+  .progress-percent {
+    font-size: 0.9rem;
+    color: $text-color;
+    text-align: right;
+    margin-top: 5px;
+  }
+
+  // Milestones section
+  .milestones {
+    margin-top: 10px;
+
+    h3 {
+      font-size: 1.1rem;
+      color: $primary-color;
+      margin: 0 0 5px;
+    }
+
+    .milestone {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 0;
+      border-bottom: 1px solid $light-gray;
+
+      &:last-child {
+        border-bottom: none;
+      }
+
+      p {
+        font-size: 0.9rem;
+        margin: 0;
+      }
+
+      .status {
+        font-weight: bold;
+
+        &.completed {
+          color: $secondary-color;
+        }
+
+        &.in-progress {
+          color: $primary-color;
+        }
+
+        &.not-started {
+          color: darken($light-gray, 30%);
+        }
+      }
+    }
+  }
+
+  // Budget section with subtle styling
+  .project-budget {
+    font-size: 1rem;
+    font-weight: bold;
+    color: darken($secondary-color, 10%);
+    margin-top: 10px;
+    text-align: center;
+  }
+}
