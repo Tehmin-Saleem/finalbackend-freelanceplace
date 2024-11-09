@@ -51,6 +51,12 @@ exports.createProfile = async (req, res) => {
       res.status(400).json({ success: false, error: err.message });
     }
   };
+
+
+
+
+
+
   exports.getProfile = async (req, res) => {
     console.log('getProfile function called');
     try {
@@ -127,5 +133,18 @@ exports.updateProfile = async (req, res) => {
     res.status(200).json(updatedProfile);
   } catch (error) {
     res.status(400).json({ message: error.message });
+  }
+};
+
+
+
+
+exports.profileExists = async (req, res) => {
+  try {
+      const clientId = req.params.id;
+      const profile = await Client_Profile.findOne({ client_id: clientId });
+      res.status(200).json({ exists: !!profile });
+  } catch (error) {
+      res.status(500).json({ success: false, error: error.message });
   }
 };

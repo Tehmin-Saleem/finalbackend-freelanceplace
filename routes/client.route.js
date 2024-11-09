@@ -14,6 +14,7 @@ const ClientProfile= require('../controllers/client_profile.controller')
 const Notification= require ('../controllers/notifications.controller')
 const consultantProfileController=require ('../controllers/consultantprofile.controller')
 
+
 const queryController = require('../controllers/query.controller');
 
 // Import Chat controller
@@ -64,6 +65,7 @@ router.get('/jobpost/:fileName', (req, res) => {
 router.post('/clientprofile', authMiddleware, upload.single('image'), ClientProfile.createProfile);
 router.get('/profile', authMiddleware, ClientProfile.getProfile);
 router.put('/clientprofile', authMiddleware, upload.single('image'), ClientProfile.updateProfile);
+router.get('/client-profile-exists/:id', authMiddleware, ClientProfile.profileExists);
 
 router.get('/notifications', authMiddleware, Notification.getNotifications);
 router.post('/notifications', authMiddleware, Notification.createNotification);
@@ -199,6 +201,17 @@ router.delete('/ban/:id',authMiddleware,usercontroller.clientban);
 router.patch('/unban/:id', authMiddleware,usercontroller.ClientUnban);
 
 // const upload = multer({ dest: 'uploads/' });
+
+
+
+
+
+
+
+
+
+
+
 
 router.post('/profile', upload.single('profilePicture'), consultantProfileController.createProfile);
 router.get('/profile/:id',  consultantProfileController.getProfile);

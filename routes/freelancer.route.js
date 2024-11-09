@@ -113,6 +113,7 @@ router.delete('/profile/:freelancerId', freelancerProfileController.deleteProfil
 // router.get('/profile', authMiddleware, freelancerProfileController.getProfileByUserId);
 router.get('/profile/:userId', authMiddleware, freelancerProfileController.getProfileByUserId);
 router.get('/profilebyfreelancerid/:freelancer_id', authMiddleware, freelancerProfileController.getProfileByFreelancerId);
+router.get("/freelancer-profile-exists/:id", freelancerProfileController.freelancerProfileExists);
 router.get('/offers/:offerId', offerController.getOfferById);
 
 // Route to get all chats for a specific freelancer
@@ -185,5 +186,9 @@ router.get('/get-cover-letter/:freelancerId/:jobPostId', aiCoverLetter.getCoverL
 router.patch('/softban/:id',authMiddleware,usercontroller.freelancersoftban);
 router.delete('/ban/:id',authMiddleware,usercontroller.freelancerban);
 router.patch('/unban/:id', authMiddleware,usercontroller.freelancerUnban);
+
+
+
+
 
 module.exports = router;

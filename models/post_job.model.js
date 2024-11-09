@@ -61,6 +61,12 @@ const job_PostSchema = new Schema({
     type: String,
     enum: ["public", "private"], 
   },
+  jobStatus: {
+    type: String,
+    enum: ["active", "completed", "pending"], // status options
+    default: "pending", // Default to pending when a job is created
+  },
+  
   
 
 });
