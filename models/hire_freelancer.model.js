@@ -1,20 +1,40 @@
 const mongoose = require("mongoose");
-const hireFreelancer = mongoose.Schema({
-  freelancerId: {
+const HireFreelancer = new mongoose.Schema({
+  proposalId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "User", 
-    // required: true,
+    ref: 'Proposal',
+    required: true
   },
   clientId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "User", 
-    // required: true,
+    ref: 'User',
+    required: true
   },
- 
+  freelancerId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: true
+  },
   jobId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "PostJob", 
-    // required: true,
+    ref: 'Job_Post',
+    required: true
   },
+  status: {
+    type: String,
+    enum: ['pending', 'hired', 'completed', 'cancelled'],
+    default: 'pending'
+  },
+  hiredAt: {
+    type: Date,
+    default: Date.now
+  },
+  terms: {
+    rate: Number,
+    projectDuration: String,
+    startDate: Date
+  }
+}, {
+  timestamps: true
 });
-module.exports = mongoose.model("HireFreelancer", hireFreelancer);
+module.exports = mongoose.model("HireFreelancer", HireFreelancer);

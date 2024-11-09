@@ -23,7 +23,7 @@ const userSchema = new Schema({
   },
   role: {
     type: String,
-    enum: ["freelancer", "client", "consultant"], // Added consultant
+    enum: ["freelancer", "client", "admin", "consultant"], // Added consultant
     required: true,
   },
   isAdmin: {

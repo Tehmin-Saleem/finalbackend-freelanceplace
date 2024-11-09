@@ -32,6 +32,10 @@ const job_PostSchema = new Schema({
     // required: true,
     ref: "User",
   }, 
+    title: {
+    type: String,
+    
+  },
   job_title: {
     type: String,
     required: true,
@@ -57,6 +61,8 @@ const job_PostSchema = new Schema({
     type: String,
     enum: ["public", "private"], 
   },
+  
+
 });
 
 const Job_Post = mongoose.model("Job_Post", job_PostSchema);

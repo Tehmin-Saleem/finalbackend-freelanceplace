@@ -3,6 +3,7 @@ const router = express.Router();
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
+const jobPostController = require('../controllers/post_job.controller');
 // Import controllers and middleware
 const usercontroller = require('../controllers/user.controller');
 const proposalController = require('../controllers/proposal.controller');
@@ -12,11 +13,14 @@ const { upload } = require('../config/cloudinary.config');//import forgot and re
 // const { forgotPassword, resetPassword } = require('../controllers/user.controller');
 const Notification= require ('../controllers/notifications.controller')
 const queryController = require('../controllers/query.controller');
+const manageProject = require('../controllers/Manageproj.controller')
 
-
-
+const offerController = require ('../controllers/offer_form.controller')
 // Import Chat controller
 const chatController = require('../controllers/chat.controller'); // Add this
+
+const  aiCoverLetter  = require('../controllers/aiCoverLetter.controller');
+
 
 // Set up multer for file uploads
 const storage = multer.diskStorage({
@@ -63,7 +67,7 @@ router.get('/notifications', authMiddleware, Notification.getNotifications);
 router.post('/notifications', authMiddleware, Notification.createNotification);
 router.put('/notifications/:notificationId/read', authMiddleware, Notification.updateNotification);
 router.get('/notifications/unread-count', authMiddleware, Notification.getUnreadNotificationsCount);
-
+router.get('/jobs', authMiddleware, jobPostController.getAllJobPosts);
 router.get('/profile/portfolios/:fileName', (req, res) => {
   const { fileName } = req.params;
   const filePath = path.join(__dirname, '..', 'uploads', fileName);
@@ -88,6 +92,7 @@ router.post('/login', usercontroller.login);
 
 router.use(authMiddleware);
 
+router.post('/manageproj',authMiddleware, manageProject.createProject);
 // Proposal routes
 router.post('/proposal/:jobPostId', upload.single('attachment'), proposalController.createProposal);
 router.get('/getproposals', proposalController.getFreelancerProposals);
@@ -108,7 +113,7 @@ router.delete('/profile/:freelancerId', freelancerProfileController.deleteProfil
 // router.get('/profile', authMiddleware, freelancerProfileController.getProfileByUserId);
 router.get('/profile/:userId', authMiddleware, freelancerProfileController.getProfileByUserId);
 router.get('/profilebyfreelancerid/:freelancer_id', authMiddleware, freelancerProfileController.getProfileByFreelancerId);
-
+router.get('/offers/:offerId', offerController.getOfferById);
 
 // Route to get all chats for a specific freelancer
 // Chat-related routes
@@ -152,6 +157,12 @@ router.get('/freelancerslist',usercontroller.getallfreelancerlist);
 router.get('/queries/:id', authMiddleware, queryController.getQueryById);
 
 router.patch('/queries/:id', authMiddleware, queryController.updatequery);
+
+
+router.post('/generate-cover-letter', aiCoverLetter.generateCoverLetter);
+router.post('/save-cover-letter', aiCoverLetter.saveCoverLetter);
+router.get('/get-cover-letter/:freelancerId/:jobPostId', aiCoverLetter.getCoverLetter);
+
 // Separate route for searching users by name and email
 // router.get('/api/users/search', async (req, res) => {
 //   const { name, email } = req.query;

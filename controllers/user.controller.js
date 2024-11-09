@@ -2,12 +2,9 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user.model');
 const asyncHandler = require("express-async-handler");
-const crypto = require('crypto');
-const {sendEmail}  = require("../utils/email");
-const { userInfo } = require('os');
+const { sendEmail } = require("../utils/email");
 
-
-
+// Middleware to check if the user already exists
 const checkUserExists = async (req, res, next) => {
   try {
     const { email } = req.body;
@@ -24,6 +21,7 @@ const checkUserExists = async (req, res, next) => {
   }
 };
 
+// Middleware to hash password before saving
 const hashPassword = async (req, res, next) => {
   try {
     const { password } = req.body;
@@ -37,10 +35,11 @@ const hashPassword = async (req, res, next) => {
     res.status(500).json(err);
   }
 };
+
+// Signup function
 const signup = async (req, res) => {
   try {
-      console.log('Request Body:', req.body);
-      const { email, first_name, last_name, password, role, country_name } = req.body;
+        const { email, first_name, last_name, password, role, country_name } = req.body;
 
       const existingUser = await User.findOne({ email });
 
@@ -51,8 +50,7 @@ const signup = async (req, res) => {
           return res.status(400).json({ message: 'Email already in use.' });
       }
 
-      // Create user in the database
-      const newUser = new User({
+        const newUser = new User({
           email,
           password,
           first_name,
@@ -61,12 +59,10 @@ const signup = async (req, res) => {
           country_name,
       });
 
-      // Hash the password before saving
-      const salt = await bcrypt.genSalt(10);
+        const salt = await bcrypt.genSalt(10);
       newUser.password = await bcrypt.hash(password, salt);
 
-      // Save the user initially
-      await newUser.save();
+        await newUser.save();
 
       // Set role-specific IDs based on the role
       if (role === 'freelancer') {
@@ -77,8 +73,7 @@ const signup = async (req, res) => {
           newUser.consultant_id = newUser._id;
       }
 
-      // Save the updated user
-      await newUser.save();
+        await newUser.save();
 
       // Generate JWT token
       const token = jwt.sign({ userId: newUser._id, role: newUser.role }, process.env.JWT_SECRET, {
@@ -105,9 +100,34 @@ const signup = async (req, res) => {
 const login = async (req, res) => {
   try {
     const { email, password } = req.body;
+
+    // Parse the admin emails from the environment variable
+    const adminEmails = process.env.ADMIN_EMAILS.split(',');
+
+    // Check if the login matches any of the admin emails
+    if (adminEmails.includes(email) && password === process.env.ADMIN_PASSWORD) {
+      // Generate JWT token for admin
+      const token = jwt.sign(
+        { userId: 'admin', email, role: 'admin' },
+        process.env.JWT_SECRET,
+        { expiresIn: '7h' }
+      );
+
+      // Respond with the token and admin user data
+      return res.status(200).json({
+        token,
+        message: 'Admin login successful',
+        user: {
+          email,
+          role: 'admin',
+          userId: 'admin', // Placeholder userId for admin
+        }
+      });
+    }
+
+    // For regular users, proceed with database lookup
     const user = await User.findOne({ email });
 
-    // Check if the user exists
     if (!user) {
       return res.status(401).json({ message: 'Invalid email or password' });
     }
@@ -123,11 +143,11 @@ const login = async (req, res) => {
       return res.status(401).json({ message: 'Invalid email or password' });
     }
 
-    // Generate JWT token
+    // Generate JWT token for regular user
     const token = jwt.sign(
       { userId: user._id, email: user.email, role: user.role },
       process.env.JWT_SECRET,
-      { expiresIn: '5h' }
+      { expiresIn: '7h' }
     );
 
     // Prepare user data for the response
@@ -139,11 +159,11 @@ const login = async (req, res) => {
 
     // Assign specific IDs based on user role
     if (user.role === 'client') {
-      userData.clientId = user._id; 
+      userData.clientId = user._id;
     } else if (user.role === 'freelancer') {
-      userData.freelancerId = user._id; 
-    } else if (user.role === 'consultant') { // Added for consultant
-      userData.consultantId = user._id; 
+      userData.freelancerId = user._id;
+    } else if (user.role === 'consultant') {
+      userData.consultantId = user._id;
     }
 
     // Respond with the token and user data
@@ -161,31 +181,58 @@ const login = async (req, res) => {
 
 
 
-  const getUserById = async (req, res) => {
-    try {
-      const user = await User.findById(req.params.userId).select('-password');
-      if (!user) {
-        return res.status(404).json({ message: 'User not found' });
-      }
-      res.json(user);
-    } catch (err) {
-      console.error('Error fetching user:', err);
-      res.status(500).json({ message: 'Internal server error' });
+
+
+
+
+
+const getUserById = async (req, res) => {
+  try {
+    const user = await User.findById(req.params.userId).select('-password');
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
     }
-  };
-  const getAllUsers = async (req, res) => {
-    try {
-      const users = await User.find(); // Retrieve all users with all fields
-      res.json(users);
-    } catch (err) {
-      console.error('Error fetching users:', err);
-      res.status(500).json({ message: 'Internal server error' });
-    }
-  };
+    res.json(user);
+  } catch (err) {
+    console.error('Error fetching user:', err);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+};
+const getAllUsers = async (req, res) => {
+  try {
+    const users = await User.find(); // Retrieve all users with all fields
+    res.json(users);
+  } catch (err) {
+    console.error('Error fetching users:', err);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+};
+// Function to create an admin user
+const createAdminUser = async (req, res) => {
+  try {
+    const { email, first_name, last_name, country_name } = req.body;
+    const adminPassword = process.env.ADMIN_PASSWORD;
 
-/////////////////////////////Sammar adding the forgot password functionlaity///////
+    const salt = await bcrypt.genSalt(10);
+    const hashedAdminPassword = await bcrypt.hash(adminPassword, salt);
 
+    const newAdminUser = new User({
+      email,
+      first_name,
+      last_name,
+      country_name,
+      password: hashedAdminPassword,
+      role: 'admin',
+      isAdmin: true,
+    });
 
+    await newAdminUser.save();
+    res.status(201).json({ message: 'Admin user created' });
+  } catch (err) {
+    console.error('Error creating admin user:', err);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+};
 
 const forgotPassword = async (req, res) => {
   const { email } = req.body;
@@ -208,8 +255,6 @@ const forgotPassword = async (req, res) => {
     return res.status(500).json({ message: 'Something went wrong.' });
   }
 };
-
-
 
 const ChangePass = async (req, res) => {
   const { newPassword, confirmPassword } = req.body;
@@ -284,6 +329,7 @@ const getallfreelancerlist= async (req, res) => {
     return res.status(500).json({ message: 'Error fetching freelancers' });
   }
 };
+
 const getallclientlist= async (req, res) => {
   try {
     const freelancers = await User.find({ role: 'client' });

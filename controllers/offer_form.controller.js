@@ -1,6 +1,6 @@
 const Offer_Form = require('../models/offer_form.model');
 const Notification=require("../controllers/notifications.controller")
-
+const mongoose = require('mongoose');
 exports.createoffer = async (req, res) => {
   console.log('Offer Controller: createoffer hit');
   console.log('Request body:', req.body);
@@ -15,6 +15,7 @@ exports.createoffer = async (req, res) => {
       detailed_description,
       freelancer_id,
       job_title,
+      offerId,
       preferred_skills,
       status
     } = req.body;
@@ -46,6 +47,7 @@ exports.createoffer = async (req, res) => {
       detailed_description,
       freelancer_id,
       job_title,
+      offerId,
       preferred_skills: preferred_skills ? JSON.parse(preferred_skills) : [],
       status
     });
@@ -74,15 +76,56 @@ exports.createoffer = async (req, res) => {
 };
 
 
-exports.getOffers = async (req, res) => {
+
+
+exports.getOfferById = async (req, res) => {
   try {
-    const offers = await Offer_Form.find()
-      .populate('client_id', 'name email')
-      .populate('freelancer_id', 'name email')
-      .sort({ createdAt: -1 });
-    res.status(200).json(offers);
+    // Assuming `offerId` is provided in the frontend URL as a query parameter
+    const offerId = req.query.offerId; 
+
+    if (!offerId) {
+      return res.status(400).json({ message: 'Offer ID is required' });
+    }
+
+    // Fetch the offer using `offerId`
+    const offer = await Offer_Form.findById(offerId);
+    if (!offer) {
+      return res.status(404).json({ message: 'Offer not found' });
+    }
+
+    // Get client profile details based on `offer.client_id`
+    const clientProfile = await Client_Profile.findOne({ client_id: offer.client_id });
+    const clientDetails = clientProfile
+      ? {
+          name: `${clientProfile.first_name} ${clientProfile.last_name}`.trim(),
+          country: clientProfile.country,
+          image: clientProfile.image,
+          email: clientProfile.email,
+          languages: clientProfile.languages,
+          about: clientProfile.about,
+          gender: clientProfile.gender,
+          DOB: clientProfile.DOB,
+        }
+      : null;
+
+    // Get freelancer details based on `offer.freelancer_id`
+    const freelancerDetails = await User.findById(offer.freelancer_id).select(
+      'name email location ratings totalProjects earnings skills'
+    );
+
+    // Combine all details into a single response
+    const completeOffer = {
+      ...offer.toObject(),
+      client_details: clientDetails,
+      freelancer_details: freelancerDetails,
+    };
+
+    res.status(200).json(completeOffer);
   } catch (error) {
-    console.error('Error fetching offers:', error);
-    res.status(500).json({ message: 'Error fetching offers', error: error.message });
+    console.error('Error fetching offer details:', error);
+    res.status(500).json({ message: 'Error fetching offer details', error: error.message });
   }
 };
+
+
+

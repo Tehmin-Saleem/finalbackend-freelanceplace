@@ -48,7 +48,7 @@ const ProposalSchema = new Schema({
   },
   freelancer_id: { 
     type: Schema.Types.ObjectId, 
-    ref: 'User'  
+    ref: 'User' ,  
   },
   
   project_duration: {

@@ -1,5 +1,6 @@
 const Notification = require('../models/notifications.model');
 
+// Function to create a notification
 exports.createNotification = async (notificationData) => {
   try {
     console.log('Creating notification with data:', notificationData);
@@ -15,31 +16,19 @@ exports.createNotification = async (notificationData) => {
       freelancer_id,
       job_id,
       message,
-      type
+      type,
+      is_read: false,
+      timestamp: new Date()
     });
 
     const savedNotification = await newNotification.save();
-    console.log('Notification saved successfully:', savedNotification);
     
     if (global.io) {
-      let recipientId, recipientType;
-      if (type === 'new_offer') {
-        recipientId = freelancer_id;
-        recipientType = 'freelancer';
-        console.log('Emitting new_offer notification to freelancer:', freelancer_id);
-      } else if (type === 'hired') {
-        recipientId = freelancer_id;
-        recipientType = 'freelancer';
-        console.log('Emitting hired notification to freelancer:', freelancer_id);
-      } else if (type === 'new_proposal') {
-        recipientId = client_id;
-        recipientType = 'client';
-        console.log('Emitting new_proposal notification to client:', client_id);
-      }
-
-      if (recipientId) {
-        console.log(`Emitting ${type} to ${recipientType}:`, recipientId);
-        global.io.to(`${recipientType}_${recipientId}`).emit('notification', savedNotification);
+      const targetRoom = getNotificationRoom(type, client_id, freelancer_id);
+      
+      if (targetRoom) {
+        console.log(`Emitting ${type} notification to room:`, targetRoom);
+        global.io.to(targetRoom).emit('notification', savedNotification);
       }
     }
     
@@ -49,10 +38,40 @@ exports.createNotification = async (notificationData) => {
     throw error;
   }
 };
+
+// Helper function to determine the correct notification room
+function getNotificationRoom(type, clientId, freelancerId) {
+  const routingRules = {
+    'hired': { targetId: freelancerId, role: 'freelancer' },
+    'new_proposal': { targetId: clientId, role: 'client' },
+    'new_offer': { targetId: freelancerId, role: 'freelancer' },
+    'milestone_completed': { targetId: clientId, role: 'client' },
+    'payment_received': { targetId: freelancerId, role: 'freelancer' }
+  };
+
+  const rule = routingRules[type];
+  if (!rule) return null;
+
+  return `${rule.role}_${rule.targetId}`;
+}
+
+// Socket server setup function
+function setupSocketServer(io) {
+  io.on('connection', (socket) => {
+    const { userId, role } = socket.handshake.auth;
+    
+    socket.on('join-rooms', (data) => {
+      const room = `${data.role}_${data.userId}`;
+      socket.join(room);
+      console.log(`User ${data.userId} joined room ${room}`);
+    });
+  });
+}
+
 exports.getNotifications = async (req, res) => {
   try {
     const userId = req.user.userId;
-    const userRole = req.user.role;  // Assuming the user role is available in req.user
+    const userRole = req.user.role;
     console.log('Fetching notifications for user:', userId, 'Role:', userRole);
 
     let query = {};
@@ -75,7 +94,7 @@ exports.getNotifications = async (req, res) => {
 exports.getUnreadNotificationsCount = async (req, res) => {
   try {
     const userId = req.user.userId;
-    const userRole = req.user.role; 
+    const userRole = req.user.role;
 
     let query = { is_read: false };
     if (userRole === 'client') {
@@ -99,7 +118,6 @@ exports.updateNotification = async (req, res) => {
   try {
     const userId = req.user.userId;
     const notificationId = req.params.notificationId;
- 
 
     const notification = await Notification.findOneAndUpdate(
       { _id: notificationId, freelancer_id: userId },
@@ -108,7 +126,6 @@ exports.updateNotification = async (req, res) => {
     );
 
     if (!notification) {
-     
       return res.status(404).json({ message: 'Notification not found or not authorized' });
     }
 
@@ -127,4 +144,14 @@ exports.checkAuth = (req, res, next) => {
     return res.status(401).json({ message: 'Unauthorized' });
   }
   next();
+};
+
+
+module.exports = {
+  createNotification: exports.createNotification,
+  getNotifications: exports.getNotifications,
+  getUnreadNotificationsCount: exports.getUnreadNotificationsCount,
+  updateNotification: exports.updateNotification,
+  checkAuth: exports.checkAuth,
+  setupSocketServer,  
 };
