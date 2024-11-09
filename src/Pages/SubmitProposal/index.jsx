@@ -301,7 +301,7 @@ return (
                             <label>{index + 1}. Milestone Description:</label>
                             <input
                               type="text"
-                              placeholder="Lorem ipsum"
+                              placeholder=""
                               value={milestone.description}
                               onChange={(e) => handleMilestoneChange(index, "description", e.target.value)}
                             />
@@ -365,7 +365,7 @@ return (
                   name="project_duration"
                   value={formData.project_duration}
                   onChange={handleInputChange}
-                  placeholder="2 months"
+                  placeholder="Hours, Days or Months"
                   className="project-duration"
                 />
                 
@@ -374,7 +374,7 @@ return (
                   name="cover_letter"
                   value={formData.cover_letter}
                   onChange={handleInputChange}
-                  placeholder="Lorem ipsum dolor sit amet consectetur..."
+                  placeholder="Write your cover letter here"
                 ></textarea>
                 
                 <label className="Label">Attachment</label>

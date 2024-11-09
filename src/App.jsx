@@ -159,7 +159,7 @@ function App() {
         <Route path="/JobPopUp" element={<JobPostedPopup/>} /> 
         <Route path="/ForgotPass" element={<ForgotPassword/>} /> 
         <Route path="/ChangePass/:id/:token" element={<ChangePassword/>} /> 
-        <Route path="/OfferDetails/:id" element={<OfferDetails/>} /> 
+        <Route path="/OfferDetails/:notificationId" element={<OfferDetails/>} /> 
         <Route path="/ClientDash" element={<Clientdash/>} /> 
  <Route path="/ManageProj" element={<ManageProjects/>} /> 
 

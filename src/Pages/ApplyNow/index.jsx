@@ -9,6 +9,8 @@ const ApplyJob = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
+  const [fileUrl, setFileUrl] = useState(null);
+  const [fileType, setFileType] = useState(null);
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -31,11 +33,16 @@ const ApplyJob = () => {
         }
 
         const data = await response.json();
-        console.log('Fetched job post:', data); // Log the job post data to inspect
         setJobPost(data.jobPost);
+
+        // If there's an attachment, handle file type and URL generation
+        if (data.jobPost.attachment) {
+          setFileUrl(data.jobPost.attachment.path);  // Using the Cloudinary URL directly
+          setFileType(data.jobPost.attachment.mimeType || 'application/pdf');
+        }
+
         setLoading(false);
       } catch (error) {
-        console.error('Error fetching job post:', error);
         setError(error.message || 'An unexpected error occurred');
         setLoading(false);
       }
@@ -74,32 +81,46 @@ const ApplyJob = () => {
     return `${Math.floor(diffInSeconds / 86400)} days ago`;
   };
 
-  const handleViewFile = async () => {
-    if (jobPost?.attachment?.fileName) {
-      try {
-        const token = localStorage.getItem('token');
-        const response = await fetch(`http://localhost:5000/api/client/jobpost/${jobPost.attachment.fileName}`, {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        });
-
-        if (!response.ok) {
-          throw new Error(`Failed to fetch file: ${response.statusText}`);
+  const handleViewFile = () => {
+    if (fileType && fileUrl) {
+      if (fileType.startsWith('image/')) {
+        // For images, check if it's a URL or a Blob and handle accordingly
+        if (fileUrl.startsWith('http')) {
+          // If the fileUrl is a URL (like Cloudinary)
+          window.open(fileUrl, '_blank');
+        } else {
+          // Otherwise, open the Blob URL
+          window.open(fileUrl, '_blank');
         }
-
-        const blob = await response.blob();
-        const fileUrl = URL.createObjectURL(blob);
-        const win = window.open();
-        win.document.write('<iframe src="' + fileUrl + '" frameborder="0" style="width:100%; height:100%;" allowfullscreen></iframe>');
-      } catch (error) {
-        console.error("Error fetching file:", error);
-        alert("Error fetching file: " + error.message);
+      } else if (fileType === 'application/pdf') {
+        // For PDF, open in a new tab
+        window.open(fileUrl, '_blank');
+      } else {
+        alert('Unsupported file type.');
       }
     } else {
-      console.error("No file available to view.");
       alert("No file available to view.");
     }
+  };
+
+  // File Preview
+  const renderFilePreview = () => {
+    if (fileType && fileUrl) {
+      if (fileType.startsWith('image/')) {
+        return <img src={fileUrl} alt="Attachment Preview" className="file-preview-image" />;
+      } else if (fileType === 'application/pdf') {
+        return (
+          <embed
+            src={fileUrl}
+            type="application/pdf"
+            width="100%"
+            height="500px"
+            className="file-preview-pdf"
+          />
+        );
+      }
+    }
+    return null;
   };
 
   if (loading) return <div>Loading...</div>;
@@ -109,6 +130,7 @@ const ApplyJob = () => {
   const handleApplyNow = () => {
     navigate(`/submitProposal/${jobPostId}`);
   };
+
   return (
     <>
       <Header />
@@ -167,6 +189,10 @@ const ApplyJob = () => {
                     <EyeIcon />
                     View
                   </button>
+                </div>
+                {/* Displaying the file preview */}
+                <div className="file-preview">
+                  {renderFilePreview()}
                 </div>
               </div>
             </>
