@@ -1,168 +1,180 @@
-// dashboardPage.scss
-
-// Variables
-$font-kodchasan: 'Kodchasan', sans-serif;
-$font-poppins: 'Poppins', sans-serif;
-$color-gray: #64748b;
-$color-dark: #2c3e50;
-$color-white: #ffffff;
-$color-accent: #4bcdeb;
+$primary-color: #3b82f6;
+$secondary-color: #6b7280;
+$gray-color: #f7fafc;
+$text-color: #4a5568;
 $bg-color: #f7f8fa;
+$color-accent: #4bcdeb;
+$font-poppins: 'Poppins', sans-serif;
 
-// Mixins
-@mixin flex-center {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-@mixin flex-col {
-  display: flex;
-  flex-direction: column;
-}
-
-@mixin text-lg {
-  font-size: 18px;
-}
-
-@mixin text-xl {
-  font-size: 20px;
-}
-
-@mixin text-2xl {
-  font-size: 24px;
-}
-
-@mixin text-5xl {
-  font-size: 48px;
-}
-
-@mixin transition {
-  transition: all 0.3s ease;
-}
-
-// Styles
-.dashboard-page {
-  min-height: 100px;
+.DashBoard {
+  font-family: $font-poppins;
+  color: $text-color;
   background-color: $bg-color;
-  @include flex-col;
-  
 
-  .main-content {
-    padding-top: 1rem;
-    padding-left: 2rem;
-    padding-bottom: 0;
-    // flex-grow: 1;
-    @include flex-col;
-    @media (min-width: 768px) {
-      @include flex-center;
-      flex-direction: row;
+  .dashboard-Header {
+    background-image: url('../../images/Illustration.png');
+    background-size: cover;
+    background-position: center;
+    padding: 100px 20px;
+    min-height: 300px;
+    text-align: center;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    margin-top: 0;
+
+    h1 {
+      font-size: 2.5rem;
+      font-weight: bold;
+      color: #fff;
     }
 
-    .left-section {
-      width: 100%;
-      padding: 2rem;
-      position: relative;
-      @media (min-width: 768px) {
-        width: 50%;
-        padding: 4rem;
-      }
+    p {
+      font-size: 1.1rem;
+      color: #f0f0f0;
+      margin-top: 10px;
+    }
+  }
 
-      .left-content {
-        position: absolute;
-        inset: 0;
-        z-index: 10;
-        @include flex-col;
-        align-items: flex-start;
-        justify-content: flex-start;
+  /* Quick Stats and Dashboard Summary combined */
+  .quick-stats-summary {
+    margin-bottom: 30px;
 
-        .welcome-text {
-          @include text-2xl;
-          font-family: $font-kodchasan;
-          margin-bottom: 1rem;
-          margin-top: 3rem;
-          margin-left: 4rem;
-          color: $color-dark;
-          @media (min-width: 768px) {
-            @include text-5xl;
-          }
+    .quick-stats {
+      display: flex;
+      justify-content: space-around;
+      padding: 20px;
+      margin-bottom: 20px;
+      background-color: $gray-color;
+      border-radius: 10px;
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+
+      .stat-item {
+        text-align: center;
+        h3 {
+          color: $color-accent;
+          margin-bottom: 5px;
         }
-
-        .description-text {
-          margin-bottom: 1.5rem;
-          @include text-lg;
-          color: $color-gray;
-          margin-top: 0.5rem;
-          margin-left: 4rem;
-          @media (min-width: 768px) {
-            @include text-xl;
-          }
-        }
-
-        .start-button {
-          background-color: $color-accent;
-          color: $color-white;
-          padding: 0.5rem 2rem;
-          border-radius: 0.5rem;
-          margin-left: 6rem;
-          margin-top: 0.5rem;
-          cursor: pointer;
-          &:hover {
-            background-color: darken($color-accent, 10%);
-          }
-          @include transition;
-        }
-      }
-
-      .background-lining {
-        @media (min-width: 768px) {
-          width: auto;
-          height: auto;
+        p {
+          font-size: 1.5rem;
+          font-weight: bold;
         }
       }
     }
 
-    .right-section {
-      display: none;
-      width: 100%;
-      padding: 1rem;
-      @media (min-width: 768px) {
-        display: flex;
-        width: 50%;
-        @include flex-center;
-      }
-
-      .illustration {
-        width: 80%;
-        max-width: 50%;
-        height: auto;
-        margin-left: 7rem;
-        margin-top: 4rem;
-      }
-      .contact-btn-fixed {
-        position: fixed;
-        bottom: 20px;
-        right: 20px;
-        background-color: $color-accent;
-        color: $color-white;
-        padding: 0.8rem 1.5rem;
-        border-radius: 50px;
-        font-family: $font-poppins;
-        font-size: 16px;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        cursor: pointer;
-        @include transition;
+    /* Dashboard Summary styling */
+    .dashboard-summary {
+      text-align: center;
+      padding: 25px;
+      // background-color: lighten($color-accent, 45%);
+      border-radius: 12px;
+      // box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+      margin-top: 20px;
+      font-family: $font-poppins;
     
+      h2 {
+        font-size: 1.8rem;
+        color: darken($color-accent, 10%);
+        margin-bottom: 12px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+    
+      p {
+        font-size: 1.15rem;
+        color: $text-color;
+        line-height: 1.4;
+        font-weight: 450;
+        max-width: 600px;
+        margin: 0 auto;
+      }
+    
+      // Adding a soft gradient to add depth
+      // background-image: linear-gradient(
+      //   to bottom right,
+      //   lighten($color-accent, 50%),
+      //   lighten($color-accent, 30%)
+      // );
+    
+      // Subtle animated shadow on hover
+      // &:hover {
+      //   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+      //   transform: translateY(-2px);
+      //   transition: transform 0.3s ease, box-shadow 0.3s ease;
+      // }
+    }
+    
+  }
+
+  .card-container {
+    display: flex;
+    justify-content: space-between;
+    gap: 18px;
+    flex-wrap: wrap;
+    margin-right: 4rem;
+
+    .card {
+      background: $gray-color;
+      border-radius: 10px;
+      padding: 20px;
+      width: calc(33.33% - 20px);
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+      text-align: center;
+      transition: transform 0.3s, box-shadow 0.3s;
+
+      &:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+      }
+
+      h2 {
+        font-size: 1.5rem;
+        color: $color-accent;
+        margin-bottom: 10px;
+        font-weight: 550;
+      }
+
+      p {
+        font-size: 1rem;
+        color: $secondary-color;
+        margin-bottom: 20px;
+      }
+
+      button {
+        background-color: $color-accent;
+        color: #fff;
+        border: none;
+        border-radius: 5px;
+        padding: 10px 20px;
+        cursor: pointer;
+        font-size: 1rem;
+
         &:hover {
           background-color: darken($color-accent, 10%);
         }
-    
-        .contact-icon {
-          font-size: 20px;
-        }
       }
+    }
+  }
+
+  .contact-btn-fixed {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: $color-accent;
+    color: #fff;
+    padding: 0.8rem 1.5rem;
+    border-radius: 50px;
+    display: flex;
+    align-items: center;
+    font-size: 1rem;
+    cursor: pointer;
+
+    .contact-icon {
+      margin-right: 0.5rem;
+    }
+
+    &:hover {
+      background-color: darken($color-accent, 10%);
     }
   }
 }

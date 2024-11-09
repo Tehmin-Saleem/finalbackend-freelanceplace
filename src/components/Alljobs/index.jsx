@@ -18,7 +18,7 @@ const Alljobs = ({
           <span className="job-card__title">{title}</span>
           {proposals > 0 && (
             <button className="job-card__view-button" onClick={() => onViewClick(jobId)}>
-              View
+              View Proposals
             </button>
           )}
         </div>
