@@ -143,7 +143,7 @@ exports.getProfileByUserId = async (req, res) => {
       return res.status(404).json({ success: false, message: 'Profile not found' });
     }
 
-    // Constructing the formatted profile
+    // Constructing the formatcdted profile
     const formattedProfile = {
       freelancer_id: profile.freelancer_id,
       name: `${profile.first_name} ${profile.last_name}`.trim() || 'No Name',
