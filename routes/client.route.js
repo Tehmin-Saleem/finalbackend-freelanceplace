@@ -128,6 +128,8 @@ router.delete('/payment-methods/:paymentMethodId', paymentMethodController.delet
 
 
 router.post('/hire/:proposalId', authMiddleware, hireFreelancerController.hireFreelancer);
+// In your routes file
+router.get('/filtered-jobs', authMiddleware, hireFreelancerController.getFilteredJobs);
 
 
 
