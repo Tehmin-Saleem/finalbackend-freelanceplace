@@ -130,18 +130,13 @@ router.delete('/payment-methods/:paymentMethodId', paymentMethodController.delet
 
 
 router.post('/hire/:proposalId', authMiddleware, hireFreelancerController.hireFreelancer);
-// In your routes file
-router.get('/filtered-jobs', authMiddleware, hireFreelancerController.getFilteredJobs);
-
-
-// In your routes file
-router.get('/ongoing-projects', authMiddleware, hireFreelancerController.getClientOngoingProjects);
 
 
 
-router.get('/hire/:proposalId', hireFreelancerController.getHireRequestById);
-router.get('/hire', hireFreelancerController.getAllHireData);
+router.get('/hire', hireFreelancerController.getClientHireRequests);
 
+
+router.get('/hire/:hireRequestId', hireFreelancerController.getHireRequestById);
 
 
 router.put('/hire/:hireRequestId', hireFreelancerController.updateHireRequest);
@@ -208,21 +203,23 @@ router.patch('/softban/:id',authMiddleware,usercontroller.clientsoftban);
 router.delete('/ban/:id',authMiddleware,usercontroller.clientban);
 router.patch('/unban/:id', authMiddleware,usercontroller.ClientUnban);
 
+
+
 // const upload = multer({ dest: 'uploads/' });
 
-
-
-
-
-
-
-
-
-
-
-
 router.post('/profile', upload.single('profilePicture'), consultantProfileController.createProfile);
-router.get('/profile/:id',  consultantProfileController.getProfile);
+router.get('/profile/:id',  consultantProfileController.getProfileByUserId);
+// In your routes file
+router.get('/filtered-jobs', authMiddleware, hireFreelancerController.getFilteredJobs);
+router.get('/count-job-posts/:userId',authMiddleware,jobPostController.countJobPostsByClientId)
+
+
+// In your routes file
+router.get('/ongoing-projects', authMiddleware, hireFreelancerController.getClientOngoingProjects);
+
+router.get('/hired-freelancers-count/:clientId', hireFreelancerController.getHiredFreelancersCountByClientId);
+
+router.get('/freelancers-engaged-count/:clientId', hireFreelancerController.getFreelancersEngagedCountByClientId);
 
 
 // Get all projects progress for a client

@@ -3,6 +3,7 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/user.model');
 const asyncHandler = require("express-async-handler");
 const { sendEmail } = require("../utils/email");
+// const Proposals=require("../controllers/proposal.controller");
 
 // Middleware to check if the user already exists
 const checkUserExists = async (req, res, next) => {

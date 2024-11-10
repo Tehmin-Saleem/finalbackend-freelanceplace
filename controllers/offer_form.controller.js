@@ -115,13 +115,12 @@ exports.getOfferById = async (req, res) => {
     const offer = await Offer_Form.findById(notification.job_id);
     console.log('Database query result:', offer);
 
-    // If no offer is found, return 404
     if (!offer) {
       console.log('No offer found for job_id:', notification.job_id);
       return res.status(404).json({ message: 'Offer not found' });
     }
 
-    // Structure the response with the relevant offer details
+    // Return the formatted offer
     const formattedOffer = {
       _id: offer._id,
       job_title: offer.job_title,
@@ -143,11 +142,7 @@ exports.getOfferById = async (req, res) => {
     res.status(200).json(formattedOffer);
 
   } catch (error) {
-    console.error('Error in getOfferById:', {
-      message: error.message,
-      stack: error.stack,
-      notificationId: req.params.notificationId
-    });
+    console.error('Error in getOfferById:', error);
     res.status(500).json({ 
       message: 'Error fetching offer details', 
       error: error.message 
