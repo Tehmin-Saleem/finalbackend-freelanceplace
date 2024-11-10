@@ -13,6 +13,8 @@ const JobsCard = ({
   timeline,
   level,
   description,
+  freelancer_id,
+  client_id,
   tags,
   verified,
   rating,
@@ -64,9 +66,12 @@ const JobsCard = ({
             verified,
             rating,
             location,
+          
             postedTime
           },
-          proposalData: specificProposal // Pass only the specific proposal
+          proposalData: specificProposal ,
+          freelancer_id: freelancer_id,
+          client_id: client_id
         }
       });
     } catch (error) {

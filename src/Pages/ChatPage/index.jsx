@@ -392,53 +392,107 @@ const Chat = () => {
   });
 
   const sendMessage = async (event) => {
-    if (event.key === "Enter" && newMessage) {
+    if ((event.key === "Enter" && (newMessage || attachment)) || event.type === "click") {
       socket.emit("stop typing", selectedChat._id);
-
+      
       const token = localStorage.getItem("token");
       if (!token) {
         throw new Error("No token found");
       }
-
+  
       try {
+        const formData = new FormData();
+        if (newMessage) {
+          formData.append("content", newMessage);
+        }
+        formData.append("chatId", selectedChat._id);
+        
+        if (attachment) {
+          formData.append("file", attachment.file);
+        }
+  
         const config = {
           headers: {
-            "Content-type": "application/json",
-            Authorization: `Bearer ${token}`,
+"Content-Type": "application/json",            Authorization: `Bearer ${token}`,
+            // Don't set Content-Type - let browser set it with boundary for FormData
           },
         };
+  
         setNewMessage("");
+        setAttachment(null);
+        setPreview(null);
+  
         const { data } = await axios.post(
           "http://localhost:5000/api/client/sendMessage",
-          {
-            content: newMessage,
-            chatId: selectedChat,
-          },
+          formData,
           config
         );
-
+  
         socket.emit("new message", data);
         setMessages([...messages, data]);
-
-
-
-        // Update the chats state with the latest message
-      setChats((prevChats) =>
-        prevChats.map((chat) =>
-          chat._id === data.chat._id // Ensure you're checking the correct chat ID
-            ? { ...chat, latestMessage: data.message } // Update latestMessage
-            : chat
-        )
-      );
-
-      // Clear the input after sending
-      setNewMessage("");
-
+  
+        // Update chats with latest message
+        setChats((prevChats) =>
+          prevChats.map((chat) =>
+            chat._id === data.chat._id
+              ? { ...chat, latestMessage: data }
+              : chat
+          )
+        );
+  
       } catch (error) {
-        setError("Failed to send the message"); // Handle error
+        setError("Failed to send the message");
         console.log(error);
       }
     }
+  };
+  const downloadFile = async (fileUrl, fileName) => {
+    try {
+      const response = await axios({
+        url: `http://localhost:5000${fileUrl}`,
+        method: 'GET',
+        responseType: 'blob',
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
+  
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', fileName);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      setError("Failed to download file");
+      console.error(error);
+    }
+  };
+  
+  // Update the ScrollableChat component to handle file attachments
+  const MessageItem = ({ message }) => {
+    return (
+      <div className={`message ${isMessageSentByMe ? 'sent' : 'received'}`}>
+        <div className="message-content">
+          {message.content && <p>{message.content}</p>}
+          {message.attachment && (
+            <div className="attachment-container">
+              <div className="file-info">
+                <span>{message.attachment.fileName}</span>
+                <button 
+                  className="download-btn"
+                  onClick={() => downloadFile(message.attachment.path, message.attachment.fileName)}
+                >
+                  Download
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    );
   };
 
   const typingHandler = (e) => {
@@ -526,12 +580,20 @@ const Chat = () => {
       setError("Failed to delete the chat");
     }
   };
+  const handleSend = () => {
+    if (newMessage.trim() || attachment) {
+      sendMessage({ type: "click" });
+    }
+  };
 
+  const clearAttachment = () => {
+    setAttachment(null);
+    setPreview(null);
+  };
   return (
     <>
-      <Header />
+     <Header />
       <div className="chat-page">
-        {/* <div className="chat-header"></div> */}
         <div className="left-section">
           <h2 className="msg">Messages</h2>
           <div className="search-bar">
@@ -542,11 +604,8 @@ const Chat = () => {
             />
           </div>
 
-          {/* =========================== */}
           <div
-            className={`mychats-container ${
-              selectedChat ? "hide-on-mobile" : ""
-            }`}
+            className={`mychats-container ${selectedChat ? 'hide-on-mobile' : ''}`}
           >
             <div className="mychats-header">My Chats</div>
 
@@ -556,11 +615,8 @@ const Chat = () => {
                   {chats.map((chat) => (
                     <div
                       onClick={() => setSelectedChat(chat)}
-                      onContextMenu={(e) => handleRightClick(e, chat._id)} // Right-click event
-                      // onDoubleClick={() => handleRightClick(e, chat._id)} // Optional: for double-click
-                      className={`chat-item ${
-                        selectedChat === chat ? "selected" : ""
-                      }`}
+                      onContextMenu={(e) => handleRightClick(e, chat._id)}
+                      className={`chat-item ${selectedChat === chat ? 'selected' : ''}`}
                       key={chat._id}
                     >
                       <p
@@ -571,13 +627,11 @@ const Chat = () => {
                           ? getSender(loggedUser, chat.users)
                           : chat.chatName}
                       </p>
-                      {console.log("Latest message:", chat.latestMessage)}
                       {chat.latestMessage && chat.latestMessage.sender && (
                         <p className="chat-latest-message">
-                          <strong>{chat.latestMessage.sender.first_name}:</strong>{" "}
+                          <strong>{chat.latestMessage.sender.first_name}:</strong>{' '}
                           {chat.latestMessage.content.length > 50
-                            ? chat.latestMessage.content.substring(0, 51) +
-                              "..."
+                            ? chat.latestMessage.content.substring(0, 51) + '...'
                             : chat.latestMessage.content}
                         </p>
                       )}
@@ -586,17 +640,15 @@ const Chat = () => {
                 </div>
               ) : (
                 <ChatLoading />
-                // <div className="chat-loading">Loading chats...</div>
               )}
 
-              {/* Context menu for chat deletion */}
               {contextMenu.visible && (
                 <div
                   className="context-menu"
                   style={{
                     top: contextMenu.y,
                     left: contextMenu.x,
-                    position: "absolute",
+                    position: 'absolute',
                   }}
                 >
                   <button onClick={handleDeleteChat}>Delete Chat</button>
@@ -604,138 +656,121 @@ const Chat = () => {
               )}
             </div>
           </div>
-          {/* =========================== */}
         </div>
+
         <div className="right-section">
-          <>
-            {selectedChat ? (
-              <>
-                <div className="chat-header">
-                  {/* Back button visible only on smaller screens */}
-                  <button
-                    className="icon-button"
-                    onClick={() => setSelectedChat("")}
-                  >
-                    ←
-                  </button>
+          {selectedChat ? (
+            <>
+              <div className="chat-header">
+                <button className="icon-button" onClick={() => setSelectedChat('')}>
+                  ←
+                </button>
+                <span className="chat-title">
+                  {!selectedChat.isGroupChat ? getSender(user, selectedChat.users) : selectedChat.chatName.toUpperCase()}
+                </span>
+              </div>
 
-                  <span className="chat-title">
-                    {!selectedChat.isGroupChat ? (
-                      <>{getSender(user, selectedChat.users)}</>
-                    ) : (
-                      <>{selectedChat.chatName.toUpperCase()}</>
-                    )}
-                  </span>
-                </div>
+              <div className="mainchat-box">
+                {loading ? (
+                  <div className="spinner"></div>
+                ) : (
+                  <div className="messages">
+                    <ScrollableChat messages={messages} />
+                  </div>
+                )}
 
-                <div className="mainchat-box">
-                  {loading ? (
-                    <div className="spinner"></div>
-                  ) : (
-                    <div className="messages">
-                      <ScrollableChat messages={messages} />
+                <div className="form-control">
+                  {istyping && (
+                    <div className="typing-animation">
+                      <Lottie options={defaultOptions} width={70} />
                     </div>
                   )}
 
-                  <div className="form-control">
-                    {/* Typing animation */}
+                  <div className="message-input-container">
+                    <input
+                      type="text"
+                      id="first-name"
+                      required
+                      placeholder="Type your message..."
+                      onKeyDown={sendMessage}
+                      className="message-input"
+                      value={newMessage}
+                      onChange={typingHandler}
+                    />
 
-                    {istyping && (
-                      <div className="typing-animation">
-                        <Lottie options={defaultOptions} width={70} />
-                      </div>
-                    )}
+                    <input
+                      type="file"
+                      id="fileInput"
+                      onChange={handleFileChange}
+                      accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+                      style={{ display: 'none' }}
+                    />
+                    <label htmlFor="fileInput" className="attach-button">
+                      <Attachment />
+                    </label>
+                  </div>
 
-                    <div className="message-input-container">
-                      {/* Message input */}
-                      <input
-                        type="text"
-                        id="first-name"
-                        required
-                        placeholder="Type your message..."
-                        onKeyDown={sendMessage}
-                        className="message-input"
-                        value={newMessage}
-                        onChange={typingHandler}
-                      />
-
-                      <input
-                        type="file"
-                        id="fileInput"
-                        onChange={handleFileChange}
-                        accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
-                        style={{ display: "none" }}
-                      />
-                      <label htmlFor="fileInput" className="attach-button">
-                        <Attachment />
-                        {/* You can replace this with an SVG icon similar to your Attachment component */}
-                      </label>
-                    </div>
-
-                    {/* Display attached file info */}
-
-                    {attachment && (
-                      <div className="file-info">
+                  {attachment && (
+                    <div className="file-info">
+                      <div className="preview-container">
                         <p>Attached file: {attachment.name}</p>
                         {preview && (
                           <img
                             src={preview}
                             alt="Preview"
-                            style={{ maxWidth: "200px", maxHeight: "200px" }}
+                            className="preview-image"
                           />
                         )}
                       </div>
-                    )}
-                  </div>
+                      <button className="send-button" onClick={handleSend}>
+                        Send
+                      </button>
+                    </div>
+                  )}
                 </div>
-                {/* ); }; */}
-              </>
-            ) : (
-              <div className="rightchat-container">
-                <p className="rightchat-text">
-                  Click on a user to start chatting
-                </p>
               </div>
-            )}
-          </>
-        </div>
+            </>
+          ) : (
+            <div className="rightchat-container">
+              <p className="rightchat-text">Click on a user to start chatting</p>
+            </div>
+          )}
 
-        {/* Side Drawer */}
-        <div className={`side-drawer ${isDrawerOpen ? "open" : ""}`}>
-          <div className="drawer-header">
-            <h3 className="drawer_search">Search</h3>
-            {/* <button onClick={closeDrawer}>X</button> Close drawer button */}
-            <button onClick={closeDrawer}>
-              <BigCross />
-            </button>
-          </div>
-          <div className="drawer-search-bar">
-            <input
-              type="text"
-              placeholder="Search Users"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-            />
-            <button className="drawer-search-bar-button" onClick={handleSearch}>
-              Go
-            </button>
+          <div className={`side-drawer ${isDrawerOpen ? 'open' : ''}`}>
+            <div className="drawer-header">
+              <h3 className="drawer_search">Search</h3>
+              <button onClick={closeDrawer}>
+                <BigCross />
+              </button>
+            </div>
 
-            {/* Error message */}
-            {error && <div className="error-message">{error}</div>}
+            <div className="drawer-search-bar">
+              <input
+                type="text"
+                placeholder="Search Users"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+              />
+              <button className="drawer-search-bar-button" onClick={handleSearch}>
+                Go
+              </button>
 
-            {loading ? (
-              <ChatLoading />
-            ) : (
-              searchResult.map((user) => (
-                <UserListItems
-                  key={user.userId}
-                  user={user}
-                  handleFunction={() => accessChat(user._id)}
-                />
-              ))
-            )}
+              {error && <div className="error-message">{error}</div>}
 
-            {loadingChat && <Spinner />}
+              {loading ? (
+                <ChatLoading />
+              ) : (
+                searchResult.map((user) => (
+                  <UserListItems
+                    key={user.userId}
+                    user={user}
+                    handleFunction={() => accessChat(user._id)}
+                  />
+                ))
+              )}
+
+              {loadingChat && <Spinner />}
+            </div>
           </div>
         </div>
       </div>
