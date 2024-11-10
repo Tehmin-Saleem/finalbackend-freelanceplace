@@ -1,22 +1,33 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { jwtDecode } from "jwt-decode";
 import './styles.scss';
-
 const ConsultantProfileView = () => {
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const { userId } = useParams(); 
 
   useEffect(() => {
     const fetchProfile = async () => {
       setLoading(true);
-      const token = localStorage.getItem('token');
-
+      
       try {
+        const token = localStorage.getItem('token');
+        if (!token) {
+          throw new Error('No authentication token found');
+        }
+
+        // Decode the JWT token to get consultant ID
+        const decodedToken = jwtDecode(token);
+        const userId = decodedToken.userId; // Assuming userId is stored in token
+
+        if (!userId) {
+          throw new Error('No consultant ID found in token');
+        }
+
+        // Fetch profile using the consultant ID from token
         const response = await fetch(`http://localhost:5000/api/client/profile/${userId}`, {
           method: 'GET',
-          headers: { 
+          headers: {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json'
           }
@@ -28,8 +39,7 @@ const ConsultantProfileView = () => {
           throw new Error(data.message || 'Failed to fetch profile');
         }
 
-        console.log('Fetched data:', data); // Debug log
-        setProfile(data.profile || data); // Handle both {profile: {...}} and direct profile object
+        setProfile(data.profile || data);
         setLoading(false);
       } catch (err) {
         console.error('Error fetching profile:', err);
@@ -38,11 +48,8 @@ const ConsultantProfileView = () => {
       }
     };
 
-    if (id) {
-      fetchProfile();
-    }
-  }, [id]);
-
+    fetchProfile();
+  }, []);
   // Debug logs
   console.log('Loading:', loading);
   console.log('Profile:', profile);
