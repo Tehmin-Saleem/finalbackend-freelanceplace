@@ -162,8 +162,9 @@ const sendMessage = asyncHandler(async (req, res) => {
   // Handle file attachment
   let attachment = null;
 
-  if (!content || !chatId) {
+  if ((!content && !req.file) || !chatId) {
     console.log("Invalid data passed into request");
+    
     return res.sendStatus(400);
   }
 
@@ -171,9 +172,11 @@ const sendMessage = asyncHandler(async (req, res) => {
   // If there's an attachment, set up its properties
   if (req.file) {
     attachment = {
-      fileName: req.file.originalname,   // Store the original file name
-      path: req.file.path,               // Store the path on the server
-      description: req.body.description || "",  // Optionally accept a description
+      fileName: req.file.originalname,
+      path: req.file.path, // This will be the Cloudinary URL
+      public_id: req.file.filename, // Cloudinary public ID
+      resource_type: req.file.resource_type,
+      description: req.body.description || ""
     };
   }
 
@@ -199,9 +202,13 @@ const sendMessage = asyncHandler(async (req, res) => {
 
     res.json(message);
   } catch (error) {
+    if (attachment && attachment.public_id) {
+      await cloudinary.uploader.destroy(attachment.public_id);
+    }
     res.status(400);
     throw new Error(error.message);
   }
+  
 });
 
 
@@ -234,6 +241,9 @@ const deleteMessage = asyncHandler(async (req, res) => {
     // Check if the user is the sender of the message
     if (message.sender.toString() !== req.user.userId) {
       return res.status(403).json({ message: "You are not authorized to delete this message" }); // Forbidden
+    }
+    if (message.attachment && message.attachment.public_id) {
+      await cloudinary.uploader.destroy(message.attachment.public_id);
     }
 
     // Delete the message

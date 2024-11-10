@@ -1,6 +1,6 @@
 const Project = require('../models/manageProject.model');
 const mongoose = require('mongoose');
-
+const Proposal= require('../models/proposal.model')
 exports.createProject = async (req, res) => {
     try {
       // Verify authentication
