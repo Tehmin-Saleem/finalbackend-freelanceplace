@@ -13,9 +13,9 @@ const EditableProjectCard = ({ project, onSave, onComplete }) => {
     projectType: 'milestone',
     status: 'Ongoing',
     clientApproved: false,
-    proposal_id: '',  // Added to match backend schema
-    client_id: '',    // Added to match backend schema
-    freelancer_id: '' // Added to match backend schema
+    proposal_id: '',
+    client_id: '',
+    freelancer_id: ''
   });
 
   const [clientInfo, setClientInfo] = useState({
@@ -27,7 +27,6 @@ const EditableProjectCard = ({ project, onSave, onComplete }) => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    // Transform incoming project data to match backend schema
     setFreelancerData({
       projectName: project.projectName || '',
       progress: project.progress || 0,
@@ -41,20 +40,19 @@ const EditableProjectCard = ({ project, onSave, onComplete }) => {
       budget: typeof project.budget === 'string' ? 
         parseFloat(project.budget.replace(/[^0-9.-]+/g, '')) : 
         project.budget || 0,
-      description: project.description || '',
+     
       projectType: project.projectType || 'milestone',
       status: project.status || 'Ongoing',
       clientApproved: project.clientApproved || false,
-      proposal_id: project.proposal_id || '',  // Ensure this is passed from ManageProjects
-      client_id: project.client_id || '',      // Ensure this is passed from ManageProjects
-      freelancer_id: project.freelancer_id || '' // Ensure this is passed from ManageProjects
+      proposal_id: project.proposal_id || '',
+      client_id: project.client_id || '',
+      freelancer_id: project.freelancer_id || ''
     });
 
     setClientInfo({
       clientName: project.clientInfo?.clientName || 'Not specified'
     });
 
-    // Due date notification check
     const dueDate = new Date(project.due_date);
     const today = new Date();
     const daysLeft = Math.ceil((dueDate - today) / (1000 * 60 * 60 * 24));
@@ -65,7 +63,6 @@ const EditableProjectCard = ({ project, onSave, onComplete }) => {
     const { name, value } = e.target;
     let processedValue = value;
 
-    // Handle special cases for different field types
     if (name === 'progress') {
       processedValue = Math.min(Math.max(parseInt(value) || 0, 0), 100);
     } else if (name === 'budget') {
@@ -94,46 +91,29 @@ const EditableProjectCard = ({ project, onSave, onComplete }) => {
   const shouldShowPendingApproval = () => {
     return freelancerData.progress === 100;
   };
+
   const handleSubmit = async () => {
     setIsLoading(true);
     setError(null);
   
     try {
+      const projectData = {
+        ...freelancerData,
+        status: freelancerData.progress === 100 ? 'Pending Approval' : 'Ongoing'
+      };
       const token = localStorage.getItem('token');
       if (!token) {
         throw new Error("Authorization token not found");
       }
   
-      // Ensure all required fields are present
       if (!freelancerData.projectName) {
         throw new Error("Project name is required");
       }
   
-      // Format the budget to ensure it's a number
       const formattedBudget = typeof freelancerData.budget === 'string' ? 
         parseFloat(freelancerData.budget.replace(/[^0-9.-]+/g, '')) : 
         freelancerData.budget;
   
-      // Prepare data matching backend schema
-      const projectData = {
-        projectName: freelancerData.projectName,
-        progress: parseInt(freelancerData.progress),
-        due_date: freelancerData.due_date,
-        milestones: freelancerData.milestones.map(milestone => ({
-          name: milestone.name,
-          status: milestone.status,
-          amount: parseFloat(milestone.amount) || 0,
-          due_date: milestone.due_date
-        })),
-        budget: formattedBudget,
-        description: freelancerData.description,
-        projectType: freelancerData.projectType,
-        status: shouldShowPendingApproval() ? 'Pending Approval' : 'Ongoing',
-        clientApproved: freelancerData.clientApproved,
-        proposal_id: freelancerData.proposal_id,
-        client_id: freelancerData.client_id,
-        freelancer_id: freelancerData.freelancer_id
-      };
   
       const response = await axios({
         method: 'POST',
@@ -146,7 +126,8 @@ const EditableProjectCard = ({ project, onSave, onComplete }) => {
       });
   
       if (response.data.success) {
-        if (response.data.status === 'Pending Approval') {
+        // Always post the data, but call different callbacks based on status
+        if (shouldShowPendingApproval()) {
           onComplete?.(response.data.data);
         } else {
           onSave?.(response.data.data);
@@ -154,10 +135,14 @@ const EditableProjectCard = ({ project, onSave, onComplete }) => {
       } else {
         throw new Error(response.data.message || 'Failed to process project');
       }
-  
+      if (freelancerData.progress === 100) {
+        onComplete?.(data.data);
+      } else {
+        onSave?.(data.data);
+      }
     } catch (err) {
       setError(err.response?.data?.message || err.message);
-      console.error('Error creating project:', err);
+      console.error('Error updating project:', err);
     } finally {
       setIsLoading(false);
     }
@@ -165,6 +150,8 @@ const EditableProjectCard = ({ project, onSave, onComplete }) => {
 
   return (
     <div className="editable-project-card">
+      {error && <div className="error-message">{error}</div>}
+      
       <div className="client-info">
         <label>Client Name:</label>
         <p>{clientInfo.clientName || 'Not Specified'}</p>
@@ -228,6 +215,7 @@ const EditableProjectCard = ({ project, onSave, onComplete }) => {
         <label>Comment or Description:</label>
         <textarea
           name="description"
+          
           onChange={handleChange}
         ></textarea>
       </div>
@@ -241,15 +229,18 @@ const EditableProjectCard = ({ project, onSave, onComplete }) => {
           onChange={handleChange}
         />
       </div>
+
       <div className="buttons-container">
-       
         <button 
           onClick={handleSubmit} 
           className={`submit-btn ${shouldShowPendingApproval() ? 'pending-btn' : 'save-btn'}`}
           disabled={isLoading}
         >
-          {isLoading ? 'Saving...' : 
-           shouldShowPendingApproval() ? 'Mark as Pending Approval' : 'Save Changes'}
+          {isLoading
+  ? 'Saving...'
+  : freelancerData.progress === 100
+  ? 'Mark as Pending Approval'
+  : 'Save Changes'}
         </button>
       </div>
     </div>
