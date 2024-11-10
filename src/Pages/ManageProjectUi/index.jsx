@@ -212,7 +212,7 @@ const ManageProjectsByClient = () => {
         setProfileData(profileResponse.data.data);
         setProjects(projectsResponse.data.data);
 
-        console.log('Project Data:', projectsResponse.data.data);
+        console.log("Project Data:", projectsResponse.data.data);
       } catch (error) {
         console.error("Error fetching data:", error);
         setError(error.message || "An error occurred while fetching data");
@@ -290,14 +290,12 @@ const ProjectCard = ({ project, onClick, isSelected }) => {
     });
   };
 
-
   const formatBudgetDisplay = (budget) => {
-    if (budget.type === 'hourly') {
+    if (budget.type === "hourly") {
       return `${budget.hourly_rate.from}-${budget.hourly_rate.to}/hr`;
     }
     return `${budget.amount} USD`;
   };
-
 
   return (
     <div
@@ -330,9 +328,12 @@ const ProjectCard = ({ project, onClick, isSelected }) => {
       </div>
 
       <div className="skills">
-      {project.preferred_skills && project.preferred_skills.map((skill, index) => (
-          <span key={index} className="skill">{skill}</span>
-        ))}
+        {project.preferred_skills &&
+          project.preferred_skills.map((skill, index) => (
+            <span key={index} className="skill">
+              {skill}
+            </span>
+          ))}
       </div>
 
       <div className="progress-section">
@@ -348,7 +349,12 @@ const ProjectCard = ({ project, onClick, isSelected }) => {
       <div className="project-footer">
         <div className="deadline">
           <Chat />
-          <span>Due: {project.deadline ? formatDate(project.deadline) : 'No deadline set'}</span>
+          <span>
+            Due:{" "}
+            {project.deadline
+              ? formatDate(project.deadline)
+              : "No deadline set"}
+          </span>
         </div>
         <div className="milestone-count">
           <Chat />
@@ -361,29 +367,170 @@ const ProjectCard = ({ project, onClick, isSelected }) => {
 
 const ProjectDetails = ({ project }) => {
   const [activeTab, setActiveTab] = useState("overview");
+  const [milestoneProgress, setMilestoneProgress] = useState(null);
+  const [loadingMilestones, setLoadingMilestones] = useState(false);
+  useEffect(() => {
+    // If project already has progressDetails, use that
+    if (project?.progressDetails) {
+      setMilestoneProgress(project.progressDetails);
+      return;
+    }
 
+    const fetchMilestoneProgress = async () => {
+      if (activeTab === "milestones" && project?._id) {
+        setLoadingMilestones(true);
+        try {
+          const token = localStorage.getItem("token");
+          
+          console.log("Fetching milestone progress for:", {
+            projectId: project._id,
+            clientId: project.client_id
+          });
+
+          const response = await axios.get(
+            `http://localhost:5000/api/client/${project.client_id}/project/${project._id}/progress`,
+            {
+              headers: { 
+                Authorization: `Bearer ${token}`,
+                'Content-Type': 'application/json'
+              },
+              timeout: 10000 // Set timeout to 10 seconds
+            }
+          );
+
+          console.log("Milestone Progress Response:", response.data);
+          setMilestoneProgress(response.data.data);
+        } catch (error) {
+          console.error("Error fetching milestone progress:", {
+            message: error.message,
+            response: error.response?.data,
+            status: error.response?.status
+          });
+        } finally {
+          setLoadingMilestones(false);
+        }
+      }
+    };
+
+    fetchMilestoneProgress();
+  }, [activeTab, project]);
+
+  const renderMilestoneTab = () => {
+    if (loadingMilestones) {
+      return <Spinner />;
+    }
+
+    if (!project) {
+      return <div className="error-message">No project selected</div>;
+    }
+
+    const progressData = milestoneProgress || project.progressDetails;
+
+    if (!progressData) {
+      return (
+        <div className="no-data-message">
+          <p>No milestone data available</p>
+          <p>Project ID: {project._id}</p>
+          <p>Client ID: {project.client_id}</p>
+        </div>
+      );
+    }
+
+
+    return (
+      <div className="milestone-content">
+        {/* Overall Progress Section */}
+        <div className="overall-progress-section">
+          <h3>Overall Project Progress</h3>
+          <div className="progress-bar-container">
+            <div
+              className="progress-bar"
+              style={{
+                width: `${milestoneProgress.projectDetails.overallProgress}%`,
+              }}
+            />
+            <span className="progress-text">
+              {Math.round(milestoneProgress.projectDetails.overallProgress)}%
+            </span>
+          </div>
+          <div className="project-meta">
+            <span>
+              Start Date:{" "}
+              {new Date(
+                milestoneProgress.projectDetails.startDate
+              ).toLocaleDateString()}
+            </span>
+            <span>
+              Due Date:{" "}
+              {new Date(
+                milestoneProgress.projectDetails.dueDate
+              ).toLocaleDateString()}
+            </span>
+          </div>
+        </div>
+
+        {/* Milestones List */}
+        <div className="milestones-list">
+          {milestoneProgress.milestones.map((milestone, index) => (
+            <div key={milestone.id} className="milestone-item">
+              <div className="milestone-header">
+                <h4>{milestone.name}</h4>
+                <span
+                  className={`status-badge ${milestone.status.toLowerCase()}`}
+                >
+                  {milestone.status}
+                </span>
+              </div>
+
+              <div className="milestone-details">
+                <div className="progress-indicator">
+                  <div
+                    className="progress-bar"
+                    style={{ width: `${milestone.progress}%` }}
+                  />
+                  <span>{milestone.progress}%</span>
+                </div>
+
+                <div className="milestone-meta">
+                  <span>Amount: ${milestone.amount}</span>
+                  <span>
+                    Due: {new Date(milestone.dueDate).toLocaleDateString()}
+                  </span>
+                </div>
+
+                {milestone.description && (
+                  <p className="milestone-description">
+                    {milestone.description}
+                  </p>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  };
 
   const formatHourlyRate = (project) => {
     if (project.hourly_rate?.from && project.hourly_rate?.to) {
       return `${project.hourly_rate.from} - ${project.hourly_rate.to}/hr`;
     }
-    return 'Rate not specified';
+    return "Rate not specified";
   };
 
   const formatProjectDuration = (project) => {
     if (project.project_duration?.duration_of_work?.duration_of_work) {
       return project.project_duration.duration_of_work.duration_of_work;
     }
-    return 'Duration not specified';
+    return "Duration not specified";
   };
 
   const formatExperienceLevel = (project) => {
     if (project.project_duration?.duration_of_work?.experience_level) {
       return project.project_duration.duration_of_work.experience_level;
     }
-    return 'Experience level not specified';
+    return "Experience level not specified";
   };
-
 
   return (
     <div className="project-details">
@@ -415,7 +562,7 @@ const ProjectDetails = ({ project }) => {
               <div className="header-job">
                 <div>
                   <h3 className="job-Title">{project.job_title}</h3>
-                  <p className="job-Location">{project.location || 'Remote'}</p>
+                  <p className="job-Location">{project.location || "Remote"}</p>
                   <p className="job-posted-Time">
                     <span className="posted-text">Started:</span>
                     <span className="time-text">
@@ -430,29 +577,31 @@ const ProjectDetails = ({ project }) => {
               <div className="job-infor">
                 <span className="job-info-item">
                   <span className="labeltext">
-                  {project.budget_type === "fixed" ? "Fixed Price:" : "Hourly Rate:"}
+                    {project.budget_type === "fixed"
+                      ? "Fixed Price:"
+                      : "Hourly Rate:"}
                   </span>
                   <span className="value">
-                  <span className="value">{formatHourlyRate(project)}</span>
+                    <span className="value">{formatHourlyRate(project)}</span>
                   </span>
                 </span>
                 <span className="job-info-item">
                   <span className="labeltext">Project Duration:</span>
                   <span className="value">
-                  {formatProjectDuration(project)}
+                    {formatProjectDuration(project)}
                   </span>
                 </span>
                 <span className="job-info-item">
                   <span className="labeltext">Experience Level:</span>
                   <span className="value">
-                  {formatExperienceLevel(project)}
+                    {formatExperienceLevel(project)}
                   </span>
                 </span>
               </div>
 
               <h4 className="section-title">Project Overview:</h4>
               <p className="job-description">
-              {project.description || "No description provided."}
+                {project.description || "No description provided."}
               </p>
 
               {project.attachment && (
@@ -509,24 +658,7 @@ const ProjectDetails = ({ project }) => {
           </div>
         )}
 
-        {activeTab === "milestones" && (
-          <div className="milestones">
-            {project.milestones.map((milestone, index) => (
-              <div key={index} className="milestone-item">
-                <div className="milestone-header">
-                  <h4>{milestone.name}</h4>
-                  <span className={`status ${milestone.status.toLowerCase()}`}>
-                    {milestone.status}
-                  </span>
-                </div>
-                <p>{milestone.description}</p>
-                <div className="milestone-date">
-                  Due: {new Date(milestone.dueDate).toLocaleDateString()}
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
+        {activeTab === "milestones" && renderMilestoneTab()}
 
         {activeTab === "proposal" && (
           <div className="proposal">
