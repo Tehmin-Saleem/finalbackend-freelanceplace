@@ -204,6 +204,12 @@ router.patch('/unban/:id', authMiddleware,usercontroller.ClientUnban);
 // const upload = multer({ dest: 'uploads/' });
 
 router.post('/profile', upload.single('profilePicture'), consultantProfileController.createProfile);
-router.get('/profile/:id',  consultantProfileController.getProfile);
+router.get('/profile/:id',  consultantProfileController.getProfileByUserId);
+// In your routes file
+router.get('/filtered-jobs', authMiddleware, hireFreelancerController.getFilteredJobs);
+
+
+// In your routes file
+router.get('/ongoing-projects', authMiddleware, hireFreelancerController.getClientOngoingProjects);
 module.exports = router;
 
