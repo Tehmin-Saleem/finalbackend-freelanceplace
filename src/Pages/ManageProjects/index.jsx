@@ -2,15 +2,15 @@ import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import EditableProjectCard from "../../components/EditAbleProjectCard";
 import Header from "../../components/Commoncomponents/Header";
-
+import { useNavigate } from 'react-router-dom';
 const ManageProjects = () => {
   const location = useLocation();
   const { jobData, proposalData } = location.state || {};
   const [projects, setProjects] = useState([]);
-
+  const { freelancer_id, client_id } = location.state || {};
+  const navigate = useNavigate();
   useEffect(() => {
     if (proposalData) {
-      // Transform the proposal data to match the project structure
       const transformedProject = {
         projectName: jobData?.job_title || jobData?.title || 'Untitled Project',
         freelancerName: getFullName(proposalData?.freelancerProfile) || 'Not specified',
@@ -22,18 +22,19 @@ const ManageProjects = () => {
         milestones: formatMilestones(proposalData?.add_requirements),
         budget: formatBudget(proposalData, jobData),
         description: jobData?.description || '',
-        // Add required IDs for project creation
         proposal_id: proposalData?._id || proposalData?.id,
-        client_id: proposalData?.clientInfo?._id || jobData?.client_id,
-        freelancer_id: proposalData?.freelancerProfile?._id || proposalData?.freelancer_id
+        client_id: client_id || proposalData?.clientInfo?._id || jobData?.client_id,
+        freelancer_id: freelancer_id || proposalData?.freelancerProfile?._id || proposalData?.freelancer_id,
+        projectType: proposalData?.add_requirements?.by_milestones ? 'milestone' : 'fixed',
+        status: 'Ongoing',
+        clientApproved: false
       };
       
       console.log('Transformed project:', transformedProject);
       setProjects([transformedProject]);
     }
-  }, [proposalData, jobData]);
+  }, [proposalData, jobData,freelancer_id, client_id]);
 
-  // Helper function to get full name from profile
   const getFullName = (profile) => {
     if (!profile) return 'Not specified';
     const firstName = profile.first_name || '';
@@ -42,30 +43,22 @@ const ManageProjects = () => {
     return fullName || 'Not specified';
   };
 
-  // Helper function to format client name
   const formatClientName = (clientInfo) => {
     if (!clientInfo) return 'Not specified';
-    
-    // If the name is already formatted (from API)
     if (clientInfo.name && clientInfo.name !== 'Not specified') {
       return clientInfo.name;
     }
-    
-    // If we have first_name and last_name fields
     if (clientInfo.first_name || clientInfo.last_name) {
       const firstName = clientInfo.first_name || '';
       const lastName = clientInfo.last_name || '';
       const fullName = `${firstName} ${lastName}`.trim();
       return fullName || 'Not specified';
     }
-    
     return 'Not specified';
   };
 
-  // Helper function to format milestones
   const formatMilestones = (requirements) => {
     if (!requirements?.by_milestones) return [];
-    
     return requirements.by_milestones.map(milestone => ({
       name: milestone.description || 'Milestone',
       status: 'Not Started',
@@ -73,6 +66,7 @@ const ManageProjects = () => {
       due_date: milestone.due_date
     }));
   };
+
 
   // Helper function to format budget
   const formatBudget = (proposalData, jobData) => {
@@ -102,7 +96,7 @@ const ManageProjects = () => {
         clientInfo: projects[index].clientInfo 
       };
       setProjects(updatedProjects);
-      
+      navigate('/freelancersjobpage');
     } catch (error) {
       console.error('Error saving project:', error);
      

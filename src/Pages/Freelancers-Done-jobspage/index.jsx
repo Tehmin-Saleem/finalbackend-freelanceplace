@@ -38,10 +38,15 @@ const FreelancersJobsPage = () => {
       if (!hireResponse.data?.data) {
         throw new Error('Invalid hire data format');
       }
-
+      const jobToFreelancerMap = hireResponse.data.data.reduce((map, hire) => {
+        if (hire.jobId?.id && hire.freelancerId?.id) {
+          map[hire.jobId.id] = hire.freelancerId.id;
+        }
+        return map;
+      }, {});
       // Extract job IDs from hire data
       const hiredJobIds = new Set(hireResponse.data.data.map(hire => hire.jobId?.id));
-
+console.log('hire response', hireResponse.data)
       // Fetch all jobs from /job-posts API
       const jobsResponse = await axios.get('http://localhost:5000/api/client/job-posts', {
         headers: {
@@ -53,14 +58,16 @@ const FreelancersJobsPage = () => {
       if (!jobsResponse.data?.jobPosts) {
         throw new Error('Invalid job posts data');
       }
-
+// console.log('response', jobsResponse.data)
       // Filter jobs to only include those with matching IDs
       const matchedJobs = jobsResponse.data.jobPosts
-        .filter(job => hiredJobIds.has(job._id))
+        .filter(job => jobToFreelancerMap[job._id])
         .map(job => ({
           id: job._id,
           type: job.budget_type === "fixed" ? "Fixed" : "Hourly",
           title: job.job_title || 'Untitled Job',
+          client_id: job.client_id._id,
+          freelancer_id: jobToFreelancerMap[job._id], // Add freelancer_id from the map
           rate: job.budget_type === "fixed" 
             ? `$${job.fixed_price}` 
             : `$${job.hourly_rate?.from}-$${job.hourly_rate?.to}/hr`,
@@ -74,6 +81,7 @@ const FreelancersJobsPage = () => {
         }));
 
       setJobs(matchedJobs);
+      console.log('id', matchedJobs)
     } catch (error) {
       console.error('Error in fetchJobs:', error);
       setError('Failed to fetch jobs. Please try again.');
@@ -132,8 +140,10 @@ const FreelancersJobsPage = () => {
               <FreelancersJobsCard 
                 key={job.title}
                 id={job.id} 
-
+                client_id={job.client_id} 
+                freelancer_id={job.freelancer_id}
                 {...job}
+             
               />
             ))
           ) : (
