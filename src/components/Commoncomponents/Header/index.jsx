@@ -3,7 +3,7 @@ import { proxy, useSnapshot } from "valtio";
 import axios from "axios";
 import { useNavigate, Link } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
-import { NotificationContext } from '../../../Pages/Notifications/NotificationContext';
+import { NotificationContext } from "../../../Pages/Notifications/NotificationContext";
 import {
   JobsDropdwon,
   IconSearchBar,
@@ -62,11 +62,11 @@ const Header = () => {
         try {
           const token = localStorage.getItem("token");
           if (!token) return;
-  
+
           const response = await axios.get(
-            'http://localhost:5000/api/freelancer/notifications/unread-count',
+            "http://localhost:5000/api/freelancer/notifications/unread-count",
             {
-              headers: { Authorization: `Bearer ${token}` }
+              headers: { Authorization: `Bearer ${token}` },
             }
           );
           setUnreadNotifications(response.data.count);
@@ -74,14 +74,12 @@ const Header = () => {
           console.error("Error fetching unread notifications count:", error);
         }
       };
-  
+
       fetchUnreadNotificationsCount();
       // Set up an interval to fetch the count periodically
       const interval = setInterval(fetchUnreadNotificationsCount, 60000); // every minute
-  
+
       return () => clearInterval(interval);
-    
-  
     };
 
     fetchUser();
@@ -101,21 +99,19 @@ const Header = () => {
   const handleSelect = (option) => {
     state.selectedOption = option;
     state.dropdownOpen = false;
-  
+
     if (option === "Explore Jobs") {
       navigate("/matchingjobs");
     } else if (option === "Post a Job") {
       navigate("/jobPosting");
-    } 
-    else if (option === "Explore Freelancers") {
-      navigate("/freelancercard");  
-    }else if (option === "All Jobs Post") {
+    } else if (option === "Explore Freelancers") {
+      navigate("/freelancercard");
+    } else if (option === "All Jobs Post") {
       navigate("/alljobs");
     } else if (option === "Add Payment") {
       navigate("/payment");
     }
   };
-  
 
   const handleLogoClick = () => {
     if (snap.user.role === "client") {
@@ -127,14 +123,48 @@ const Header = () => {
     }
   };
   const token = localStorage.getItem("token");
-  
+
   const decodedToken = jwtDecode(token);
   const userId = decodedToken.userId;
 
-  const handleProfileOption = (option) => {
+
+
+  const handleProfileOption = async (option) => {
     setProfileDropdownOpen(false);
+
     if (option === "PROFILE") {
-      navigate(`/profile/${userId}`);
+      if (snap.user.role === "client") {
+        const token = localStorage.getItem("token"); // or wherever the token is stored
+        const config = {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        };
+        try {
+          const response = await axios.get(
+            `http://localhost:5000/api/client/client-profile-exists/${userId}`, config
+          );
+          if (response.data.exists) {
+            navigate(`/ClientProfile`);
+          } else {
+            navigate(`/ClientProfileForm`);
+          }
+        } catch (error) {
+          console.error("Error checking profile existence:", error);
+        }
+      } else if (snap.user.role === "freelancer") {
+        const token = localStorage.getItem("token"); // or wherever the token is stored
+        const config = {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        };
+        const response = await axios.get(
+          `http://localhost:5000/api/freelancer/freelancer-profile-exists/${userId}`,
+          config
+        );
+        navigate(response.data.exists ? `/profile/${userId}` : `/myProfile`);
+      }
     } else if (option === "LOGOUT") {
       localStorage.clear();
       navigate("/signin");
@@ -165,8 +195,7 @@ const Header = () => {
           "Explore Freelancers",
           "Add Payment",
           "All Jobs Post",
-          "Privacy Policy"
-          
+          "Privacy Policy",
         ]
       : ["Explore Jobs", "Add Payment", "Privacy Policy"];
 
@@ -220,15 +249,15 @@ const Header = () => {
           <input type="text" placeholder="Search" className="search-input" />
         </div>
         <div className="icon">
-                    <Link to="/notifications">
-                        <div className="notification-icon-container">
-                            <Notification className="icon" width="20" height="20" />
-                            {unreadCount > 0 && (
-                                <span className="notification-badge">{unreadCount}</span>
-                            )}
-                        </div>
-                    </Link>
-                </div>
+          <Link to="/notifications">
+            <div className="notification-icon-container">
+              <Notification className="icon" width="20" height="20" />
+              {unreadCount > 0 && (
+                <span className="notification-badge">{unreadCount}</span>
+              )}
+            </div>
+          </Link>
+        </div>
         <div className="user-info">
           <div
             className="profile-dropdown"

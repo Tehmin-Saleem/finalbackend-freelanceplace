@@ -64,7 +64,7 @@ const ClientProfilePage = () => {
       setIsLoading(false);
       alert('Profile created successfully!');
       console.log('Created profile:', response.data);
-      navigate('/ClientDash');
+      navigate('/ClientDashboard');
     } catch (err) {
       setError('Failed to create profile: ' + (err.response?.data?.message || err.message));
       setIsLoading(false);

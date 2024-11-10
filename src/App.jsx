@@ -156,6 +156,7 @@ function App() {
           <Route path="/applyjob" element={<ApplyJob />} />
           <Route path="/applyjob/:jobPostId" element={<ApplyJob />} />
           <Route path="/profile/:userId" element={<ProfileView />} />
+          <Route path="/profile/:userId" element={<ProfileView />} />
 
           <Route
             path="/freelancercard"
@@ -186,7 +187,6 @@ function App() {
           <Route path="/jobpopup" element={<JobPostedPopup />} />
           <Route path="/signin" element={<SignIn />} />
           <Route path="/signup" element={<Signup />} />
-          <Route path="/profile/:userId" element={<ProfileView />} />
 
           {/* Chat Route with ChatProvider */}
           <Route
@@ -212,6 +212,7 @@ function App() {
         <Route path="/ForgotPass" element={<ForgotPassword/>} /> 
         <Route path="/ChangePass/:id/:token" element={<ChangePassword/>} /> 
         <Route path="/OfferDetails/:id" element={<OfferDetails/>} /> 
+        <Route path="/OfferDetails/:notificationId" element={<OfferDetails/>} /> 
         <Route path="/ClientDash" element={<Clientdash/>} /> 
 
           <Route path="/proposals/:jobId" element={<JobStatusProvider>
@@ -231,8 +232,8 @@ function App() {
           <Route path="/ForgotPass" element={<ForgotPassword />} />
           <Route path="/ChangePass/:id/:token" element={<ChangePassword />} />
           <Route path="/OfferDetails" element={<OfferDetails />} />
-          <Route path="/ClientDash" element={<Clientdash />} />
-          
+          {/* <Route path="/ClientDash" element={<Clientdash />} /> */}
+           
           
           
           <Route path="/ManageProj" element={<ManageProjects />} />

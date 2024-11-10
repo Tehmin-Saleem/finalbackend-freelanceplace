@@ -43,6 +43,8 @@ const EyeIcon = () => (
 );
 const JobDetails = () => {
   const [isPopupVisible, setPopupVisible] = useState(false);
+  const [fileUrl, setFileUrl] = useState(null);
+  const [fileType, setFileType] = useState(null);
 
   const handleClosePopup = () => {
     // Close the popup and redirect to homepage
@@ -99,9 +101,19 @@ const JobDetails = () => {
           storedData.attachment?.attachment?.fileName ||
           storedData.attachment?.fileName,
         base64: storedData.attachment?.attachment?.base64,
-        detailed_description: storedData.attachment?.description || "",
-      },
+        detailed_description: storedData.attachment?.description || ''
+      }
     });
+    if (storedData.attachment?.attachment?.base64) {
+      setFileUrl(storedData.attachment.attachment.base64);
+      // Determine file type from base64 string or filename
+      const fileExtension = storedData.attachment.attachment.fileName.split('.').pop().toLowerCase();
+      setFileType(
+        fileExtension === 'pdf' ? 'application/pdf' :
+        fileExtension.match(/(jpg|jpeg|png|gif)/) ? `image/${fileExtension}` :
+        'application/octet-stream'
+      );
+    }
   }, [navigate]);
   const handlePostJob = async () => {
     setPopupVisible(true);
@@ -140,7 +152,7 @@ const JobDetails = () => {
           jobData.attachment.detailed_description || ""
         );
       }
-
+  console.log('file',jobData.attachment)
       const response = await axios.post(
         "http://localhost:5000/api/client/jobpost",
         formData,
@@ -161,17 +173,67 @@ const JobDetails = () => {
     }
   };
   const handleViewFile = () => {
-    if (jobData.attachment?.base64) {
-      const fileUrl = jobData.attachment.base64;
-      const win = window.open();
-      win.document.write(
-        '<iframe src="' +
-          fileUrl +
-          '" frameborder="0" style="width:100%; height:100%;" allowfullscreen></iframe>'
-      );
+    if (fileType && fileUrl) {
+      // For PDF files, we need to properly format the base64 data URL
+      if (fileType === 'application/pdf') {
+        // Check if the base64 string already includes the data URL prefix
+        const pdfDataUrl = fileUrl.startsWith('data:') 
+          ? fileUrl 
+          : `data:application/pdf;base64,${fileUrl}`;
+        console.log('attachment', fileUrl)
+        // Open PDF in a new window
+        const pdfWindow = window.open();
+        if (pdfWindow) {
+          pdfWindow.document.write(
+            `<iframe width='100%' height='100%' src='${pdfDataUrl}'></iframe>`
+          );
+        }
+      } 
+      // For images, keep the existing behavior
+      else if (fileType.startsWith('image/')) {
+        const imageDataUrl = fileUrl.startsWith('data:') 
+          ? fileUrl 
+          : `data:${fileType};base64,${fileUrl}`;
+        window.open(imageDataUrl, '_blank');
+      } 
+      else {
+        alert('Unsupported file type.');
+      }
     } else {
-      console.error("No file available to view.");
+      alert("No file available to view.");
     }
+  };
+  const renderFilePreview = () => {
+    if (fileType && fileUrl) {
+      // Format the data URL properly based on file type
+      const dataUrl = fileUrl.startsWith('data:') 
+        ? fileUrl 
+        : `data:${fileType};base64,${fileUrl}`;
+
+      if (fileType.startsWith('image/')) {
+        return (
+          <div className="file-preview">
+            <img 
+              src={dataUrl} 
+              alt="Attachment Preview" 
+              className="file-preview-image w-full max-h-64 object-contain" 
+            />
+          </div>
+        );
+      } else if (fileType === 'application/pdf') {
+        return (
+          <div className="file-preview">
+            <iframe
+              src={dataUrl}
+              type="application/pdf"
+              className="file-preview-pdf w-full h-64"
+              title="PDF Preview"
+            />
+          </div>
+        );
+      }
+    }
+    return null;
   };
 
   // const handleEditClick = () => {
@@ -220,15 +282,10 @@ const JobDetails = () => {
               <h3 className="detail-heading">Attachment</h3>
               <div className="attachment">
                 <div className="file-details">
-                  <span className="file-icon">&#128206;</span>
+                  <span className="file-icon">📄</span>
                   <span className="file-name">
                     {jobData.attachment?.fileName || "No file uploaded"}
                   </span>
-                  {/* {jobData.attachment?.detailed_description && (
-        <span className="file-description">
-          {jobData.attachment.detailed_description}
-        </span>
-      )} */}
                 </div>
                 {jobData.attachment?.fileName && (
                   <button className="btn view-btn" onClick={handleViewFile}>
@@ -236,21 +293,18 @@ const JobDetails = () => {
                     View
                   </button>
                 )}
+                {/* File Preview Section */}
+                {renderFilePreview()}
               </div>
             </div>
           </div>
           <div className="actions">
-            <button className="btn back-btn" onClick={() => navigate(-1)}>
-              Back
-            </button>
-            <button className="btn post-job-btn" onClick={handlePostJob}>
-              Post a Job
-            </button>
-
-            {isPopupVisible && <JobPostedPopup onClose={handleClosePopup} />}
+            <button className="btn back-btn" onClick={() => navigate(-1)}>Back</button>
+            <button className="btn post-job-btn" onClick={handlePostJob}>Post a Job</button>
           </div>
         </div>
       </div>
+      {isPopupVisible && <JobPostedPopup onClose={handleClosePopup} />}
     </div>
   );
 };
