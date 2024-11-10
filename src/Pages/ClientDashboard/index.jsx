@@ -17,6 +17,8 @@ const ClientDashboard = () => {
     freelancersEngaged: 0,
   });
   const [totalJobsCount, setTotalJobsCount] = useState(0);
+  const [hiredFreelancersCount, setHiredFreelancersCount] = useState(0);
+  const [engagedFreelancersCount, setEngagedFreelancersCount] = useState(0);
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -45,7 +47,25 @@ const ClientDashboard = () => {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
-      setTotalJobsCount(jobCountResponse.data.totalJobPosts);  // Update the total jobs count
+      setTotalJobsCount(jobCountResponse.data.totalJobPosts); 
+      
+      const hiredFreelancersResponse = await axios.get(
+        `http://localhost:5000/api/client/hired-freelancers-count/${userId}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      setHiredFreelancersCount(hiredFreelancersResponse.data.hiredFreelancersCount);
+
+      const EngagedFreelancersResponse = await axios.get(
+        `http://localhost:5000/api/client/freelancers-engaged-count/${userId}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      setEngagedFreelancersCount(EngagedFreelancersResponse.data.engagedFreelancersCount);
+      
+      // Update the total jobs count
     } catch (error) {
       // navigate("/ClientDashbaord");
     }
@@ -72,7 +92,7 @@ const ClientDashboard = () => {
             </div>
             <div className="stat-item">
               <h3>Active Jobs</h3>
-              <p>{quickStats.activeJobs}</p>
+              <p>{hiredFreelancersCount}</p>
             </div>
             <div className="stat-item">
               <h3>Completed Jobs</h3>
@@ -80,7 +100,7 @@ const ClientDashboard = () => {
             </div>
             <div className="stat-item">
               <h3>Freelancers Engaged</h3>
-              <p>{quickStats.freelancersEngaged}</p>
+              <p>{hiredFreelancersCount}</p>
             </div>
           </div>
 
