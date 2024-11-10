@@ -16,6 +16,7 @@ const ClientDashboard = () => {
     CompletedJobs: 0,
     freelancersEngaged: 0,
   });
+  const [totalJobsCount, setTotalJobsCount] = useState(0);
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -37,10 +38,18 @@ const ClientDashboard = () => {
         );
 
         setUser(response.data);
-      } catch (error) {
-        navigate("/signin");
-      }
-    };
+      
+      const jobCountResponse = await axios.get(
+        `http://localhost:5000/api/client/count-job-posts/${userId}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      setTotalJobsCount(jobCountResponse.data.totalJobPosts);  // Update the total jobs count
+    } catch (error) {
+      // navigate("/ClientDashbaord");
+    }
+  };
 
     fetchUser();
   }, [navigate]);
@@ -59,7 +68,7 @@ const ClientDashboard = () => {
           <div className="quick-stats">
             <div className="stat-item">
               <h3>Total Jobs</h3>
-              <p>{quickStats.totalJobs}</p>
+              <p>{totalJobsCount}</p>
             </div>
             <div className="stat-item">
               <h3>Active Jobs</h3>
@@ -100,7 +109,7 @@ const ClientDashboard = () => {
             <p>View proposals on your jobs.</p>
             <button>View Proposals</button>
           </div>
-          <div className="card" onClick={() => navigate('/job-progress')}>
+          <div className="card" onClick={() => navigate('/ManageProjectbyclient')}>
             <h2>Job Progress</h2>
             <p>Track progress of ongoing jobs and milestones.</p>
             <button>View Progress</button>

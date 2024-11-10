@@ -258,6 +258,7 @@ function App() {
             path="/ConsultantProfileView"
             element={<ConsultantProfileView />}
           />
+          {/* <Route path="/profile/:id"  element={<ConsultantProfileView />} /> */}
         </Routes>
       </Router>
     </NotificationProvider>

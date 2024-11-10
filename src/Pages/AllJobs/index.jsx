@@ -35,7 +35,6 @@ const AllJobsPage = () => {
           'Authorization': `Bearer ${token}`
         }
       });
-  
       setJobs(response.data.jobPosts);
       setLoading(false);
     } catch (err) {

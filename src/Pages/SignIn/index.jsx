@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useState,useEffect } from "react";
 import React from "react";
 import { useNavigate } from "react-router-dom"; // Import useNavigate for navigation
 import CHARACTER from "../../images/CHARACTER.png";
 import Group from "../../images/Group.png";
+import Cookies from "js-cookie"; // Import js-cookie for managing cookies
 
 import { CommonButton, TextField } from "../../components/index";
 import { Mail, Password, PassEye, Google, Apple ,LogoName} from "../../svg/index";
@@ -17,6 +18,16 @@ function SignIn() {
   const [rememberMe, setRememberMe] = useState(false);
 
   const navigate = useNavigate(); // Initialize useNavigate for navigation
+
+  useEffect(() => {
+    const savedEmail = Cookies.get("savedEmail");
+    const savedPassword = Cookies.get("savedPassword");
+    if (savedEmail && savedPassword) {
+      setEmail(savedEmail);
+      setPassword(savedPassword);
+      setRememberMe(true);
+    }
+  }, []);
 
   const handlePasswordChange = (e) => {
     const newPassword = e.target.value;
@@ -48,9 +59,12 @@ function SignIn() {
       setErrorMessage("Please fix the errors before submitting.");
       return;
     }
-    if (!rememberMe) {
-      setErrorMessage('You must check the "Remember me" box to continue.');
-      return;
+    if (rememberMe) {
+      Cookies.set("savedEmail", email, { expires: 7 }); // Store for 7 days
+      Cookies.set("savedPassword", password, { expires: 7 });
+    } else {
+      Cookies.remove("savedEmail");
+      Cookies.remove("savedPassword");
     }
 
     try {
@@ -193,12 +207,13 @@ function SignIn() {
             {/* Remember Me Checkbox and Forgot Password Link */}
             <div className="mb-4 flex items-center justify-between">
               <div className="flex items-center">
-                <input
+              <input
                   type="checkbox"
                   id="rememberMe"
                   name="rememberMe"
                   className="mr-2 leading-tight"
                   onChange={(e) => setRememberMe(e.target.checked)}
+                  checked={rememberMe}
                 />
                 <label
                   htmlFor="rememberMe"
