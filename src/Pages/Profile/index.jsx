@@ -1,132 +1,219 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
-import './styles.scss';
-import { Cross, IconSearchBar, UploadIcon, PlusIcon } from '../../svg/index';
-import { Header } from "../../components/index"; 
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import "./styles.scss";
+import { jwtDecode } from "jwt-decode";
+import { Cross, IconSearchBar, UploadIcon, PlusIcon } from "../../svg/index";
+import { Header, Spinner } from "../../components/index";
 // import { GlobalWorkerOptions } from 'pdfjs-dist';
 // import 'pdfjs-dist/build/pdf.worker.entry';
 
 // GlobalWorkerOptions.workerSrc = pdfWorker;
 const MyProfile = () => {
-  const [skillInput, setSkillInput] = useState('');
+  const [skillInput, setSkillInput] = useState("");
   const [error, setError] = useState(null);
   const navigate = useNavigate();
   const [portfolioThumbnails, setPortfolioThumbnails] = useState({});
-  const [profile, setProfile] = useState({
-    profileId: '',
+  const [isLoading, setIsLoading] = useState(true);
 
-    first_name: '',
-    last_name: '',
-    image: '',
-    title: '',
+  const [profile, setProfile] = useState({
+    profileId: "",
+
+    first_name: "",
+    last_name: "",
+    image: "",
+    title: "",
     experience: {
-      completed_projects: 0
+      completed_projects: 0,
     },
     availability: {
       full_time: false,
       part_time: false,
-      hourly_rate: 0
+      hourly_rate: 0,
     },
-    profile_overview: '',
+    profile_overview: "",
     languages: [],
     skills: [],
-    portfolios: []
+    portfolios: [],
   });
-  
+
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    const userId = localStorage.getItem('userId');
+    const token = localStorage.getItem("token");
+    const userId = localStorage.getItem("userId");
     if (!token) {
-      navigate('/signin');
+      navigate("/signin");
     } else {
-      setProfile(prevProfile => ({
+      setProfile((prevProfile) => ({
         ...prevProfile,
-        freelancer_id: userId 
+        freelancer_id: userId,
       }));
     }
   }, [navigate]);
   const [portfolioModalOpen, setPortfolioModalOpen] = useState(false);
- 
 
   const [currentPortfolio, setCurrentPortfolio] = useState({
-    project_title: '',
-    category: '',
-    description: '',
-    tool_used: '',
-    url: '',
-    attachment: null
+    project_title: "",
+    category: "",
+    description: "",
+    tool_used: "",
+    url: "",
+    attachment: null,
   });
   const [imageFile, setImageFile] = useState(null);
 
- 
+  // ===========================================
+  // useEffect(() => {
+  //   const token = localStorage.getItem("token");
+  //   const userId = localStorage.getItem("userId");
+
+  //   if (!token) {
+  //     navigate("/signin");
+  //     return;
+  //   }
+
+  //   // Fetch the profile data if it exists
+  //   const fetchProfileData = async () => {
+  //     try {
+  //       const response = await axios.get(
+  //         `http://localhost:5000/api/freelancer/profile/${userId}`,
+  //         {
+  //           headers: { Authorization: `Bearer ${token}` },
+  //         }
+  //       );
+
+  //       if (response.data.data) {
+  //         setProfile((prevProfile) => ({
+  //           ...prevProfile,
+  //           ...response.data.data,
+  //         }));
+  //       }
+  //     } catch (error) {
+  //       console.error("Error fetching profile data:", error);
+  //       setError("Failed to load profile data.");
+  //     } finally {
+  //       setIsLoading(false);
+  //     }
+  //   };
+
+  //   fetchProfileData();
+  // }, [navigate]);
+
+  // Fetch the profile data if it exists
+  const fetchProfileDataIfNeeded = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const decodedToken = jwtDecode(token);
+      const userId = decodedToken.userId;
+      const config = {
+        headers: { Authorization: `Bearer ${token}` },
+      };
+
+      // Check if the profile exists
+      const existenceResponse = await axios.get(
+        `http://localhost:5000/api/freelancer/freelancer-profile-exists/${userId}`,
+        config
+      );
+
+      // If profile exists, fetch the data
+      if (existenceResponse.data.exists) {
+        const response = await axios.get(
+          `http://localhost:5000/api/freelancer/profile/${userId}`,
+          config
+        );
+
+        if (response.data.data) {
+          setProfile((prevProfile) => ({
+            ...prevProfile,
+            ...response.data.data,
+          }));
+        }
+      } else {
+        navigate("/myProfile"); // Redirect to profile creation page if it doesn't exist
+      }
+    } catch (error) {
+      console.error("Error fetching profile data:", error);
+      setError("Failed to load profile data.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Call the function inside useEffect
+  useEffect(() => {
+    fetchProfileDataIfNeeded();
+  }, [navigate]);
+
+  // =====================
 
   const handleProfileChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setProfile(prevProfile => ({
+    setProfile((prevProfile) => ({
       ...prevProfile,
-      [name]: type === 'checkbox' ? checked : value
+      [name]: type === "checkbox" ? checked : value,
     }));
   };
 
   const handleExperienceChange = (e) => {
     const { value } = e.target;
-    setProfile(prevProfile => ({
+    setProfile((prevProfile) => ({
       ...prevProfile,
       experience: {
         ...prevProfile.experience,
-        completed_projects: parseInt(value)
-      }
+        completed_projects: parseInt(value),
+      },
     }));
   };
 
   const handleAvailabilityChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setProfile(prevProfile => ({
+    setProfile((prevProfile) => ({
       ...prevProfile,
       availability: {
         ...prevProfile.availability,
-        [name]: type === 'checkbox' ? checked : parseFloat(value)
-      }
+        [name]: type === "checkbox" ? checked : parseFloat(value),
+      },
     }));
   };
 
   const handleLanguageChange = (index, field, value) => {
     const updatedLanguages = [...profile.languages];
     updatedLanguages[index] = { ...updatedLanguages[index], [field]: value };
-    setProfile(prevProfile => ({
+    setProfile((prevProfile) => ({
       ...prevProfile,
-      languages: updatedLanguages
+      languages: updatedLanguages,
     }));
   };
 
   const addLanguage = () => {
-    setProfile(prevProfile => ({
+    setProfile((prevProfile) => ({
       ...prevProfile,
-      languages: [...prevProfile.languages, { language: '', proficiency_level: '' }]
+      languages: [
+        ...prevProfile.languages,
+        { language: "", proficiency_level: "" },
+      ],
     }));
   };
 
   const removeLanguage = (index) => {
-    setProfile(prevProfile => ({
+    setProfile((prevProfile) => ({
       ...prevProfile,
-      languages: prevProfile.languages.filter((_, i) => i !== index)
+      languages: prevProfile.languages.filter((_, i) => i !== index),
     }));
   };
 
   const handleAddSkill = (skill) => {
     if (!profile.skills.includes(skill)) {
-      setProfile(prevProfile => ({
+      setProfile((prevProfile) => ({
         ...prevProfile,
-        skills: [...prevProfile.skills, skill]
+        skills: [...prevProfile.skills, skill],
       }));
     }
   };
 
   const handleRemoveSkill = (skill) => {
-    setProfile(prevProfile => ({
+    setProfile((prevProfile) => ({
       ...prevProfile,
-      skills: prevProfile.skills.filter(s => s !== skill)
+      skills: prevProfile.skills.filter((s) => s !== skill),
     }));
   };
 
@@ -140,9 +227,9 @@ const MyProfile = () => {
       setImageFile(file);
       const reader = new FileReader();
       reader.onloadend = () => {
-        setProfile(prevProfile => ({
+        setProfile((prevProfile) => ({
           ...prevProfile,
-          image: reader.result
+          image: reader.result,
         }));
       };
       reader.readAsDataURL(file);
@@ -150,10 +237,10 @@ const MyProfile = () => {
   };
 
   const generateThumbnail = async (file) => {
-    if (file.type !== 'application/pdf') {
-      throw new Error('Unsupported file type');
+    if (file.type !== "application/pdf") {
+      throw new Error("Unsupported file type");
     }
-  
+
     const fileReader = new FileReader();
     return new Promise((resolve, reject) => {
       fileReader.onload = async (event) => {
@@ -163,13 +250,13 @@ const MyProfile = () => {
           const page = await pdf.getPage(1);
           const scale = 1.5;
           const viewport = page.getViewport({ scale });
-          const canvas = document.createElement('canvas');
-          const context = canvas.getContext('2d');
+          const canvas = document.createElement("canvas");
+          const context = canvas.getContext("2d");
           canvas.height = viewport.height;
           canvas.width = viewport.width;
           const renderContext = {
             canvasContext: context,
-            viewport: viewport
+            viewport: viewport,
           };
           await page.render(renderContext).promise;
           resolve(canvas.toDataURL());
@@ -177,7 +264,7 @@ const MyProfile = () => {
           reject(error);
         }
       };
-  
+
       fileReader.onerror = reject;
       fileReader.readAsArrayBuffer(file);
     });
@@ -185,103 +272,124 @@ const MyProfile = () => {
 
   const handlePortfolioChange = async (e) => {
     const { name, value, type } = e.target;
-    if (type === 'file') {
+    if (type === "file") {
       const file = e.target.files[0];
       if (file.size > 10 * 1024 * 1024) {
         alert("File size exceeds 10MB limit.");
         return;
       }
-      setCurrentPortfolio(prev => ({
+      setCurrentPortfolio((prev) => ({
         ...prev,
-        attachment: file
+        attachment: file,
       }));
       try {
         const thumbnail = await generateThumbnail(file);
-        setPortfolioThumbnails(prev => ({
+        setPortfolioThumbnails((prev) => ({
           ...prev,
-          [currentPortfolio.project_title]: thumbnail
+          [currentPortfolio.project_title]: thumbnail,
         }));
       } catch (error) {
-        console.error('Error generating thumbnail:', error);
+        console.error("Error generating thumbnail:", error);
       }
     } else {
-      setCurrentPortfolio(prev => ({
+      setCurrentPortfolio((prev) => ({
         ...prev,
-        [name]: value
+        [name]: value,
       }));
     }
   };
-  
+
   const handleSavePortfolio = () => {
-    setProfile(prevProfile => ({
+    setProfile((prevProfile) => ({
       ...prevProfile,
-      portfolios: [...prevProfile.portfolios, currentPortfolio]
+      portfolios: [...prevProfile.portfolios, currentPortfolio],
     }));
     setPortfolioModalOpen(false);
     setCurrentPortfolio({
-      project_title: '',
-      category: '',
-      description: '',
-      tool_used: '',
-      url: '',
-      attachment: null
+      project_title: "",
+      category: "",
+      description: "",
+      tool_used: "",
+      url: "",
+      attachment: null,
     });
   };
- 
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsLoading(true);
     try {
       const formData = new FormData();
-      
+
       // Append basic profile data
-      formData.append('first_name', profile.first_name);
-      formData.append('last_name', profile.last_name);
-      formData.append('title', profile.title);
-      formData.append('profile_overview', profile.profile_overview);
-     
+      formData.append("first_name", profile.first_name);
+      formData.append("last_name", profile.last_name);
+      formData.append("title", profile.title);
+      formData.append("profile_overview", profile.profile_overview);
+
+      // Ensure email is included if required
+      formData.append("email", profile.email); // Include email if required by backend
+
       // Append nested objects as JSON strings
-      formData.append('experience', JSON.stringify(profile.experience));
-      formData.append('availability', JSON.stringify(profile.availability));
-      formData.append('languages', JSON.stringify(profile.languages));
-      formData.append('skills', JSON.stringify(profile.skills));
-      
+      formData.append("experience", JSON.stringify(profile.experience));
+      formData.append("availability", JSON.stringify(profile.availability));
+      formData.append("languages", JSON.stringify(profile.languages));
+      formData.append("skills", JSON.stringify(profile.skills));
+
       // Append profile image if changed
       if (imageFile) {
-        formData.append('image', imageFile);
+        formData.append("image", imageFile);
       }
-  
+
       // Append portfolios as a single JSON string
-      formData.append('portfolios', JSON.stringify(profile.portfolios));
-  
+      formData.append("portfolios", JSON.stringify(profile.portfolios));
+
       // Append portfolio attachments
       profile.portfolios.forEach((portfolio, index) => {
         if (portfolio.attachment instanceof File) {
-          formData.append(`portfolios`, portfolio.attachment, `portfolio_${index}_${portfolio.attachment.name}`);
+          formData.append(
+            `portfolios`,
+            portfolio.attachment,
+            `portfolio_${index}_${portfolio.attachment.name}`
+          );
         }
       });
-      
-      const token = localStorage.getItem('token');
+
+      const token = localStorage.getItem("token");
       console.log("Retrieved token:", token);
-      const response = await axios.post('http://localhost:5000/api/freelancer/profile', formData, {
-        headers: { 
-          'Content-Type': 'multipart/form-data',
-          'Authorization': `Bearer ${token}`
+      const response = await axios.post(
+        "http://localhost:5000/api/freelancer/profile",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${token}`,
+          },
         }
-        
-      });
-      
-      console.log('Profile updated successfully:', response.data);
-  
-   
-      navigate('/FreelanceDashBoard'); 
+      );
+
+      console.log("Profile updated successfully:", response.data);
+
+      navigate("/FreelanceDashBoard");
     } catch (error) {
-      console.error('Error submitting profile:', error);
-      setError('An error occurred while updating the profile.');
+      console.error("Error submitting profile:", error);
+      setError("An error occurred while updating the profile.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
+  if (isLoading) {
+    return <Spinner alignCenter />;
+  }
+
   const popularSkills = [
-    'React', 'UI/UX Design', 'JavaScript', 'CSS', 'HTML', 'Figma'
+    "React",
+    "UI/UX Design",
+    "JavaScript",
+    "CSS",
+    "HTML",
+    "Figma",
   ];
 
   return (
@@ -295,65 +403,65 @@ const MyProfile = () => {
           <div className="input-row">
             <div className="input-group">
               <label>Enter your first name:</label>
-              <input 
-                type="text" 
+              <input
+                type="text"
                 name="first_name"
                 value={profile.first_name}
                 onChange={handleProfileChange}
-                placeholder="First Name" 
+                placeholder="First Name"
               />
             </div>
             <div className="input-group">
               <label>Enter your last name:</label>
-              <input 
-                type="text" 
+              <input
+                type="text"
                 name="last_name"
                 value={profile.last_name}
                 onChange={handleProfileChange}
-                placeholder="Last Name" 
+                placeholder="Last Name"
               />
             </div>
           </div>
           <div className="profile-image-section">
             <p>Upload your profile image</p>
-            <div className='img-format'>
+            <div className="img-format">
               <span>Support Format: PNG, JPEG</span>
               <span> Maximum Size: 5MB</span>
             </div>
             <div className="profile-image">
-              <img src={profile.image}  />
+              <img src={profile.image} />
               <label htmlFor="image-upload" className="upload-overlay">
                 <UploadIcon />
-                <span className='re'>Upload</span>
+                <span className="re">Upload</span>
               </label>
               <input
                 id="image-upload"
                 type="file"
                 accept="image/png, image/jpeg"
                 onChange={handleImageUpload}
-                style={{ display: 'none' }}
+                style={{ display: "none" }}
               />
             </div>
           </div>
 
           <div className="field-group">
             <label>Enter your title</label>
-            <input 
-              type="text" 
+            <input
+              type="text"
               name="title"
               value={profile.title}
               onChange={handleProfileChange}
-              placeholder="UI/UX Designer, Graphic Designer" 
+              placeholder="UI/UX Designer, Graphic Designer"
             />
           </div>
 
           <div className="field-group">
             <label>Experience (Completed Projects)</label>
-            <input 
-              type="number" 
+            <input
+              type="number"
               value={profile.experience.completed_projects}
               onChange={handleExperienceChange}
-              placeholder="Enter your completed projects" 
+              placeholder="Enter your completed projects"
             />
           </div>
 
@@ -361,12 +469,12 @@ const MyProfile = () => {
             <label>Enter hourly rate</label>
             <div className="input-with-icon">
               <span className="icon">$</span>
-              <input 
-                type="number" 
+              <input
+                type="number"
                 name="hourly_rate"
                 value={profile.availability.hourly_rate}
                 onChange={handleAvailabilityChange}
-                placeholder="120.00/hour" 
+                placeholder="120.00/hour"
               />
             </div>
           </div>
@@ -377,31 +485,47 @@ const MyProfile = () => {
                 <input
                   type="text"
                   value={lang.language}
-                  onChange={(e) => handleLanguageChange(index, 'language', e.target.value)}
+                  onChange={(e) =>
+                    handleLanguageChange(index, "language", e.target.value)
+                  }
                   placeholder="Language"
                 />
                 <select
                   value={lang.proficiency_level}
-                  onChange={(e) => handleLanguageChange(index, 'proficiency_level', e.target.value)}
+                  onChange={(e) =>
+                    handleLanguageChange(
+                      index,
+                      "proficiency_level",
+                      e.target.value
+                    )
+                  }
                 >
-                  <option value="" >Select Proficiency</option>
+                  <option value="">Select Proficiency</option>
                   <option value="Beginner">Beginner</option>
                   <option value="Intermediate">Intermediate</option>
                   <option value="Advanced">Advanced</option>
                   <option value="Native">Native</option>
                 </select>
-                <button type="button" onClick={() => removeLanguage(index)}>Remove</button>
+                <button type="button" onClick={() => removeLanguage(index)}>
+                  Remove
+                </button>
               </div>
             ))}
-            <button type="button" onClick={addLanguage} className="add-language-btn">Add Language</button>
+            <button
+              type="button"
+              onClick={addLanguage}
+              className="add-language-btn"
+            >
+              Add Language
+            </button>
           </div>
 
           <div className="form-group availability-group">
             <label>Availability</label>
             <div className="checkbox-group">
               <label>
-                <input 
-                  type="checkbox" 
+                <input
+                  type="checkbox"
                   name="full_time"
                   checked={profile.availability.full_time}
                   onChange={handleAvailabilityChange}
@@ -409,8 +533,8 @@ const MyProfile = () => {
                 Full Time
               </label>
               <label>
-                <input 
-                  type="checkbox" 
+                <input
+                  type="checkbox"
                   name="part_time"
                   checked={profile.availability.part_time}
                   onChange={handleAvailabilityChange}
@@ -419,14 +543,10 @@ const MyProfile = () => {
               </label>
             </div>
           </div>
-          
-          
-
-
 
           <div className="form-group">
             <label>Profile Overview</label>
-            <textarea 
+            <textarea
               name="profile_overview"
               value={profile.profile_overview}
               onChange={handleProfileChange}
@@ -450,7 +570,7 @@ const MyProfile = () => {
           <div className="form-group">
             <label>Selected Skills</label>
             <div className="selected-skills">
-              {profile.skills.map(skill => (
+              {profile.skills.map((skill) => (
                 <div className="skill-badge" key={skill}>
                   {skill}
                   <Cross
@@ -463,11 +583,10 @@ const MyProfile = () => {
             </div>
           </div>
 
-
           <div className="form-group">
             <label>Popular Skills for UI/UX Design</label>
             <div className="popular-skills">
-              {popularSkills.map(skill => (
+              {popularSkills.map((skill) => (
                 <div
                   className="skill-badge"
                   key={skill}
@@ -481,28 +600,51 @@ const MyProfile = () => {
           </div>
 
           <div className="form-group">
-      <label>Add Your Portfolio</label>
-      <div className="portfolio">
-        {profile.portfolios.map((portfolio, index) => (
-          <div key={index} className="portfolio-box">
-           <div className="thumbnail-preview">
-  {portfolioThumbnails[currentPortfolio.project_title] && (
-    <img src={portfolioThumbnails[currentPortfolio.project_title]} alt="Portfolio Thumbnail" />
-  )}
-</div>
+            <label>Add Your Portfolio</label>
+            <div className="portfolio">
+              {profile.portfolios.map((portfolio, index) => (
+                <div key={index} className="portfolio-box">
+                  <div className="thumbnail-preview">
+                    {portfolioThumbnails[currentPortfolio.project_title] && (
+                      <img
+                        src={
+                          portfolioThumbnails[currentPortfolio.project_title]
+                        }
+                        alt="Portfolio Thumbnail"
+                      />
+                    )}
+                  </div>
 
-            <h3>{portfolio.project_title}</h3>
-            <p>{portfolio.category}</p>
+                  <h3>{portfolio.project_title}</h3>
+                  <p>{portfolio.category}</p>
+                </div>
+              ))}
+              <div
+                className="portfolio-box add-box"
+                onClick={() => setPortfolioModalOpen(true)}
+              >
+                <PlusIcon />
+                <p>Add</p>
+              </div>
+            </div>
           </div>
-        ))}
-        <div className="portfolio-box add-box" onClick={() => setPortfolioModalOpen(true)}>
-          <PlusIcon />
-          <p>Add</p>
-        </div>
-      </div>
-    </div>
 
-          <button type="submit" className="save-button">Save</button>
+         <label >Email:</label>
+          <div className="field-group">
+            <input
+              type="email"
+              name="email"
+              value={profile.email || ""}
+              onChange={(e) =>
+                setProfile({ ...profile, email: e.target.value })
+              }
+              required
+            />
+          </div>
+
+          <button type="submit" className="save-button">
+            Save
+          </button>
         </form>
       </div>
 
@@ -568,8 +710,18 @@ const MyProfile = () => {
               />
             </div>
             <div className="portfolio-button-group">
-              <button className="portfolio-save-button" onClick={handleSavePortfolio}>Save Portfolio</button>
-              <button className="portfolio-cancel-button" onClick={() => setPortfolioModalOpen(false)}>Cancel</button>
+              <button
+                className="portfolio-save-button"
+                onClick={handleSavePortfolio}
+              >
+                Save Portfolio
+              </button>
+              <button
+                className="portfolio-cancel-button"
+                onClick={() => setPortfolioModalOpen(false)}
+              >
+                Cancel
+              </button>
             </div>
           </div>
         </div>

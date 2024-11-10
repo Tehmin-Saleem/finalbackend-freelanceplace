@@ -100,7 +100,7 @@ const ClientDashboard = () => {
             <p>View proposals on your jobs.</p>
             <button>View Proposals</button>
           </div>
-          <div className="card" onClick={() => navigate('/job-progress')}>
+          <div className="card" onClick={() => navigate('/ManageProjectbyclient')}>
             <h2>Job Progress</h2>
             <p>Track progress of ongoing jobs and milestones.</p>
             <button>View Progress</button>

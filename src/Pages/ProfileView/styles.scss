@@ -307,13 +307,14 @@ $margin-bottom: 16px;
 
 // Top section
 .top {
-  @include border-style(#d1d5db, $border-radius);
+  // @include border-style(#d1d5db, $border-radius);
   @include common-padding(2rem 0);
+  border-bottom:  1px solid #94A3B8
   
 }
 
 // Profile title
-.Profiletitle {
+.ProfileTitle {
   @include common-text($font-size-lg, $color-primary, 500);
   margin-bottom: 2%;
  
@@ -321,7 +322,7 @@ $margin-bottom: 16px;
 }
 
 // Profile description
-.ProfileDescription {
+.Profiledescription {
   @include common-text($font-size-md);
   margin-bottom: 4%;
   margin-left: 10px
@@ -331,12 +332,12 @@ $margin-bottom: 16px;
 .PortfolioSection {
   margin-top: 4%;
   
-  @include border-style(#d1d5db, $border-radius);
+  // @include border-style(#d1d5db, $border-radius);
   @include common-padding(2rem 0);
 }
 
 // Portfolio title
-.PortfolioTitle {
+.Portfoliotitle {
   @include common-text($font-size-lg, $color-primary, 500);
   margin-bottom: 2rem;
   margin-left: 10px;
@@ -401,7 +402,7 @@ $margin-bottom: 16px;
 }
 
 // Responsiveness
-.upper-part {
+.Upper-part {
   @include border-style($color-secondary, $border-radius);
   @include common-padding($padding);
   margin-bottom: 2rem;

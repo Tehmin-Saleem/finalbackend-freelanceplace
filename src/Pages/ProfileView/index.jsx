@@ -2,7 +2,8 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import "./styles.scss";
 import { jwtDecode } from "jwt-decode";
-import { UserReview, CommonButton, Header } from "../../components/index";
+import { useNavigate } from 'react-router-dom';
+import { UserReview, CommonButton, Header, Spinner } from "../../components/index";
 import {
   Australia,
   UStates,
@@ -11,12 +12,19 @@ import {
   Star,
   JobSucces,
 } from "../../svg/index";
+import { Navigate } from "react-router-dom";
 
 function ProfileView() {
   const [profileData, setProfileData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [country, setCountry] = useState("");
+
+  const navigate = useNavigate();
+
+  const handleClick = () => {
+    navigate('/chat');
+  };
 
   useEffect(() => {
     const fetchProfileData = async () => {
@@ -55,9 +63,11 @@ function ProfileView() {
     setCountry(localStorage.getItem("country") || "Not specified");
   }, []);
 
-  if (loading) return <div>Loading...</div>;
+  if (loading) return <Spinner size={100} alignCenter />;
   if (error) return <div>{error}</div>;
   if (!profileData) return <div>No profile data found</div>;
+
+
 
   //   console.log('Profile data:', profileData);
 
@@ -99,8 +109,8 @@ function ProfileView() {
     <div>
       <Header />
       <div className="m-20 p-8 absolute">
-        <div className="upper-part">
-          <div className="container">
+        <div className="Upper-part">
+          <div className="Container">
             <div className="flex items-center mb-16 pl-8">
               <img
                 src={profileData.image} // Image URL from Cloudinary
@@ -136,6 +146,7 @@ function ProfileView() {
 
               <div className="flex items-center justify-between buttons ml-[50%] pr-5">
                 <CommonButton
+                  onClick={handleClick}
                   text={<Chat />}
                   className="bg-[#FFFFFF] border border-[#4BCBEB] text-[18px] font-Poppins text-[#FFFFFF] rounded-lg font-semibold font-Poppins py-1 px-6 w-full focus:outline-none focus:shadow-outline"
                 />
@@ -143,6 +154,7 @@ function ProfileView() {
 
               <div className="flex items-center justify-between buttons">
                 <CommonButton
+                 onClick={() => navigate(`/myprofile`)}
                   text="Edit"
                   className="bg-[#4BCBEB] text-[18px] font-Poppins text-[#FFFFFF] rounded-lg font-semibold font-Poppins py-2 px-6 w-full focus:outline-none focus:shadow-outline"
                 />
@@ -199,16 +211,16 @@ function ProfileView() {
 
             <div className="RightSide Outer">
               <div className="top">
-                <h2 className="Profiletitle">{profileData.experience.title}</h2>
+                <h2 className="ProfileTitle">{profileData.experience.title}</h2>
                 <div>
-                  <p className="ProfileDescription">
+                  <p className="Profiledescription">
                     {profileData.experience.description}
                   </p>
                 </div>
               </div>
 
               <div className="PortfolioSection">
-                <h2 className="PortfolioTitle">Portfolio</h2>
+                <h2 className="Portfoliotitle">Portfolio</h2>
                 <div className="grid grid-cols-3 gap-4 ml-4">
                   {profileData.portfolios.map((portfolio, index) => (
                     <div key={index} className="border rounded p-4">

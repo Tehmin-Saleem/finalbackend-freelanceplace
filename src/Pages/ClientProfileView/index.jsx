@@ -2,9 +2,10 @@
 
 import React from 'react';
 import './styles.scss';
-import { Header } from '../../components';
+import { Header, Spinner } from '../../components';
 import axios from 'axios';
 import  { useState, useEffect } from 'react';
+import { jwtDecode } from "jwt-decode";
 
 const ClientProfile = () => {
   const [profileData, setProfileData] = useState({
@@ -25,6 +26,10 @@ const ClientProfile = () => {
       try {
         const token = localStorage.getItem('token');
         console.log('Token:', token);
+
+        const decodedToken = jwtDecode(token);
+        const userId = decodedToken.userId;
+        console.log(userId)
   
         const [profileResponse, jobPostsResponse] = await Promise.all([
           axios.get("http://localhost:5000/api/client/profile", {
@@ -85,7 +90,7 @@ const ClientProfile = () => {
     return 'Unknown';
   };
 
-  if (loading) return <div>Loading...</div>;
+  if (loading) return <Spinner size={100} alignCenter />;
   if (error) return <div>Error: {error}</div>;
   const clientData = {
     profilePicture: 'https://via.placeholder.com/150', 
