@@ -277,24 +277,7 @@ exports.getClientHireRequests = async (req, res) => {
   }
 };
 
-// Get a single hire request by its ID
-// exports.getHireRequestById = async (req, res) => {
-//   try {
-//     const { hireRequestId } = req.params;
-//     const clientId = req.user._id;
 
-//     const hireRequest = await HireFreelancer.findOne({ _id: hireRequestId, clientId }).populate('freelancerId jobId');
-
-//     if (!hireRequest) {
-//       return res.status(404).json({ message: 'Hire request not found or unauthorized' });
-//     }
-
-//     res.status(200).json({ hireRequest });
-//   } catch (err) {
-//     console.error('Error fetching hire request:', err);
-//     res.status(500).json({ message: 'Internal server error' });
-//   }
-// };
 
 // Update a hire request
 exports.updateHireRequest = async (req, res) => {
@@ -340,115 +323,6 @@ exports.deleteHireRequest = async (req, res) => {
 };
 
 
-
-
-
-
-// exports.getFilteredJobs = async (req, res) => {
-//   try {
-//     const clientId = req.user.userId;
-//     const { filter } = req.query;
-
-//     console.log('Fetching jobs for clientId:', clientId);
-//     console.log('Applied filter:', filter);
-
-//     // Base query to find all jobs posted by this client
-//     let query = { client_id: clientId }; // Changed from posted_by to client_id
-
-//     console.log('Initial query:', query);
-
-//     // First, let's check if we can find any jobs at all
-//     const jobCount = await Job.countDocuments(query); // Changed from Job to Job_Post
-//     console.log('Total jobs found:', jobCount);
-
-//     // Fetch all jobs with detailed population
-//     let jobs = await Job.find(query) // Changed from Job to Job_Post
-//       .populate({
-//         path: 'freelancer_id',
-//         select: 'name email profile_image'
-//       })
-//       .populate({
-//         path: 'client_id',
-//         select: 'name email'
-//       });
-
-//     console.log('Jobs found:', jobs.length);
-
-//     // Get hire requests
-//     const hireRequests = await HireFreelancer.find({ clientId })
-//       .populate('jobId')
-//       .populate('proposalId');
-
-//     console.log('Hire requests found:', hireRequests.length);
-
-//     // Create a map of job IDs to their status
-//     const jobStatusMap = new Map();
-//     hireRequests.forEach(hire => {
-//       if (hire.jobId) {
-//         jobStatusMap.set(hire.jobId._id.toString(), hire.status);
-//       }
-//     });
-
-//     // Map jobs with additional information
-//     jobs = jobs.map(job => {
-//       const jobData = job.toObject();
-//       const hireStatus = jobStatusMap.get(job._id.toString());
-      
-//       // Use the jobstatus field from your model
-//       let status = job.jobstatus || 'pending';
-//       const hasHiredProposal = !!job.hired_freelancer;
-
-//       return {
-//         ...jobData,
-//         status,
-//         hasHiredProposal,
-//         budget: job.budget_type === 'hourly' 
-//           ? `${job.hourly_rate.from}-${job.hourly_rate.to}/hr`
-//           : `${job.fixed_price}/fixed`,
-//         duration: job.project_duration?.duration_of_work || 'Not specified',
-//         experience: job.project_duration?.experience_level || 'Not specified',
-//         skills: job.preferred_skills || []
-//       };
-//     });
-
-//     // Apply filter if specified
-//     if (filter && filter !== 'all') {
-//       const filteredJobs = jobs.filter(job => {
-//         switch (filter.toLowerCase()) {
-//           case 'ongoing':
-//             return job.jobstatus === 'ongoing' || !!job.hired_freelancer;
-//           case 'completed':
-//             return job.jobstatus === 'completed';
-//           case 'pending':
-//             return job.jobstatus === 'pending' && !job.hired_freelancer;
-//           default:
-//             return true;
-//         }
-//       });
-//       console.log(`Jobs after ${filter} filter:`, filteredJobs.length);
-//       jobs = filteredJobs;
-//     }
-
-//     // Log the final response
-//     console.log('Sending response with jobs count:', jobs.length);
-
-//     res.status(200).json({
-//       success: true,
-//       count: jobs.length,
-//       data: jobs
-//     });
-
-//   } catch (error) {
-//     console.error('Error in getFilteredJobs:', error);
-//     console.error('Stack trace:', error.stack);
-//     res.status(500).json({
-//       success: false,
-//       message: 'Failed to fetch filtered jobs',
-//       error: error.message,
-//       stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
-//     });
-//   }
-// };
 
 
 
@@ -617,123 +491,7 @@ exports.getFilteredJobs = async (req, res) => {
 
 
 
-// exports.getClientOngoingProjects = async (req, res) => {
-//   try {
-//     const clientId = req.user.userId;
 
-//     // Validate client exists
-//     const client = await User.findById(clientId);
-//     if (!client) {
-//       return res.status(404).json({
-//         success: false,
-//         message: 'Client not found'
-//       });
-//     }
-
-//     // Find all ongoing projects for this client
-//     const ongoingProjects = await HireFreelancer.find({
-//       clientId: clientId,
-//       status: 'hired'
-//     })
-//     .populate({
-//       path: 'freelancerId',
-//       select: 'first_name last_name email country_name image'
-//     })
-//     .populate({
-//       path: 'jobId',
-//       select: 'job_title description budget_type hourly_rate fixed_price project_duration preferred_skills'
-//     })
-//     .populate({
-//       path: 'proposalId',
-//       select: 'cover_letter project_duration add_requirements'
-//     })
-//     .lean();
-
-//     // Transform the data to match frontend requirements
-//     const formattedProjects = ongoingProjects.map(project => {
-//       // Calculate progress based on milestones if they exist
-//       const milestones = project.proposalId.add_requirements?.by_milestones || [];
-//       const progress = calculateProgress(milestones);
-      
-//       // Format budget display
-//       const budget = formatBudget(project.jobId);
-      
-//       return {
-//         projectId: project._id,
-//         projectName: project.jobId.job_title,
-//         description: project.jobId.description,
-//         preferred_skills: project.jobId.preferred_skills, // Add this line
-//         freelancer: {
-//           id: project.freelancerId._id,
-//           name: `${project.freelancerId.first_name} ${project.freelancerId.last_name}`,
-//           email: project.freelancerId.email,
-//           image : project.freelancerId.image,
-//           location: {
-//             country: project.freelancerId.country_name
-//           }
-//         },
-//         budget,
-//         progress,
-//         startDate: project.hiredAt,
-//         deadline: project.proposalId.add_requirements?.by_project?.due_date,
-//         milestones: formatMilestones(project.proposalId.add_requirements?.by_milestones),
-//         proposalDetails: {
-//           coverLetter: project.proposalId.cover_letter,
-//           estimatedDuration: project.proposalId.project_duration,
-//           proposedRate: project.proposalId.add_requirements?.by_project?.bid_amount,
-//           status: project.status
-//         },
-//         terms: project.terms || {}
-//       };
-//     });
-
-//     res.status(200).json({
-//       success: true,
-//       count: formattedProjects.length,
-//       data: formattedProjects
-//     });
-
-//   } catch (error) {
-//     console.error('Error in getClientOngoingProjects:', error);
-//     res.status(500).json({
-//       success: false,
-//       message: 'Failed to fetch ongoing projects',
-//       error: error.message,
-//       stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
-//     });
-//   }
-// };
-
-// // Helper functions
-// const calculateProgress = (milestones) => {
-//   if (!milestones || milestones.length === 0) return 0;
-  
-//   const totalMilestones = milestones.length;
-//   const completedMilestones = milestones.filter(m => 
-//     new Date(m.due_date) < new Date()
-//   ).length;
-
-//   return Math.round((completedMilestones / totalMilestones) * 100);
-// };
-
-// const formatBudget = (job) => {
-//   if (job.budget_type === 'hourly') {
-//     return `${job.hourly_rate?.from || 0}-${job.hourly_rate?.to || 0}/hr`;
-//   }
-//   return `${job.fixed_price || 0} USD`;
-// };
-
-// const formatMilestones = (milestones) => {
-//   if (!milestones) return [];
-  
-//   return milestones.map(milestone => ({
-//     id: milestone._id,
-//     name: milestone.description,
-//     amount: milestone.amount,
-//     dueDate: milestone.due_date,
-//     status: new Date(milestone.due_date) < new Date() ? 'completed' : 'pending'
-//   }));
-// };
 
 
 exports.getClientOngoingProjects = async (req, res) => {
@@ -876,3 +634,45 @@ function formatMilestones(milestones) {
     status: milestone.status || 'pending'
   }));
 }
+
+exports.getHiredFreelancersCountByClientId = async (req, res) => {
+  try {
+      // Extract clientId from the request parameters or query
+      const { clientId } = req.params;
+
+      // Find the count of hire requests where freelancers have been hired by the specified clientId
+      // Assuming that there is a field in HireRequest model to indicate hiring status, e.g., 'status': 'hired'
+      const hiredFreelancersCount = await HireFreelancer.countDocuments({
+          clientId: clientId,
+          status: 'hired' // Adjust the status field value as per your data schema
+      });
+
+      // Send the count as a response
+      res.status(200).json({ hiredFreelancersCount });
+  } catch (error) {
+      console.error("Error fetching hired freelancers count:", error);
+      res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+
+exports.getFreelancersEngagedCountByClientId = async (req, res) => {
+  try {
+    // Extract clientId from the request parameters
+    const { clientId } = req.params;
+
+    // Find the count of hire requests where freelancers are engaged by the specified clientId
+    // Assuming that there is a field in HireFreelancer model to indicate engagement status, e.g., 'status': 'engaged'
+    const freelancersEngagedCount = await HireFreelancer.countDocuments({
+      clientId: clientId,
+      status: 'hired' // Adjust the status field value as per your data schema
+    });
+
+    // Send the count as a response
+    res.status(200).json({ freelancersEngagedCount });
+  } catch (error) {
+    console.error("Error fetching engaged freelancers count:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+
