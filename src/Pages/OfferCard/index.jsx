@@ -7,17 +7,18 @@ const OfferDetails = () => {
     const [offer, setOffer] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const { notificationId } = useParams(); // This will be 672f25de5721c6ab0f7dab52
+    const { notificationId } = useParams(); 
   
     useEffect(() => {
       const fetchOfferDetails = async () => {
         try {
           const token = localStorage.getItem('token');
+          console.log('Making API call with offeId:', notificationId);
           const response = await axios.get(
             `http://localhost:5000/api/freelancer/offers/${notificationId}`,
             {
               headers: {
-                'Authorization': `Bearer ${token}`
+                Authorization: `Bearer ${token}`
               }
             }
           );

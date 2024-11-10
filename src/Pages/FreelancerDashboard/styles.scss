@@ -1,167 +1,158 @@
-// Variables
-$font-kodchasan: 'Kodchasan', sans-serif;
-$font-poppins: 'Poppins', sans-serif;
-$color-gray: #64748b;
-$color-dark: #2c3e50;
-$color-white: #ffffff;
-$color-accent: #4bcdeb;
+$primary-color: #3b82f6;
+$secondary-color: #6b7280;
+$gray-color: #f7fafc;
+$text-color: #4a5568;
 $bg-color: #f7f8fa;
+$color-accent: #4bcdeb;
+$font-poppins: 'Poppins', sans-serif;
 
-// Mixins
-@mixin flex-center {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-@mixin flex-col {
-  display: flex;
-  flex-direction: column;
-}
-
-@mixin text-lg {
-  font-size: 18px;
-}
-
-@mixin text-xl {
-  font-size: 20px;
-}
-
-@mixin text-2xl {
-  font-size: 24px;
-}
-
-@mixin text-5xl {
-  font-size: 48px;
-}
-
-@mixin transition {
-  transition: all 0.3s ease;
-}
-
-// Styles
 .dashboard-page {
-  min-height: 100px;
+  font-family: $font-poppins;
+  color: $text-color;
   background-color: $bg-color;
-  @include flex-col;
-  
 
-  .main-content {
-    padding-top: 1rem;
-    padding-left: 2rem;
-    padding-bottom: 2rem;
-    @include flex-col;
-    @media (min-width: 768px) {
-      @include flex-center;
-      flex-direction: row;
+  .background-section {
+    background: url('../../images/Dashboard.png') no-repeat center center / cover;
+    text-align: center;
+    padding: 4rem 2rem;
+    color: #fff;
+
+    h1 {
+      font-size: 2.5rem;
+      font-weight: bold;
+      color: black;
     }
 
-    .left-section {
-      width: 100%;
-      padding: 2rem;
-      position: relative;
-      @media (min-width: 768px) {
-        width: 50%;
-        padding: 4rem;
-      }
-
-      .left-content {
-        position: absolute;
-        inset: 0;
-        z-index: 10;
-        @include flex-col;
-        align-items: flex-start;
-        justify-content: flex-start;
-
-        .welcome-text {
-          @include text-2xl;
-          font-family: $font-kodchasan;
-          margin-bottom: 1rem;
-          margin-top: 2rem;
-          margin-left: 4rem;
-          color: $color-dark;
-          @media (min-width: 768px) {
-            @include text-5xl;
-          }
-        }
-
-        .description-text {
-          margin-bottom: 1.5rem;
-          @include text-lg;
-          color: $color-gray;
-          margin-top: 0.5rem;
-          margin-left: 4rem;
-          @media (min-width: 768px) {
-            @include text-xl;
-          }
-        }
-
-        .start-button {
-          background-color: $color-accent;
-          color: $color-white;
-          padding: 0.5rem 2rem;
-          border-radius: 0.5rem;
-          margin-left: 6rem;
-          margin-top: 0.5rem;
-          cursor: pointer;
-          margin-bottom: 5rem;
-          &:hover {
-            background-color: darken($color-accent, 10%);
-          }
-          @include transition;
-        }
-      }
-
-      .background-lining {
-        @media (min-width: 768px) {
-          width: auto;
-          height: auto;
-        }
-      }
+    p {
+      font-size: 1.2rem;
+      margin-top: 10px;
+      color: black;
     }
+  }
 
-    .right-section {
-      display: none;
-      width: 100%;
-      padding: 1rem;
-      @media (min-width: 768px) {
-        display: flex;
-        width: 50%;
-        @include flex-center;
+  .quick-stats {
+    display: flex;
+    justify-content: space-between;
+    margin: 20px 10px;
+    padding: 20px;
+    background-color: $gray-color;
+    border-radius: 10px;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+
+    .stat-item {
+      text-align: center;
+
+      h3 {
+        color: $color-accent;
+        margin-bottom: 5px;
       }
 
-      .illustration {
-        width: 120%;
-        max-width: 50%;
-        height: 100%;
-        margin-left: 7rem;
-        margin-top: 4rem;
+      p {
+        font-size: 1.5rem;
+        font-weight: bold;
       }
     }
   }
+  .summary-section {
+    text-align: center;
+    padding: 25px;
+    // background-color: lighten($color-accent, 45%);
+    border-radius: 12px;
+    // box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+    margin-top: 20px;
+    font-family: $font-poppins;
   
+    // h2 {
+    //   font-size: 1.8rem;
+    //   color: darken($color-accent, 10%);
+    //   margin-bottom: 12px;
+    //   font-weight: 600;
+    //   text-transform: uppercase;
+    //   letter-spacing: 0.05em;
+    // }
+  
+    p {
+      font-size: 1.15rem;
+      color: $text-color;
+      line-height: 1.4;
+      font-weight: 450;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+  }
+
+  .card-container {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin-top: 30px;
+    margin-right: 4rem;
+
+    .card {
+      background-color: $gray-color;
+      border-radius: 10px;
+      padding: 20px;
+      width: calc(33.33% - 20px);
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+      text-align: center;
+      transition: transform 0.3s, box-shadow 0.3s;
+
+      &:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+      }
+
+      h2 {
+        font-size: 1.5rem;
+        color: $color-accent;
+        margin-bottom: 10px;
+        font-weight: 550;
+      }
+
+      p {
+        font-size: 1rem;
+        color: $secondary-color;
+        margin-bottom: 20px;
+      }
+      
+    
+
+      button {
+        background-color: $color-accent;
+        color: #fff;
+        border: none;
+        border-radius: 5px;
+        padding: 10px 20px;
+        cursor: pointer;
+        font-size: 1rem;
+
+        &:hover {
+          background-color: darken($color-accent, 10%);
+        }
+      }
+    }
+  }
+
   .contact-btn-fixed {
     position: fixed;
     bottom: 20px;
     right: 20px;
     background-color: $color-accent;
-    color: $color-white;
+    color: #fff;
     padding: 0.8rem 1.5rem;
     border-radius: 50px;
-    font-family: $font-poppins;
-    font-size: 16px;
     display: flex;
     align-items: center;
-    gap: 10px;
+    font-size: 1rem;
     cursor: pointer;
-    @include transition;
+
+    .contact-icon {
+      margin-right: 0.5rem;
+    }
 
     &:hover {
       background-color: darken($color-accent, 10%);
-    }
-
-    .contact-icon {
-      font-size: 20px;
     }
   }
 }

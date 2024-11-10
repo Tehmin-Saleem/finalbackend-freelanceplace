@@ -81,6 +81,7 @@ const ProjectDuration = () => {
                         <button className="back-button" onClick={handleBackButtonClick}>Back</button>
                     </div>
                     <div className="right-section">
+                        <h2>Select the project duration </h2>
                         <div className="size-options">
                             <div className="size-box">
                                 <span

@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import './styles.scss';
-// import jwt_decode from 'jwt-decode';
+//  import {jwtdecode} from 'jwt-decode';
+import { useNavigate } from "react-router-dom";
 
-function ConsultantProfileForm({ onSave }) {
+function ConsultantProfileForm() {
+    const navigate = useNavigate();
     const [profile, setProfile] = useState({
+        userId:'',
         profilePicture: null,
         bio: '',
         experience: [{ title: '', company: '', years: '' }],
@@ -16,26 +19,20 @@ function ConsultantProfileForm({ onSave }) {
         email: '',
     });
 
-    // Fetch email from token on component mount
     useEffect(() => {
         const fetchEmailFromToken = async () => {
-            const token = localStorage.getItem('authToken');
-            if (!token) {
-                console.error('Token not found');
-                return; // Stop further execution if token is missing
-            }
+            const token = localStorage.getItem('token');
+            
+            if (!token) return;
     
             try {
                 const jwt_decode = (await import('jwt-decode')).default;
                 const decodedToken = jwt_decode(token);
-                console.log(decodedToken);
                 if (decodedToken && decodedToken.email) {
                     setProfile((prevProfile) => ({
                         ...prevProfile,
                         email: decodedToken.email,
                     }));
-                } else {
-                    console.error('No email found in token');
                 }
             } catch (error) {
                 console.error('Error decoding token:', error);
@@ -44,10 +41,7 @@ function ConsultantProfileForm({ onSave }) {
     
         fetchEmailFromToken();
     }, []);
-    
-    
 
-    // Handle changes to input fields
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         setProfile((prevProfile) => ({
@@ -55,6 +49,55 @@ function ConsultantProfileForm({ onSave }) {
             [name]: value,
         }));
     };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        const formData = new FormData();
+        for (const key in profile) {
+            if (key === 'experience' || key === 'education') {
+                profile[key].forEach((item, index) => {
+                    for (const subKey in item) {
+                        formData.append(`${key}[${index}][${subKey}]`, item[subKey]);
+                    }
+                });
+            } else {
+                formData.append(key, profile[key]);
+            }
+        }
+
+        const token = localStorage.getItem('token');
+if (token) {
+    try {
+        const response = await fetch('http://localhost:5000/api/client/profile', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+            },
+            body: formData,
+        });
+
+        if (response.ok) {
+            navigate('/ConsultantDash');
+        } else {
+            const errorText = await response.text();
+            console.log('Error saving profile:', errorText);
+        }
+    } catch (error) {
+        console.error('Network or server error:', error);
+    }
+} else {
+    console.log('No token found, user not authenticated');
+}
+    };
+
+    // Handle changes to input fields
+    // const handleInputChange = (e) => {
+    //     const { name, value } = e.target;
+    //     setProfile((prevProfile) => ({
+    //         ...prevProfile,
+    //         [name]: value,
+    //     }));
+    // };
 
     // Handle file input change
     const handleFileChange = (e) => {
@@ -124,47 +167,44 @@ function ConsultantProfileForm({ onSave }) {
     };
 
     // Handle form submission
-    const handleSubmit = async (e) => {
-        e.preventDefault();
+    // const handleSubmit = async (e) => {
+    //     e.preventDefault();
 
-        const formData = new FormData();
-        for (const key in profile) {
-            if (key === 'experience' || key === 'education') {
-                profile[key].forEach((item, index) => {
-                    for (const subKey in item) {
-                        formData.append(`${key}[${index}][${subKey}]`, item[subKey]);
-                    }
-                });
-            } else {
-                formData.append(key, profile[key]);
-            }
-        }
+    //     const formData = new FormData();
+    //     for (const key in profile) {
+    //         if (key === 'experience' || key === 'education') {
+    //             profile[key].forEach((item, index) => {
+    //                 for (const subKey in item) {
+    //                     formData.append(`${key}[${index}][${subKey}]`, item[subKey]);
+    //                 }
+    //             });
+    //         } else {
+    //             formData.append(key, profile[key]);
+    //         }
+    //     }
 
-        const token = localStorage.getItem('token');
-        console.log("tokennnnnnnn",token); 
-        try {
-            const response = await fetch('http://localhost:5000/api/client/profile', {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                },
-                body: formData,
-            });
-
-            if (response.ok) {
-              
-                    // console.log('Error:', response.status, response.statusText);
-                
-                    onSave(profile); // Notify parent on save
-                window.location.href = '/ConsultantDash'; // Redirect to dashboard
-            } else {
-                const errorText = await response.text();
-                console.log('Error saving profile:', errorText);
-            }
-        } catch (error) {
-            console.log('Network or server error:', error);
-        }
-    };
+    //     const token = localStorage.getItem('token');
+    //     try {
+    //         const response = await fetch('http://localhost:5000/api/client/profile', {
+    //             method: 'POST',
+    //             headers: {
+    //                 'Authorization': `Bearer ${token}`,
+    //             },
+    //             body: formData,
+    //         });
+    
+    //         if (response.ok) {
+    //             const savedProfile = await response.json();
+    //             console.log('Profile saved:', savedProfile);
+    //             navigate('/ConsultantDash', { replace: true }); // Use navigate instead of window.location.href
+    //         } else {
+    //             const errorText = await response.text();
+    //             console.log('Error saving profile:', errorText);
+    //         }
+    //     } catch (error) {
+    //         console.log('Network or server error:', error);
+    //     }
+    // };
 
     return (
         <form className="consultant-profile-form" onSubmit={handleSubmit}>
