@@ -1,6 +1,6 @@
 const Proposal = require('../models/proposal.model');
 const Freelancer_Profile = require('../models/freelancer_profile.model');
-const Job = require('../models/post_job.model'); // Import the Job model
+const Job = require('../models/post_job.model'); 
 const Notification = require('../controllers/notifications.controller');
 exports.createProposal = async (req, res) => {
   try {
@@ -302,6 +302,3 @@ exports.getFreelancerDetailsByProposal = async (req, res) => {
     res.status(500).json({ message: 'Internal server error' });
   }
 };
-
-
-

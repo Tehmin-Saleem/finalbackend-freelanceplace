@@ -14,6 +14,7 @@ const educationSchema = new mongoose.Schema({
 });
 
 const consultantProfileSchema = new mongoose.Schema({
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },  // Add userId field
   profilePicture: String, // Store the file path or URL
   bio: String,
   experience: [experienceSchema],
@@ -27,4 +28,3 @@ const consultantProfileSchema = new mongoose.Schema({
 });
 
 module.exports = mongoose.model('ConsultantProfile', consultantProfileSchema);
-

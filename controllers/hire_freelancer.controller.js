@@ -4,6 +4,9 @@ const Notification = require('../models/notifications.model');
 const Proposal = require('../models/proposal.model');
 const Job= require('../models/post_job.model')
 const mongoose = require('mongoose');
+const User = require('../models/user.model');
+const Freelancer_Profile = require('../models/freelancer_profile.model')
+
 
 // Get hire request status by proposal ID
 exports.getHireRequestById = async (req, res) => {
@@ -608,3 +611,268 @@ exports.getFilteredJobs = async (req, res) => {
     });
   }
 };
+
+
+
+
+
+
+// exports.getClientOngoingProjects = async (req, res) => {
+//   try {
+//     const clientId = req.user.userId;
+
+//     // Validate client exists
+//     const client = await User.findById(clientId);
+//     if (!client) {
+//       return res.status(404).json({
+//         success: false,
+//         message: 'Client not found'
+//       });
+//     }
+
+//     // Find all ongoing projects for this client
+//     const ongoingProjects = await HireFreelancer.find({
+//       clientId: clientId,
+//       status: 'hired'
+//     })
+//     .populate({
+//       path: 'freelancerId',
+//       select: 'first_name last_name email country_name image'
+//     })
+//     .populate({
+//       path: 'jobId',
+//       select: 'job_title description budget_type hourly_rate fixed_price project_duration preferred_skills'
+//     })
+//     .populate({
+//       path: 'proposalId',
+//       select: 'cover_letter project_duration add_requirements'
+//     })
+//     .lean();
+
+//     // Transform the data to match frontend requirements
+//     const formattedProjects = ongoingProjects.map(project => {
+//       // Calculate progress based on milestones if they exist
+//       const milestones = project.proposalId.add_requirements?.by_milestones || [];
+//       const progress = calculateProgress(milestones);
+      
+//       // Format budget display
+//       const budget = formatBudget(project.jobId);
+      
+//       return {
+//         projectId: project._id,
+//         projectName: project.jobId.job_title,
+//         description: project.jobId.description,
+//         preferred_skills: project.jobId.preferred_skills, // Add this line
+//         freelancer: {
+//           id: project.freelancerId._id,
+//           name: `${project.freelancerId.first_name} ${project.freelancerId.last_name}`,
+//           email: project.freelancerId.email,
+//           image : project.freelancerId.image,
+//           location: {
+//             country: project.freelancerId.country_name
+//           }
+//         },
+//         budget,
+//         progress,
+//         startDate: project.hiredAt,
+//         deadline: project.proposalId.add_requirements?.by_project?.due_date,
+//         milestones: formatMilestones(project.proposalId.add_requirements?.by_milestones),
+//         proposalDetails: {
+//           coverLetter: project.proposalId.cover_letter,
+//           estimatedDuration: project.proposalId.project_duration,
+//           proposedRate: project.proposalId.add_requirements?.by_project?.bid_amount,
+//           status: project.status
+//         },
+//         terms: project.terms || {}
+//       };
+//     });
+
+//     res.status(200).json({
+//       success: true,
+//       count: formattedProjects.length,
+//       data: formattedProjects
+//     });
+
+//   } catch (error) {
+//     console.error('Error in getClientOngoingProjects:', error);
+//     res.status(500).json({
+//       success: false,
+//       message: 'Failed to fetch ongoing projects',
+//       error: error.message,
+//       stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+//     });
+//   }
+// };
+
+// // Helper functions
+// const calculateProgress = (milestones) => {
+//   if (!milestones || milestones.length === 0) return 0;
+  
+//   const totalMilestones = milestones.length;
+//   const completedMilestones = milestones.filter(m => 
+//     new Date(m.due_date) < new Date()
+//   ).length;
+
+//   return Math.round((completedMilestones / totalMilestones) * 100);
+// };
+
+// const formatBudget = (job) => {
+//   if (job.budget_type === 'hourly') {
+//     return `${job.hourly_rate?.from || 0}-${job.hourly_rate?.to || 0}/hr`;
+//   }
+//   return `${job.fixed_price || 0} USD`;
+// };
+
+// const formatMilestones = (milestones) => {
+//   if (!milestones) return [];
+  
+//   return milestones.map(milestone => ({
+//     id: milestone._id,
+//     name: milestone.description,
+//     amount: milestone.amount,
+//     dueDate: milestone.due_date,
+//     status: new Date(milestone.due_date) < new Date() ? 'completed' : 'pending'
+//   }));
+// };
+
+
+exports.getClientOngoingProjects = async (req, res) => {
+  try {
+    const clientId = req.user.userId;
+
+    // Validate client exists
+    const client = await User.findById(clientId);
+    if (!client) {
+      return res.status(404).json({
+        success: false,
+        message: 'Client not found'
+      });
+    }
+
+    // Find all ongoing projects for this client
+    const ongoingProjects = await HireFreelancer.find({
+      clientId: clientId,
+      status: 'hired'
+    })
+    .populate({
+      path: 'freelancerId',
+      select: 'first_name last_name email country_name image'
+    })
+    .populate({
+      path: 'jobId',
+      select: 'job_title description budget_type hourly_rate fixed_price project_duration preferred_skills'
+    })
+    .populate({
+      path: 'proposalId',
+      select: 'cover_letter project_duration add_requirements'
+    })
+
+    // Get freelancer profiles for all freelancers
+    const freelancerIds = ongoingProjects.map(project => project.freelancerId._id);
+    const freelancerProfiles = await Freelancer_Profile.find({
+      freelancer_id: { $in: freelancerIds }  })
+    .lean();
+
+
+
+    // Create a map of freelancer profiles
+    const freelancerProfileMap = freelancerProfiles.reduce((map, profile) => {
+      map[profile.freelancer_id.toString()] = profile;
+      return map;
+    }, {});
+
+
+    // Transform the data to match frontend requirements
+    const formattedProjects = ongoingProjects.map(project => {
+      const freelancerProfile = freelancerProfileMap[project.freelancerId._id.toString()];
+      return {
+        budget_type: project.jobId.budget_type,
+        hourly_rate: {
+          from: project.jobId.hourly_rate?.from || 0,
+          to: project.jobId.hourly_rate?.to || 0
+        },
+        fixed_price: project.jobId.fixed_price,
+        project_duration: {
+          duration: project.jobId.project_duration || 'Not specified',
+          experience_level: project.jobId.experience_level || 'Not specified'
+        },
+        projectId: project._id,
+        projectName: project.jobId.job_title,
+        job_title: project.jobId.job_title,
+        description: project.jobId.description,
+        preferred_skills: project.jobId.preferred_skills || [],
+        freelancer: {
+          id: project.freelancerId._id,
+          name: `${project.freelancerId.first_name} ${project.freelancerId.last_name}`,
+          email: project.freelancerId.email,
+          image: freelancerProfile?.image || null, // Get image from freelancer 
+          location: {
+            country: project.freelancerId.country_name || 'Not specified'
+          }
+        },
+        budget_type: project.jobId.budget_type,
+        budget: formatBudget(project.jobId),
+        progress: 0, // Set a default value or calculate based on your logic
+        startDate: project.hiredAt || new Date(),
+        deadline: project.proposalId?.add_requirements?.by_project?.due_date || null,
+        project_duration: {
+          duration_of_work: project.jobId.project_duration || 'Not specified',
+          experience_level: 'Not specified'
+        },
+        milestones: formatMilestones(project.proposalId?.add_requirements?.by_milestones || []),
+        proposalDetails: {
+          coverLetter: project.proposalId?.cover_letter || '',
+          estimatedDuration: project.proposalId?.project_duration || '',
+          proposedRate: project.proposalId?.add_requirements?.by_project?.bid_amount || 0,
+          status: project.status || 'pending'
+        }
+      };
+    });
+
+    res.status(200).json({
+      success: true,
+      count: formattedProjects.length,
+      data: formattedProjects
+    });
+
+  } catch (error) {
+    console.error('Error in getClientOngoingProjects:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to fetch ongoing projects',
+      error: error.message
+    });
+  }
+};
+
+// Helper Functions
+function formatBudget(job) {
+  if (!job) return { amount: 0, type: 'fixed' };
+
+  if (job.budget_type === 'hourly') {
+    return {
+      type: 'hourly',
+      hourly_rate: {
+        from: job.hourly_rate?.from || 0,
+        to: job.hourly_rate?.to || 0
+      }
+    };
+  }
+  
+  return {
+    type: 'fixed',
+    amount: job.fixed_price || 0
+  };
+}
+
+function formatMilestones(milestones) {
+  if (!Array.isArray(milestones)) return [];
+  
+  return milestones.map(milestone => ({
+    id: milestone._id || String(Math.random()),
+    name: milestone.description || 'Untitled Milestone',
+    amount: milestone.amount || 0,
+    dueDate: milestone.due_date || new Date(),
+    status: milestone.status || 'pending'
+  }));
+}
