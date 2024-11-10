@@ -44,9 +44,10 @@ const JobsCard = ({
 
       // Find the specific proposal for this job
       const specificProposal = response.data.proposals.find(
-        proposal => proposal.isAuthenticatedUser
+        proposal => proposal._id === proposalId
       );
-
+      
+console.log('proposals',response.data )
       if (!specificProposal) {
         throw new Error('No proposal found for this job');
       }
@@ -76,7 +77,7 @@ const JobsCard = ({
       });
     } catch (error) {
       console.error('Error fetching proposal data:', error);
-      alert('Failed to fetch proposal data. Please try again.');
+      
     }
   };
 
