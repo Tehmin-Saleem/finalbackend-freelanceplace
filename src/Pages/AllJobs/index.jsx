@@ -348,6 +348,16 @@ useEffect(() => {
     return pages;
   };
 
+  const getStatusBadge = () => {
+    if (jobs.isHired) {
+      return <span className="badge ongoing">Ongoing</span>;
+    } else if (jobs.isPastDue) {
+      return <span className="badge pending">Pending</span>;
+    } else {
+      return <span className="badge active">Active</span>;
+    }
+  };
+
   return (
     <div className="jobs-Page">
       <Header />
