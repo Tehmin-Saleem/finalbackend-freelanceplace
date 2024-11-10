@@ -4,6 +4,9 @@ const Notification = require('../models/notifications.model');
 const Proposal = require('../models/proposal.model');
 const Job= require('../models/post_job.model')
 const mongoose = require('mongoose');
+const User = require('../models/user.model');
+const Freelancer_Profile = require('../models/freelancer_profile.model')
+
 
 // Get hire request status by proposal ID
 exports.getHireRequestById = async (req, res) => {
@@ -172,6 +175,15 @@ exports.hireFreelancer = async (req, res) => {
     proposal.status = 'hired';
     await proposal.save();
 
+
+    // Update job status
+    await Job.findByIdAndUpdate(proposal.job_id._id, {
+      $set: {
+        jobstatus: 'ongoing',
+        hired_freelancer: proposal.freelancer_id._id
+      }
+    });
+
     // Create notification
     const notificationData = {
       freelancer_id: proposal.freelancer_id._id,
@@ -326,3 +338,541 @@ exports.deleteHireRequest = async (req, res) => {
     res.status(500).json({ message: 'Internal server error' });
   }
 };
+
+
+
+
+
+
+// exports.getFilteredJobs = async (req, res) => {
+//   try {
+//     const clientId = req.user.userId;
+//     const { filter } = req.query;
+
+//     console.log('Fetching jobs for clientId:', clientId);
+//     console.log('Applied filter:', filter);
+
+//     // Base query to find all jobs posted by this client
+//     let query = { client_id: clientId }; // Changed from posted_by to client_id
+
+//     console.log('Initial query:', query);
+
+//     // First, let's check if we can find any jobs at all
+//     const jobCount = await Job.countDocuments(query); // Changed from Job to Job_Post
+//     console.log('Total jobs found:', jobCount);
+
+//     // Fetch all jobs with detailed population
+//     let jobs = await Job.find(query) // Changed from Job to Job_Post
+//       .populate({
+//         path: 'freelancer_id',
+//         select: 'name email profile_image'
+//       })
+//       .populate({
+//         path: 'client_id',
+//         select: 'name email'
+//       });
+
+//     console.log('Jobs found:', jobs.length);
+
+//     // Get hire requests
+//     const hireRequests = await HireFreelancer.find({ clientId })
+//       .populate('jobId')
+//       .populate('proposalId');
+
+//     console.log('Hire requests found:', hireRequests.length);
+
+//     // Create a map of job IDs to their status
+//     const jobStatusMap = new Map();
+//     hireRequests.forEach(hire => {
+//       if (hire.jobId) {
+//         jobStatusMap.set(hire.jobId._id.toString(), hire.status);
+//       }
+//     });
+
+//     // Map jobs with additional information
+//     jobs = jobs.map(job => {
+//       const jobData = job.toObject();
+//       const hireStatus = jobStatusMap.get(job._id.toString());
+      
+//       // Use the jobstatus field from your model
+//       let status = job.jobstatus || 'pending';
+//       const hasHiredProposal = !!job.hired_freelancer;
+
+//       return {
+//         ...jobData,
+//         status,
+//         hasHiredProposal,
+//         budget: job.budget_type === 'hourly' 
+//           ? `${job.hourly_rate.from}-${job.hourly_rate.to}/hr`
+//           : `${job.fixed_price}/fixed`,
+//         duration: job.project_duration?.duration_of_work || 'Not specified',
+//         experience: job.project_duration?.experience_level || 'Not specified',
+//         skills: job.preferred_skills || []
+//       };
+//     });
+
+//     // Apply filter if specified
+//     if (filter && filter !== 'all') {
+//       const filteredJobs = jobs.filter(job => {
+//         switch (filter.toLowerCase()) {
+//           case 'ongoing':
+//             return job.jobstatus === 'ongoing' || !!job.hired_freelancer;
+//           case 'completed':
+//             return job.jobstatus === 'completed';
+//           case 'pending':
+//             return job.jobstatus === 'pending' && !job.hired_freelancer;
+//           default:
+//             return true;
+//         }
+//       });
+//       console.log(`Jobs after ${filter} filter:`, filteredJobs.length);
+//       jobs = filteredJobs;
+//     }
+
+//     // Log the final response
+//     console.log('Sending response with jobs count:', jobs.length);
+
+//     res.status(200).json({
+//       success: true,
+//       count: jobs.length,
+//       data: jobs
+//     });
+
+//   } catch (error) {
+//     console.error('Error in getFilteredJobs:', error);
+//     console.error('Stack trace:', error.stack);
+//     res.status(500).json({
+//       success: false,
+//       message: 'Failed to fetch filtered jobs',
+//       error: error.message,
+//       stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+//     });
+//   }
+// };
+
+
+
+exports.getFilteredJobs = async (req, res) => {
+  try {
+    const clientId = req.user.userId;
+    const { filter } = req.query;
+    const currentDate = new Date();
+
+    console.log('Fetching jobs for clientId:', clientId);
+    console.log('Applied filter:', filter);
+
+    // Base query to find all jobs posted by this client
+    let query = { client_id: clientId };
+
+    // Fetch all jobs
+    let jobs = await Job.find(query)
+      .populate({
+        path: 'client_id',
+        select: 'name email profile_image'
+      })
+      .populate('hired_freelancer', 'name email profile_image')
+      .lean();
+
+    console.log('Found jobs:', jobs.length);
+
+    // Get all proposals for these jobs
+    const jobIds = jobs.map(job => job._id);
+    const proposals = await Proposal.find({
+      job_id: { $in: jobIds }
+    })
+    .populate({
+      path: 'freelancer_id',
+      select: 'name email profile_image'
+    })
+    .lean();
+
+    // Get hire requests to check which jobs have hired freelancers
+    const hireRequests = await HireFreelancer.find({
+      jobId: { $in: jobIds },
+      status: 'hired' // Only get successful hires
+    }).lean();
+
+    // Create a map of hired jobs
+    const hiredJobsMap = new Map(
+      hireRequests.map(hire => [hire.jobId.toString(), true])
+    );
+
+    // Enhance jobs with proposal and hire information
+    jobs = jobs.map(job => {
+      const jobId = job._id.toString();
+      const jobProposals = proposals.filter(p => p.job_id.toString() === jobId);
+      const isHired = hiredJobsMap.get(jobId) || !!job.hired_freelancer;
+      
+      // Calculate due date based on project duration
+      let dueDate = null;
+      if (job.createdAt && job.project_duration?.duration_of_work) {
+        dueDate = new Date(job.createdAt);
+        switch (job.project_duration.duration_of_work) {
+          case 'Less than 1 month':
+            dueDate.setMonth(dueDate.getMonth() + 1);
+            break;
+          case '1 to 3 months':
+            dueDate.setMonth(dueDate.getMonth() + 3);
+            break;
+          case '3 to 6 months':
+            dueDate.setMonth(dueDate.getMonth() + 6);
+            break;
+          default:
+            dueDate.setMonth(dueDate.getMonth() + 1); // Default to 1 month
+        }
+      }
+
+      // Determine job status based on hire status and due date
+      let jobStatus;
+      if (isHired) {
+        jobStatus = 'ongoing';
+      } else if (dueDate && currentDate > dueDate) {
+        jobStatus = 'pending';
+      } else {
+        jobStatus = 'active';
+      }
+
+      return {
+        ...job,
+        status: jobStatus,
+        isHired,
+        dueDate,
+        isPastDue: dueDate ? currentDate > dueDate : false,
+        proposalCount: jobProposals.length,
+        proposals: jobProposals.map(proposal => ({
+          id: proposal._id,
+          freelancer: {
+            id: proposal.freelancer_id?._id,
+            name: proposal.freelancer_id?.name,
+            image: proposal.freelancer_id?.profile_image
+          },
+          coverLetter: proposal.cover_letter,
+          projectDuration: proposal.project_duration,
+          budget: proposal.add_requirements?.by_project?.bid_amount || 
+                 proposal.add_requirements?.by_milestones?.reduce((sum, m) => sum + (m.amount || 0), 0),
+          proposalType: proposal.add_requirements?.by_milestones ? 'Milestone' : 'Project'
+        }))
+      };
+    });
+
+    // Apply filter
+    if (filter && filter !== 'all') {
+      const filteredJobs = jobs.filter(job => {
+        switch (filter.toLowerCase()) {
+          case 'ongoing':
+            // Show jobs where a freelancer has been hired
+            return job.isHired;
+          case 'pending':
+            // Show jobs past their due date without a hired freelancer
+            return !job.isHired && job.isPastDue;
+          case 'active':
+            // Show jobs that are neither hired nor past due
+            return !job.isHired && !job.isPastDue;
+          default:
+            return true;
+        }
+      });
+      console.log(`Jobs after ${filter} filter:`, filteredJobs.length);
+      jobs = filteredJobs;
+    }
+
+    // Debug logging
+    jobs.forEach(job => {
+      console.log(`Job ${job._id}:`, {
+        title: job.job_title,
+        status: job.status,
+        isHired: job.isHired,
+        dueDate: job.dueDate,
+        isPastDue: job.isPastDue,
+        proposalCount: job.proposalCount
+      });
+    });
+
+    res.status(200).json({
+      success: true,
+      count: jobs.length,
+      data: jobs.map(job => ({
+        ...job,
+        proposals: job.proposals.map(proposal => ({
+          ...proposal,
+          coverLetter: proposal.coverLetter?.substring(0, 100) + '...' // Truncate cover letter
+        }))
+      }))
+    });
+
+  } catch (error) {
+    console.error('Error in getFilteredJobs:', error);
+    console.error('Stack trace:', error.stack);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to fetch filtered jobs',
+      error: error.message,
+      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+    });
+  }
+};
+
+
+
+
+
+
+// exports.getClientOngoingProjects = async (req, res) => {
+//   try {
+//     const clientId = req.user.userId;
+
+//     // Validate client exists
+//     const client = await User.findById(clientId);
+//     if (!client) {
+//       return res.status(404).json({
+//         success: false,
+//         message: 'Client not found'
+//       });
+//     }
+
+//     // Find all ongoing projects for this client
+//     const ongoingProjects = await HireFreelancer.find({
+//       clientId: clientId,
+//       status: 'hired'
+//     })
+//     .populate({
+//       path: 'freelancerId',
+//       select: 'first_name last_name email country_name image'
+//     })
+//     .populate({
+//       path: 'jobId',
+//       select: 'job_title description budget_type hourly_rate fixed_price project_duration preferred_skills'
+//     })
+//     .populate({
+//       path: 'proposalId',
+//       select: 'cover_letter project_duration add_requirements'
+//     })
+//     .lean();
+
+//     // Transform the data to match frontend requirements
+//     const formattedProjects = ongoingProjects.map(project => {
+//       // Calculate progress based on milestones if they exist
+//       const milestones = project.proposalId.add_requirements?.by_milestones || [];
+//       const progress = calculateProgress(milestones);
+      
+//       // Format budget display
+//       const budget = formatBudget(project.jobId);
+      
+//       return {
+//         projectId: project._id,
+//         projectName: project.jobId.job_title,
+//         description: project.jobId.description,
+//         preferred_skills: project.jobId.preferred_skills, // Add this line
+//         freelancer: {
+//           id: project.freelancerId._id,
+//           name: `${project.freelancerId.first_name} ${project.freelancerId.last_name}`,
+//           email: project.freelancerId.email,
+//           image : project.freelancerId.image,
+//           location: {
+//             country: project.freelancerId.country_name
+//           }
+//         },
+//         budget,
+//         progress,
+//         startDate: project.hiredAt,
+//         deadline: project.proposalId.add_requirements?.by_project?.due_date,
+//         milestones: formatMilestones(project.proposalId.add_requirements?.by_milestones),
+//         proposalDetails: {
+//           coverLetter: project.proposalId.cover_letter,
+//           estimatedDuration: project.proposalId.project_duration,
+//           proposedRate: project.proposalId.add_requirements?.by_project?.bid_amount,
+//           status: project.status
+//         },
+//         terms: project.terms || {}
+//       };
+//     });
+
+//     res.status(200).json({
+//       success: true,
+//       count: formattedProjects.length,
+//       data: formattedProjects
+//     });
+
+//   } catch (error) {
+//     console.error('Error in getClientOngoingProjects:', error);
+//     res.status(500).json({
+//       success: false,
+//       message: 'Failed to fetch ongoing projects',
+//       error: error.message,
+//       stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+//     });
+//   }
+// };
+
+// // Helper functions
+// const calculateProgress = (milestones) => {
+//   if (!milestones || milestones.length === 0) return 0;
+  
+//   const totalMilestones = milestones.length;
+//   const completedMilestones = milestones.filter(m => 
+//     new Date(m.due_date) < new Date()
+//   ).length;
+
+//   return Math.round((completedMilestones / totalMilestones) * 100);
+// };
+
+// const formatBudget = (job) => {
+//   if (job.budget_type === 'hourly') {
+//     return `${job.hourly_rate?.from || 0}-${job.hourly_rate?.to || 0}/hr`;
+//   }
+//   return `${job.fixed_price || 0} USD`;
+// };
+
+// const formatMilestones = (milestones) => {
+//   if (!milestones) return [];
+  
+//   return milestones.map(milestone => ({
+//     id: milestone._id,
+//     name: milestone.description,
+//     amount: milestone.amount,
+//     dueDate: milestone.due_date,
+//     status: new Date(milestone.due_date) < new Date() ? 'completed' : 'pending'
+//   }));
+// };
+
+
+exports.getClientOngoingProjects = async (req, res) => {
+  try {
+    const clientId = req.user.userId;
+
+    // Validate client exists
+    const client = await User.findById(clientId);
+    if (!client) {
+      return res.status(404).json({
+        success: false,
+        message: 'Client not found'
+      });
+    }
+
+    // Find all ongoing projects for this client
+    const ongoingProjects = await HireFreelancer.find({
+      clientId: clientId,
+      status: 'hired'
+    })
+    .populate({
+      path: 'freelancerId',
+      select: 'first_name last_name email country_name image'
+    })
+    .populate({
+      path: 'jobId',
+      select: 'job_title description budget_type hourly_rate fixed_price project_duration preferred_skills'
+    })
+    .populate({
+      path: 'proposalId',
+      select: 'cover_letter project_duration add_requirements'
+    })
+
+    // Get freelancer profiles for all freelancers
+    const freelancerIds = ongoingProjects.map(project => project.freelancerId._id);
+    const freelancerProfiles = await Freelancer_Profile.find({
+      freelancer_id: { $in: freelancerIds }  })
+    .lean();
+
+
+
+    // Create a map of freelancer profiles
+    const freelancerProfileMap = freelancerProfiles.reduce((map, profile) => {
+      map[profile.freelancer_id.toString()] = profile;
+      return map;
+    }, {});
+
+
+    // Transform the data to match frontend requirements
+    const formattedProjects = ongoingProjects.map(project => {
+      const freelancerProfile = freelancerProfileMap[project.freelancerId._id.toString()];
+      return {
+        budget_type: project.jobId.budget_type,
+        hourly_rate: {
+          from: project.jobId.hourly_rate?.from || 0,
+          to: project.jobId.hourly_rate?.to || 0
+        },
+        fixed_price: project.jobId.fixed_price,
+        project_duration: {
+          duration: project.jobId.project_duration || 'Not specified',
+          experience_level: project.jobId.experience_level || 'Not specified'
+        },
+        projectId: project._id,
+        projectName: project.jobId.job_title,
+        job_title: project.jobId.job_title,
+        description: project.jobId.description,
+        preferred_skills: project.jobId.preferred_skills || [],
+        freelancer: {
+          id: project.freelancerId._id,
+          name: `${project.freelancerId.first_name} ${project.freelancerId.last_name}`,
+          email: project.freelancerId.email,
+          image: freelancerProfile?.image || null, // Get image from freelancer 
+          location: {
+            country: project.freelancerId.country_name || 'Not specified'
+          }
+        },
+        budget_type: project.jobId.budget_type,
+        budget: formatBudget(project.jobId),
+        progress: 0, // Set a default value or calculate based on your logic
+        startDate: project.hiredAt || new Date(),
+        deadline: project.proposalId?.add_requirements?.by_project?.due_date || null,
+        project_duration: {
+          duration_of_work: project.jobId.project_duration || 'Not specified',
+          experience_level: 'Not specified'
+        },
+        milestones: formatMilestones(project.proposalId?.add_requirements?.by_milestones || []),
+        proposalDetails: {
+          coverLetter: project.proposalId?.cover_letter || '',
+          estimatedDuration: project.proposalId?.project_duration || '',
+          proposedRate: project.proposalId?.add_requirements?.by_project?.bid_amount || 0,
+          status: project.status || 'pending'
+        }
+      };
+    });
+
+    res.status(200).json({
+      success: true,
+      count: formattedProjects.length,
+      data: formattedProjects
+    });
+
+  } catch (error) {
+    console.error('Error in getClientOngoingProjects:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to fetch ongoing projects',
+      error: error.message
+    });
+  }
+};
+
+// Helper Functions
+function formatBudget(job) {
+  if (!job) return { amount: 0, type: 'fixed' };
+
+  if (job.budget_type === 'hourly') {
+    return {
+      type: 'hourly',
+      hourly_rate: {
+        from: job.hourly_rate?.from || 0,
+        to: job.hourly_rate?.to || 0
+      }
+    };
+  }
+  
+  return {
+    type: 'fixed',
+    amount: job.fixed_price || 0
+  };
+}
+
+function formatMilestones(milestones) {
+  if (!Array.isArray(milestones)) return [];
+  
+  return milestones.map(milestone => ({
+    id: milestone._id || String(Math.random()),
+    name: milestone.description || 'Untitled Milestone',
+    amount: milestone.amount || 0,
+    dueDate: milestone.due_date || new Date(),
+    status: milestone.status || 'pending'
+  }));
+}

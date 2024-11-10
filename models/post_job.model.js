@@ -61,6 +61,16 @@ const job_PostSchema = new Schema({
     type: String,
     enum: ["public", "private"], 
   },
+  jobstatus: {
+    type: String,
+    enum: ['pending', 'ongoing', 'completed'],
+    default: 'pending'
+  },
+  hired_freelancer: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    default: null
+  }
   
 
 });

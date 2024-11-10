@@ -11,6 +11,7 @@ exports.createOrUpdateProfile = async (req, res) => {
       freelancer_id: freelancerId,
       first_name: req.body.first_name,
       last_name: req.body.last_name,
+      email: req.body.email,  // Ensure email is included
       title: req.body.title,
       profile_overview: req.body.profile_overview,
       experience: JSON.parse(req.body.experience),
@@ -273,4 +274,13 @@ exports.deleteProfile = async (req, res) => {
 };
 
 
-
+// Controller: freelancerController.js
+exports.freelancerProfileExists = async (req, res) => {
+  try {
+    const freelancerId = req.params.id;
+    const profile = await Freelancer_Profile.findOne({ freelancer_id: freelancerId });
+    res.status(200).json({ exists: !!profile });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+};

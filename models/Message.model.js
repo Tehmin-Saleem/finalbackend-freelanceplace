@@ -8,7 +8,9 @@ const messageSchema = mongoose.Schema(
     readBy: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
     attachment: {
       fileName: String,
-      path: String,
+      path: String, // Cloudinary URL
+      public_id: String, // Cloudinary public ID
+      resource_type: String, // Cloudinary resource type
       description: String
     },
   },

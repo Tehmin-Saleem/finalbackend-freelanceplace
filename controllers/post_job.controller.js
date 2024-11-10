@@ -80,6 +80,40 @@ exports.getAllJobPosts = async (req, res) => {
     res.status(500).json({ message: 'Internal server error', error: err.message });
   }
 };
+// exports.getClientJobPosts = async (req, res) => {
+//   try {
+//     // Get the logged-in user's ID from the request object
+//     const loggedInUserId = req.user.userId || req.user;
+
+//     // Find job posts for the logged-in user
+//     const jobPosts = await Job_Post.find({ client_id: loggedInUserId })
+//       .populate('client_id', 'email')
+//       .lean();
+    
+//     const jobPostsWithDetails = await Promise.all(jobPosts.map(async (job) => {
+//       const proposalCount = await Proposal.countDocuments({ job_id: job._id });
+      
+//       // Check if the client has a payment method
+//       const hasPaymentMethod = await Payment_Method.exists({ client_id: job.client_id });
+      
+//       return {
+//         ...job,
+//         proposalCount,
+//         paymentMethodStatus: hasPaymentMethod ? "Payment method verified" : "Payment method unverified"
+//       };
+//     }));
+    
+//     res.status(200).json({ jobPosts: jobPostsWithDetails });
+//   } catch (err) {
+//     console.error('Error fetching job posts:', err);
+//     res.status(500).json({ message: 'Internal server error', error: err.message });
+//   }
+// };
+
+
+
+
+
 exports.getClientJobPosts = async (req, res) => {
   try {
     const loggedInUserId = req.user.userId || req.user;
@@ -93,10 +127,14 @@ exports.getClientJobPosts = async (req, res) => {
       const proposalCount = await Proposal.countDocuments({ job_id: job._id });
       const hasPaymentMethod = await Payment_Method.exists({ client_id: job.client_id });
 
+      // Check if any proposal has the status "hired"
+      const hasHiredProposal = await Proposal.exists({ job_id: job._id, status: 'hired' });
+
       return {
         ...job,
         proposalCount,
-        paymentMethodStatus: hasPaymentMethod ? "Payment method verified" : "Payment method unverified"
+        paymentMethodStatus: hasPaymentMethod ? "Payment method verified" : "Payment method unverified",
+        hasHiredProposal // Add this field to indicate if there's a hired proposal
       };
     }));
 
