@@ -298,21 +298,30 @@ function Signup() {
             </div>
 
             <div className="relative">
-              <div className="flex mb-4 shadow border rounded-xl w-full py-3 px-3 bg-[#ECF0F1] font-Poppins">
-                <div className="pr-3">
-                  <Location />
-                </div>
-                <input
-                  type="text"
-                  id="country"
-                  name="country"
-                  placeholder="Enter your country"
-                  className="text-[#94A3B8] bg-[#ECF0F1] text-[14px] flex-1"
-                  onChange={(e) => setCountry(e.target.value)}
-                  value={country}
-                />
-              </div>
-            </div>
+  <div className="flex mb-4 shadow border rounded-xl w-full py-3 px-3 bg-[#ECF0F1] font-Poppins">
+    <div className="pr-3">
+      <Location />
+    </div>
+    <select
+      id="country"
+      name="country"
+      className="text-[#94A3B8] bg-[#ECF0F1] text-[14px] flex-1 appearance-none outline-none"
+      onChange={(e) => setCountry(e.target.value)}
+      value={country}
+    >
+      <option value="" disabled>
+        Select your country
+      </option>
+      <option value="Pakistan">United States</option>
+      <option value="United Kingdom">United Kingdom</option>
+      <option value="Canada">Canada</option>
+      <option value="Australia">Australia</option>
+      <option value="India">India</option>
+      {/* Add more countries as needed */}
+    </select>
+  </div>
+</div>
+
 
             <div className="mb-4 flex items-center">
               <input

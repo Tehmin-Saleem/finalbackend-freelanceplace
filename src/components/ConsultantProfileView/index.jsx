@@ -1,108 +1,188 @@
-// src/components/ConsultantProfileView.js
-
 import React, { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
 import './styles.scss';
 
-const ConsultantProfileView = ({ id }) => {
+const ConsultantProfileView = () => {
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const { userId } = useParams(); 
 
   useEffect(() => {
     const fetchProfile = async () => {
+      setLoading(true);
       const token = localStorage.getItem('token');
-      setLoading(true); // Start loading
+
       try {
-        const response = await fetch(`http://localhost:5000/api/client/profile/${id}`, {
-          headers: { 'Authorization': `Bearer ${token}` },
+        const response = await fetch(`http://localhost:5000/api/client/profile/${userId}`, {
+          method: 'GET',
+          headers: { 
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
         });
-        if (!response.ok) throw new Error('Failed to fetch profile data');
+
         const data = await response.json();
-        setProfile(data);
+        
+        if (!response.ok) {
+          throw new Error(data.message || 'Failed to fetch profile');
+        }
+
+        console.log('Fetched data:', data); // Debug log
+        setProfile(data.profile || data); // Handle both {profile: {...}} and direct profile object
+        setLoading(false);
       } catch (err) {
+        console.error('Error fetching profile:', err);
         setError(err.message);
-      } finally {
-        setLoading(false); // End loading
+        setLoading(false);
       }
     };
 
-    fetchProfile();
+    if (id) {
+      fetchProfile();
+    }
   }, [id]);
 
-  if (loading) return <p>Loading...</p>;
-  if (error) return <p>Error: {error}</p>;
-  if (!profile) return null; // Avoid rendering if profile is null
+  // Debug logs
+  console.log('Loading:', loading);
+  console.log('Profile:', profile);
+  console.log('Error:', error);
+
+  if (loading) {
+    return (
+      <div className="loading-container">
+        <div className="loading-spinner"></div>
+        <p>Loading consultant profile...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="error-container">
+        <h2>Error</h2>
+        <p>{error}</p>
+      </div>
+    );
+  }
+
+  if (!profile) {
+    return (
+      <div className="not-found-container">
+        <h2>Profile Not Found</h2>
+        <p>The requested consultant profile could not be found.</p>
+      </div>
+    );
+  }
 
   return (
     <div className="consultant-profile-view">
       <div className="profile-card">
         {profile.profilePicture && (
-          <img 
-            src={`http://localhost:5000/${profile.profilePicture}`} 
-            alt="Profile" 
-            className="profile-picture" 
-          />
+          <div className="profile-picture-container">
+            <img 
+              src={`http://localhost:5000/${profile.profilePicture}`} 
+              alt="Consultant Profile" 
+              className="profile-picture"
+              onError={(e) => {
+                e.target.src = '/default-profile.png';
+                e.target.onerror = null;
+              }}
+            />
+          </div>
         )}
-        <h2 className="profile-name">{profile.name}</h2>
-        <p className="profile-bio">{profile.bio}</p>
+
+        <div className="profile-header">
+          <h2 className="profile-name">{profile.name || 'Unnamed Consultant'}</h2>
+          {profile.bio && <p className="profile-bio">{profile.bio}</p>}
+        </div>
         
-        <div className="profile-details">
+        <div className="profile-section contact-info">
           <h3>Contact Information</h3>
-          <p><strong>Email:</strong> {profile.email}</p>
-          <p><strong>Phone:</strong> {profile.phoneNumber}</p>
-          <p><strong>Address:</strong> {profile.address}</p>
-          <p><strong>LinkedIn:</strong> <a href={profile.linkedIn} target="_blank" rel="noopener noreferrer">{profile.linkedIn}</a></p>
+          <div className="info-grid">
+            {profile.email && (
+              <div className="info-item">
+                <span>Email: {profile.email}</span>
+              </div>
+            )}
+            {profile.phoneNumber && (
+              <div className="info-item">
+                <span>Phone: {profile.phoneNumber}</span>
+              </div>
+            )}
+            {profile.address && (
+              <div className="info-item">
+                <span>Address: {profile.address}</span>
+              </div>
+            )}
+            {profile.linkedIn && (
+              <div className="info-item">
+                <a 
+                  href={profile.linkedIn} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="linkedin-link"
+                >
+                  LinkedIn Profile
+                </a>
+              </div>
+            )}
+          </div>
         </div>
 
-        <div className="profile-experience">
-          <h3>Experience</h3>
+        <div className="profile-section experience">
+          <h3>Professional Experience</h3>
           {profile.experience?.length > 0 ? (
-            <ul>
-              {profile.experience.map((item, index) => (
-                <li key={index}>
-                  <strong>{item.title}</strong> at {item.company} - {item.years}
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p>No experience listed</p>
-          )}
-        </div>
-
-        <div className="profile-education">
-          <h3>Education</h3>
-          {profile.education?.length > 0 ? (
-            <ul>
-              {profile.education.map((item, index) => (
-                <li key={index}>
-                  <strong>{item.degree}</strong> from {item.institution} - {item.year}
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p>No education listed</p>
-          )}
-        </div>
-
-        <div className="profile-certifications">
-          <h3>Certifications</h3>
-          {profile.certifications ? (
-            <p>{profile.certifications}</p>
-          ) : (
-            <p>No certifications listed</p>
-          )}
-        </div>
-
-        <div className="profile-skills">
-          <h3>Skills</h3>
-          {profile.skills?.length > 0 ? (
-            <div className="skills-container">
-              {profile.skills.map((skill, index) => (
-                <span key={index} className="skill-tag">{skill}</span>
+            <div className="experience-list">
+              {profile.experience.map((exp, index) => (
+                <div key={index} className="experience-item">
+                  <h4>{exp.title}</h4>
+                  <p className="company">{exp.company}</p>
+                  <p className="years">{exp.years}</p>
+                </div>
               ))}
             </div>
           ) : (
-            <p>No skills listed</p>
+            <p className="no-content">No experience listed</p>
+          )}
+        </div>
+
+        <div className="profile-section education">
+          <h3>Education</h3>
+          {profile.education?.length > 0 ? (
+            <div className="education-list">
+              {profile.education.map((edu, index) => (
+                <div key={index} className="education-item">
+                  <h4>{edu.degree}</h4>
+                  <p className="institution">{edu.institution}</p>
+                  <p className="year">{edu.year}</p>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="no-content">No education listed</p>
+          )}
+        </div>
+
+        {profile.certifications && (
+          <div className="profile-section certifications">
+            <h3>Certifications</h3>
+            <p>{profile.certifications}</p>
+          </div>
+        )}
+
+        <div className="profile-section skills">
+          <h3>Skills & Expertise</h3>
+          {profile.skills?.length > 0 ? (
+            <div className="skills-container">
+              {profile.skills.map((skill, index) => (
+                <span key={index} className="skill-tag">
+                  {skill}
+                </span>
+              ))}
+            </div>
+          ) : (
+            <p className="no-content">No skills listed</p>
           )}
         </div>
       </div>

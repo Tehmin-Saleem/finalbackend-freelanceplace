@@ -9,7 +9,18 @@ const Alljobs = ({
   proposals,
   messages,
   onViewClick,
+  job,
 }) => {
+
+  const getStatusBadge = () => {
+    if (job.isHired) {
+      return <span className="badge ongoing">Ongoing</span>;
+    } else if (job.isPastDue) {
+      return <span className="badge pending">Pending</span>;
+    } else {
+      return <span className="badge active">Active</span>;
+    }
+  };
   // console.log("jobId in Alljobs:", jobId);
   return (
     <div className="job-card">
