@@ -129,9 +129,10 @@ router.post('/hire/:proposalId', authMiddleware, hireFreelancerController.hireFr
 
 
 
-router.get('/hire/:proposalId', hireFreelancerController.getHireRequestById);
-router.get('/hire', hireFreelancerController.getAllHireData);
+router.get('/hire', hireFreelancerController.getClientHireRequests);
 
+
+router.get('/hire/:hireRequestId', hireFreelancerController.getHireRequestById);
 
 
 router.put('/hire/:hireRequestId', hireFreelancerController.updateHireRequest);
@@ -200,7 +201,15 @@ router.patch('/unban/:id', authMiddleware,usercontroller.ClientUnban);
 
 // const upload = multer({ dest: 'uploads/' });
 
-router.post('/profile', upload.single('profilePicture'), consultantProfileController.createProfile);
-router.get('/profile/:id',  consultantProfileController.getProfile);
+router.post('/profile', upload.single('profilePicture'),authMiddleware, consultantProfileController.createProfile);
+// Get single profile
+router.get('/profile/:userId', consultantProfileController.getProfileByUserId);
+
+
+// Get all profiles (optional, maybe admin-only)
+router.get('/profiles', consultantProfileController.getAllProfiles);
+
+router.get('/count-job-posts/:clientId',  jobPostController.countJobPostsByClientId);
+
 module.exports = router;
 

@@ -82,33 +82,31 @@ exports.getAllJobPosts = async (req, res) => {
 };
 exports.getClientJobPosts = async (req, res) => {
   try {
-    // Get the logged-in user's ID from the request object
     const loggedInUserId = req.user.userId || req.user;
 
-    // Find job posts for the logged-in user
     const jobPosts = await Job_Post.find({ client_id: loggedInUserId })
       .populate('client_id', 'email')
+      .sort({ createdAt: -1 }) // Sort jobs by newest first
       .lean();
     
     const jobPostsWithDetails = await Promise.all(jobPosts.map(async (job) => {
       const proposalCount = await Proposal.countDocuments({ job_id: job._id });
-      
-      // Check if the client has a payment method
       const hasPaymentMethod = await Payment_Method.exists({ client_id: job.client_id });
-      
+
       return {
         ...job,
         proposalCount,
         paymentMethodStatus: hasPaymentMethod ? "Payment method verified" : "Payment method unverified"
       };
     }));
-    
+
     res.status(200).json({ jobPosts: jobPostsWithDetails });
   } catch (err) {
     console.error('Error fetching job posts:', err);
     res.status(500).json({ message: 'Internal server error', error: err.message });
   }
 };
+
 
 // Backend API controller
 exports.getJobPostById = async (req, res) => {
@@ -168,3 +166,20 @@ exports.deleteJobPost = async (req, res) => {
     res.status(500).json({ message: 'Internal server error' });
   }
 };
+// Controller: count job posts by client ID
+exports.countJobPostsByClientId = async (req, res) => {
+  try {
+    // Get clientId from request params
+    const { clientId } = req.params;
+
+    // Count the number of job posts for this specific client
+    const jobPostCount = await Job_Post.countDocuments({ client_id: clientId });
+
+    // Return the result
+    res.status(200).json({ totalJobPosts: jobPostCount });
+  } catch (err) {
+    console.error('Error counting job posts:', err);
+    res.status(500).json({ message: 'Internal server error', error: err.message });
+  }
+};
+
