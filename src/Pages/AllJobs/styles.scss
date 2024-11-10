@@ -1,250 +1,565 @@
-$color-accent: #4bcdeb;
+// // $color-accent: #4bcdeb;
+
+// // .jobs-Page {
+// //   .jobs-Heading {
+// //     font-size: 24px;
+// //     font-weight: 600;
+// //     color: #0f172a;
+// //     margin-left: 8.5rem;
+// //     margin-bottom: 2rem;
+// //   }
+
+// //   .search-Container {
+// //     display: flex;
+// //   //   align-items: center;
+// //     justify-content: space-between;
+// //     margin-top: 20px;
+// //     width: 80%;
+// //     margin: 0px 10%;
+
+// //   }
+
+// //   .search-bar-wrapper {
+// //     // flex-grow: 1;
+// //     display: flex;
+
+// //     // border: 1px solid #dae0e7;
+// //     border: 1px solid #050505;
+// //     border-radius: 20px;
+// //     padding: 10px;
+
+// //   }
+
+// //   .filter-wrapper {
+// //     position: relative;
+// //     margin: 0px 10%;
+
+// //     .filter-button {
+// //       display: flex;
+// //       align-items: center;
+// //       border: 1px solid #94a3b8; /* equivalent to border-[#94A3B8] in Tailwind */
+// //       border-radius: 20px; /* equivalent to rounded-2xl in Tailwind */
+// //       font-size: 14px; /* equivalent to text-[14px] in Tailwind */
+// //       color: #383a3d; /* equivalent to text-[#94A3B8] in Tailwind */
+// //       font-family: "Poppins", sans-serif; /* equivalent to font-Poppins in Tailwind */
+// //       background-color: #f4f7f9;
+// //       cursor: pointer; // Adds a pointer cursor on hover
+// //       padding: 0px 100%;
+
+// //       // .filter-icon {
+// //       //   padding-left: 1%;
+// //       // }
+// //     }
+
+// //     // .filter-Dropdown {
+// //     //   display: none;
+// //     //   position: absolute;
+// //     //   // top: 100%;
+// //     //   left: 0;
+// //     //   background-color: white;
+// //     //   border: 1px solid #dae0e7;
+// //     //   border-radius: 8px;
+// //     //   padding: 20px 20%;
+// //     //   z-index: 100;
+
+// //     //   &__inner{
+// //     //       display: flex;
+// //     //       justify-content: center;
+// //     //       align-items: center;
+// //     //       padding: 10px 15px;
+
+// //     //   }
+
+// //     //   input {
+// //     //     margin-right: 10px;
+
+// //     //   }
+
+// //     //   .filter-done-button {
+// //     //     background-color: $color-accent;
+// //     //     color: white;
+// //     //     padding: 5px 10px;
+// //     //     border: none;
+// //     //     border-radius: 5px;
+// //     //     margin-top: 10px;
+// //     //     cursor: pointer;
+// //     //   }
+// //     // }
+
+// //     // &:hover .filter-dropdown {
+// //     //   display: block;
+// //     // }
+// //   }
+
+// //   .filter-Dropdown {
+// //     display: none; /* Default state */
+// //     position: absolute;
+// //     background-color: white;
+// //     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+// //     z-index: 1000;
+// //   }
+
+// //   &:hover.filter-Wrapper .filter-Dropdown {
+// //     display: block; /* Show when active */
+// //   }
+
+// //   .post-job-Button {
+// //     width: 30%;
+// //     margin-left: 20%;
+// //     // margin: 0px 10%;
+// //     background-color: $color-accent;
+// //     color: white;
+// //     padding: 10px 20px;
+// //     border: none;
+// //     border-radius: 5px;
+// //     cursor: pointer;
+// //     font-family: "Poppins", sans-serif;
+
+// //     &:hover {
+// //       background-color: darken($color-accent, 10%);
+// //     }
+// //   }
+
+// //   .jobs-containers {
+// //     margin: 20px 6%;
+// //   }
+
+// //   .pagination {
+// //       display: flex;
+// //       justify-content: space-between;
+// //       align-items: center;
+// //       padding-top: 20px;
+// //     }
+// //   }.jobs-page {
+// //     .jobs-heading {
+// //       font-size: 24px;
+// //       font-weight: 600;
+// //       color: #0f172a;
+// //     }
+
+// //     .search-container {
+// //       display: flex;
+// //     //   align-items: center;
+// //       justify-content: space-between;
+// //       margin-top: 20px;
+// //       width: 80%;
+
+// //       margin: 20px auto;
+// //       border: 1px solid #94a3b8;
+// //     }
+
+// //     .search-bar-wrapper {
+// //       flex-grow: 1;
+// //       display: flex;
+// //       align-items: center;
+// //       // border: 1px solid #dae0e7;
+// //       border: 1px solid #050505;
+// //       border-radius: 20px;
+// //       padding: 10px;
+// //       margin-right: 20px;
+// //       // max-width: 1200px;
+
+// //     }
+
+// //     .filter-wrapper {
+// //       position: relative;
+// //       border: 1px solid #94a3b8;
+
+// //       .filter-button {
+// //         display: flex;
+// //         align-items: center;
+// //         border: 1px solid #94a3b8; /* equivalent to border-[#94A3B8] in Tailwind */
+// //         border-radius: 20px; /* equivalent to rounded-2xl in Tailwind */
+// //         padding: 8px 50%; /* equivalent to p-2 in Tailwind */
+// //         margin-right: 2%;
+// //         font-size: 14px; /* equivalent to text-[14px] in Tailwind */
+// //         color: #383a3d; /* equivalent to text-[#94A3B8] in Tailwind */
+// //         font-family: "Poppins", sans-serif; /* equivalent to font-Poppins in Tailwind */
+// //         background-color: #f4f7f9;
+// //         width: 30%;
+// //         cursor: pointer; // Adds a pointer cursor on hover
+
+// //         // .filter-icon {
+// //         //   padding-left: 1%;
+// //         // }
+// //       }
+
+// //       .filter-dropdown {
+// //         display: none;
+// //         position: absolute;
+// //         // top: 100%;
+// //         left: 0;
+// //         background-color: white;
+// //         border: 1px solid #dae0e7;
+// //         border-radius: 8px;
+// //         padding: 20px;
+// //         z-index: 100;
+
+// //         &__inner{
+// //             display: flex;
+// //             justify-content: center;
+// //             align-items: center;
+// //             padding: 10px 15px;
+
+// //         }
+
+// //         input {
+// //           margin-right: 10px;
+// //         }
+
+// //         .filter-done-Button {
+// //           background-color: $color-accent;
+// //           color: white;
+// //           padding: 5px 10px;
+// //           border: none;
+// //           border-radius: 5px;
+// //           margin-top: 10px;
+// //           cursor: pointer;
+// //         }
+// //       }
+
+// //       &:hover .filter-dropdown {
+// //         display: block;
+// //       }
+// //     }
+
+// //     .post-job-Button {
+// //       margin-left: auto;
+// //       background-color: $color-accent;
+// //       color: white;
+// //       padding: 10px 15px;
+// //       border: none;
+// //       border-radius: 5px;
+// //       cursor: pointer;
+// //       font-family: "Poppins", sans-serif;
+
+// //       &:hover {
+// //         background-color: darken($color-accent, 10%);
+// //       }
+// //     }
+
+// //     .jobs-container {
+// //       margin: 20px 6%;
+// //     }
+
+// //     .pagination {
+// //         display: flex;
+// //         justify-content: space-between;
+// //         align-items: center;
+// //         padding-top: 20px;
+// //       }
+// //     }
+
+// $color-accent: #4bcdeb;
+
+// .jobs-Page {
+//   .jobs-Heading {
+//     font-size: 24px;
+//     font-weight: 600;
+//     color: #0f172a;
+//     margin-left: 8.5rem;
+//     margin-bottom: 2rem;
+//   }
+
+//   .search-Container {
+//     display: flex;
+//     justify-content: space-between;
+//     margin-top: 20px;
+//     width: 80%;
+//     margin: 0px 10%;
+//   }
+
+//   .search-bar-wrapper {
+//     display: flex;
+//     border: 1px solid #050505;
+//     border-radius: 20px;
+//     padding: 10px;
+//   }
+//   .filter-wrapper {
+//     position: relative;
+//     display: inline-block;
+
+//     .filter-button {
+//       display: flex;
+//       align-items: center;
+//       justify-content: center;
+//       border: 1px solid #94a3b8;
+//       border-radius: 20px;
+//       font-size: 14px;
+//       color: #383a3d;
+//       font-family: "Poppins", sans-serif;
+//       background-color: #f4f7f9;
+//       cursor: pointer;
+//       padding: 8px 16px;
+//       width: 120px; // Adjust width as needed
+//     }
+
+//     .filter-Dropdown {
+//       display: none;
+//       position: absolute;
+//       top: 100%;
+//       left: 0;
+//       background-color: white;
+//       border: 1px solid #dae0e7;
+//       border-radius: 8px;
+//       padding: 10px;
+//       z-index: 1000;
+//       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+//       width: 150px; // Adjust width as needed
+
+//       &__inner {
+//         display: flex;
+//         align-items: center;
+//         padding: 5px 0;
+//       }
+
+//       input {
+//         margin-right: 10px;
+//       }
+
+//       .filter-done-Button {
+//         background-color: $color-accent;
+//         color: white;
+//         padding: 5px 10px;
+//         border: none;
+//         border-radius: 5px;
+//         margin-top: 10px;
+//         cursor: pointer;
+//         width: 100%;
+//         text-align: center;
+//       }
+//     }
+
+//     &.open .filter-Dropdown {
+//       display: block;
+//     }
+//   }
+
+//   .post-job-Button {
+//     width: 30%;
+//     margin-left: 20%;
+//     background-color: $color-accent;
+//     color: white;
+//     padding: 10px 20px;
+//     border: none;
+//     border-radius: 5px;
+//     cursor: pointer;
+//     font-family: "Poppins", sans-serif;
+
+//     &:hover {
+//       background-color: darken($color-accent, 10%);
+//     }
+//   }
+
+//   .jobs-containers {
+//     margin: 20px 6%;
+//   }
+
+//   .pagination {
+//     display: flex;
+//     justify-content: space-between;
+//     align-items: center;
+//     padding-top: 20px;
+//   }
+// }
 
 .jobs-Page {
+  // padding: 2rem;
+
   .jobs-Heading {
-    font-size: 24px;
+    font-size: 2rem;
+    margin-bottom: 2rem;
+    color: #333;
     font-weight: 600;
-    color: #0f172a;
     margin-left: 8.5rem;
     margin-bottom: 2rem;
+    margin-top: 2rem;
   }
 
   .search-Container {
     display: flex;
-  //   align-items: center;
-    justify-content: space-between;
-    margin-top: 20px;
-    width: 80%;
-    margin: 0px 10%;
-    
-  }
+    gap: 1rem;
+    margin-bottom: 2rem;
+    align-items: center;
 
-  .search-bar-Wrapper {
-    // flex-grow: 1;
-    display: flex;
-    
-    // border: 1px solid #dae0e7;
-    border: 1px solid #050505;
-    border-radius: 20px;
-    padding: 10px;
+    //     justify-content: space-between;
    
+    width: 80%;
+    margin: 20px 10%;
 
+    .search-bar-wrapper {
+      flex: 1;
+      position: relative;
+      display: flex; // Changed from inline-block to flex
+      align-items: center; // Center items vertically
+      border: 1px solid #e2e8f0;
     
+      .icon {
+        position: absolute;
+        left: 12px; // Adjusted positioning
+        top: 50%;
+        transform: translateY(-50%);
+        color: #666;
+        z-index: 1; // Ensure icon stays above input
+        pointer-events: none; // Prevent icon from interfering with input
     
+      }
     
+      .search-input {
+        width: 100%;
+        padding: 12px 16px 12px 40px; // Adjusted padding to accommodate icon
+        border-radius: 8px;
+        font-size: 1rem;
+        line-height: 1.5;
+        position: relative; // Added position relative
+        background-color: white; // Ensure background is white
     
-  }
-
-  .filter-Wrapper {
-    position: relative;
-    margin: 0px 10%;
-
-    .filter-Button {
-      display: flex;
-      align-items: center;
-      border: 1px solid #94a3b8; /* equivalent to border-[#94A3B8] in Tailwind */
-      border-radius: 20px; /* equivalent to rounded-2xl in Tailwind */
-      font-size: 14px; /* equivalent to text-[14px] in Tailwind */
-      color: #383a3d; /* equivalent to text-[#94A3B8] in Tailwind */
-      font-family: "Poppins", sans-serif; /* equivalent to font-Poppins in Tailwind */
-      background-color: #f4f7f9;
-      cursor: pointer; // Adds a pointer cursor on hover
-      padding: 0px 100%;
-     
-    
-      // .filter-icon {
-      //   padding-left: 1%;
-      // }
+        
+      }
     }
 
-    .filter-Dropdown {
-      display: none;
-      position: absolute;
-      // top: 100%;
-      left: 0;
-      background-color: white;
-      border: 1px solid #dae0e7;
-      border-radius: 8px;
-      padding: 20px 20%;
-      z-index: 100;
+    .filter-wrapper {
+      position: relative;
 
-      &__inner{
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          padding: 10px 15px;
-         
-
-      }
-
-      input {
-        margin-right: 10px;
-      
-      }
-
-      .filter-done-button {
-        background-color: $color-accent;
-        color: white;
-        padding: 5px 10px;
-        border: none;
-        border-radius: 5px;
-        margin-top: 10px;
+      .filter-button {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.75rem 1rem;
+        border: 1px solid #4bcbeb;
+        border-radius: 0.5rem;
+        background: white;
         cursor: pointer;
+
+        &:hover {
+          background: #f7f7f7;
+        }
+      }
+
+      .filter-Dropdown {
+        position: absolute;
+        top: 100%;
+        right: 0;
+        margin-top: 0.5rem;
+        background: white;
+        border: 1px solid #e2e8f0;
+        border-radius: 0.5rem;
+        padding: 1rem;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        z-index: 10;
+
+        .filter-dropdown__inner {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          padding: 0.5rem 0;
+
+          label {
+            cursor: pointer;
+          }
+        }
+
+        .filter-done-Button {
+          width: 100%;
+          margin-top: 1rem;
+          padding: 0.5rem;
+          background: #4bcbeb;
+          color: white;
+          border: none;
+          border-radius: 0.25rem;
+          cursor: pointer;
+
+          &:hover {
+            background: darken(#4bcbeb, 10%);
+          }
+        }
       }
     }
 
-    &:hover .filter-dropdown {
-      display: block;
-    }
-  }
+    .post-job-Button {
+      padding: 0.75rem 1.5rem;
+      background: #4bcbeb;
+      color: white;
+      border: none;
+      border-radius: 0.5rem;
+      cursor: pointer;
+      font-weight: 500;
 
-  .post-job-Button {
-    width: 30%;
-    margin-left: 20%;
-    // margin: 0px 10%;
-    background-color: $color-accent;
-    color: white;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-family: "Poppins", sans-serif;
-  
-
-    &:hover {
-      background-color: darken($color-accent, 10%);
+      &:hover {
+        background: darken(#4bcbeb, 10%);
+      }
     }
   }
 
   .jobs-containers {
-    margin: 20px 6%;
+    margin-bottom: 2rem;
   }
 
   .pagination {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding-top: 20px;
-    }
-  }.jobs-page {
-    .jobs-heading {
-      font-size: 24px;
-      font-weight: 600;
-      color: #0f172a;
-    }
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 0;
 
-    .search-container {
-      display: flex;
-    //   align-items: center;
-      justify-content: space-between;
-      margin-top: 20px;
-      width: 80%;
-    
-      margin: 20px auto;
-      border: 1px solid #94a3b8;
-    }
-  
-    .search-bar-wrapper {
-      flex-grow: 1;
+    .rows-per-page {
       display: flex;
       align-items: center;
-      // border: 1px solid #dae0e7;
-      border: 1px solid #050505;
-      border-radius: 20px;
-      padding: 10px;
-      margin-right: 20px;
-      // max-width: 1200px;
-      
-    }
-  
-    .filter-wrapper {
-      position: relative;
-      border: 1px solid #94a3b8;
-  
-      .filter-button {
-        display: flex;
-        align-items: center;
-        border: 1px solid #94a3b8; /* equivalent to border-[#94A3B8] in Tailwind */
-        border-radius: 20px; /* equivalent to rounded-2xl in Tailwind */
-        padding: 8px 50%; /* equivalent to p-2 in Tailwind */
-        margin-right: 2%; 
-        font-size: 14px; /* equivalent to text-[14px] in Tailwind */
-        color: #383a3d; /* equivalent to text-[#94A3B8] in Tailwind */
-        font-family: "Poppins", sans-serif; /* equivalent to font-Poppins in Tailwind */
-        background-color: #f4f7f9;
-        width: 30%;
-        cursor: pointer; // Adds a pointer cursor on hover
-    
-       
-      
-        // .filter-icon {
-        //   padding-left: 1%;
-        // }
+      gap: 0.5rem;
+
+      select {
+        padding: 0.25rem;
+        border: 1px solid #e2e8f0;
+        border-radius: 0.25rem;
       }
-  
-      .filter-dropdown {
-        display: none;
-        position: absolute;
-        // top: 100%;
-        left: 0;
-        background-color: white;
-        border: 1px solid #dae0e7;
-        border-radius: 8px;
-        padding: 20px;
-        z-index: 100;
+    }
 
-        &__inner{
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 10px 15px;
-           
+    .page-controls {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
 
-        }
-  
-        input {
-          margin-right: 10px;
-        }
-  
-        .filter-done-Button {
-          background-color: $color-accent;
+      .page-number {
+        padding: 0.5rem;
+        min-width: 2rem;
+        text-align: center;
+        cursor: pointer;
+        border-radius: 0.25rem;
+
+        &.active {
+          background: #4bcbeb;
           color: white;
-          padding: 5px 10px;
-          border: none;
-          border-radius: 5px;
-          margin-top: 10px;
-          cursor: pointer;
+        }
+
+        &.dots {
+          cursor: default;
         }
       }
-  
-      &:hover .filter-dropdown {
-        display: block;
+
+      .pagination-button {
+        padding: 0.5rem;
+        border: 1px solid #e2e8f0;
+        border-radius: 0.25rem;
+        background: white;
+        cursor: pointer;
+
+        &:disabled {
+          opacity: 0.5;
+          cursor: not-allowed;
+        }
       }
     }
-  
-    .post-job-Button {
-      margin-left: auto;
-      background-color: $color-accent;
-      color: white;
-      padding: 10px 15px;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      font-family: "Poppins", sans-serif;
-  
-      &:hover {
-        background-color: darken($color-accent, 10%);
+
+    .go-to-page {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+
+      input {
+        width: 4rem;
+        padding: 0.25rem;
+        border: 1px solid #e2e8f0;
+        border-radius: 0.25rem;
       }
     }
-  
-    .jobs-container {
-      margin: 20px 6%;
-    }
-  
-    .pagination {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding-top: 20px;
-      }
-    }
+  }
+}
