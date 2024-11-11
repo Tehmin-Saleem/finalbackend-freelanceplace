@@ -31,6 +31,7 @@ const ClientDashboard = () => {
 
         const decodedToken = jwtDecode(token);
         const userId = decodedToken.userId;
+        console.log("Decoded User ID:", userId);
 
         const response = await axios.get(
           `http://localhost:5000/api/client/users/${userId}`,
@@ -48,6 +49,8 @@ const ClientDashboard = () => {
         }
       );
       setTotalJobsCount(jobCountResponse.data.totalJobPosts); 
+    
+console.log("Total Jobs Count Response:", jobCountResponse.data)
       
       const hiredFreelancersResponse = await axios.get(
         `http://localhost:5000/api/client/hired-freelancers-count/${userId}`,

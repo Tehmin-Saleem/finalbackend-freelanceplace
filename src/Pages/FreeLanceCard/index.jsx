@@ -140,8 +140,8 @@ const FreelancerCard = ({ heading, freelancer }) => {
 
   const categoriesOptions = [
     "MERN Stack",
-    "UI/UX Designer",
-    "Frontend Developer",
+    "UI/UX Design",
+    "Front end developer",
     "Backend Developer",
   ];
   const skillsOptions = ["JavaScript", "Python", "CSS", "HTML"];

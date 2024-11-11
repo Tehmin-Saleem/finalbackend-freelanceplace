@@ -36,19 +36,25 @@ const FreelanceDashboardPage = () => {
         });
         setUser(response.data);
 
-
-
-
-
-
-
-
-
-        // Fetch stats
         const statsResponse = await axios.get(`http://localhost:5000/api/freelancer/proposals/count/${userId}`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
-        setQuickStats(statsResponse.data);
+        setQuickStats(prevStats => ({
+          ...prevStats,
+          totalJobsApplied: statsResponse.data.totalProposals
+        }));
+
+
+
+
+
+
+
+        // // Fetch stats
+        // const statsResponse = await axios.get(`http://localhost:5000/api/freelancer/proposals/count/${userId}`, {
+        //   headers: { 'Authorization': `Bearer ${token}` }
+        // });
+        // setQuickStats(statsResponse.data);
         
       } catch (error) {
         // navigate('/signin');
@@ -126,10 +132,10 @@ const FreelanceDashboardPage = () => {
           <p>Explore available opportunities that match your skills.</p>
           <button>Browse Jobs</button>
         </div>
-        <div className="card" onClick={() => navigate('/myProposals')}>
-          <h2>My Proposals</h2>
-          <p>View and manage the proposals you’ve submitted.</p>
-          <button>View Proposals</button>
+        <div className="card" onClick={() => navigate('/freelancersjobpage')}>
+          <h2>offers</h2>
+          <p>View and manage the offers.</p>
+          <button>View offers</button>
         </div>
         <div className="card" onClick={() => navigate('/profile/:userId')}>
           <h2>Profile Settings</h2>
