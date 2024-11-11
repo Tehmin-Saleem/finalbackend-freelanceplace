@@ -370,7 +370,7 @@ function Signup() {
               </span>
             </div>
             {/* New div for Google and Apple buttons */}
-            <div className="mt-5 mx-auto max-w-xs flex flex-row">
+            {/* <div className="mt-5 mx-auto max-w-xs flex flex-row">
               <div className="flex justify-center mb-4 shadow-xl p-3">
                 <div className="mr-3">
                   <Google />
@@ -396,7 +396,7 @@ function Signup() {
                   </a>
                 </div>
               </div>
-            </div>
+            </div> */}
           </form>
         </div>
       </div>
