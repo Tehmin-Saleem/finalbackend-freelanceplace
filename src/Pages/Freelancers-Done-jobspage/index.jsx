@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import {
   Header,
@@ -6,9 +5,10 @@ import {
   CommonButton,
   Spinner
 } from "../../components/index";
-import "./styles.scss"; // Import the SCSS file
+import "./styles.scss";
 import { Filter, IconSearchBar } from "../../svg";
 import axios from "axios";
+
 const FreelancersJobsPage = () => {
   const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -27,7 +27,6 @@ const FreelancersJobsPage = () => {
         throw new Error('No authentication token found');
       }
 
-      // First fetch job IDs from /hire API
       const hireResponse = await axios.get('http://localhost:5000/api/client/hire', {
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -35,19 +34,29 @@ const FreelancersJobsPage = () => {
         }
       });
 
-      if (!hireResponse.data?.data) {
-        throw new Error('Invalid hire data format');
+      console.log('hire response', hireResponse.data);
+      
+      if (!hireResponse.data || !Array.isArray(hireResponse.data.data)) {
+        console.log('Hire response structure:', hireResponse.data);
+        setJobs([]);
+        return;
       }
+
       const jobToFreelancerMap = hireResponse.data.data.reduce((map, hire) => {
-        if (hire.jobId?.id && hire.freelancerId?.id) {
+        if (hire?.jobId?.id && hire?.freelancerId?.id) {
           map[hire.jobId.id] = hire.freelancerId.id;
         }
         return map;
       }, {});
-      // Extract job IDs from hire data
-      const hiredJobIds = new Set(hireResponse.data.data.map(hire => hire.jobId?.id));
-console.log('hire response', hireResponse.data)
-      // Fetch all jobs from /job-posts API
+
+      const hiredJobIds = new Set(
+        hireResponse.data.data
+          .filter(hire => hire?.jobId?.id)
+          .map(hire => hire.jobId.id)
+      );
+
+      console.log('hire response', hireResponse.data);
+
       const jobsResponse = await axios.get('http://localhost:5000/api/client/job-posts', {
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -58,8 +67,7 @@ console.log('hire response', hireResponse.data)
       if (!jobsResponse.data?.jobPosts) {
         throw new Error('Invalid job posts data');
       }
-// console.log('response', jobsResponse.data)
-      // Filter jobs to only include those with matching IDs
+
       const matchedJobs = jobsResponse.data.jobPosts
         .filter(job => jobToFreelancerMap[job._id])
         .map(job => ({
@@ -67,10 +75,10 @@ console.log('hire response', hireResponse.data)
           type: job.budget_type === "fixed" ? "Fixed" : "Hourly",
           title: job.job_title || 'Untitled Job',
           client_id: job.client_id._id,
-          freelancer_id: jobToFreelancerMap[job._id], // Add freelancer_id from the map
+          freelancer_id: jobToFreelancerMap[job._id],
           rate: job.budget_type === "fixed" 
-            ? `$${job.fixed_price}` 
-            : `$${job.hourly_rate?.from}-$${job.hourly_rate?.to}/hr`,
+            ? `${job.fixed_price}`
+            : `${job.hourly_rate?.from}-${job.hourly_rate?.to}/hr`,
           timeline: job.project_duration?.duration_of_work || "Not specified",
           level: job.project_duration?.experience_level || "Not specified",
           description: job.description || "No description provided",
@@ -81,7 +89,7 @@ console.log('hire response', hireResponse.data)
         }));
 
       setJobs(matchedJobs);
-      console.log('id', matchedJobs)
+      console.log('id', matchedJobs);
     } catch (error) {
       console.error('Error in fetchJobs:', error);
       setError('Failed to fetch jobs. Please try again.');
@@ -94,13 +102,11 @@ console.log('hire response', hireResponse.data)
     fetchJobs();
   }, []);
 
-  // Filter jobs based on search term
   const filteredJobs = jobs.filter(job => 
     job.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
     job.description.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  // Pagination
   const totalPages = Math.ceil(filteredJobs.length / pageSize);
   const paginatedJobs = filteredJobs.slice(
     (currentPage - 1) * pageSize,
@@ -143,7 +149,6 @@ console.log('hire response', hireResponse.data)
                 client_id={job.client_id} 
                 freelancer_id={job.freelancer_id}
                 {...job}
-             
               />
             ))
           ) : (
@@ -165,22 +170,13 @@ console.log('hire response', hireResponse.data)
           <option value={15}>15</option>
         </select>
         <div className="page-controls">
-        <span>1</span>
+          <span>1</span>
           <span>2</span>
           <span>3</span>
           <span>...</span>
           <span>10</span>
           <span>11</span>
           <span>12</span>
-          {/* {[...Array(totalPages)].map((_, index) => (
-            <span 
-              key={index + 1}
-              onClick={() => setCurrentPage(index + 1)}
-              className={currentPage === index + 1 ? 'active' : ''}
-            >
-              {index + 1}
-            </span>
-          ))} */}
         </div>
         <span>Go to page</span>
         <input type="text" />
