@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './styles.scss';
 import axios from "axios";
-
+import { useNavigate } from 'react-router-dom';
 const EditableProjectCard = ({ project, onSave, onComplete }) => {
   const [freelancerData, setFreelancerData] = useState({
     projectName: '',
@@ -25,7 +25,7 @@ const EditableProjectCard = ({ project, onSave, onComplete }) => {
   const [showDueDateNotification, setShowDueDateNotification] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
-
+  const navigate = useNavigate();
   useEffect(() => {
     setFreelancerData({
       projectName: project.projectName || '',
@@ -126,20 +126,21 @@ const EditableProjectCard = ({ project, onSave, onComplete }) => {
       });
   
       if (response.data.success) {
-        // Always post the data, but call different callbacks based on status
+        const data = response.data.data;
+      
+        // Determine the action based on `shouldShowPendingApproval`
         if (shouldShowPendingApproval()) {
-          onComplete?.(response.data.data);
+          await onComplete?.(data);
         } else {
-          onSave?.(response.data.data);
+          await onSave?.(data);
         }
+      
+        // Navigate to freelancersjobpage for both cases
+        navigate('/freelancersjobpage');
       } else {
         throw new Error(response.data.message || 'Failed to process project');
       }
-      if (freelancerData.progress === 100) {
-        onComplete?.(data.data);
-      } else {
-        onSave?.(data.data);
-      }
+      
     } catch (err) {
       setError(err.response?.data?.message || err.message);
       console.error('Error updating project:', err);
