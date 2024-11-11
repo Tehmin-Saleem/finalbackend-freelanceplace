@@ -1,179 +1,4 @@
-// import React, { useState, useEffect } from "react";
-// import "./styles.scss";
-// import Header from "../../components/Commoncomponents/Header";
-// import { Chat } from "../../svg/index";
-// import CommonButton from "../../components/Commoncomponents/CommonButton";
-// import axios from "axios";
-// import { jwtDecode } from "jwt-decode";
-// import Spinner from "../../components/chatcomponents/Spinner"; // Assuming you have this component
 
-// const ManageProjectbyclient = () => {
-//   const [loading, setLoading] = useState(false);
-//   const [error, setError] = useState(null);
-//   const [profileData, setProfileData] = useState(null);
-
-//   useEffect(() => {
-//     const fetchClientData = async () => {
-//       setLoading(true);
-//       try {
-//         const token = localStorage.getItem('token');
-//         if (!token) {
-//           throw new Error('No authentication token found. Please login.');
-//         }
-
-//         const decodedToken = jwtDecode(token);
-//         const userId = decodedToken.userId;
-
-//         const profileResponse = await axios.get(
-//           "http://localhost:5000/api/client/profile",
-//           {
-//             headers: { 'Authorization': `Bearer ${token}` }
-//           }
-//         );
-
-//         const clientProfile = profileResponse.data.data;
-//         setProfileData(clientProfile);
-//       } catch (error) {
-//         console.error('Error fetching client data:', error);
-//         setError(error.message || 'An error occurred while fetching data');
-//       } finally {
-//         setLoading(false);
-//       }
-//     };
-
-//     fetchClientData();
-//   }, []);
-
-//   if (loading) return <Spinner alignCenter/>;
-//   if (error) return <div className="error-message">{error}</div>;
-
-//   return (
-//     <>
-//       <Header />
-//       <div className="manage-projects">
-//         {/* Header Section */}
-//         <header className="header">
-//           <div className="header-content">
-//             <h1>Manage Ongoing Projects</h1>
-//             <p>Track project progress and milestones</p>
-//           </div>
-
-//           <div className="client-profile">
-//             <img
-//               src={profileData?.image || 'https://via.placeholder.com/150'}
-//               alt={profileData?.name || "Client"}
-//             />
-//             <span>{profileData?.name || "Loading..."}</span>
-//           </div>
-//         </header>
-
-//         {/* Project Cards - Static Content */}
-//         <div className="project-list">
-//           <ProjectCard
-//             projectName="Website Redesign"
-//             freelancerName="John Doe"
-//             deadline="2024-11-01"
-//             progress={60}
-//             milestones={[
-//               { name: "Initial Design", status: "Completed" },
-//               { name: "Development", status: "In Progress" },
-//               { name: "Testing", status: "Not Started" },
-//             ]}
-//             budget="5,000 USD"
-//           />
-
-//           <ProjectCard
-//             projectName="Mobile App Development"
-//             freelancerName="Jane Smith"
-//             deadline="2024-12-15"
-//             progress={30}
-//             milestones={[
-//               { name: "Requirement Gathering", status: "Completed" },
-//               { name: "UI/UX Design", status: "In Progress" },
-//               { name: "Development", status: "Not Started" },
-//             ]}
-//             budget="10,000 USD"
-//           />
-//         </div>
-//       </div>
-//     </>
-//   );
-// };
-
-// // ProjectCard Component (unchanged)
-// const ProjectCard = ({
-//   projectName,
-//   freelancerName,
-//   deadline,
-//   progress,
-//   milestones,
-//   budget,
-// }) => {
-//   return (
-//     <div className="project-card">
-//       <div className="project-header">
-//         <div className="project-info">
-//           <h2>{projectName}</h2>
-//           <p>Freelancer: {freelancerName}</p>
-//         </div>
-//         <div className="project-deadline">
-//           <p>Deadline: {deadline}</p>
-//           <TimerButton />
-//         </div>
-//       </div>
-
-//       <div className="project-progress-bar">
-//         <div className="progress" style={{ width: `${progress}%` }}></div>
-//       </div>
-//       <p className="progress-percent">{progress}% complete</p>
-
-//       <div className="milestones">
-//         <h3>Milestones</h3>
-//         {milestones.map((milestone, index) => (
-//           <MilestoneItem
-//             key={index}
-//             name={milestone.name}
-//             status={milestone.status}
-//           />
-//         ))}
-//       </div>
-
-//       <div className="project-budget">
-//         <p>Budget: {budget}</p>
-//       </div>
-
-//       <div className="chat-button">
-//         <CommonButton
-//           text={<Chat />}
-//           className="bg-[#FFFFFF] border border-[#4BCBEB] text-[18px] font-Poppins text-[#4BCBEB] rounded-lg font-semibold py-1 px-6 w-30 focus:outline-none focus:shadow-outline"
-//         />
-//       </div>
-//     </div>
-//   );
-// };
-
-// // MilestoneItem Component (unchanged)
-// const MilestoneItem = ({ name, status }) => {
-//   return (
-//     <div className="milestone">
-//       <p>{name}</p>
-//       <p className={`status ${status.toLowerCase().replace(" ", "-")}`}>
-//         {status}
-//       </p>
-//     </div>
-//   );
-// };
-
-// // TimerButton Component (unchanged)
-// const TimerButton = () => {
-//   return (
-//     <button className="timer-btn">
-//       <i className="bell-icon">🔔</i> Set Notification
-//     </button>
-//   );
-// };
-
-// export default ManageProjectbyclient;
 
 import React, { useState, useEffect } from "react";
 import "./styles.scss";
@@ -181,7 +6,21 @@ import Header from "../../components/Commoncomponents/Header";
 import { Chat } from "../../svg/index";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
+import { 
+  Card, 
+  Progress, 
+  Tag, 
+  Row, 
+  Col, 
+  Timeline, 
+  Empty, 
+  Alert,
+  Statistic,
+  Typography 
+} from 'antd';
+const { Title, Text } = Typography;
 import Spinner from "../../components/chatcomponents/Spinner";
+
 
 const ManageProjectsByClient = () => {
   const [loading, setLoading] = useState(false);
@@ -365,151 +204,275 @@ const ProjectCard = ({ project, onClick, isSelected }) => {
   );
 };
 
+
+
+
+
+
 const ProjectDetails = ({ project }) => {
   const [activeTab, setActiveTab] = useState("overview");
-  const [milestoneProgress, setMilestoneProgress] = useState(null);
-  const [loadingMilestones, setLoadingMilestones] = useState(false);
-  useEffect(() => {
-    // If project already has progressDetails, use that
-    if (project?.progressDetails) {
-      setMilestoneProgress(project.progressDetails);
-      return;
-    }
+  const [projectProgress, setProjectProgress] = useState(null);
+  const [loadingProgress, setLoadingProgress] = useState(false);
+  const [error, setError] = useState(null);
 
-    const fetchMilestoneProgress = async () => {
-      if (activeTab === "milestones" && project?._id) {
-        setLoadingMilestones(true);
+
+  const token = localStorage.getItem("token");
+
+
+  const decodedToken = jwtDecode(token);
+  const ClientId = decodedToken.userId;
+
+
+  useEffect(() => {
+    const getProjectProgress = async () => {
+      // Only proceed if we have all required data
+      if (activeTab === "milestones" && project) {
+        console.log("Project Data for API call:", {
+          projectId: project.projectId || project._id,
+          proposalId: project.proposal_id,
+          fullProject: project
+        });
+
+        // Extract the correct IDs
+        const projectId = project.projectId || project._id;
+        const clientId =  ClientId;
+
+        // Validate IDs before making the API call
+        if (!projectId || !clientId) {
+          console.error("Missing required IDs:", { projectId, clientId });
+          setError("Missing required project or client ID");
+          return;
+        }
+
+        console.log("Making API call with IDs:", { projectId, clientId });
+        setLoadingProgress(true);
+
         try {
           const token = localStorage.getItem("token");
-          
-          console.log("Fetching milestone progress for:", {
-            projectId: project._id,
-            clientId: project.client_id
-          });
+          if (!token) {
+            throw new Error("No authentication token found");
+          }
 
           const response = await axios.get(
-            `http://localhost:5000/api/client/${project.client_id}/project/${project._id}/progress`,
+            `http://localhost:5000/api/client/${clientId}/project/${projectId}/progress`,
             {
-              headers: { 
+              headers: {
                 Authorization: `Bearer ${token}`,
                 'Content-Type': 'application/json'
-              },
-              timeout: 10000 // Set timeout to 10 seconds
+              }
             }
           );
 
-          console.log("Milestone Progress Response:", response.data);
-          setMilestoneProgress(response.data.data);
-        } catch (error) {
-          console.error("Error fetching milestone progress:", {
-            message: error.message,
-            response: error.response?.data,
-            status: error.response?.status
+          console.log("API Response:", response.data);
+
+          if (response.data.success) {
+            setProjectProgress(response.data.data);
+          } else {
+            throw new Error(response.data.message || 'Failed to fetch progress');
+          }
+        } catch (err) {
+          console.error("API Call Error:", {
+            message: err.message,
+            response: err.response?.data,
+            status: err.response?.status,
+            fullError: err
           });
+          setError(err.response?.data?.message || err.message);
         } finally {
-          setLoadingMilestones(false);
+          setLoadingProgress(false);
         }
       }
     };
 
-    fetchMilestoneProgress();
+    getProjectProgress();
   }, [activeTab, project]);
 
-  const renderMilestoneTab = () => {
-    if (loadingMilestones) {
-      return <Spinner />;
-    }
+  // // Add this debug component
+  // const DebugProjectInfo = () => (
+  //   <div style={{ margin: '20px', padding: '10px', border: '1px solid #ccc' }}>
+  //     <h4>Debug Project Information</h4>
+  //     <pre style={{ whiteSpace: 'pre-wrap' }}>
+  //       {JSON.stringify({
+  //         projectId: project?.projectId || project?._id,
+  //         clientId: project?.client_id || project?.clientId,
+  //         proposalId: project?.proposal_id,
+  //         activeTab,
+  //         hasToken: !!localStorage.getItem("token"),
+  //         projectData: {
+  //           ...project,
+  //           // Add any other relevant fields
+  //         }
+  //       }, null, 2)}
+  //     </pre>
+  //   </div>
+  // );
 
-    if (!project) {
-      return <div className="error-message">No project selected</div>;
-    }
 
-    const progressData = milestoneProgress || project.progressDetails;
 
-    if (!progressData) {
-      return (
-        <div className="no-data-message">
-          <p>No milestone data available</p>
-          <p>Project ID: {project._id}</p>
-          <p>Client ID: {project.client_id}</p>
-        </div>
-      );
-    }
+
+
+
+
+
+
+
+const renderMilestoneTab = () => {
+  if (loadingProgress) {
+    return <Spinner />;
+  }
+
+  if (error) {
+    return (
+      <div className="error-state">
+        <Alert type="error" message={error} />
+      </div>
+    );
+  }
+
+  if (!projectProgress) {
+    return (
+      <div className="empty-state">
+        <Empty description="No progress data available" />
+      </div>
+    );
+  }
+
+
+
+  // useEffect(() => {
+  //   // If project already has progressDetails, use that
+  //   if (project?.progressDetails) {
+  //     setMilestoneProgress(project.progressDetails);
+  //     return;
+  //   }
+
+  //   const fetchMilestoneProgress = async () => {
+  //     if (activeTab === "milestones" && project?._id) {
+  //       setLoadingMilestones(true);
+  //       try {
+  //         const token = localStorage.getItem("token");
+          
+  //         console.log("Fetching milestone progress for:", {
+  //           projectId: project._id,
+  //           clientId: project.client_id
+  //         });
+
+  //         const response = await axios.get(
+  //           `http://localhost:5000/api/client/${project.client_id}/project/${project._id}/progress`,
+  //           {
+  //             headers: { 
+  //               Authorization: `Bearer ${token}`,
+  //               'Content-Type': 'application/json'
+  //             },
+  //             timeout: 10000 // Set timeout to 10 seconds
+  //           }
+  //         );
+
+  //         console.log("Milestone Progress Response:", response.data);
+  //         setMilestoneProgress(response.data.data);
+  //       } catch (error) {
+  //         console.error("Error fetching milestone progress:", {
+  //           message: error.message,
+  //           response: error.response?.data,
+  //           status: error.response?.status
+  //         });
+  //       } finally {
+  //         setLoadingMilestones(false);
+  //       }
+  //     }
+  //   };
+
+  //   fetchMilestoneProgress();
+  // }, [activeTab, project]);
 
 
     return (
-      <div className="milestone-content">
-        {/* Overall Progress Section */}
-        <div className="overall-progress-section">
-          <h3>Overall Project Progress</h3>
-          <div className="progress-bar-container">
-            <div
-              className="progress-bar"
-              style={{
-                width: `${milestoneProgress.projectDetails.overallProgress}%`,
-              }}
+      <div className="milestone-progress-container">
+      {/* Overall Progress Card */}
+      <Card className="progress-card">
+        <div className="progress-header">
+          <Title level={4}>{projectProgress.projectName}</Title>
+          <Tag color={projectProgress.status === 'Completed' ? 'green' : 'blue'}>
+            {projectProgress.status}
+          </Tag>
+        </div>
+
+        <div className="progress-section">
+          <h4>Overall Progress</h4>
+          <Progress 
+            percent={projectProgress.progress} 
+            status={projectProgress.progress === 100 ? 'success' : 'active'}
+          />
+        </div>
+
+        <Row gutter={[16, 16]} className="project-details">
+          <Col span={8}>
+            <Statistic 
+              title="Budget" 
+              value={projectProgress.budget} 
+              prefix="$" 
             />
-            <span className="progress-text">
-              {Math.round(milestoneProgress.projectDetails.overallProgress)}%
-            </span>
+          </Col>
+          <Col span={8}>
+            <Statistic
+              title="Due Date"
+              value={new Date(projectProgress.due_date).toLocaleDateString()}
+            />
+          </Col>
+          <Col span={8}>
+            <Statistic
+              title="Project Type"
+              value={projectProgress.projectType}
+            />
+          </Col>
+        </Row>
+
+        {projectProgress.description && (
+          <div className="description-section">
+            <Title level={5}>Description</Title>
+            <Text>{projectProgress.description}</Text>
           </div>
-          <div className="project-meta">
-            <span>
-              Start Date:{" "}
-              {new Date(
-                milestoneProgress.projectDetails.startDate
-              ).toLocaleDateString()}
-            </span>
-            <span>
-              Due Date:{" "}
-              {new Date(
-                milestoneProgress.projectDetails.dueDate
-              ).toLocaleDateString()}
-            </span>
-          </div>
-        </div>
+        )}
+      </Card>
 
-        {/* Milestones List */}
-        <div className="milestones-list">
-          {milestoneProgress.milestones.map((milestone, index) => (
-            <div key={milestone.id} className="milestone-item">
-              <div className="milestone-header">
-                <h4>{milestone.name}</h4>
-                <span
-                  className={`status-badge ${milestone.status.toLowerCase()}`}
-                >
-                  {milestone.status}
-                </span>
-              </div>
-
-              <div className="milestone-details">
-                <div className="progress-indicator">
-                  <div
-                    className="progress-bar"
-                    style={{ width: `${milestone.progress}%` }}
-                  />
-                  <span>{milestone.progress}%</span>
-                </div>
-
-                <div className="milestone-meta">
-                  <span>Amount: ${milestone.amount}</span>
-                  <span>
-                    Due: {new Date(milestone.dueDate).toLocaleDateString()}
-                  </span>
-                </div>
-
-                {milestone.description && (
-                  <p className="milestone-description">
-                    {milestone.description}
-                  </p>
-                )}
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    );
-  };
+      {/* Milestones Section */}
+      {projectProgress.milestones && projectProgress.milestones.length > 0 ? (
+        <Card className="milestones-card" style={{ marginTop: '20px' }}>
+          <Title level={4}>Milestones</Title>
+          <Timeline>
+            {projectProgress.milestones.map((milestone, index) => (
+              <Timeline.Item 
+                key={index}
+                color={milestone.status === 'Completed' ? 'green' : 'blue'}
+              >
+                <Card size="small">
+                  <h4>{milestone.name}</h4>
+                  <Row gutter={[16, 16]}>
+                    <Col span={12}>
+                      <Text strong>Amount: </Text>
+                      <Text>${milestone.amount}</Text>
+                    </Col>
+                    <Col span={12}>
+                      <Text strong>Status: </Text>
+                      <Tag color={milestone.status === 'Completed' ? 'green' : 'blue'}>
+                        {milestone.status}
+                      </Tag>
+                    </Col>
+                  </Row>
+                </Card>
+              </Timeline.Item>
+            ))}
+          </Timeline>
+        </Card>
+      ) : (
+        <Empty 
+          description="No milestones available" 
+          style={{ marginTop: '20px' }}
+        />
+      )}
+    </div>
+  );
+};
 
   const formatHourlyRate = (project) => {
     if (project.hourly_rate?.from && project.hourly_rate?.to) {

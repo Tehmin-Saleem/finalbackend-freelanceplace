@@ -570,6 +570,43 @@ $proposal-shadow: rgba(0, 0, 0, 0.1);
         }
       }
     }
+
+    .milestone-progress-container {
+      padding: 20px;
+    
+      .progress-card {
+        .progress-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 24px;
+        }
+    
+        .progress-section {
+          margin: 20px 0;
+          
+          h4 {
+            margin-bottom: 16px;
+          }
+        }
+    
+        .project-details {
+          margin-top: 24px;
+        }
+    
+        .description-section {
+          margin-top: 24px;
+          padding-top: 24px;
+          border-top: 1px solid #f0f0f0;
+        }
+      }
+    
+      .milestones-card {
+        .ant-timeline {
+          margin-top: 20px;
+        }
+      }
+    }
   }
 
   .proposal-attachments {
