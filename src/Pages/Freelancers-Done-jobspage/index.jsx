@@ -35,22 +35,27 @@ const FreelancersJobsPage = () => {
             "Content-Type": "application/json",
           },
         }
-      );
-
-      if (!hireResponse.data?.data) {
-        throw new Error("Invalid hire data format");
-      }
-      const jobToFreelancerMap = hireResponse.data.data.reduce((map, hire) => {
-        if (hire.jobId?.id && hire.freelancerId?.id) {
-          map[hire.jobId.id] = hire.freelancerId.id;
-        }
-        return map;
-      }, {});
+      });
+console.log('hire response', hireResponse.data)
+if (!hireResponse.data || !Array.isArray(hireResponse.data.data)) {
+  console.log('Hire response structure:', hireResponse.data);
+  setJobs([]);
+  return;
+}
+const jobToFreelancerMap = hireResponse.data.data.reduce((map, hire) => {
+  if (hire?.jobId?.id && hire?.freelancerId?.id) {
+    map[hire.jobId.id] = hire.freelancerId.id;
+  }
+  return map;
+}, {});
+const hiredJobIds = new Set(
+  hireResponse.data.data
+    .filter(hire => hire?.jobId?.id)
+    .map(hire => hire.jobId.id)
+);
       // Extract job IDs from hire data
-      const hiredJobIds = new Set(
-        hireResponse.data.data.map((hire) => hire.jobId?.id)
-      );
-      console.log("hire response", hireResponse.data);
+     
+console.log('hire response', hireResponse.data)
       // Fetch all jobs from /job-posts API
       const jobsResponse = await axios.get(
         "http://localhost:5000/api/client/job-posts",
