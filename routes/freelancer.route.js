@@ -20,6 +20,7 @@ const offerController = require ('../controllers/offer_form.controller')
 const chatController = require('../controllers/chat.controller'); // Add this
 
 const  aiCoverLetter  = require('../controllers/aiCoverLetter.controller');
+const hireFreelancerController = require('../controllers/hire_freelancer.controller');
 
 
 // Set up multer for file uploads
@@ -194,6 +195,12 @@ router.patch('/unban/:id', authMiddleware,usercontroller.freelancerUnban);
 
 router.get('/profile/:id',  authMiddleware, usercontroller.fetchprofile);
 router.get('/proposals/count/:userId',authMiddleware, proposalController.getTotalProposalsByFreelancer);
+
+
+
+
+// route for getting jobs for specific freelancer
+router.get('/hired-jobs/:freelancerId', hireFreelancerController.getFreelancerHiredJobs);
 
 
 

@@ -678,3 +678,148 @@ exports.getFreelancersEngagedCountByClientId = async (req, res) => {
   }
 };
 
+
+
+
+
+// exports.getFreelancerHiredJobs = async (req, res) => {
+//   try {
+//     const { freelancerId } = req.params;
+    
+//     if (!freelancerId) {
+//       return res.status(400).json({
+//         success: false,
+//         message: 'Freelancer ID is required'
+//       });
+//     }
+
+//     const hiredJobs = await HireFreelancer.find({ 
+//       freelancerId: freelancerId,
+//       status: 'hired'
+//     })
+//     .populate('jobId', '_id job_title description budget deadline category skills') // Note: _id is already included
+//     .populate('clientId', '_id name email company')
+//     .populate('proposalId', '_id proposal_description bid_amount')
+//     .sort({ _id: -1 });
+
+//     const formattedResponse = hiredJobs.map(hire => ({
+//       hireId: hire._id,
+//       job: hire.jobId ? {
+//         id: hire.jobId._id,        // Already included job ID
+//         jobId: hire.jobId._id,     // Adding explicit jobId field
+//         title: hire.jobId.job_title,
+//         description: hire.jobId.description,
+//         budget: hire.jobId.budget,
+//         deadline: hire.jobId.deadline,
+//         category: hire.jobId.category,
+//         skills: hire.jobId.skills
+//       } : null,
+//       client: hire.clientId ? {
+//         id: hire.clientId._id,
+//         name: hire.clientId.name,
+//         email: hire.clientId.email,
+//         company: hire.clientId.company
+//       } : null,
+//       proposal: hire.proposalId ? {
+//         id: hire.proposalId._id,
+//         description: hire.proposalId.proposal_description,
+//         bidAmount: hire.proposalId.bid_amount
+//       } : null,
+//       status: hire.status,
+//       hiredDate: hire._id.getTimestamp()
+//     }));
+
+//     res.status(200).json({
+//       success: true,
+//       count: formattedResponse.length,
+//       data: formattedResponse
+//     });
+
+//   } catch (error) {
+//     console.error('Error in getFreelancerHiredJobs:', error);
+//     res.status(500).json({
+//       success: false,
+//       message: 'Failed to fetch freelancer\'s hired jobs',
+//       error: error.message
+//     });
+//   }
+// };
+
+
+exports.getFreelancerHiredJobs = async (req, res) => {
+  try {
+    const { freelancerId } = req.params;
+    
+    if (!freelancerId) {
+      return res.status(400).json({
+        success: false,
+        message: 'Freelancer ID is required'
+      });
+    }
+
+    const hiredJobs = await HireFreelancer.find({ 
+      freelancerId: freelancerId,
+      status: 'hired'
+    })
+    .populate('jobId', '_id job_title description budget deadline category skills')
+    .populate('clientId', '_id name email company')
+    .populate({
+      path: 'proposalId',
+      select: '_id add_requirements cover_letter project_duration portfolio_link attachment'
+    })
+    .sort({ _id: -1 });
+
+    const formattedResponse = hiredJobs.map(hire => ({
+      hireId: hire._id,
+      job: hire.jobId ? {
+        id: hire.jobId._id,
+        jobId: hire.jobId._id,
+        title: hire.jobId.job_title,
+        description: hire.jobId.description,
+        budget: hire.jobId.budget,
+        deadline: hire.jobId.deadline,
+        category: hire.jobId.category,
+        skills: hire.jobId.skills
+      } : null,
+      client: hire.clientId ? {
+        id: hire.clientId._id,
+        name: hire.clientId.name,
+        email: hire.clientId.email,
+        company: hire.clientId.company
+      } : null,
+      proposal: hire.proposalId ? {
+        id: hire.proposalId._id,           // Proposal ID
+        proposalId: hire.proposalId._id,   // Adding explicit proposalId
+        coverLetter: hire.proposalId.cover_letter,
+        projectDuration: hire.proposalId.project_duration,
+        portfolioLink: hire.proposalId.portfolio_link,
+        attachment: hire.proposalId.attachment,
+        milestones: hire.proposalId.add_requirements?.by_milestones?.map(milestone => ({
+          amount: milestone.amount,
+          description: milestone.description,
+          dueDate: milestone.due_date
+        })) || [],
+        projectBid: hire.proposalId.add_requirements?.by_project ? {
+          bidAmount: hire.proposalId.add_requirements.by_project.bid_amount,
+          dueDate: hire.proposalId.add_requirements.by_project.due_date
+        } : null
+      } : null,
+      status: hire.status,
+      hiredDate: hire._id.getTimestamp()
+    }));
+
+    res.status(200).json({
+      success: true,
+      count: formattedResponse.length,
+      data: formattedResponse
+    });
+
+  } catch (error) {
+    console.error('Error in getFreelancerHiredJobs:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to fetch freelancer\'s hired jobs',
+      error: error.message
+    });
+  }
+};
