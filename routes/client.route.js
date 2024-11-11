@@ -133,10 +133,13 @@ router.post('/hire/:proposalId', authMiddleware, hireFreelancerController.hireFr
 
 
 
-router.get('/hire', hireFreelancerController.getClientHireRequests);
 
 
-router.get('/hire/:hireRequestId', hireFreelancerController.getHireRequestById);
+
+// router.get('/hire', hireFreelancerController.getClientHireRequests);
+
+
+// router.get('/hire/:hireRequestId', hireFreelancerController.getHireRequestById);
 
 
 router.put('/hire/:hireRequestId', hireFreelancerController.updateHireRequest);
@@ -147,6 +150,16 @@ router.delete('/hire/:hireRequestId', hireFreelancerController.deleteHireRequest
 
 // route for getting freelancer details for specific proposal id
 router.get("/proposal/:proposalId", proposalController.getProposalById);
+
+
+
+
+
+
+
+
+router.get('/hire/:proposalId', hireFreelancerController.getHireRequestById);
+router.get('/hire', hireFreelancerController.getAllHireData);
 
 
 
