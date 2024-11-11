@@ -13,6 +13,8 @@ const { upload } = require('../config/cloudinary.config');// const { forgotPassw
 const ClientProfile= require('../controllers/client_profile.controller')
 const Notification= require ('../controllers/notifications.controller')
 const consultantProfileController=require ('../controllers/consultantprofile.controller')
+const manageProject = require('../controllers/Manageproj.controller')
+
 
 
 const queryController = require('../controllers/query.controller');
@@ -218,5 +220,23 @@ router.get('/ongoing-projects', authMiddleware, hireFreelancerController.getClie
 router.get('/hired-freelancers-count/:clientId', hireFreelancerController.getHiredFreelancersCountByClientId);
 
 router.get('/freelancers-engaged-count/:clientId', hireFreelancerController.getFreelancersEngagedCountByClientId);
+
+
+// Get all projects progress for a client
+router.get(
+  '/client/:client_id/projects/progress', 
+  authMiddleware, 
+  manageProject.getClientJobsProgress
+);
+
+// Get specific project progress
+router.get(
+  '/:client_id/project/:project_id/progress', 
+  authMiddleware, 
+  manageProject.getSpecificJobProgress
+);
+
+
+
 module.exports = router;
 

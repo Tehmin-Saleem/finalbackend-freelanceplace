@@ -94,6 +94,9 @@ router.use(authMiddleware);
 
 router.post('/manageproj',authMiddleware, manageProject.createProject);
 // Proposal routes
+
+
+
 router.post('/proposal/:jobPostId', upload.single('attachment'), proposalController.createProposal);
 router.get('/getproposals', proposalController.getFreelancerProposals);
 router.get('/proposals/:proposalId', proposalController.getProposalById);
