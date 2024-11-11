@@ -193,7 +193,9 @@ router.patch('/unban/:id', authMiddleware,usercontroller.freelancerUnban);
 
 
 router.get('/profile/:id',  authMiddleware, usercontroller.fetchprofile);
+router.get('/proposals/count/:userId',authMiddleware, proposalController.getTotalProposalsByFreelancer);
 
-// router.get('/proposals/count/:id',authMiddleware, proposalController.getFreelancerProposalCount);
+
+
 
 module.exports = router;

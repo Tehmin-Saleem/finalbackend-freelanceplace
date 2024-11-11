@@ -214,7 +214,7 @@ router.post('/profile', upload.single('profilePicture'), consultantProfileContro
 router.get('/profile/:id',  consultantProfileController.getProfileByUserId);
 // In your routes file
 router.get('/filtered-jobs', authMiddleware, hireFreelancerController.getFilteredJobs);
-router.get('/count-job-posts/:userId',authMiddleware,jobPostController.countJobPostsByClientId)
+router.get('/count-job-posts/:clientId',authMiddleware, jobPostController.countJobPostsByClientId);
 
 
 // In your routes file
