@@ -59,7 +59,10 @@ exports.createJobPost = async (req, res) => {
 };
 exports.getAllJobPosts = async (req, res) => {
   try {
-    const jobPosts = await Job_Post.find().populate('client_id', 'email').lean();
+    const jobPosts = await Job_Post.find()
+    .populate('client_id', 'email')
+    .sort({ createdAt: -1 })  // Sort by createdAt, descending order (newest first)
+    .lean();
 
     const jobPostsWithDetails = await Promise.all(jobPosts.map(async (job) => {
       const proposalCount = await Proposal.countDocuments({ job_id: job._id });
@@ -213,6 +216,8 @@ exports.countJobPostsByClientId = async (req, res) => {
     // Count the number of job posts for this specific client
     const jobPostCount = await Job_Post.countDocuments({ client_id: clientId });
 
+console.log("Client ID:", clientId);
+console.log("Job Post Count:", jobPostCount);
     // Return the result
     res.status(200).json({ totalJobPosts: jobPostCount });
   } catch (err) {
