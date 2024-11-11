@@ -302,3 +302,23 @@ exports.getFreelancerDetailsByProposal = async (req, res) => {
     res.status(500).json({ message: 'Internal server error' });
   }
 };
+
+
+exports.getTotalProposalsByFreelancer = async (req, res) => {
+  try {
+    // Ensure the user is authenticated and has a valid ID
+    if (!req.user || !req.user.userId) {
+      return res.status(401).json({ message: 'User not authenticated or user ID not found' });
+    }
+
+    const freelancer_id = req.user.userId;
+
+    // Count the number of proposals created by this freelancer
+    const totalProposals = await Proposal.countDocuments({ freelancer_id });
+
+    res.status(200).json({ totalProposals });
+  } catch (err) {
+    console.error('Error fetching total proposals count:', err);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+};

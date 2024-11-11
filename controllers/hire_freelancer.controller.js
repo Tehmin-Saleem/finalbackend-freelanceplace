@@ -340,6 +340,8 @@ exports.getFilteredJobs = async (req, res) => {
 
     // Fetch all jobs
     let jobs = await Job.find(query)
+    
+  .sort({ createdAt: -1 }) 
       .populate({
         path: 'client_id',
         select: 'name email profile_image'
