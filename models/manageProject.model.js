@@ -164,7 +164,7 @@ const projectSchema = new mongoose.Schema({
   freelancer_profile_id: {  // Changed from freelancer_id
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Freelancer_Profile',  // Direct reference to Freelancer_Profile
-    required: true
+    
 }
 }, {
   timestamps: true

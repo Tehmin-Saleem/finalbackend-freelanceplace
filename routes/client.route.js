@@ -133,6 +133,7 @@ router.post('/hire/:proposalId', authMiddleware, hireFreelancerController.hireFr
 
 
 
+<<<<<<< HEAD
 
 
 
@@ -140,6 +141,15 @@ router.post('/hire/:proposalId', authMiddleware, hireFreelancerController.hireFr
 
 
 // router.get('/hire/:hireRequestId', hireFreelancerController.getHireRequestById);
+=======
+
+// In your routes file
+router.get('/filtered-jobs', authMiddleware, hireFreelancerController.getFilteredJobs);
+
+
+router.get('/hire/:proposalId', hireFreelancerController.getHireRequestById);
+router.get('/hire', hireFreelancerController.getAllHireData);
+>>>>>>> 08d78c7f02234da35171e52e684bbe22c04514ab
 
 
 router.put('/hire/:hireRequestId', hireFreelancerController.updateHireRequest);
