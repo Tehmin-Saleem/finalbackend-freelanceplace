@@ -160,7 +160,7 @@ const IndexPage = () => {
                 location={proposal.country || "Unknown"}
                 rate={
                   proposal.rate
-                    ? `${proposal.rate}$`
+                    ? `${proposal.rate}`
                     : proposal.add_requirements?.by_project?.bid_amount
                     ? `${proposal.add_requirements.by_project.bid_amount}$`
                     : proposal.add_requirements?.by_milestones

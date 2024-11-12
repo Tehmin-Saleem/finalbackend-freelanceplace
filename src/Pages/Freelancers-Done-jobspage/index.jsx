@@ -67,11 +67,12 @@ const FreelancersJobsPage = () => {
       if (!jobsResponse.data?.jobPosts) {
         throw new Error('Invalid job posts data');
       }
-
+      
+      console.log('jobsprespinse', jobsResponse.data)
       const matchedJobs = jobsResponse.data.jobPosts
         .filter(job => jobToFreelancerMap[job._id])
         .map(job => ({
-          id: job._id,
+          job_id: job._id,
           type: job.budget_type === "fixed" ? "Fixed" : "Hourly",
           title: job.job_title || 'Untitled Job',
           client_id: job.client_id._id,
@@ -87,9 +88,10 @@ const FreelancersJobsPage = () => {
           location: job.country || "Not specified",
           postedTime: new Date(job.createdAt).toLocaleDateString()
         }));
-
+       
       setJobs(matchedJobs);
-      console.log('id', matchedJobs);
+      console.log('matched jobs', matchedJobs)
+      console.log('id', matchedJobs.job_id)
     } catch (error) {
       console.error('Error in fetchJobs:', error);
       setError('Failed to fetch jobs. Please try again.');
@@ -141,11 +143,12 @@ const FreelancersJobsPage = () => {
         <div className="error-message">{error}</div>
       ) : (
         <div className="jobs-container">
+        
           {paginatedJobs.length > 0 ? (
             paginatedJobs.map((job) => (
               <FreelancersJobsCard 
                 key={job.title}
-                id={job.id} 
+                job_id={job.job_id}
                 client_id={job.client_id} 
                 freelancer_id={job.freelancer_id}
                 {...job}

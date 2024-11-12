@@ -3,36 +3,75 @@ import { useParams } from "react-router-dom";
 import axios from "axios";
 import { Header } from "../../components";
 import { MapPin, Briefcase, Clock, DollarSign, Paperclip } from 'lucide-react';
+import { useLocation } from 'react-router-dom';
 const OfferDetails = () => {
     const [offer, setOffer] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const { notificationId } = useParams(); // This will be 672f25de5721c6ab0f7dab52
+    const { id } = useParams();
+    const [fileUrl, setFileUrl] = useState(null);
+    const [fileType, setFileType] = useState(null);
   
-    useEffect(() => {
-      const fetchOfferDetails = async () => {
-        try {
-          const token = localStorage.getItem('token');
-          const response = await axios.get(
-            `http://localhost:5000/api/freelancer/offers/${notificationId}`,
-            {
-              headers: {
-                'Authorization': `Bearer ${token}`
+    const location = useLocation();
+
+ 
+    // Extract the notificationId from the pathname
+
+    const notificationId = location.pathname.split('/').pop();
+  
+
+  
+  
+    
+      useEffect(() => {
+        const fetchOfferDetails = async () => {
+          try {
+            const token = localStorage.getItem('token');
+            console.log('Fetching offer details with notificationId:', notificationId);
+            const response = await axios.get(
+              `http://localhost:5000/api/freelancer/offers/${notificationId}`,
+              {
+                headers: {
+                  'Authorization': `Bearer ${token}`
+                }
               }
-            }
-          );
-          console.log('offer',response.data )
-          setOffer(response.data);
-          setLoading(false);
-        } catch (error) {
-          console.error('Error fetching offer details:', error);
-          setError(error.response?.data?.message || 'Failed to fetch offer details');
-          setLoading(false);
+            );
+            console.log('offer', response.data);
+            const fetchedOffer = response.data;
+            setOffer(fetchedOffer);
+
+           
+        if (fetchedOffer.attachment?.fileType) {
+          setFileType(fetchedOffer.attachment.fileType);
+          setFileUrl(fetchedOffer.attachment.path);
+        } else if (fetchedOffer.attachment?.fileName) {
+          const extension = fetchedOffer.attachment.fileName
+            .split(".")
+            .pop()
+            .toLowerCase();
+          if (["jpg", "jpeg", "png"].includes(extension)) {
+            setFileType("image/" + extension);
+          } else if (extension === "pdf") {
+            setFileType(fetchedOffer.attachment.mimeType || 'application/pdf');
+            setFileUrl(fetchedOffer.attachment.path);
+          } else {
+            console.error("Unsupported file extension.");
+          }
         }
-      };
-  
-      fetchOfferDetails();
-    }, [notificationId]);
+      
+          console.log('file', fetchedOffer.attachment)
+          
+            setLoading(false);
+          } catch (error) {
+            console.error('Error fetching offer details:', error);
+            setError(error.response?.data?.message || 'Failed to fetch offer details');
+            setLoading(false);
+          }
+        };
+    
+        fetchOfferDetails();
+      }, [notificationId]);
+    
   const handleAcceptOffer = async () => {
     try {
       const token = localStorage.getItem("token");
@@ -49,7 +88,28 @@ const OfferDetails = () => {
       // Handle error - show error message
     }
   };
-
+  const handleViewFile = () => {
+    if (fileType && fileUrl) {
+      if (fileType.startsWith('image/')) {
+        // For images, check if it's a URL or a Blob and handle accordingly
+        if (fileUrl.startsWith('http')) {
+          // If the fileUrl is a URL (like Cloudinary)
+          window.open(fileUrl, '_blank');
+        } else {
+          // Otherwise, open the Blob URL
+          window.open(fileUrl, '_blank');
+        }
+      } else if (fileType === 'application/pdf') {
+        // For PDF, open in a new tab
+        window.open(fileUrl, '_blank');
+      } else {
+        alert('Unsupported file type.');
+      }
+    } else {
+      alert("No file available to view.");
+    }
+  };
+  
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-screen">
@@ -84,14 +144,16 @@ const OfferDetails = () => {
                 <div className="flex justify-between items-start">
                   <div className="space-y-2">
                     
-                <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center">
-                    <span className="text-lg font-medium text-gray-600">
-                      {(offer.clientname || "John Doe").charAt(0)}
-                    </span>
-                  </div>
-                  <div>
-                    <h3 className="font-medium">{offer.clientname || "John Doe"}</h3>
+                  <div className="flex items-center gap-3">
+  <div className="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center">
+    <span className="text-lg font-medium text-gray-600">
+      {(offer.clientFirstName || "John").charAt(0)}
+    </span>
+  </div>
+  <div>
+    <h3 className="font-medium">
+      {offer.clientFirstName} {offer.clientLastName} 
+    </h3>
                     <p className="text-sm text-gray-600">Client</p>
                   </div>
                 
@@ -99,32 +161,32 @@ const OfferDetails = () => {
                 <div className="flex items-center gap-2 text-gray-600">
                       {/* Using a simple map pin icon (or you can use your own or an emoji) */}
                       <span className="w-4 h-4">&#x1F4CD;</span>
-                      <span>{offer.location || 'Location not specified'}</span>
+                      <span>{offer.clientCountry || "Country not specified"}</span>
                     </div>
                     <h1 className="text-2xl font-bold tracking-tight">{offer.job_title}</h1>
                    
                   </div>
                   
                   <div className="text-right">
-                    <div className="inline-flex items-center gap-1 px-3 py-1 bg-sky-100 text-sky-700 rounded-full">
-                      Rate:{offer.budget_type === "hourly" ? (
-                        <>
-                          {/* Using a clock emoji for hourly rate */}
-                          <span className="w-4 h-4">&#x23F1;</span>
-                          <span>{offer.hourly_rate}/hr</span>
-                        </>
-                      ) : (
-                        <>
-                          {/* Using a dollar sign emoji for fixed price */}
-                          <span className="w-4 h-4">&#x24;</span>
-                          <span>{offer.fixed_price}</span>
-                        </>
-                      )}
-                    </div>
-                  </div>
-                </div>
-    
+                  <div className="inline-flex items-center gap-1 px-3 py-1 bg-sky-100 text-sky-700 rounded-full">
+                  Rate:{" "}
+                  {offer.budget_type === "hourly" ? (
+                    <>
+                      <span className="w-4 h-4">&#x23F1;</span>
+                      <span>
+                        ${offer.hourly_rate.from} - ${offer.hourly_rate.to}/hr
+                      </span>
+                    </>
+                  ) : (
+                    <>
+                      <span className="w-4 h-4">&#x24;</span>
+                      <span>{offer.fixed_price}</span>
+                    </>
+                  )}
               </div>
+            </div>
+          </div>
+          </div>
     
               <div className="space-y-8 p-6">
                 {/* Project Description */}
@@ -158,24 +220,20 @@ const OfferDetails = () => {
                   </section>
                 )}
     
-                {/* Attachments */}
-                {offer.attachment && (
-  <section className="space-y-4">
-    <h2 className="text-lg font-semibold">Attachments</h2>
-    <div className="p-4 bg-gray-50 rounded-lg">
-      <a href={offer.attachment?.path || "#"} target="_blank" rel="noopener noreferrer"
-         className="flex items-center gap-2 text-sky-600 hover:text-sky-700"
-      >
-        {/* Using a paperclip emoji for attachment */}
-        <span className="w-4 h-4">&#x1F4CE;</span>
-        <span>{offer.attachment?.fileName}</span>
-      </a>
-      {offer.attachment?.description && (
-        <p className="mt-2 text-sm text-gray-600">{offer.attachment.description}</p>
-      )}
-    </div>
-  </section>
+            
+    {offer.attachment && offer.attachment.fileName && (
+  <div className="mt-4">
+    <p>Attachment: {offer.attachment.fileName}</p>
+    <button  onClick={handleViewFile}
+      className="flex items-center gap-2 text-sky-600 hover:text-sky-700"
+    >
+      <span className="w-4 h-4">&#x1F441;</span>
+      View Attachment
+    </button>
+  </div>
 )}
+
+
     
                 {/* Action Buttons */}
                 <div className="flex gap-4 pt-4 border-t">
