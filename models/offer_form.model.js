@@ -7,10 +7,21 @@ const Offer_FormSchema = new Schema({
     path: String,
     description: String
   },
-  budget_type: { type: String, enum: ['hourly', 'fixed'],  },
+  budget_type: { 
+    type: String, 
+    enum: ['hourly', 'fixed'], 
+    required: true 
+  },
   hourly_rate: {
-    from: { type: Number },
-    to: { type: Number }
+    from: { 
+      type: Number, 
+      required: function() { return this.budget_type === 'hourly'; } 
+    },
+    to: { 
+      type: Number, 
+      required: function() { return this.budget_type === 'hourly'; } 
+    }
+
   },
   fixed_price: {
     type: Number,

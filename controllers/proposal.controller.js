@@ -311,7 +311,7 @@ const Proposal = require('../models/proposal.model');
 const Freelancer_Profile = require('../models/freelancer_profile.model');
 const Job = require('../models/post_job.model'); // Import the Job model
 const Notification = require('../controllers/notifications.controller');
-
+const { Types } = require('mongoose');
 exports.createProposal = async (req, res) => {
   try {
     const {
@@ -381,8 +381,8 @@ exports.getFreelancerProposals = async (req, res) => {
     const jobId = req.query.jobId;
     const authenticatedUserId = req.user.userId;
 
-    if (!jobId) {
-      return res.status(400).json({ message: 'Job ID is required' });
+    if (!jobId || !Types.ObjectId.isValid(jobId)) {
+      return res.status(400).json({ message: 'Invalid or missing Job ID' });
     }
     
     // Populate both job and client details
