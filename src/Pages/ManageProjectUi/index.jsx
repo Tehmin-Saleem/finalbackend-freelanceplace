@@ -20,8 +20,9 @@ import {
   Modal,
   Button,
   message,
+  
 } from "antd";
-const { Title, Text } = Typography;
+const { Title, Text, Paragraph  } = Typography;
 import Spinner from "../../components/chatcomponents/Spinner";
 
 const ManageProjectsByClient = () => {
@@ -205,6 +206,7 @@ const ProjectDetails = ({ project, onProjectStatusChange }) => {
   const [description, setdescription] = useState(null);
   const [showReviewModal, setShowReviewModal] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [ProjectId, setProjectId] = useState(false);
 
   const handleMarkAsComplete = () => {
     // Instead of making the API call here, just show the modal
@@ -236,6 +238,7 @@ const ProjectDetails = ({ project, onProjectStatusChange }) => {
       );
       console.log("Progress :", response.data);
       setdescription(response.data.projectDetails.description);
+      setProjectId(response.data.projectDetails.projectId);
 
       setProgressData(response.data);
       setError(null);
@@ -255,43 +258,24 @@ const ProjectDetails = ({ project, onProjectStatusChange }) => {
     }
   }, [activeTab]);
 
-  // const handleMarkAsCompleted = async (id, reviewData) => {
-  //   try {
-  //     const response = await axios.post(
-  //       `http://localhost:5000/api/client/complete-project/${id}`,
-  //       {
-  //         stars: reviewData.rating, // Number between 1-5
-  //         message: reviewData.review // Review text
-  //       },
-  //       {
-  //         headers: {
-  //           Authorization: `Bearer ${localStorage.getItem('token')}`
-  //         }
-  //       }
-  //     );
+ 
 
-  //     if (response.data.success) {
-  //       // Update UI accordingly
-  //       message.success('Project marked as completed and review submitted successfully');
-  //       // Refresh project list or update state
-  //       // You might want to call your fetchProgress function here to update the UI
-  //     }
-  //   } catch (error) {
-  //     console.error('Error marking project as complete:', error);
-  //     message.error(error.response?.data?.message || 'Failed to mark project as complete');
-  //   }
-  // };
 
-  const handleReviewSubmit = async (id, reviewData) => {
+  const id = ProjectId;
+  console.log("outside", ProjectId)
+
+  const handleReviewSubmit = async ( ProjectId, reviewData, ) => {
     try {
       setIsSubmitting(true);
       const token = localStorage.getItem("token");
       const decodedToken = jwtDecode(token);
       const userId = decodedToken.userId;
 
+   
+
       // Make the API call to mark project as completed with review
       const response = await axios.post(
-        `http://localhost:5000/api/client/complete-project/${id}`,
+        `http://localhost:5000/api/client/complete-project/${ProjectId}`,
         {
           stars: reviewData.rating,
           message: reviewData.review,
@@ -352,144 +336,163 @@ const ProjectDetails = ({ project, onProjectStatusChange }) => {
     if (!progressData)
       return <Empty description="No progress data available" />;
 
-    const { progressData: progress } = progressData;
-
+    const { progressData: progress, timeMetrics, projectDetails } = progressData;
     return (
       <div className="milestone-progress">
-        {/* Overall Progress Card with Progress Bar */}
-        <Card className="overall-progress-card">
-          <Title level={4}>Overall Project Progress</Title>
-          <div className="progress-container">
-            <Progress
-              percent={progress.overallProgress}
-              status="active"
-              strokeColor={{
-                "0%": "#108ee9",
-                "100%": "#87d068",
-              }}
-              strokeWidth={15}
+      {/* Overall Progress Card with Progress Bar */}
+      <Card className="overall-progress-card">
+        <Title level={4}>Overall Project Progress</Title>
+        <div className="progress-container">
+          <Progress
+            percent={progress.overallProgress}
+            status="active"
+            strokeColor={{
+              "0%": "#108ee9",
+              "100%": "#87d068",
+            }}
+            strokeWidth={15}
+          />
+        </div>
+      </Card>
+
+      {/* Project Statistics */}
+      <Row gutter={[16, 16]} className="stats-cards">
+        <Col span={6}>
+          <Card>
+            <Statistic
+              title="Overall Progress"
+              value={progress.overallProgress}
+              suffix="%"
+              valueStyle={{ color: "#3f8600" }}
             />
-          </div>
-        </Card>
+          </Card>
+        </Col>
+        <Col span={6}>
+          <Card>
+            <Statistic
+              title="Completed Milestones"
+              value={progress.completedMilestones}
+              suffix={`/ ${progress.totalMilestones}`}
+              valueStyle={{ color: "#1890ff" }}
+            />
+          </Card>
+        </Col>
+        <Col span={6}>
+          <Card>
+            <Statistic
+              title="Days Remaining"
+              value={timeMetrics.daysRemaining}
+              suffix="days"
+              valueStyle={{ color: timeMetrics.isOverdue ? "#ff4d4f" : "#722ed1" }}
+            />
+          </Card>
+        </Col>
+        <Col span={6}>
+          <Card>
+            <Statistic
+              title="Days Elapsed"
+              value={timeMetrics.daysElapsed}
+              suffix={`/ ${timeMetrics.totalDays}`}
+              valueStyle={{ color: "#faad14" }}
+            />
+          </Card>
+        </Col>
+      </Row>
 
-        {progress.overallProgress === 100 && (
-          <Button
-            type="primary"
-            className="mark-complete-btn"
-            onClick={handleMarkAsComplete}
-          >
-            Mark as Completed
-          </Button>
-        )}
-
-        <Row gutter={[16, 16]} className="stats-cards">
-          <Col span={8}>
-            <Card>
-              <Statistic
-                title="Overall Progress"
-                value={progress.overallProgress}
-                suffix="%"
-                valueStyle={{ color: "#3f8600" }}
-              />
-            </Card>
+      {/* Project Description */}
+      <Card style={{ marginTop: 16, marginBottom: 16 }}>
+        <Title level={5}>Project Details</Title>
+        <Row gutter={[16, 16]}>
+          <Col span={12}>
+            <Text strong>Project Name: </Text>
+            <Text>{projectDetails.projectName}</Text>
           </Col>
-          <Col span={8}>
-            <Card>
-              <Statistic
-                title="Completed Milestones"
-                value={progress.completedMilestones}
-                suffix={`/ ${project.milestones?.length}`}
-                valueStyle={{ color: "#1890ff" }}
-              />
-            </Card>
+          <Col span={12}>
+            <Text strong>Last Updated: </Text>
+            <Text>{new Date(progress.lastUpdated).toLocaleString()}</Text>
           </Col>
         </Row>
+        <Row style={{ marginTop: 16 }}>
+          <Col span={24}>
+            <Text strong>Description: </Text>
+            <Paragraph ellipsis={{ rows: 3, expandable: true }}>
+              {projectDetails.description}
+            </Paragraph>
+          </Col>
+        </Row>
+      </Card>
 
-        <Card style={{ marginTop: 16, marginBottom: 16 }}>
-          <Statistic
-            title="Project Description"
-            value={description}
-            valueStyle={{
-              color: "#722ed1",
-              fontSize: "14px",
-              whiteSpace: "normal",
-              overflow: "hidden",
-              textOverflow: "ellipsis",
-              display: "-webkit-box",
-              WebkitLineClamp: 3,
-              WebkitBoxOrient: "vertical",
-            }}
-          />
-          {description && description.length > 150 && (
-            <Typography.Link
-              onClick={() =>
-                Modal.info({
-                  title: "Project Description",
-                  content: (
-                    <Typography.Paragraph
-                      style={{ maxHeight: "60vh", overflow: "auto" }}
-                    >
-                      {description}
-                    </Typography.Paragraph>
-                  ),
-                  width: 600,
-                })
-              }
-              style={{ marginTop: 8, display: "block" }}
-            >
-              Read More
-            </Typography.Link>
-          )}
-        </Card>
-
-        <div className="milestones-list">
+      {/* Milestones Timeline */}
+      <Card title="Milestones Timeline" style={{ marginTop: 16 }}>
+        <Timeline mode="left">
           {progress.milestones.map((milestone, index) => (
-            <Card
+            <Timeline.Item
               key={index}
-              className="milestone-card"
-              style={{ marginTop: 16 }}
+              color={
+                milestone.status === "Completed"
+                  ? "green"
+                  : milestone.status === "In Progress"
+                  ? "blue"
+                  : "gray"
+              }
+              label={new Date(milestone.due_date).toLocaleDateString()}
             >
-              <Row justify="space-between" align="middle">
-                <Col span={16}>
-                  <Title level={4}>{milestone.name}</Title>
-                  <Text type="secondary">
-                    Due: {new Date(milestone.due_date).toLocaleDateString()}
-                  </Text>
-                </Col>
-                <Col span={8} style={{ textAlign: "right" }}>
-                  <Tag
-                    color={
-                      milestone.status === "Completed"
-                        ? "success"
-                        : milestone.status === "In Progress"
-                        ? "processing"
-                        : "default"
-                    }
-                  >
-                    {milestone.status}
-                  </Tag>
-                  <div style={{ marginTop: 8 }}>
-                    <Text strong>${milestone.amount}</Text>
-                  </div>
-                </Col>
-              </Row>
-              <Progress
-                percent={milestone.progress}
-                status={
-                  milestone.status === "Completed"
-                    ? "success"
-                    : milestone.status === "In Progress"
-                    ? "active"
-                    : "normal"
-                }
-                style={{ marginTop: 16 }}
-              />
-            </Card>
+              <Card className="milestone-card" bordered={false}>
+                <Row justify="space-between" align="middle">
+                  <Col span={16}>
+                    <Title level={5}>{milestone.name}</Title>
+                    <Text type="secondary">
+                      Due: {new Date(milestone.due_date).toLocaleDateString()}
+                    </Text>
+                  </Col>
+                  <Col span={8} style={{ textAlign: "right" }}>
+                    <Tag
+                      color={
+                        milestone.status === "Completed"
+                          ? "success"
+                          : milestone.status === "In Progress"
+                          ? "processing"
+                          : "default"
+                      }
+                    >
+                      {milestone.status}
+                    </Tag>
+                    <div style={{ marginTop: 8 }}>
+                      <Text strong>${milestone.amount}</Text>
+                    </div>
+                  </Col>
+                </Row>
+                <Progress
+                  percent={milestone.progress}
+                  status={
+                    milestone.status === "Completed"
+                      ? "success"
+                      : milestone.status === "In Progress"
+                      ? "active"
+                      : "normal"
+                  }
+                  style={{ marginTop: 16 }}
+                />
+              </Card>
+            </Timeline.Item>
           ))}
-        </div>
-      </div>
-    );
-  };
+        </Timeline>
+      </Card>
+
+      {progress.overallProgress === 100 && (
+        <Button
+          type="primary"
+          className="mark-complete-btn"
+          onClick={handleMarkAsComplete}
+          style={{ marginTop: 16 }}
+        >
+          Mark as Completed
+        </Button>
+      )}
+    </div>
+  );
+};
+
 
   return (
     <div className="project-details">
@@ -731,7 +734,7 @@ const ProjectDetails = ({ project, onProjectStatusChange }) => {
        <ReviewModal
         visible={showReviewModal}
         onClose={() => setShowReviewModal(false)}
-        onSubmit={(reviewData) => handleReviewSubmit(id, reviewData)}
+        onSubmit={(reviewData) => handleReviewSubmit( ProjectId, reviewData)}
         freelancerName={project.freelancer?.name || 'Freelancer'}
         isSubmitting={isSubmitting}
       />
