@@ -20,6 +20,7 @@ const offerController = require ('../controllers/offer_form.controller')
 const chatController = require('../controllers/chat.controller'); // Add this
 
 const  aiCoverLetter  = require('../controllers/aiCoverLetter.controller');
+const hireFreelancerController = require('../controllers/hire_freelancer.controller');
 // const offerController=require("../controllers/offer_form.controller");
 
 
@@ -195,6 +196,21 @@ router.patch('/unban/:id', authMiddleware,usercontroller.freelancerUnban);
 
 router.get('/profile/:id',  authMiddleware, usercontroller.fetchprofile);
 router.get('/proposals/count/:userId',authMiddleware, proposalController.getTotalProposalsByFreelancer);
+
+
+
+
+// route for getting jobs for specific freelancer
+router.get('/hired-jobs/:freelancerId', hireFreelancerController.getFreelancerHiredJobs);
+
+// Get specific job review
+router.get('/job-review/:jobId',authMiddleware, hireFreelancerController.getJobReview);
+
+// Get all reviews for a freelancer
+router.get('/freelancer-reviews/:freelancerId',authMiddleware, hireFreelancerController.getFreelancerReviews);
+
+
+router.get('/:freelancerId/reviews',authMiddleware ,hireFreelancerController.getFreelancerReviews);
 
 router.get('/offer/:freelancerId', authMiddleware,offerController.getOffersByFreelancerId);
 

@@ -131,15 +131,6 @@ router.delete('/payment-methods/:paymentMethodId', paymentMethodController.delet
 
 
 router.post('/hire/:proposalId', authMiddleware, hireFreelancerController.hireFreelancer);
-
-
-
-router.get('/hire', hireFreelancerController.getClientHireRequests);
-
-
-router.get('/hire/:hireRequestId', hireFreelancerController.getHireRequestById);
-
-
 router.put('/hire/:hireRequestId', hireFreelancerController.updateHireRequest);
 
 
@@ -148,6 +139,16 @@ router.delete('/hire/:hireRequestId', hireFreelancerController.deleteHireRequest
 
 // route for getting freelancer details for specific proposal id
 router.get("/proposal/:proposalId", proposalController.getProposalById);
+
+
+
+
+
+
+
+
+router.get('/hire/:proposalId', hireFreelancerController.getHireRequestById);
+router.get('/hire', hireFreelancerController.getAllHireData);
 
 
 
@@ -232,10 +233,21 @@ router.get(
 );
 
 // Get specific project progress
-router.get(
-  '/:client_id/project/:project_id/progress', 
-  authMiddleware, 
-  manageProject.getSpecificJobProgress
+// router.get(
+//   '/:client_id/project/:project_id/progress', 
+//   authMiddleware, 
+//   manageProject.getSpecificJobProgress
+// );
+
+
+
+router.get('/project-progress/:proposal_id', authMiddleware, manageProject.getProjectProgress);
+
+
+router.post(
+  '/complete-project/:projectId',
+  authMiddleware,
+  hireFreelancerController.markProjectAsCompleted
 );
 
 
