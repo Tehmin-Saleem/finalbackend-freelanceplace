@@ -129,7 +129,7 @@ import StarRating from "../ProfileView/starrating";
 import { JobSucces } from "../../svg";
 
 const JobsCard = ({
-  id,
+  job_id,
   type,
   title,
   rate,
@@ -161,10 +161,10 @@ const JobsCard = ({
 
       // Fetch specific proposal data
       const response = await axios.get(
-        `http://localhost:5000/api/freelancer/getproposals?jobId=${id}`, // Fixed template literal
+        `http://localhost:5000/api/freelancer/getproposals?jobId=${job_id}`, // Fixed template literal
         { headers }
       );
-
+      console.log('Fetched job_id:', job_id); // Debug log
       // Find the specific proposal for this job
       const specificProposal = response.data.proposals.find(
         proposal => proposal._id === proposalId
@@ -180,7 +180,7 @@ const JobsCard = ({
       navigate("/manageproj", {
         state: {
           jobData: {
-            id,
+            job_id,
             type,
             title,
             rate,
@@ -195,7 +195,8 @@ const JobsCard = ({
           },
           proposalData: specificProposal,
           freelancer_id: freelancer_id,
-          client_id: client_id
+          client_id: client_id,
+          job_id:job_id
         }
       });
     } catch (error) {

@@ -132,11 +132,29 @@ const OfferForm = () => {
       setIsLoading(false);
       return;
     }
-  
+    console.log('Submitting form with values:', {
+      budgetType,
+      hourlyRate,
+      fixedPrice,
+      description,
+      detailedDescription,
+      freelancerProfile,
+      jobTitle,
+      selectedSkills
+    });
     const formData = new FormData();
     formData.append('budget_type', budgetType);
-    formData.append('hourly_rate', JSON.stringify(hourlyRate));
-    formData.append('fixed_price', fixedPrice);
+    if (budgetType === 'hourly') {
+      console.log('Setting hourly rates:', hourlyRate);
+      // Send hourly rates in the correct format for the new schema
+      formData.append('hourly_rate_from', hourlyRate.min);
+      formData.append('hourly_rate_to', hourlyRate.max);
+    } else {
+      console.log('Setting fixed price:', fixedPrice);
+      formData.append('fixed_price', fixedPrice);
+    }
+  
+  
     formData.append('description', description);
     formData.append('detailed_description', detailedDescription);
     formData.append('freelancer_id', freelancerProfile.freelancer_id);
@@ -149,6 +167,11 @@ const OfferForm = () => {
     }
   
     try {
+      // Log the FormData entries for debugging
+      for (let pair of formData.entries()) {
+        console.log(pair[0] + ': ' + pair[1]);
+      }
+  
       const response = await axios.post('http://localhost:5000/api/client/offerform', formData, {
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -157,7 +180,6 @@ const OfferForm = () => {
       });
       
       console.log('Offer created successfully:', response.data);
-      // Store the correct offer ID for later use if needed
       const offerId = response.data._id || response.data.offerId;
       console.log('Generated offer ID:', offerId);
       
