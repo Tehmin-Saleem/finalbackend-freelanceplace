@@ -72,13 +72,14 @@ function SignIn() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          // Authorization: `Bearer ${token}`
+          // Authorization: `Bearer ${token}`,
 
         },
         body: JSON.stringify({ email, password }),
       });
 
       const data = await response.json();
+      console.log("dataaaa",data);
       
       if (response.ok) {
 
@@ -125,6 +126,8 @@ function SignIn() {
       setErrorMessage("An error occurred. Please try again later.");
     }
   };
+  
+  
 
   return (
     <div className="md:flex md:flex-row  h-auto">
