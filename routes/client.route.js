@@ -237,7 +237,7 @@ router.get(
 //   manageProject.getSpecificJobProgress
 // );
 
-q
+
 
 router.get('/project-progress/:proposal_id', authMiddleware, manageProject.getProjectProgress);
 

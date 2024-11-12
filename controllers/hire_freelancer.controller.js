@@ -6,6 +6,7 @@ const Job= require('../models/post_job.model')
 const mongoose = require('mongoose');
 const User = require('../models/user.model');
 const Freelancer_Profile = require('../models/freelancer_profile.model')
+const Review = require('../models/review.model')
 
 
 // Get hire request status by proposal ID
@@ -839,6 +840,7 @@ exports.markProjectAsCompleted = async (req, res) => {
     const { stars, message } = req.body;
 
     console.log("project id", projectId)
+    console.log("client id", clientId)
 
     // Validate required fields
     if (!stars || !message) {
@@ -856,9 +858,9 @@ exports.markProjectAsCompleted = async (req, res) => {
       });
     }
 
+    // _id: projectId,
     // Find the hire request
     const hireRequest = await HireFreelancer.findOne({
-      _id: projectId,
       clientId: clientId,
       status: 'hired' // Only allow completing projects that are currently hired
     }).populate('jobId freelancerId');
@@ -907,15 +909,15 @@ exports.markProjectAsCompleted = async (req, res) => {
       await reviewData.save({ session });
 
       // Create notification for freelancer
-      const notificationData = {
-        freelancer_id: hireRequest.freelancerId._id,
-        client_id: clientId,
-        job_id: hireRequest.jobId._id,
-        message: `Project "${hireRequest.jobId.job_title}" has been marked as completed. Client has left a ${stars}-star review.`,
-        type: 'project_completed'
-      };
+      // const notificationData = {
+      //   freelancer_id: hireRequest.freelancerId._id,
+      //   client_id: clientId,
+      //   job_id: hireRequest.jobId._id,
+      //   message: `Project "${hireRequest.jobId.job_title}" has been marked as completed. Client has left a ${stars}-star review.`,
+      //   type: 'project_completed'
+      // };
 
-      await notificationController.createNotification(notificationData);
+      // await notificationController.createNotification(notificationData);
 
       // Update freelancer's profile statistics
       await Freelancer_Profile.findOneAndUpdate(

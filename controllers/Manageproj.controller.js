@@ -429,7 +429,11 @@ exports.getProjectProgress = async (req, res) => {
       });
     }
 
-    // Use aggregation to get the latest project information
+
+
+
+
+  // Modified aggregation pipeline
     const project = await Project.aggregate([
       {
         $match: {
@@ -439,23 +443,15 @@ exports.getProjectProgress = async (req, res) => {
       },
       {
         $lookup: {
-          from: 'freelancerprofiles', // Replace with your actual collection name
-          localField: 'freelancer_profile_id',
+          from: 'freelancerprofiles',
+          localField: 'freelancer_id', // Make sure this matches your schema
           foreignField: '_id',
           as: 'freelancerInfo'
         }
       },
       {
         $lookup: {
-          from: 'milestones', // Replace with your actual milestones collection name if separate
-          localField: '_id',
-          foreignField: 'project_id',
-          as: 'latestMilestones'
-        }
-      },
-      {
-        $lookup: {
-          from: 'projectupdates', // Assuming you have a collection for project updates
+          from: 'projectupdates',
           localField: '_id',
           foreignField: 'project_id',
           pipeline: [
@@ -488,51 +484,52 @@ exports.getProjectProgress = async (req, res) => {
 
     const currentProject = project[0];
 
-    // Prepare response based on project type
-    let progressData;
 
-    if (currentProject.projectType === 'milestone') {
-      // For milestone-based projects
-      const milestoneProgress = {
-        totalMilestones: currentProject.latestMilestones.length,
-        completedMilestones: currentProject.latestMilestones.filter(m => m.status === 'Completed').length,
-        milestones: currentProject.latestMilestones.map(milestone => ({
-          name: milestone.name,
-          status: milestone.status,
-          amount: milestone.amount,
-          due_date: milestone.due_date,
-          progress: milestone.status === 'Completed' ? 100 : 
-                   milestone.status === 'In Progress' ? 50 : 0,
-          last_updated: milestone.updatedAt
-        })),
-        overallProgress: currentProject.progress,
-        lastUpdated: currentProject.updatedAt
-      };
-      
-      progressData = {
-        type: 'milestone',
-        ...milestoneProgress
-      };
-    } else {
-      // For fixed projects
-      progressData = {
-        type: 'fixed',
-        overallProgress: currentProject.progress,
-        status: currentProject.status,
-        lastUpdated: currentProject.updatedAt,
-        totalMilestones: currentProject.latestMilestones.length,
-        completedMilestones: currentProject.latestMilestones.filter(m => m.status === 'Completed').length,
-        milestones: currentProject.latestMilestones.map(milestone => ({
-          name: milestone.name,
-          status: milestone.status,
-          amount: milestone.amount,
-          due_date: milestone.due_date,
-          progress: milestone.status === 'Completed' ? 100 : 
-                   milestone.status === 'In Progress' ? 50 : 0,
-          last_updated: milestone.updatedAt
-        })),
-      };
-    }
+// Prepare response based on project type
+let progressData;
+
+if (currentProject.projectType === 'milestone') {
+  // For milestone-based projects
+  const milestoneProgress = {
+    totalMilestones: currentProject.milestones.length, // Direct access to milestones array
+    completedMilestones: currentProject.milestones.filter(m => m.status === 'Completed').length,
+    milestones: currentProject.milestones.map(milestone => ({
+      name: milestone.name,
+      status: milestone.status,
+      amount: milestone.amount,
+      due_date: milestone.due_date,
+      progress: milestone.status === 'Completed' ? 100 : 
+               milestone.status === 'In Progress' ? 50 : 0,
+      last_updated: milestone.updatedAt
+    })),
+    overallProgress: currentProject.progress,
+    lastUpdated: currentProject.updatedAt
+  };
+  
+  progressData = {
+    type: 'milestone',
+    ...milestoneProgress
+  };
+} else {
+  // For fixed projects
+  progressData = {
+    type: 'fixed',
+    overallProgress: currentProject.progress,
+    status: currentProject.status,
+    lastUpdated: currentProject.updatedAt,
+    totalMilestones: currentProject.milestones.length,
+    completedMilestones: currentProject.milestones.filter(m => m.status === 'Completed').length,
+    milestones: currentProject.milestones.map(milestone => ({
+      name: milestone.name,
+      status: milestone.status,
+      amount: milestone.amount,
+      due_date: milestone.due_date,
+      progress: milestone.status === 'Completed' ? 100 : 
+               milestone.status === 'In Progress' ? 50 : 0,
+      last_updated: milestone.updatedAt
+    })),
+  };
+}
 
     // Prepare freelancer details safely
     const freelancerDetails = currentProject.freelancerInfo ? {
