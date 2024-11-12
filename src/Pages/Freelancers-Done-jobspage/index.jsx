@@ -106,76 +106,76 @@ console.log('hire response', hireResponse.data)
     fetchJobs();
   }, []);
 
-  const fetchFreelancerHiredJobs = async () => {
-    try {
-      setLoading(true);
-      setError(null);
+  // const fetchFreelancerHiredJobs = async () => {
+  //   try {
+  //     setLoading(true);
+  //     setError(null);
 
-      const token = localStorage.getItem("token");
-      if (!token) {
-        throw new Error("No authentication token found");
-      }
+  //     const token = localStorage.getItem("token");
+  //     if (!token) {
+  //       throw new Error("No authentication token found");
+  //     }
 
-      const decodedToken = jwtDecode(token);
-      const freelancerId = decodedToken.userId;
+  //     const decodedToken = jwtDecode(token);
+  //     const freelancerId = decodedToken.userId;
 
-      if (!freelancerId) {
-        throw new Error("Freelancer ID not found");
-      }
+  //     if (!freelancerId) {
+  //       throw new Error("Freelancer ID not found");
+  //     }
 
-      const response = await axios.get(
-        `http://localhost:5000/api/freelancer/hired-jobs/${freelancerId}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
+  //     const response = await axios.get(
+  //       `http://localhost:5000/api/freelancer/hired-jobs/${freelancerId}`,
+  //       {
+  //         headers: {
+  //           Authorization: `Bearer ${token}`,
+  //           "Content-Type": "application/json",
+  //         },
+  //       }
+  //     );
 
-      if (!response.data || !Array.isArray(response.data.data)) {
-        setSpecificJobs([]);
-        return;
-      }
+  //     if (!response.data || !Array.isArray(response.data.data)) {
+  //       setSpecificJobs([]);
+  //       return;
+  //     }
 
-      const formattedJobs = response.data.data.map((hire) => ({
-        id: hire.hireId,
-        jobId: hire.job?.jobId || hire.job?.id,
-        proposalId: hire.proposal?.proposalId || hire.proposal?.id, // Adding proposal ID
-        type: hire.job?.budget_type === "fixed" ? "Fixed" : "Hourly",
-        title: hire.job?.title || "Untitled Job",
-        client_id: hire.client?.id,
-        freelancer_id: freelancerId,
-        rate: hire.job?.budget || "Not specified",
-        timeline: hire.job?.deadline || "Not specified",
-        level: hire.job?.category || "Not specified",
-        description: hire.job?.description || "No description provided",
-        tags: hire.job?.skills || [],
-        verified: true,
-        location: "Not specified",
-        postedTime: new Date(hire.hiredDate).toLocaleDateString(),
-        status: hire.status,
-        dueDate: hire.job?.deadline ? new Date(hire.job.deadline) : null,
-        proposalDetails: {
-          ...hire.proposal,
-          id: hire.proposal?.id || hire.proposal?.proposalId, // Including proposal ID in details
-          milestones: hire.proposal?.milestones || [],
-          projectBid: hire.proposal?.projectBid || null,
-        },
-      }));
+  //     const formattedJobs = response.data.data.map((hire) => ({
+  //       id: hire.hireId,
+  //       jobId: hire.job?.jobId || hire.job?.id,
+  //       proposalId: hire.proposal?.proposalId || hire.proposal?.id, // Adding proposal ID
+  //       type: hire.job?.budget_type === "fixed" ? "Fixed" : "Hourly",
+  //       title: hire.job?.title || "Untitled Job",
+  //       client_id: hire.client?.id,
+  //       freelancer_id: freelancerId,
+  //       rate: hire.job?.budget || "Not specified",
+  //       timeline: hire.job?.deadline || "Not specified",
+  //       level: hire.job?.category || "Not specified",
+  //       description: hire.job?.description || "No description provided",
+  //       tags: hire.job?.skills || [],
+  //       verified: true,
+  //       location: "Not specified",
+  //       postedTime: new Date(hire.hiredDate).toLocaleDateString(),
+  //       status: hire.status,
+  //       dueDate: hire.job?.deadline ? new Date(hire.job.deadline) : null,
+  //       proposalDetails: {
+  //         ...hire.proposal,
+  //         id: hire.proposal?.id || hire.proposal?.proposalId, // Including proposal ID in details
+  //         milestones: hire.proposal?.milestones || [],
+  //         projectBid: hire.proposal?.projectBid || null,
+  //       },
+  //     }));
 
-      setSpecificJobs(formattedJobs);
-    } catch (error) {
-      console.error("Error in fetchFreelancerHiredJobs:", error);
-      setError("Failed to fetch your hired jobs. Please try again.");
-    } finally {
-      setLoading(false);
-    }
-  };
+  //     setSpecificJobs(formattedJobs);
+  //   } catch (error) {
+  //     console.error("Error in fetchFreelancerHiredJobs:", error);
+  //     setError("Failed to fetch your hired jobs. Please try again.");
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
 
-  useEffect(() => {
-    fetchFreelancerHiredJobs();
-  }, []);
+  // useEffect(() => {
+  //   fetchFreelancerHiredJobs();
+  // }, []);
 
   // Filter jobs based on status and search term
   const getFilteredJobs = () => {
