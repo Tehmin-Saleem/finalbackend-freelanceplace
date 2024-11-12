@@ -8,10 +8,10 @@ const OfferDetails = () => {
     const [offer, setOffer] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const { id } = useParams();
+    const [canAccept, setCanAccept] = useState(false);
     const [fileUrl, setFileUrl] = useState(null);
     const [fileType, setFileType] = useState(null);
-  
+    const [submitLoading, setSubmitLoading] = useState(false);
     const location = useLocation();
 
  
@@ -71,23 +71,50 @@ const OfferDetails = () => {
     
         fetchOfferDetails();
       }, [notificationId]);
+    // In your frontend, add this before trying to accept
+    const checkStatus = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const response = await axios.get(
+          `http://localhost:5000/api/freelancer/offers/${offer._id}/status`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+        const { status } = response.data;
+        console.log('Current offer status:', status);
+        setCanAccept(status === "open");  // assuming "open" means it can be accepted
+      } catch (err) {
+        console.error('Error checking status:', err);
+      }
+    };
     
-  const handleAcceptOffer = async () => {
-    try {
-      const token = localStorage.getItem("token");
-      await axios.post(
-        `http://localhost:5000/api/freelancer/offers/${offerId}/accept`,
-        {},
-        {
-          headers: { Authorization: `Bearer ${token}` },
+    useEffect(() => {
+      if (offer) {
+        checkStatus();
+      }
+    }, [offer]);
+      const handleAcceptOffer = async () => {
+        try {
+          setSubmitLoading(true);
+          const token = localStorage.getItem("token");
+          await axios.post(
+            `http://localhost:5000/api/freelancer/offers/${offer._id}/accept`,
+            {},
+            {
+              headers: { Authorization: `Bearer ${token}` },
+            }
+          );
+          navigate('/dashboard/jobs');
+        } catch (err) {
+          const errorMessage = err.response?.data?.message || "Failed to accept offer";
+          const currentStatus = err.response?.data?.currentStatus;
+          setError(`${errorMessage}${currentStatus ? ` (Current status: ${currentStatus})` : ''}`);
+          console.error("Error accepting offer:", err.response?.data);
+        } finally {
+          setSubmitLoading(false);
         }
-      );
-      // Handle success - maybe redirect or show success message
-    } catch (err) {
-      console.error("Error accepting offer:", err);
-      // Handle error - show error message
-    }
-  };
+      };
   const handleViewFile = () => {
     if (fileType && fileUrl) {
       if (fileType.startsWith('image/')) {
@@ -237,12 +264,21 @@ const OfferDetails = () => {
     
                 {/* Action Buttons */}
                 <div className="flex gap-4 pt-4 border-t">
-                  <button
-                    onClick={handleAcceptOffer}
-                    className="px-4 py-2 bg-sky-500 text-white rounded-md hover:bg-sky-600"
-                  >
-                    Accept Offer
-                  </button>
+                   
+                {canAccept ? (
+  <button
+    onClick={handleAcceptOffer}
+    disabled={submitLoading}
+    className={`px-4 py-2 bg-sky-500 text-white rounded-md hover:bg-sky-600 ${
+        submitLoading ? 'opacity-50 cursor-not-allowed' : ''
+    }`}
+  >
+    {submitLoading ? 'Accepting...' : 'Accept Offer'}
+  </button>
+) : (
+  <div className="text-gray-500">This offer can no longer be accepted.</div>
+)}
+
                   <button
                     className="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-100"
                   >
