@@ -24,79 +24,86 @@ const FreelancersJobsPage = () => {
     try {
       setLoading(true);
       setError(null);
-      
-      const token = localStorage.getItem('token');
+
+      const token = localStorage.getItem("token");
       if (!token) {
-        throw new Error('No authentication token found');
+        throw new Error("No authentication token found");
       }
 
       // First fetch job IDs from /hire API
-      const hireResponse = await axios.get('http://localhost:5000/api/client/hire', {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
+      const hireResponse = await axios.get(
+        "http://localhost:5000/api/client/hire",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
         }
-      });
-console.log('hire response', hireResponse.data)
-if (!hireResponse.data || !Array.isArray(hireResponse.data.data)) {
-  console.log('Hire response structure:', hireResponse.data);
-  setJobs([]);
-  return;
-}
-const jobToFreelancerMap = hireResponse.data.data.reduce((map, hire) => {
-  if (hire?.jobId?.id && hire?.freelancerId?.id) {
-    map[hire.jobId.id] = hire.freelancerId.id;
-  }
-  return map;
-}, {});
-const hiredJobIds = new Set(
-  hireResponse.data.data
-    .filter(hire => hire?.jobId?.id)
-    .map(hire => hire.jobId.id)
-);
+      );
+      console.log("hire response", hireResponse.data);
+      if (!hireResponse.data || !Array.isArray(hireResponse.data.data)) {
+        console.log("Hire response structure:", hireResponse.data);
+        setJobs([]);
+        return;
+      }
+      const jobToFreelancerMap = hireResponse.data.data.reduce((map, hire) => {
+        if (hire?.jobId?.id && hire?.freelancerId?.id) {
+          map[hire.jobId.id] = hire.freelancerId.id;
+        }
+        return map;
+      }, {});
+      const hiredJobIds = new Set(
+        hireResponse.data.data
+          .filter((hire) => hire?.jobId?.id)
+          .map((hire) => hire.jobId.id)
+      );
       // Extract job IDs from hire data
-     
-console.log('hire response', hireResponse.data)
+
+      console.log("hire response", hireResponse.data);
       // Fetch all jobs from /job-posts API
-      const jobsResponse = await axios.get('http://localhost:5000/api/client/job-posts', {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
+      const jobsResponse = await axios.get(
+        "http://localhost:5000/api/client/job-posts",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
         }
-      });
+      );
 
       if (!jobsResponse.data?.jobPosts) {
-        throw new Error('Invalid job posts data');
+        throw new Error("Invalid job posts data");
       }
       // console.log('response', jobsResponse.data)
       // Filter jobs to only include those with matching IDs
-      console.log('jobsprespinse', jobsResponse.data)
+      console.log("jobsprespinse", jobsResponse.data);
       const matchedJobs = jobsResponse.data.jobPosts
-        .filter(job => jobToFreelancerMap[job._id])
-        .map(job => ({
+        .filter((job) => jobToFreelancerMap[job._id])
+        .map((job) => ({
           job_id: job._id,
           type: job.budget_type === "fixed" ? "Fixed" : "Hourly",
-          title: job.job_title || 'Untitled Job',
+          title: job.job_title || "Untitled Job",
           client_id: job.client_id._id,
           freelancer_id: jobToFreelancerMap[job._id], // Add freelancer_id from the map
-          rate: job.budget_type === "fixed" 
-            ? `$${job.fixed_price}` 
-            : `$${job.hourly_rate?.from}-$${job.hourly_rate?.to}/hr`,
+          rate:
+            job.budget_type === "fixed"
+              ? `$${job.fixed_price}`
+              : `$${job.hourly_rate?.from}-$${job.hourly_rate?.to}/hr`,
           timeline: job.project_duration?.duration_of_work || "Not specified",
           level: job.project_duration?.experience_level || "Not specified",
           description: job.description || "No description provided",
           tags: job.preferred_skills || [],
           verified: job.paymentMethodStatus === "Payment method verified",
           location: job.country || "Not specified",
-          postedTime: new Date(job.createdAt).toLocaleDateString()
+          postedTime: new Date(job.createdAt).toLocaleDateString(),
         }));
-       
+
       setJobs(matchedJobs);
-      console.log('matched jobs', matchedJobs)
-      console.log('id', matchedJobs.job_id)
+      console.log("matched jobs", matchedJobs);
+      console.log("id", matchedJobs.job_id);
     } catch (error) {
-      console.error('Error in fetchJobs:', error);
-      setError('Failed to fetch jobs. Please try again.');
+      console.error("Error in fetchJobs:", error);
+      setError("Failed to fetch jobs. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -296,18 +303,15 @@ console.log('hire response', hireResponse.data)
         <div className="error-message">{error}</div>
       ) : (
         <div className="jobs-container">
-        
           {paginatedJobs.length > 0 ? (
             paginatedJobs.map((job) => (
-              <FreelancersJobsCard 
+              <FreelancersJobsCard
                 key={job.title}
                 job_id={job.job_id}
-                client_id={job.client_id} 
+                client_id={job.client_id}
                 freelancer_id={job.freelancer_id}
                 {...job}
               />
-
-
             ))
           ) : (
             <div className="no-jobs">
