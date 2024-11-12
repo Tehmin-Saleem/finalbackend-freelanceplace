@@ -27,13 +27,14 @@ const Notification = () => {
             });
         } else if (message.includes('received a new offer')) {
             // Use notification._id for the offerId
-            navigate(`/OfferDetails/${notification._id}`, {
+            navigate(`/OfferDetails/${notification.job_id}`, {
                 state: { 
                     jobId: notification.job_id 
                 }
             });
         } else {
             console.log('Notification message not mapped to any route:', notification.message);
+            console.log('id', notification.job_id)
         }
     };
 
