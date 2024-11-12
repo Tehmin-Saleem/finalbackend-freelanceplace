@@ -1,16 +1,36 @@
-.star-rating {
-  font-size: 24px; /* Adjust as needed */
-  cursor: pointer;
+.star-rating-container {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 
-  .star {
-    color: #ccc; /* Default star color */
-    transition: color 0.2s;
+  .star-rating {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    font-size: 24px; /* Adjust as needed */
+    cursor: pointer;
+  
 
-    &:hover,
-    &.checked {
-      color: #FFE61C;
-     
-    //   color: #FFA929 /* Color of selected stars */
+    .star {
+      font-size: 1.2rem;
+      cursor: default;
+      transition: color 0.2s ease;
+      color: #ccc; /* Default star color */
+
+      
+      &.filled {
+        color: #ffc107;
+        text-shadow: 0 0 2px rgba(0, 0, 0, 0.1);
+      }
+      
+      &.empty {
+        color: #dee2e6;
+      }
     }
+  }
+
+  .rating-value {
+    font-size: 0.9rem;
+    color: #6c757d;
   }
 }

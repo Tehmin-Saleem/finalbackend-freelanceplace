@@ -379,33 +379,33 @@ const SubmitProposal = () => {
       }
 
       console.log(
-        "cover letter in handle sumbit function to test save",
+        "cover letter in handle sumbit cover letter function to test save",
         freelancerCoverLetter
       );
 
       // Call API to save the generated cover letter to the proposal
-      const response = await axios.post(
-        "http://localhost:5000/api/freelancer/save-cover-letter",
-        {
-          freelancerId, // The freelancer's ID
-          jobPostId, // The job post's ID
-          coverLetter: freelancerCoverLetter, // The generated or edited cover letter
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      // const response = await axios.post(
+      //   "http://localhost:5000/api/freelancer/save-cover-letter",
+      //   {
+      //     freelancerId, // The freelancer's ID
+      //     jobPostId, // The job post's ID
+      //     coverLetter: freelancerCoverLetter, // The generated or edited cover letter
+      //   },
+      //   {
+      //     headers: {
+      //       Authorization: `Bearer ${token}`,
+      //     },
+      //   }
+      // );
 
-      if (response.data.success) {
+      if (freelancerCoverLetter) {
         console.log("Cover letter saved successfully!");
         // Optionally, trigger any additional actions, like refreshing the proposal list
         handleCloseModal(); // Close the modal after saving
       } else {
         console.error(
           "Failed to save the cover letter:",
-          response.data.message
+          // response.data.message
         );
       }
     } catch (error) {
