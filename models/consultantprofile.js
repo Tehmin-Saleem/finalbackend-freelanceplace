@@ -18,13 +18,13 @@ const consultantProfileSchema = new mongoose.Schema({
   profilePicture: String, // Store the file path or URL
   bio: String,
   experience: [experienceSchema],
-  skills: [String],
+  skills: String,
   linkedIn: String,
   phoneNumber: String,
   address: String,
   education: [educationSchema],
   certifications: String,
   email: { type: String, required: true }, // Add email field here
-});
+}, { timestamps: true }); // Add timestamps option here
 
 module.exports = mongoose.model('ConsultantProfile', consultantProfileSchema);

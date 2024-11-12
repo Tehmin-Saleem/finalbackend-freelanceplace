@@ -149,3 +149,39 @@ exports.getOfferById = async (req, res) => {
     });
   }
 };
+
+exports.getOffersByFreelancerId = async (req, res) => {
+  console.log('getOffersByFreelancerId called with params:', req.params);
+
+  try {
+    const { freelancerId } = req.params;
+
+    // Validate that freelancerId is provided
+    if (!freelancerId) {
+      return res.status(400).json({ message: 'Freelancer ID is required' });
+    }
+
+    // Validate that freelancerId is a valid ObjectId
+    if (!mongoose.Types.ObjectId.isValid(freelancerId)) {
+      return res.status(400).json({ message: 'Invalid Freelancer ID format' });
+    }
+
+    // Find all offers where freelancer_id matches the provided ID
+    const offers = await Offer_Form.find({ freelancer_id: freelancerId }).populate('client_id', 'name'); // Populate client details if needed
+
+    // Check if offers were found
+    if (offers.length === 0) {
+      return res.status(404).json({ message: 'No offers found for this freelancer' });
+    }
+
+    // Send the offers as the response
+    res.status(200).json(offers);
+
+  } catch (error) {
+    console.error('Error fetching offers for freelancer:', error);
+    res.status(500).json({ 
+      message: 'Error fetching offers for freelancer', 
+      error: error.message 
+    });
+  }
+};

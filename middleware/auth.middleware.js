@@ -1,22 +1,34 @@
-
-
-
 const jwt = require('jsonwebtoken');
 
-
-// 
-const authMiddleware = (req, res, next) => {
-  const authHeader = req.headers['authorization']; // Capture the authorization header
-  // console.log('Authorization header:', authHeader); // Log the header to see if it's present
+// Define public routes that don't need authentication
+const publicRoutes = [
+  "/client/login",
   
-  // Ensure the header starts with 'Bearer ' and extract the token
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    console.error('Authorization header missing or incorrect format');
-    return res.status(401).json({ message: 'Authorization header missing or malformed' });
+  
+];
+
+// Helper function to check if the current route is public
+const isPublicRoute = (req) => {
+  return publicRoutes.some(route => req.path.includes(route));
+};
+
+const authMiddleware = (req, res, next) => {
+  // First, check if it's a public route
+  if (isPublicRoute(req)) {
+    return next(); // Skip authentication for public routes
   }
 
-  const token = authHeader.split(' ')[1]; // Extract token from 'Bearer <token>'
+  const authHeader = req.headers['authorization'];
+  
+  // For protected routes, verify authentication
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    console.error('Authorization header missing or incorrect format');
+    return res.status(401).json({ 
+      message: 'Authorization header missing or malformed' 
+    });
+  }
 
+  const token = authHeader.split(' ')[1];
 
   if (!token) {
     console.error('No token provided');
@@ -24,14 +36,12 @@ const authMiddleware = (req, res, next) => {
   }
 
   try {
-
-    const decoded = jwt.verify(token, process.env.JWT_SECRET); // Ensure the same secret is used here
-    req.user = decoded;  // Attach the decoded token (user info) to the request// Set the decoded token data to the request
-    next();  // Proceed to the next middleware or route handler
-    } catch (err) {
-    console.error('Token verification failed:', err.message); // Log specific error message
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    req.user = decoded;  // Attach user info to request
+    next();
+  } catch (err) {
+    console.error('Token verification failed:', err.message);
     
-    // Handle token expiration or invalid signature specifically
     if (err.name === 'TokenExpiredError') {
       return res.status(401).json({ message: 'Token has expired' });
     } else if (err.name === 'JsonWebTokenError') {
@@ -43,4 +53,3 @@ const authMiddleware = (req, res, next) => {
 };
 
 module.exports = authMiddleware;
-
