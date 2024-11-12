@@ -609,6 +609,42 @@ $proposal-shadow: rgba(0, 0, 0, 0.1);
     }
   }
 
+
+
+  .milestone-progress {
+    .progress-stats {
+      margin-bottom: 24px;
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+  
+    .milestones-list {
+      .milestone-card {
+        margin-bottom: 16px;
+        
+        .amount {
+          font-size: 18px;
+          font-weight: bold;
+          color: #1890ff;
+          margin-top: 8px;
+        }
+  
+        .ant-progress {
+          margin-top: 16px;
+        }
+      }
+    }
+  }
+  
+  .progress-section {
+    .ant-progress {
+      margin-bottom: 8px;
+    }
+  }
+
+
   .proposal-attachments {
     margin-top: 2rem;
     padding-top: 2rem;
@@ -675,6 +711,8 @@ $proposal-shadow: rgba(0, 0, 0, 0.1);
       }
     }
   }
+
+  
 
   .proposal-actions {
     margin-top: 2rem;
