@@ -130,28 +130,6 @@ router.delete('/payment-methods/:paymentMethodId', paymentMethodController.delet
 
 
 router.post('/hire/:proposalId', authMiddleware, hireFreelancerController.hireFreelancer);
-
-
-
-<<<<<<< HEAD
-
-
-
-// router.get('/hire', hireFreelancerController.getClientHireRequests);
-
-
-// router.get('/hire/:hireRequestId', hireFreelancerController.getHireRequestById);
-=======
-
-// In your routes file
-router.get('/filtered-jobs', authMiddleware, hireFreelancerController.getFilteredJobs);
-
-
-router.get('/hire/:proposalId', hireFreelancerController.getHireRequestById);
-router.get('/hire', hireFreelancerController.getAllHireData);
->>>>>>> 08d78c7f02234da35171e52e684bbe22c04514ab
-
-
 router.put('/hire/:hireRequestId', hireFreelancerController.updateHireRequest);
 
 
@@ -257,6 +235,17 @@ router.get(
   '/:client_id/project/:project_id/progress', 
   authMiddleware, 
   manageProject.getSpecificJobProgress
+);
+
+
+
+router.get('/project-progress/:proposal_id', authMiddleware, manageProject.getProjectProgress);
+
+
+router.post(
+  '/complete-project/:projectId',
+  authMiddleware,
+  hireFreelancerController.markProjectAsCompleted
 );
 
 

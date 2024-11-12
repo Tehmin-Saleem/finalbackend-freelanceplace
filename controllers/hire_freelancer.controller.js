@@ -524,7 +524,7 @@ exports.getClientOngoingProjects = async (req, res) => {
     })
     .populate({
       path: 'proposalId',
-      select: 'cover_letter project_duration add_requirements'
+      select: 'Proposal_id cover_letter project_duration add_requirements'
     })
 
     // Get freelancer profiles for all freelancers
@@ -581,6 +581,7 @@ exports.getClientOngoingProjects = async (req, res) => {
         },
         milestones: formatMilestones(project.proposalId?.add_requirements?.by_milestones || []),
         proposalDetails: {
+          Proposal_id: project.proposalId ||'',
           coverLetter: project.proposalId?.cover_letter || '',
           estimatedDuration: project.proposalId?.project_duration || '',
           proposedRate: project.proposalId?.add_requirements?.by_project?.bid_amount || 0,
@@ -819,6 +820,146 @@ exports.getFreelancerHiredJobs = async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Failed to fetch freelancer\'s hired jobs',
+      error: error.message
+    });
+  }
+};
+
+
+
+// mark as completed controller
+
+// In hire_freelancer.controller.js
+// In hire_freelancer.controller.js
+
+exports.markProjectAsCompleted = async (req, res) => {
+  try {
+    const { projectId } = req.params;
+    const clientId = req.user.userId;
+    const { stars, message } = req.body;
+
+    // Validate required fields
+    if (!stars || !message) {
+      return res.status(400).json({
+        success: false,
+        message: 'Rating (stars) and review message are required'
+      });
+    }
+
+    // Validate stars range
+    if (stars < 1 || stars > 5) {
+      return res.status(400).json({
+        success: false,
+        message: 'Rating must be between 1 and 5 stars'
+      });
+    }
+
+    // Find the hire request
+    const hireRequest = await HireFreelancer.findOne({
+      _id: projectId,
+      clientId: clientId,
+      status: 'hired' // Only allow completing projects that are currently hired
+    }).populate('jobId freelancerId');
+
+    if (!hireRequest) {
+      return res.status(404).json({
+        success: false,
+        message: 'Project not found or unauthorized'
+      });
+    }
+
+    // Start a transaction
+    const session = await mongoose.startSession();
+    session.startTransaction();
+
+    try {
+      // Update hire request status
+      hireRequest.status = 'completed';
+      hireRequest.completedAt = new Date();
+      await hireRequest.save({ session });
+
+      // Update job status
+      await Job.findByIdAndUpdate(
+        hireRequest.jobId._id,
+        {
+          $set: {
+            jobstatus: 'completed',
+            completion_date: new Date()
+          }
+        },
+        { session }
+      );
+
+      // Create review document using your Review model
+      const reviewData = new Review({
+        client_id: clientId,
+        freelancer_id: hireRequest.freelancerId._id,
+        job_id: hireRequest.jobId._id,
+        message: message,
+        stars: stars,
+        status: 'Completed',
+        createdAt: new Date(),
+        updated_at: new Date()
+      });
+
+      await reviewData.save({ session });
+
+      // Create notification for freelancer
+      const notificationData = {
+        freelancer_id: hireRequest.freelancerId._id,
+        client_id: clientId,
+        job_id: hireRequest.jobId._id,
+        message: `Project "${hireRequest.jobId.job_title}" has been marked as completed. Client has left a ${stars}-star review.`,
+        type: 'project_completed'
+      };
+
+      await notificationController.createNotification(notificationData);
+
+      // Update freelancer's profile statistics
+      await Freelancer_Profile.findOneAndUpdate(
+        { freelancer_id: hireRequest.freelancerId._id },
+        {
+          $inc: {
+            completed_jobs: 1,
+            total_earnings: hireRequest.terms?.rate || 0,
+            total_reviews: 1,
+            total_ratings: stars
+          }
+        },
+        { session }
+      );
+
+      // Commit the transaction
+      await session.commitTransaction();
+
+      res.status(200).json({
+        success: true,
+        message: 'Project marked as completed and review submitted successfully',
+        data: {
+          projectId: projectId,
+          status: 'completed',
+          completedAt: hireRequest.completedAt,
+          review: {
+            stars: stars,
+            message: message,
+            status: 'Completed'
+          }
+        }
+      });
+
+    } catch (error) {
+      // If anything fails, abort the transaction
+      await session.abortTransaction();
+      throw error;
+    } finally {
+      session.endSession();
+    }
+
+  } catch (error) {
+    console.error('Error in markProjectAsCompleted:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to mark project as completed',
       error: error.message
     });
   }
