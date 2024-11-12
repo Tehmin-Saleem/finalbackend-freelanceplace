@@ -231,13 +231,13 @@ router.get(
 );
 
 // Get specific project progress
-router.get(
-  '/:client_id/project/:project_id/progress', 
-  authMiddleware, 
-  manageProject.getSpecificJobProgress
-);
+// router.get(
+//   '/:client_id/project/:project_id/progress', 
+//   authMiddleware, 
+//   manageProject.getSpecificJobProgress
+// );
 
-
+q
 
 router.get('/project-progress/:proposal_id', authMiddleware, manageProject.getProjectProgress);
 

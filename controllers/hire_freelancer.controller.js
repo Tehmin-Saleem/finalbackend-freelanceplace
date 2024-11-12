@@ -838,6 +838,8 @@ exports.markProjectAsCompleted = async (req, res) => {
     const clientId = req.user.userId;
     const { stars, message } = req.body;
 
+    console.log("project id", projectId)
+
     // Validate required fields
     if (!stars || !message) {
       return res.status(400).json({
