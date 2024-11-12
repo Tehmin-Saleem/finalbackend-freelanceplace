@@ -3,6 +3,9 @@ import './styles.scss';
 import axios from "axios";
 import { useNavigate } from 'react-router-dom';
 const EditableProjectCard = ({ project, onSave, onComplete }) => {
+ 
+ 
+ 
   const [freelancerData, setFreelancerData] = useState({
     projectName: '',
     progress: 0,
@@ -26,6 +29,8 @@ const EditableProjectCard = ({ project, onSave, onComplete }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
+
+
   useEffect(() => {
     setFreelancerData({
       projectName: project.projectName || '',

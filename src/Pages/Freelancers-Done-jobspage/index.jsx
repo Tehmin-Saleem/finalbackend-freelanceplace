@@ -4,6 +4,7 @@ import {
   FreelancersJobsCard,
   CommonButton,
   Spinner,
+  StatusBadge,
 } from "../../components/index";
 import "./styles.scss";
 import { Filter, IconSearchBar } from "../../svg";
@@ -30,9 +31,17 @@ const FreelancersJobsPage = () => {
         throw new Error("No authentication token found");
       }
 
+      const decodedToken = jwtDecode(token);
+      const freelancerId = decodedToken.userId;
+
+      if (!freelancerId) {
+        throw new Error("Freelancer ID not found");
+      }
+
       // First fetch job IDs from /hire API
       const hireResponse = await axios.get(
         "http://localhost:5000/api/client/hire",
+        // `http://localhost:5000/api/freelancer/hired-jobs/${freelancerId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -46,6 +55,18 @@ const FreelancersJobsPage = () => {
         setJobs([]);
         return;
       }
+
+      // Create maps for hire status and freelancer IDs
+      const hireStatusMap = hireResponse.data.data.reduce((map, hire) => {
+        if (hire?.jobId?.id) {
+          map[hire.jobId.id] = {
+            status: hire.status,
+            freelancerId: hire.freelancerId?.id,
+          };
+        }
+        return map;
+      }, {});
+
       const jobToFreelancerMap = hireResponse.data.data.reduce((map, hire) => {
         if (hire?.jobId?.id && hire?.freelancerId?.id) {
           map[hire.jobId.id] = hire.freelancerId.id;
@@ -77,6 +98,9 @@ const FreelancersJobsPage = () => {
       // console.log('response', jobsResponse.data)
       // Filter jobs to only include those with matching IDs
       console.log("jobsprespinse", jobsResponse.data);
+      
+      
+      
       const matchedJobs = jobsResponse.data.jobPosts
         .filter((job) => jobToFreelancerMap[job._id])
         .map((job) => ({
@@ -84,7 +108,8 @@ const FreelancersJobsPage = () => {
           type: job.budget_type === "fixed" ? "Fixed" : "Hourly",
           title: job.job_title || "Untitled Job",
           client_id: job.client_id._id,
-          freelancer_id: jobToFreelancerMap[job._id], // Add freelancer_id from the map
+          freelancer_id: hireStatusMap[job._id].freelancerId,
+          // freelancer_id: jobToFreelancerMap[job._id], // Add freelancer_id from the map
           rate:
             job.budget_type === "fixed"
               ? `$${job.fixed_price}`
@@ -96,10 +121,14 @@ const FreelancersJobsPage = () => {
           verified: job.paymentMethodStatus === "Payment method verified",
           location: job.country || "Not specified",
           postedTime: new Date(job.createdAt).toLocaleDateString(),
+          status: hireStatusMap[job._id].status || "pending", // Use hire status
+          jobStatus: job.jobstatus || "pending", // Use job status
         }));
 
       setJobs(matchedJobs);
       console.log("matched jobs", matchedJobs);
+      
+      
       console.log("id", matchedJobs.job_id);
     } catch (error) {
       console.error("Error in fetchJobs:", error);
@@ -190,21 +219,22 @@ const FreelancersJobsPage = () => {
       const matchesSearch = job.title
         .toLowerCase()
         .includes(searchTerm.toLowerCase());
-
-      if (statusFilter === "all") return matchesSearch;
-
-      const today = new Date();
-      const dueDate = job.dueDate ? new Date(job.dueDate) : null;
+      if (!matchesSearch) return false;
 
       switch (statusFilter) {
+        case "all":
+          return true;
         case "ongoing":
-          return matchesSearch && (!dueDate || dueDate > today);
+          return (
+            (job.status === "hired" && job.jobStatus === "pending") ||
+            job.jobStatus === "ongoing"
+          );
         case "pending":
-          return matchesSearch && dueDate && dueDate < today;
+          return job.status === "pending";
         case "completed":
-          return matchesSearch && job.status === "completed";
+          return job.status === "completed" || job.jobStatus === "completed";
         default:
-          return matchesSearch;
+          return true;
       }
     });
   };
@@ -286,7 +316,7 @@ const FreelancersJobsPage = () => {
             value={statusFilter}
             onChange={(e) => {
               setStatusFilter(e.target.value);
-              setCurrentPage(1); // Reset to first page on filter change
+              setCurrentPage(1);
             }}
             className="status-select"
           >
@@ -311,6 +341,9 @@ const FreelancersJobsPage = () => {
                 client_id={job.client_id}
                 freelancer_id={job.freelancer_id}
                 {...job}
+                statusBadge={
+                  <StatusBadge status={job.status} jobStatus={job.jobStatus} />
+                }
               />
             ))
           ) : (
