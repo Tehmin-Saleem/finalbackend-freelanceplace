@@ -10,15 +10,56 @@ exports.createoffer = async (req, res) => {
   try {
     const {
       budget_type,
-      hourly_rate,
+      hourly_rate_from,
+      hourly_rate_to,
       fixed_price,
       description,
       detailed_description,
       freelancer_id,
       job_title,
       preferred_skills,
-      status
+    
     } = req.body;
+    console.log('Budget type:', budget_type);
+    console.log('Hourly rates (raw):', { from: hourly_rate_from, to: hourly_rate_to });
+    console.log('Fixed price (raw):', fixed_price);
+    let budget = {
+      budget_type: budget_type
+    };
+
+    if (budget_type === 'hourly') {
+      // Convert and validate hourly rates
+      const from = hourly_rate_from ? parseFloat(hourly_rate_from) : null;
+      const to = hourly_rate_to ? parseFloat(hourly_rate_to) : null;
+      
+      console.log('Parsed hourly rates:', { from, to });
+
+      if (from === null || to === null) {
+        console.log('Hourly rate validation failed');
+        return res.status(400).json({ message: 'Hourly rate values are required for hourly budget type' });
+      }
+
+      if (from > to) {
+        console.log('Invalid rate range: minimum exceeds maximum');
+        return res.status(400).json({ message: 'Minimum hourly rate cannot exceed maximum rate' });
+      }
+
+      budget.hourly_rate = {
+        from: from,
+        to: to
+      };
+    } else if (budget_type === 'fixed') {
+      // Convert and validate fixed price
+      const price = fixed_price ? parseFloat(fixed_price) : null;
+      console.log('Parsed fixed price:', price);
+
+      if (price === null) {
+        console.log('Fixed price validation failed');
+        return res.status(400).json({ message: 'Fixed price is required for fixed budget type' });
+      }
+
+      budget.fixed_price = price;
+    }
 
     const client_id = req.user.userId || req.user.id;
     if (!client_id) {
@@ -40,9 +81,7 @@ exports.createoffer = async (req, res) => {
     // Create the new offer first
     const newOffer = new Offer_Form({
       attachment,
-      budget_type,
-      hourly_rate: budget_type === 'hourly' ? JSON.parse(hourly_rate) : undefined,
-      fixed_price: budget_type === 'fixed' ? fixed_price : undefined,
+      ...budget,
       client_id,
       description,
       detailed_description,
@@ -81,71 +120,106 @@ exports.createoffer = async (req, res) => {
   }
 };
 
-// Update the getOfferById to look for both _id and job_id
 exports.getOfferById = async (req, res) => {
-  console.log('getOfferById called with params:', req.params);
-
   try {
     const { notificationId } = req.params;
-    console.log('Extracted notificationId:', notificationId);
-
-    // Validate that notificationId is present
-    if (!notificationId) {
-      console.log('No notificationId provided in request');
-      return res.status(400).json({ message: 'Notification ID is required' });
-    }
+    console.log('notificationId', notificationId);
 
     // Validate that notificationId is a valid ObjectId
     if (!mongoose.Types.ObjectId.isValid(notificationId)) {
-      console.log('Invalid ObjectId format:', notificationId);
-      return res.status(400).json({ message: 'Invalid Notification ID format' });
+      return res.status(400).json({ message: 'Invalid Offer ID format' });
     }
 
-    // Find the notification first using the NotificationModel
-    const notification = await NotificationModel.findById(notificationId);
-    
-    if (!notification) {
-      console.log('No notification found for ID:', notificationId);
-      return res.status(404).json({ message: 'Notification not found' });
-    }
+    // Find the offer by its ID and populate the client_id field to include name and country
+    const offer = await Offer_Form.findById(notificationId).populate('client_id', 'first_name last_name country_name');
 
-    console.log('Found notification:', notification);
-
-    // Use the job_id from notification to find the offer
-    const offer = await Offer_Form.findById(notification.job_id);
-    console.log('Database query result:', offer);
-
+    // If no offer is found, return 404
     if (!offer) {
-      console.log('No offer found for job_id:', notification.job_id);
       return res.status(404).json({ message: 'Offer not found' });
     }
-
-    // Return the formatted offer
+    let budgetDetails;
+    if (offer.budget_type === 'hourly' && offer.hourly_rate) {
+      budgetDetails = {
+        budget_type: 'hourly',
+        hourly_rate: {
+          from: offer.hourly_rate.from,
+          to: offer.hourly_rate.to
+        }
+      };
+    } else if (offer.budget_type === 'fixed' && offer.fixed_price) {
+      budgetDetails = {
+        budget_type: 'fixed',
+        fixed_price: offer.fixed_price
+      };
+    } else {
+      budgetDetails = {
+        budget_type: 'unknown',
+        message: 'Budget details are not available'
+      };
+    }
+    // Prepare the response with the offer details
     const formattedOffer = {
       _id: offer._id,
+      clientFirstName: offer.client_id.first_name,
+      clientLastName: offer.client_id.last_name,
+      clientCountry: offer.client_id.country_name,
+      location: offer.location,
       job_title: offer.job_title,
+      ...budgetDetails, // Insert the budget details dynamically
       description: offer.description,
       detailed_description: offer.detailed_description,
-      budget_type: offer.budget_type,
-      hourly_rate: offer.hourly_rate || null,
-      fixed_price: offer.fixed_price || null,
-      client_id: offer.client_id,
-      freelancer_id: offer.freelancer_id,
       preferred_skills: offer.preferred_skills,
-      status: offer.status,
-      attachment: offer.attachment,
-      createdAt: offer.createdAt,
-      updatedAt: offer.updatedAt
+      attachment: offer.attachment ? {
+        fileName: offer.attachment.fileName,
+        path: offer.attachment.path
+      } : null 
     };
-
-    console.log('Sending formatted response:', formattedOffer);
+console.log('formatted offer', formattedOffer)
     res.status(200).json(formattedOffer);
-
   } catch (error) {
     console.error('Error in getOfferById:', error);
-    res.status(500).json({ 
-      message: 'Error fetching offer details', 
-      error: error.message 
-    });
+    res.status(500).json({ message: 'Error fetching offer details', error: error.message });
   }
 };
+
+
+// exports.getOfferById = async (req, res) => {
+//   try {
+//     const { notificationId } = req.params;
+//     console.log('notificationId', notificationId);
+
+//     // Validate that notificationId is a valid ObjectId
+//     if (!mongoose.Types.ObjectId.isValid(notificationId)) {
+//       return res.status(400).json({ message: 'Invalid Offer ID format' });
+//     }
+
+//     // Find the offer by its ID and populate the client_id field
+//     const offer = await Offer_Form.findById(notificationId).populate('client_id');
+
+//     // If no offer is found, return 404
+//     if (!offer) {
+//       return res.status(404).json({ message: 'Offer not found' });
+//     }
+
+//     // Prepare the response with the offer details
+//     const formattedOffer = {
+//       _id: offer._id,
+//       clientFirstName: offer.client_id.first_name,
+//       clientLastName: offer.client_id.last_name,
+//       location: offer.location,
+//       job_title: offer.job_title,
+//       budget_type: offer.budget_type,
+//       hourly_rate: offer.hourly_rate,
+//       fixed_price: offer.fixed_price,
+//       description: offer.description,
+//       detailed_description: offer.detailed_description,
+//       preferred_skills: offer.preferred_skills,
+//       attachment: offer.attachment
+//     };
+
+//     res.status(200).json(formattedOffer);
+//   } catch (error) {
+//     console.error('Error in getOfferById:', error);
+//     res.status(500).json({ message: 'Error fetching offer details', error: error.message });
+//   }
+// };
