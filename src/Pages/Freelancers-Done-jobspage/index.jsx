@@ -9,8 +9,7 @@ import {
 import "./styles.scss";
 import { Filter, IconSearchBar } from "../../svg";
 import axios from "axios";
-import { jwtDecode } from "jwt-decode";
-
+import {jwtDecode} from "jwt-decode";
 const FreelancersJobsPage = () => {
   const [jobs, setJobs] = useState([]);
   const [specificjobs, setSpecificJobs] = useState([]);
@@ -31,12 +30,8 @@ const FreelancersJobsPage = () => {
         throw new Error("No authentication token found");
       }
 
-      const decodedToken = jwtDecode(token);
-      const freelancerId = decodedToken.userId;
-
-      if (!freelancerId) {
-        throw new Error("Freelancer ID not found");
-      }
+    
+     
 
       // First fetch job IDs from /hire API
       const hireResponse = await axios.get(
@@ -49,6 +44,11 @@ const FreelancersJobsPage = () => {
           },
         }
       );
+      const decodedToken = jwtDecode(token);
+      const loggedInUserId = decodedToken.userId; // Adjust this field based on your token structure
+      if (!loggedInUserId) {
+        throw new Error('Unable to decode user ID from token');
+      }
       console.log("hire response", hireResponse.data);
       if (!hireResponse.data || !Array.isArray(hireResponse.data.data)) {
         console.log("Hire response structure:", hireResponse.data);
@@ -67,8 +67,14 @@ const FreelancersJobsPage = () => {
         return map;
       }, {});
 
+      // const jobToFreelancerMap = hireResponse.data.data.reduce((map, hire) => {
+      //   if (hire?.jobId?.id && hire?.freelancerId?.id) {
+      //     map[hire.jobId.id] = hire.freelancerId.id;
+      //   }
+      //   return map;
+      // }, {});
       const jobToFreelancerMap = hireResponse.data.data.reduce((map, hire) => {
-        if (hire?.jobId?.id && hire?.freelancerId?.id) {
+        if (hire?.jobId?.id && hire?.freelancerId?.id && hire.freelancerId.id === loggedInUserId) {
           map[hire.jobId.id] = hire.freelancerId.id;
         }
         return map;
@@ -350,7 +356,7 @@ const FreelancersJobsPage = () => {
             <div className="no-jobs">
               {searchTerm
                 ? "No matching jobs found"
-                : "You haven't been hired for any jobs yet"}
+                : "You haven't completed any jobs yet"}
             </div>
           )}
         </div>
@@ -369,7 +375,9 @@ const FreelancersJobsPage = () => {
               <option value={5}>5</option>
               <option value={10}>10</option>
               <option value={15}>15</option>
-            </select>
+              <option value={20}>20</option>
+          <option value={25}>25</option>
+        </select>
           </div>
           <div className="page-controls">
             <button
