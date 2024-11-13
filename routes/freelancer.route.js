@@ -212,6 +212,9 @@ router.get('/freelancer-reviews/:freelancerId',authMiddleware, hireFreelancerCon
 router.get('/:freelancerId/reviews',authMiddleware ,hireFreelancerController.getFreelancerReviews);
 
 
+router.get('/completed-jobs/:freelancerId', authMiddleware, hireFreelancerController.getFreelancerCompletedJobs);
+
+
 
 
 module.exports = router;

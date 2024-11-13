@@ -463,6 +463,7 @@ exports.getFreelancerProposals = async (req, res) => {
 
       return {
         id: proposal._id,
+        freelancer_id: freelancerId, // Added freelancer ID here
         coverLetter: proposal.cover_letter || 'No cover letter',
         timeline: proposal.project_duration || 'Not specified',
         rate,
@@ -518,7 +519,7 @@ exports.getProposalById = async (req, res) => {
       return res.status(404).json({ message: 'Proposal not found or unauthorized' });
     }
 
-    res.status(200).json({ proposal });
+    res.status(200).json({ proposal, freelancer_id  });
   } catch (err) {
     console.error('Error getting proposal:', err); 
     res.status(500).json({ message: 'Internal server error', error: err.message });
