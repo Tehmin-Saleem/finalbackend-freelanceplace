@@ -197,9 +197,30 @@ const SubmitProposal = () => {
 
   const navigate = useNavigate();
 
-  const handleInputChange = (e) => {
+  const handleInputChange = async (e) => {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+  
+    // Update the form data with the new value
+    setFormData((prevData) => ({ ...prevData, [name]: value }));
+  
+    // If the updated field is the portfolio link, fetch the thumbnail
+    if (name === "portfolio_link" && value) {
+      try {
+        const thumbnail = await fetchThumbnail(value); // Fetch the thumbnail
+        setFormData((prevData) => ({ ...prevData, thumbnail })); // Update form data with the thumbnail URL
+      } catch (error) {
+        console.error("Error fetching thumbnail:", error);
+      }
+    }
+  };
+  const fetchThumbnail = async (url) => {
+    try {
+      const response = await fetch(`https://api.linkpreview.net/?key=YOUR_API_KEY&q=${url}`);
+      const data = await response.json();
+      return data.image; // Assuming the API returns the image in the `data.image` field
+    } catch (error) {
+      throw new Error("Failed to fetch thumbnail");
+    }
   };
 
   const handleFileChange = (e) => {
@@ -615,14 +636,24 @@ const SubmitProposal = () => {
                   </div>
 
                   <label className="Label">Add portfolio link</label>
-                  <input
-                    type="text"
-                    name="portfolio_link"
-                    value={formData.portfolio_link}
-                    onChange={handleInputChange}
-                    placeholder="Lorem ipsum"
-                    className="portfolio-link"
-                  />
+  <input
+    type="text"
+    name="portfolio_link"
+    value={formData.portfolio_link}
+    onChange={handleInputChange}
+    placeholder="Enter your portfolio link"
+    className="portfolio-link"
+  />
+  {formData.thumbnail ? (
+  <div className="thumbnail-preview">
+    <img src={formData.thumbnail} alt="Portfolio Thumbnail" />
+  </div>
+) : (
+  <div className="thumbnail-preview">
+    <img src="https://picsum.photos/200/300" alt="Default Thumbnail" />
+  </div>
+)}
+
 
                   <div className="actions">
                     <button

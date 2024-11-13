@@ -132,7 +132,7 @@ const FreelanceDashboardPage = () => {
           <p>Explore available opportunities that match your skills.</p>
           <button>Browse Jobs</button>
         </div>
-        <div className="card" onClick={() => navigate('/freelancersjobpage')}>
+        <div className="card" onClick={() => navigate('/freelancerOffers')}>
           <h2>offers</h2>
           <p>View and manage the offers.</p>
           <button>View offers</button>

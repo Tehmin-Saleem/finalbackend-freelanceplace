@@ -1,0 +1,197 @@
+// Variables
+$primary-color: #3b82f6;
+$secondary-color: #6b7280;
+$gray-color: #f7fafc;
+$text-color: #4a5568;
+$border-color: #e2e8f0;
+$hover-darken: 10%;
+$font-kodchasan: 'Kodchasan', sans-serif;
+$font-poppins: 'Poppins', sans-serif;
+$color-gray: #64748b;
+$color-dark: #2c3e50;
+$color-white: #ffffff;
+$color-accent: #4bcdeb;
+$bg-color: #f7f8fa;
+
+// Mixins
+@mixin card-shadow {
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+}
+
+@mixin flex-center {
+  display: flex;
+  align-items: center;
+}
+
+// Styles
+.offer-cards-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2.5rem;
+  padding: 4rem 2rem;
+  background-color: $bg-color;
+  min-height: 100vh;
+}
+
+.offer-card {
+  background-color: $color-white;
+  border-radius: 16px;
+  padding: 3rem;
+  width: 100%;
+  max-width: 900px;
+  @include card-shadow;
+  position: relative;
+  font-family: $font-poppins;
+  color: $text-color;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid rgba($border-color, 0.1);
+
+  &:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
+    border-color: rgba($color-accent, 0.3);
+  }
+
+  &__title {
+    font-size: 1.8rem;
+    margin-bottom: 1.5rem;
+    color: $color-dark;
+    font-weight: 700;
+    line-height: 1.4;
+    padding-right: 120px; // Space for the button
+  }
+
+  .top-right-btn {
+    position: absolute;
+    top: 2.5rem;
+    right: 2.5rem;
+    background-color: $color-accent;
+    color: $color-white;
+    border: none;
+    padding: 0.8rem 1.6rem;
+    font-size: 1.1rem;
+    border-radius: 12px;
+    cursor: pointer;
+    font-family: $font-kodchasan;
+    font-weight: 600;
+    transition: all 0.3s ease;
+
+    &:hover {
+      background-color: darken($color-accent, $hover-darken);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba($color-accent, 0.3);
+    }
+  }
+
+  &__description,
+  &__detailed-description {
+    font-size: 1.1rem;
+    line-height: 1.8;
+    color: $color-gray;
+    margin: 1.2rem 0;
+
+    .label {
+      color: $color-dark;
+      font-weight: 600;
+      margin-right: 0.5rem;
+    }
+  }
+
+  &__info-section {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 2rem;
+    margin: 2rem 0;
+    padding: 1.5rem;
+    background-color: rgba($gray-color, 0.5);
+    border-radius: 12px;
+  }
+
+  &__info-item {
+    @include flex-center;
+    gap: 1rem;
+
+    .label {
+      color: $secondary-color;
+      font-weight: 500;
+    }
+
+    &-value {
+      color: $color-dark;
+      font-weight: 600;
+      font-size: 1.1rem;
+    }
+  }
+
+  &__skills {
+    margin-top: 2rem;
+
+    .label {
+      display: block;
+      margin-bottom: 1rem;
+      color: $color-dark;
+      font-weight: 600;
+    }
+  }
+
+  &__skills-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+  &__skill-item {
+    background-color: rgba($color-accent, 0.1);
+    color: $color-accent;
+    font-size: 0.95rem;
+    padding: 0.6rem 1.2rem;
+    border-radius: 8px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+
+    &:hover {
+      background-color: $primary-color;
+      color: $color-white;
+      transform: translateY(-2px);
+    }
+  }
+}
+
+.error-message {
+  font-size: 1.3rem;
+  color: #e74c3c;
+  font-weight: 500;
+  text-align: center;
+  margin-top: 3rem;
+  padding: 2rem;
+  background-color: rgba(#e74c3c, 0.1);
+  border-radius: 12px;
+  width: 100%;
+  max-width: 600px;
+}
+
+// Responsive adjustments
+@media (max-width: 768px) {
+  .offer-card {
+    padding: 2rem;
+
+    &__title {
+      font-size: 1.5rem;
+      padding-right: 0;
+      margin-top: 3rem;
+    }
+
+    .top-right-btn {
+      top: 1.5rem;
+      right: 1.5rem;
+      padding: 0.6rem 1.2rem;
+      font-size: 1rem;
+    }
+
+    &__info-section {
+      grid-template-columns: 1fr;
+      gap: 1rem;
+    }
+  }
+}

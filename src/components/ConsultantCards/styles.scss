@@ -1,0 +1,177 @@
+$primary-color: #4bcdeb;
+$secondary-color: #6b7280;
+$gray-color: #f7fafc;
+$border-color: #e2e8f0;
+$text-color: #4a5568;
+$font-poppins: 'Poppins', sans-serif;
+$color-white: #ffffff;
+
+
+.filter-container {
+  padding: 20px;
+
+  .filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-bottom: 20px;
+    margin-left: 10rem;
+    margin-right: 2rem;
+    label {
+        display: block;
+        font-weight: bold;
+        margin-bottom: 5px;
+      }
+
+    input {
+      padding: 10px;
+      border: 1px solid $border-color;
+      border-radius: 8px;
+      font-size: 14px;
+      width: 220px;
+      font-family: $font-poppins;
+      align-items: center;
+
+      &:focus {
+        outline: none;
+        border-color: $primary-color;
+        box-shadow: 0 0 4px $primary-color;
+      }
+    }
+  }
+}
+
+.consultant-card-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 20px;
+//   background-color: $gray-color;
+}
+
+.consultant-card {
+  background-color: $color-white;
+  border-radius: 12px;
+  padding: 20px;
+  max-width: 1000px;
+//   margin: 0 auto;
+margin-left: 7rem;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  font-family: $font-poppins;
+
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    transition: all 0.3s ease-in-out;
+  }
+
+  .profile-picture {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin: 0 auto 15px;
+    border: 3px solid $primary-color;
+  }
+
+  .consultant-name {
+    font-size: 20px;
+    font-weight: 600;
+    text-align: center;
+    color: $text-color;
+    margin-bottom: 5px;
+  }
+
+  .consultant-location {
+    font-size: 16px;
+    color: $secondary-color;
+    text-align: center;
+    margin-bottom: 10px;
+  }
+
+  .consultant-bio {
+    font-size: 14px;
+    color: $text-color;
+    margin-bottom: 15px;
+    text-align: justify;
+  }
+
+  .section-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: $primary-color;
+    margin-top: 15px;
+    border-bottom: 2px solid $border-color;
+    padding-bottom: 5px;
+  }
+
+  .experience-list, .education-list {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+
+    li {
+      font-size: 14px;
+      margin-bottom: 8px;
+
+      strong {
+        color: $text-color;
+      }
+    }
+  }
+
+  .skills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 10px;
+
+    .skill-tag {
+      background-color: $primary-color;
+      color: $color-white;
+      border-radius: 8px;
+      padding: 6px 10px;
+      font-size: 12px;
+      text-transform: uppercase;
+
+      &:hover {
+        background-color: darken($primary-color, 10%);
+        cursor: pointer;
+      }
+    }
+  }
+
+  p {
+    margin: 5px 0;
+    font-size: 14px;
+    color: $secondary-color;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .consultant-card {
+    padding: 15px;
+  }
+
+  .profile-picture {
+    width: 100px;
+    height: 100px;
+  }
+
+  .consultant-name {
+    font-size: 18px;
+  }
+
+  .consultant-location,
+  .consultant-bio {
+    font-size: 14px;
+  }
+
+  .section-title {
+    font-size: 14px;
+  }
+
+  .skills .skill-tag {
+    font-size: 10px;
+  }
+}
