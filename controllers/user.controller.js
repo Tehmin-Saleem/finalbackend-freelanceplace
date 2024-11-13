@@ -199,6 +199,8 @@ const getUserById = async (req, res) => {
     res.status(500).json({ message: 'Internal server error' });
   }
 };
+
+
 const getAllUsers = async (req, res) => {
   try {
     const users = await User.find(); // Retrieve all users with all fields
@@ -208,6 +210,8 @@ const getAllUsers = async (req, res) => {
     res.status(500).json({ message: 'Internal server error' });
   }
 };
+
+
 // Function to create an admin user
 const createAdminUser = async (req, res) => {
   try {

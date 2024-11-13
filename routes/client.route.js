@@ -67,7 +67,7 @@ router.get('/jobpost/:fileName', (req, res) => {
 });
 router.post('/clientprofile', authMiddleware, upload.single('image'), ClientProfile.createProfile);
 router.get('/profile', authMiddleware, ClientProfile.getProfile);
-router.put('/clientprofile', authMiddleware, upload.single('image'), ClientProfile.updateProfile);
+router.put('/profile/update', upload.single('image'), ClientProfile.updateProfile);
 router.get('/client-profile-exists/:id', authMiddleware, ClientProfile.profileExists);
 
 router.get('/notifications', authMiddleware, Notification.getNotifications);
@@ -249,6 +249,9 @@ router.post(
   authMiddleware,
   hireFreelancerController.markProjectAsCompleted
 );
+
+router.get('/job-status/:jobId',authMiddleware, jobPostController.getJobStatus);
+router.patch('/proposals/:proposalId/status', authMiddleware, jobPostController.updateProposalStatus);
 
 
 

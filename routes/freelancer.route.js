@@ -221,7 +221,9 @@ router.get('/offer/:freelancerId', authMiddleware,offerController.getOffersByFre
 
 router.get('/completed-jobs/:freelancerId', authMiddleware, hireFreelancerController.getFreelancerCompletedJobs);
 
+// router.get('/users/:userId', usercontroller.getAllUsers);
 
+router.get('/users/:userId', usercontroller.getUserById);
 
 
 module.exports = router;
