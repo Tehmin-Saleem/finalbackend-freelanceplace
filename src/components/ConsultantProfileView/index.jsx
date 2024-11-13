@@ -1,9 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { jwtDecode } from "jwt-decode";
 import './styles.scss';
+
 const ConsultantProfileView = () => {
   const [profile, setProfile] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [userName, setUserName] = useState('');
+  const [userPicture, setUserPicture] = useState('');  // This will hold the profile picture URL
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
   useEffect(() => {
@@ -15,31 +18,50 @@ const ConsultantProfileView = () => {
         if (!token) {
           throw new Error('No authentication token found');
         }
-
-        // Decode the JWT token to get consultant ID
+  
         const decodedToken = jwtDecode(token);
-        const userId = decodedToken.userId; // Assuming userId is stored in token
-
+        const userId = decodedToken.userId;
+  
         if (!userId) {
           throw new Error('No consultant ID found in token');
         }
-
-        // Fetch profile using the consultant ID from token
-        const response = await fetch(`http://localhost:5000/api/client/profile/${userId}`, {
+  
+        const response = await fetch(`http://localhost:5000/api/client/Constprofile/${userId}`, {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          }
+            'Content-Type': 'application/json',
+          },
         });
-
+  
         const data = await response.json();
-        
+  
         if (!response.ok) {
           throw new Error(data.message || 'Failed to fetch profile');
         }
-
-        setProfile(data.profile || data);
+  
+        // Ensure skills is always an array
+        const skills = Array.isArray(data.profile.skills) ? data.profile.skills : data.profile.skills ? [data.profile.skills] : [];
+  
+        setProfile({
+          ...data.profile,
+          skills, // ensure skills is an array
+        });
+  
+        // Handle profile picture and name
+        const profilePicture = data.profile?.profilePicture || '/default-profile.png';
+        setUserPicture(profilePicture);
+        const response1 = await fetch(`http://localhost:5000/api/client/users/${userId}`, {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        });
+  
+        const data1 = await response1.json();
+        setUserName(data1.first_name || 'Unnamed User');
+        
         setLoading(false);
       } catch (err) {
         console.error('Error fetching profile:', err);
@@ -47,13 +69,9 @@ const ConsultantProfileView = () => {
         setLoading(false);
       }
     };
-
+  
     fetchProfile();
   }, []);
-  // Debug logs
-  console.log('Loading:', loading);
-  console.log('Profile:', profile);
-  console.log('Error:', error);
 
   if (loading) {
     return (
@@ -85,25 +103,26 @@ const ConsultantProfileView = () => {
   return (
     <div className="consultant-profile-view">
       <div className="profile-card">
-        {profile.profilePicture && (
-          <div className="profile-picture-container">
-            <img 
-              src={`http://localhost:5000/${profile.profilePicture}`} 
-              alt="Consultant Profile" 
-              className="profile-picture"
-              onError={(e) => {
-                e.target.src = '/default-profile.png';
-                e.target.onerror = null;
-              }}
-            />
-          </div>
-        )}
-
         <div className="profile-header">
-          <h2 className="profile-name">{profile.name || 'Unnamed Consultant'}</h2>
+          {userPicture && (
+            <div className="profile-picture-container">
+              <img 
+                src={userPicture}  // Directly use the profile picture URL here
+                alt="User Profile" 
+                className="profile-picture"
+                onError={(e) => {
+                  e.target.src = '/default-profile.png';
+                  e.target.onerror = null;
+                }}
+              />
+            </div>
+          )}
+
+          <h2 className="profile-name">{userName || 'Unnamed User'}</h2>
           {profile.bio && <p className="profile-bio">{profile.bio}</p>}
         </div>
-        
+
+        {/* Other sections like Contact, Experience, Education, etc. */}
         <div className="profile-section contact-info">
           <h3>Contact Information</h3>
           <div className="info-grid">
@@ -124,9 +143,9 @@ const ConsultantProfileView = () => {
             )}
             {profile.linkedIn && (
               <div className="info-item">
-                <a 
-                  href={profile.linkedIn} 
-                  target="_blank" 
+                <a
+                  href={profile.linkedIn}
+                  target="_blank"
                   rel="noopener noreferrer"
                   className="linkedin-link"
                 >
@@ -178,20 +197,18 @@ const ConsultantProfileView = () => {
           </div>
         )}
 
-        <div className="profile-section skills">
-          <h3>Skills & Expertise</h3>
-          {profile.skills?.length > 0 ? (
-            <div className="skills-container">
-              {profile.skills.map((skill, index) => (
-                <span key={index} className="skill-tag">
-                  {skill}
-                </span>
-              ))}
-            </div>
-          ) : (
-            <p className="no-content">No skills listed</p>
-          )}
-        </div>
+<div className="profile-section skills">
+  <h3>Skills & Expertise</h3>
+  {Array.isArray(profile.skills) && profile.skills.length > 0 ? (
+    <ul className="skills-list">
+      {profile.skills.map((skill, index) => (
+        <li key={index}>{skill}</li>
+      ))}
+    </ul>
+  ) : (
+    <p className="no-content">No skills listed</p>
+  )}
+</div>
       </div>
     </div>
   );

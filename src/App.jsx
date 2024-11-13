@@ -56,6 +56,8 @@ import ClientList from "./components/ClientLists";
 import ConsultantDashboard from "./Pages/ConsultantDashboard";
 import ConsultantProfileForm from "./components/ConsultantProfileForm";
 import ConsultantProfileView from "./components/ConsultantProfileView";
+import ConsultantCard from "./components/ConsultantCards";
+import Offers from "./Pages/FetchOffers";
 // import PaymentMethod from './components/PaymentMethod';
 
 const freelancers = [
@@ -259,6 +261,10 @@ function App() {
             path="/ConsultantProfileView"
             element={<ConsultantProfileView />}
           />
+              <Route path="/Consultantprofiles" element={<ConsultantCard/>} />
+
+
+              <Route path="/freelancerOffers" element={<Offers/>} />
           {/* <Route path="/profile/:id"  element={<ConsultantProfileView />} /> */}
         </Routes>
       </Router>

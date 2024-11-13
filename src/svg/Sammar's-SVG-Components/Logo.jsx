@@ -1,11 +1,11 @@
 import React from "react";
 
-function Logo() {
+function Logo({ width, height, onClick }) {
   return (
-    <div>
+    <div onClick={onClick}>
       <svg
-        width="101"
-        height="31"
+        width={width}
+        height={height}
         viewBox="0 0 101 31"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"

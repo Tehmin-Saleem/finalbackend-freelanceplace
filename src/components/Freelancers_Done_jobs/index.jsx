@@ -21,6 +21,7 @@ const JobsCard = ({
   rating,
   location,
   postedTime,
+  source,
   proposalId,
   status, // Add status prop
   jobStatus, // Add jobStatus prop
@@ -93,7 +94,37 @@ const JobsCard = ({
       if (!token) {
         throw new Error("No authentication token found");
       }
-
+      if (source === 'offer') {
+        // Navigate directly without fetching proposal
+        navigate("/manageproj", {
+          state: {
+            jobData: {
+              job_id,
+              type,
+              title,
+              rate,
+              timeline,
+              level,
+              description,
+              tags,
+              verified,
+              rating,
+              location,
+              postedTime
+            },
+            // Create minimal proposal data structure for offers
+            proposalData: {
+              _id: job_id,
+              freelancer_id: freelancer_id,
+              client_id: client_id
+            },
+            freelancer_id: freelancer_id,
+            client_id: client_id,
+            job_id: job_id,
+          },
+        });
+        return;
+      }
       const headers = {
         Authorization: `Bearer ${token}`, // Fixed template literal
         "Content-Type": "application/json",

@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import './styles.scss';
 //  import {jwtdecode} from 'jwt-decode';
+// import jwt_decode from 'jwt-decode';
+
 import { useNavigate } from "react-router-dom";
 
 function ConsultantProfileForm() {
@@ -24,7 +26,7 @@ function ConsultantProfileForm() {
             const token = localStorage.getItem('token');
             
             if (!token) return;
-    
+        
             try {
                 const jwt_decode = (await import('jwt-decode')).default;
                 const decodedToken = jwt_decode(token);
@@ -38,6 +40,8 @@ function ConsultantProfileForm() {
                 console.error('Error decoding token:', error);
             }
         };
+        
+        
     
         fetchEmailFromToken();
     }, []);
@@ -53,42 +57,52 @@ function ConsultantProfileForm() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         const formData = new FormData();
-        for (const key in profile) {
+        const updatedProfile = {
+            ...profile,
+            skills, // Add the skills from the separate state
+          };
+        
+          for (const key in updatedProfile) {
             if (key === 'experience' || key === 'education') {
-                profile[key].forEach((item, index) => {
-                    for (const subKey in item) {
-                        formData.append(`${key}[${index}][${subKey}]`, item[subKey]);
-                    }
-                });
+              updatedProfile[key].forEach((item, index) => {
+                for (const subKey in item) {
+                  formData.append(`${key}[${index}][${subKey}]`, item[subKey]);
+                }
+              });
+            } else if (Array.isArray(updatedProfile[key])) {
+              // Handle array fields such as skills properly
+              updatedProfile[key].forEach((item) => {
+                formData.append(`${key}[]`, item);
+              });
             } else {
-                formData.append(key, profile[key]);
+              formData.append(key, updatedProfile[key]);
             }
-        }
-
-        const token = localStorage.getItem('token');
-if (token) {
-    try {
-        const response = await fetch('http://localhost:5000/api/client/profile', {
-            method: 'POST',
-            headers: {
-                'Authorization': `Bearer ${token}`,
-            },
-            body: formData,
-        });
-
-        if (response.ok) {
-            navigate('/ConsultantDash');
-        } else {
-            const errorText = await response.text();
-            console.log('Error saving profile:', errorText);
-        }
-    } catch (error) {
-        console.error('Network or server error:', error);
-    }
-} else {
-    console.log('No token found, user not authenticated');
-}
-    };
+          }
+        
+          const token = localStorage.getItem('token');
+          if (token) {
+            try {
+              const response = await fetch('http://localhost:5000/api/client/Constprofile', {
+                method: 'POST',
+                headers: {
+                  'Authorization': `Bearer ${token}`,
+                },
+                body: formData,
+              });
+        
+              if (response.ok) {
+                navigate('/ConsultantDash');
+              } else {
+                const errorText = await response.text();
+                console.log('Error saving profile:', errorText);
+              }
+            } catch (error) {
+              console.error('Network or server error:', error);
+            }
+          } else {
+            console.log('No token found, user not authenticated');
+          }
+        };
 
     // Handle changes to input fields
     // const handleInputChange = (e) => {
@@ -151,21 +165,32 @@ if (token) {
     };
 
     // Add new skill
-    const handleAddSkill = (skill) => {
-        if (skill && !profile.skills.includes(skill)) {
-            setProfile((prevProfile) => ({
-                ...prevProfile,
-                skills: [...prevProfile.skills, skill],
-            }));
-        }
-    };
+    // const handleAddSkill = (skill) => {
+    //     if (skill && !profile.skills.includes(skill)) {
+    //         setProfile((prevProfile) => ({
+    //             ...prevProfile,
+    //             skills: [...prevProfile.skills, skill],
+    //         }));
+    //     }
+    // };
 
     // Remove skill
-    const handleRemoveSkill = (index) => {
-        const newSkills = profile.skills.filter((_, i) => i !== index);
-        setProfile((prevProfile) => ({ ...prevProfile, skills: newSkills }));
-    };
-
+    // const handleRemoveSkill = (index) => {
+    //     const newSkills = profile.skills.filter((_, i) => i !== index);
+    //     setProfile((prevProfile) => ({ ...prevProfile, skills: newSkills }));
+    // };
+    
+        const [skills, setSkills] = useState([]);
+      
+        const handleAddSkill = (newSkill) => {
+          if (newSkill && !skills.includes(newSkill)) {
+            setSkills([...skills, newSkill]); // Add the new skill if it doesn't already exist
+          }
+        };
+      
+        const handleRemoveSkill = (index) => {
+          setSkills(skills.filter((_, i) => i !== index)); // Remove skill by index
+        };
     // Handle form submission
     // const handleSubmit = async (e) => {
     //     e.preventDefault();
@@ -331,29 +356,29 @@ if (token) {
             </div>
 
             <div className="form-group">
-                <label>Skills</label>
-                <div className="skills-input">
-                    {profile.skills.map((skill, index) => (
-                        <span key={index} className="skill-tag">
-                            {skill}
-                            <button type="button" onClick={() => handleRemoveSkill(index)}>
-                                &times;
-                            </button>
-                        </span>
-                    ))}
-                    <input
-                        type="text"
-                        placeholder="Add a skill"
-                        onKeyDown={(e) => {
-                            if (e.key === 'Enter') {
-                                e.preventDefault();
-                                handleAddSkill(e.target.value.trim());
-                                e.target.value = '';
-                            }
-                        }}
-                    />
-                </div>
-            </div>
+      <label>Skills</label>
+      <div className="skills-input">
+        {skills.map((skill, index) => (
+          <span key={index} className="skill-tag">
+            {skill}
+            <button type="button" onClick={() => handleRemoveSkill(index)}>
+              &times;
+            </button>
+          </span>
+        ))}
+        <input
+          type="text"
+          placeholder="Add a skill"
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') {
+              e.preventDefault();
+              handleAddSkill(e.target.value.trim());
+              e.target.value = ''; // Clear the input field
+            }
+          }}
+        />
+      </div>
+    </div>
 
             <div className="form-group">
                 <label>Certifications</label>
