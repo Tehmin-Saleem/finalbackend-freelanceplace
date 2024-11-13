@@ -8,7 +8,7 @@ import {
 import "./styles.scss";
 import { Filter, IconSearchBar } from "../../svg";
 import axios from "axios";
-
+import {jwtDecode} from "jwt-decode";
 const FreelancersJobsPage = () => {
   const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -33,7 +33,12 @@ const FreelancersJobsPage = () => {
           'Content-Type': 'application/json'
         }
       });
+      const decodedToken = jwtDecode(token);
+      const loggedInUserId = decodedToken.userId; // Adjust this field based on your token structure
 
+      if (!loggedInUserId) {
+        throw new Error('Unable to decode user ID from token');
+      }
       console.log('hire response', hireResponse.data);
       
       if (!hireResponse.data || !Array.isArray(hireResponse.data.data)) {
@@ -42,8 +47,14 @@ const FreelancersJobsPage = () => {
         return;
       }
 
+      // const jobToFreelancerMap = hireResponse.data.data.reduce((map, hire) => {
+      //   if (hire?.jobId?.id && hire?.freelancerId?.id) {
+      //     map[hire.jobId.id] = hire.freelancerId.id;
+      //   }
+      //   return map;
+      // }, {});
       const jobToFreelancerMap = hireResponse.data.data.reduce((map, hire) => {
-        if (hire?.jobId?.id && hire?.freelancerId?.id) {
+        if (hire?.jobId?.id && hire?.freelancerId?.id && hire.freelancerId.id === loggedInUserId) {
           map[hire.jobId.id] = hire.freelancerId.id;
         }
         return map;
@@ -171,6 +182,8 @@ const FreelancersJobsPage = () => {
           <option value={5}>5</option>
           <option value={10}>10</option>
           <option value={15}>15</option>
+          <option value={20}>20</option>
+          <option value={25}>25</option>
         </select>
         <div className="page-controls">
           <span>1</span>
