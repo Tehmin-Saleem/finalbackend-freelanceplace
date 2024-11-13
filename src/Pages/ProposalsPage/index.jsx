@@ -17,7 +17,17 @@ const IndexPage = () => {
   const { jobId } = useParams();
   const [userMap, setUserMap] = useState({});
 
+
+
+
+
+
+  
+
   useEffect(() => {
+
+
+
     const fetchData = async () => {
       try {
         const token = localStorage.getItem("token");
@@ -40,11 +50,19 @@ const IndexPage = () => {
 
         console.log("Proposals Response:", proposalsResponse.data);
         console.log("Users Response:", userResponse.data);
+        // console.log ("freelancer id" , proposalsResponse.data.proposals)
+
+
 
         const userCountryMap = userResponse.data.reduce((acc, user) => {
           acc[user._id] = user.country_name;
           return acc;
         }, {});
+
+
+        const freelancerIds = proposalsResponse.data.proposals.map(proposal => proposal.freelancer_id);
+        console.log("freelancer id ",freelancerIds)
+        
 
         const proposalsWithCountry = proposalsResponse.data.proposals.map(
           (proposal) => {
@@ -153,6 +171,7 @@ const IndexPage = () => {
               className="profile-card"
             >
               <Proposalscard
+                freelancerId={proposal.freelancer_id} // Add this line
                 ProposalID={proposal.id}
                 onHireSuccess={handleHireSuccess}
                 name={proposal.freelancerProfile?.name || "No Name"}

@@ -32,7 +32,10 @@ const ProposalCard = ({
   due_date,
   jobTitle,
   initialStatus,
-  onHireSuccess
+  onHireSuccess,
+  freelancerId
+
+
 }) => {
   const navigate = useNavigate();
   const { jobStatuses, updateJobStatus } = useJobStatus();
@@ -42,6 +45,56 @@ const ProposalCard = ({
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
   const [freelancerData, setFreelancerData] = useState(null);
+
+
+
+  const [reviews, setReviews] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+
+  // const fetchFreelancerReviews = async () => {
+  //   try {
+  //     const token = localStorage.getItem("token");
+  //     if (!token) {
+  //       throw new Error("No token found");
+  //     }
+
+  //     const decodedToken = jwtDecode(token);
+  //     const freelancerId = freelancerId;
+  //     // console("freelnacer id in card" , freelancerId)
+
+  //     console.log("Token:", token);
+
+  //     console.log("freelancerid", freelancerId);
+  //     setLoading(true);
+  //     const response = await axios.get(
+  //       `http://localhost:5000/api/freelancer/${freelancerId}/reviews`,
+  //       {
+  //         headers: {
+  //           Authorization: `Bearer ${token}`,
+  //           "Content-Type": "application/json",
+  //         },
+  //       }
+  //     );
+  //     console.log("response review", response.data.data.average_rating);
+  //     setReviews(response.data.data.average_rating);
+
+  //     setError(null);
+  //   } catch (err) {
+  //     setError(err.response?.data?.message || "Failed to fetch reviews");
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
+
+  // useEffect(() => {
+  //   fetchFreelancerReviews();
+  // }, []);
+
+
+
+
+  
 
   // Fetch current proposal status when component mounts
   useEffect(() => {
@@ -152,6 +205,7 @@ const ProposalCard = ({
           }
         }
       );
+      console.log("freelancer data" , response.data)
 
       if (response.data) {
         setFreelancerData(response.data);
@@ -205,10 +259,16 @@ const ProposalCard = ({
           <span className="proposal-card__job-title-head">Job Title: </span>
           <span className="proposal-card__job-title">{jobTitle}</span>
         </div>
+        {/* <div>
+          <span className="proposal-card__cover-letter-head">Ratings</span>
+          <p className="proposal-card__cover-letter">{reviews}</p>
+        </div> */}
         <div>
           <span className="proposal-card__cover-letter-head">Cover Letter</span>
           <p className="proposal-card__cover-letter">{coverLetter}</p>
         </div>
+
+        
         <div className="proposal-card__actions">
           <CommonButton
             text={<Chat />}

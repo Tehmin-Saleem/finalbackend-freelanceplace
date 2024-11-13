@@ -39,10 +39,8 @@ function ProfileView() {
 
       console.log("Token:", token);
 
-      console.log("freelancerid", freelancerId)
-      setLoading(true)
-      
-      ;
+      console.log("freelancerid", freelancerId);
+      setLoading(true);
       const response = await axios.get(
         `http://localhost:5000/api/freelancer/${freelancerId}/reviews`,
         {
@@ -153,7 +151,7 @@ function ProfileView() {
   return (
     <div>
       <Header />
-      <div className="m-20 p-8 absolute">
+      <div className="m-20 p-8">
         <div className="Upper-part">
           <div className="Container">
             <div className="flex items-center mb-16 pl-8">
@@ -298,64 +296,73 @@ function ProfileView() {
                   ))}
                 </div>
               </div>
-              <div className="">
-                <div className="review">
-                  <h2 className="reviewtitle">Reviews</h2>
-                  {reviews && reviews.reviews ? (
-                    <>
-                      <div className="review-summary mb-4">
-                        <div className="flex items-center gap-4 mb-2">
-                          <div className="flex">
-                            {[...Array(5)].map((_, index) => (
-                              <Star
-                                key={index}
-                                className={`h-5 w-5 ${
-                                  index < Math.round(reviews.average_rating)
-                                    ? "text-[#4BCBEB]"
-                                    : "text-gray-300"
-                                }`}
-                              />
-                            ))}
-                          </div>
-                          <span className="text-gray-600">
-                            ({reviews.total_reviews} reviews)
-                          </span>
-                        </div>
-                      </div>
+              <div className="review">
+                <h2 className="reviewtitle">Reviews</h2>
+                {loading ? (
+                  <div className="text-center py-4">Loading reviews...</div>
+                ) : error ? (
+                  <div className="text-red-500 py-4">{error}</div>
+                ) : (
+                  <>
+                    {reviews && reviews.total_reviews > 0 ? (
+                      <>
+                        <div className="review-summary mb-6 bg-white rounded-lg p-6 shadow-sm">
+                          <div className="flex items-center justify-between">
+                            <div className="flex flex-col">
+                              <div className="flex items-center gap-2 mb-2">
+                              <h2 className="reviewtitle">Average Ratings</h2>
+                                <span className="text-3xl font-bold text-[#2C3E50]">
+                                  {reviews.average_rating.toFixed(1)}
+                                </span>
+                             
+                              </div>
+                              <span className="text-gray-600 text-sm">
+                                {reviews.total_reviews}{" "}
+                                {reviews.total_reviews === 1
+                                  ? "review"
+                                  : "reviews"}
+                              </span>
+                            </div>
 
-                      {reviews.reviews.map((review) => (
-                        <UserReview
-                          key={review.review_id}
-                          name={review.client.name}
-                          location={review.client.country || "Unknown"}
-                          description={review.review_message}
-                          rating={review.rating}
-                          locationIcon={
-                            review.client.country === "Australia" ? (
-                              <Australia />
-                            ) : review.client.country === "United States" ? (
-                              <UStates />
-                            ) : review.client.country === "Saudi Arabia" ? (
-                              <SArabia />
-                            ) : (
-                              <UStates /> // Default icon
-                            )
-                          }
-                          date={new Date(
-                            review.posted_date
-                          ).toLocaleDateString()}
-                          jobTitle={review.job.title}
-                        />
-                      ))}
-                    </>
-                  ) : loading ? (
-                    <div className="text-center py-4">Loading reviews...</div>
-                  ) : error ? (
-                    <div className="text-red-500 py-4">{error}</div>
-                  ) : (
-                    <div className="text-center py-4">No reviews found</div>
-                  )}
-                </div>
+                          </div>
+                        </div>
+
+                        {/* Existing reviews mapping */}
+                        {reviews.reviews.map((review) => (
+                          <UserReview
+                            key={review.review_id}
+                            name={review.client.name}
+                            location={review.client.country || "Unknown"}
+                            description={review.review_message}
+                            rating={review.rating}
+                            locationIcon={
+                              review.client.country === "Australia" ? (
+                                <Australia />
+                              ) : review.client.country === "United States" ? (
+                                <UStates />
+                              ) : review.client.country === "Saudi Arabia" ? (
+                                <SArabia />
+                              ) : (
+                                <UStates />
+                              )
+                            }
+                            date={new Date(
+                              review.posted_date
+                            ).toLocaleDateString()}
+                            jobTitle={review.job.title}
+                          />
+                        ))}
+                      </>
+                    ) : (
+                      <div className="text-center py-4 text-gray-500 bg-gray-50 rounded-lg">
+                        <p className="text-sm">No reviews yet</p>
+                        <p className="text-xs mt-1">
+                          This freelancer hasn't received any reviews yet
+                        </p>
+                      </div>
+                    )}
+                  </>
+                )}
               </div>
             </div>
           </div>
