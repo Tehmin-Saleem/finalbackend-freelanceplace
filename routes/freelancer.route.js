@@ -121,9 +121,13 @@ router.get('/profilebyfreelancerid/:freelancer_id', authMiddleware, freelancerPr
 router.get("/freelancer-profile-exists/:id", freelancerProfileController.freelancerProfileExists);
 // router.get('/offers/:offerId', offerController.getOfferById);
 router.get('/offers/:notificationId', offerController.getOfferById);
+router.get('/offers', offerController.getOfferById);
 
+router.post('/offers/:notificationId', offerController.getOfferById);
 // Route to get all chats for a specific freelancer
 // Chat-related routes
+// In routes file (e.g., offerRoutes.js)
+router.patch('/offers/:notificationId', authMiddleware, offerController.updateOfferStatus);
 
 
 router.get('/searchClients',authMiddleware, usercontroller.searchClients);
