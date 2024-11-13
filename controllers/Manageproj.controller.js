@@ -25,7 +25,7 @@ exports.createProject = async (req, res) => {
       clientApproved,
       proposal_id,
       client_id,
-      freelancer_id, job_id
+      freelancer_id
     } = req.body;
 
     // Enhanced validation
@@ -35,7 +35,7 @@ exports.createProject = async (req, res) => {
       due_date,
       client_id,
       freelancer_id,
-      job_id
+      
     };
 
     const missingFields = Object.entries(requiredFields)
@@ -89,7 +89,7 @@ exports.createProject = async (req, res) => {
       proposal_id,
       client_id,
       freelancer_id,
-      job_id
+
     };
 
     const project = new Project(projectData);
