@@ -52,7 +52,7 @@ const OfferCards = () => {
         ) : (
           offers.map((offer) => (
             <div className="offer-card" key={offer._id}>
-              <button className="top-right-btn">Accept Offer</button>
+              <button className="top-right-btn">Accepted Offer</button>
               <h3 className="offer-card__title">{offer.job_title}</h3>
               <p className="offer-card__description"><span className="label">Description:</span> {offer.description}</p>
               <p className="offer-card__detailed-description"><span className="label">Detailed Description:</span> {offer.detailed_description}</p>

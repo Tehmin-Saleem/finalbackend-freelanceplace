@@ -16,6 +16,7 @@ const IndexPage = () => {
   const navigate = useNavigate();
   const { jobId } = useParams();
   const [userMap, setUserMap] = useState({});
+  const [isJobFilled, setIsJobFilled] = useState(false);
 
 
 

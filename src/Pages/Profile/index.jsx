@@ -21,6 +21,7 @@ const MyProfile = () => {
 
     first_name: "",
     last_name: "",
+    email: "",
     image: "",
     title: "",
     experience: {
@@ -108,35 +109,88 @@ const MyProfile = () => {
         headers: { Authorization: `Bearer ${token}` },
       };
 
-      // Check if the profile exists
+      // First fetch user data
+      const userResponse = await axios.get(
+        `http://localhost:5000/api/freelancer/users/${userId}`,
+        config
+      );
+
+      const userData = userResponse.data;
+
+      console.log("userdata", userData);
+
+      // Set initial profile data with user data
+      setProfile((prevProfile) => ({
+        ...prevProfile,
+        first_name: userData.first_name || "",
+        last_name: userData.last_name || "",
+        email: userData.email || "",
+        // Add any other fields from user data
+      }));
+
+      // Then check if profile exists
       const existenceResponse = await axios.get(
         `http://localhost:5000/api/freelancer/freelancer-profile-exists/${userId}`,
         config
       );
 
-      // If profile exists, fetch the data
+      // If profile exists, fetch and merge profile data
       if (existenceResponse.data.exists) {
-        const response = await axios.get(
+        const profileResponse = await axios.get(
           `http://localhost:5000/api/freelancer/profile/${userId}`,
           config
         );
 
-        if (response.data.data) {
+        if (profileResponse.data.data) {
           setProfile((prevProfile) => ({
             ...prevProfile,
-            ...response.data.data,
+            ...profileResponse.data.data,
+            // Preserve user data if profile data is missing these fields
+            first_name:
+              profileResponse.data.data.first_name || prevProfile.first_name,
+            last_name:
+              profileResponse.data.data.last_name || prevProfile.last_name,
+            email: profileResponse.data.data.email || prevProfile.email,
           }));
         }
-      } else {
-        navigate("/myProfile"); // Redirect to profile creation page if it doesn't exist
       }
     } catch (error) {
-      console.error("Error fetching profile data:", error);
+      console.error("Error fetching data:", error);
       setError("Failed to load profile data.");
     } finally {
       setIsLoading(false);
     }
   };
+
+  //     // Check if the profile exists
+  //     const existenceResponse = await axios.get(
+  //       `http://localhost:5000/api/freelancer/freelancer-profile-exists/${userId}`,
+  //       config
+  //     );
+
+  //     // If profile exists, fetch the data
+  //     if (existenceResponse.data.exists) {
+  //       const response = await axios.get(
+  //         `http://localhost:5000/api/freelancer/profile/${userId}`,
+  //         config
+  //       );
+
+  //       if (response.data.data) {
+  //         setProfile((prevProfile) => ({
+  //           ...prevProfile,
+  //           ...response.data.data,
+  //         }));
+  //       }
+  //     } else {
+  //       navigate("/myProfile"); // Redirect to profile creation page if it doesn't exist
+  //     }
+  //   } catch (error) {
+  //     console.error("Error fetching profile data:", error);
+  //     setError("Failed to load profile data.");
+  //   } finally {
+  //     setIsLoading(false);
+  //   }
+  // };
 
   // Call the function inside useEffect
   useEffect(() => {
@@ -216,6 +270,46 @@ const MyProfile = () => {
       skills: prevProfile.skills.filter((s) => s !== skill),
     }));
   };
+
+  // Add this new useEffect after your existing useEffects
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        if (!token) {
+          navigate("/signin");
+          return;
+        }
+
+        const decodedToken = jwtDecode(token);
+        const userId = decodedToken.userId;
+
+        // Fetch user data
+        const response = await axios.get(
+          `http://localhost:5000/api/freelancer/users/${userId}`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+
+        const userData = response.data;
+
+        // Update profile state with user data
+        setProfile((prevProfile) => ({
+          ...prevProfile,
+          first_name: userData.first_name || "",
+          last_name: userData.last_name || "",
+          email: userData.email || "",
+          // Add any other fields that come from user data
+        }));
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+        setError("Failed to load user data");
+      }
+    };
+
+    fetchUserData();
+  }, [navigate]);
 
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
@@ -629,7 +723,7 @@ const MyProfile = () => {
             </div>
           </div>
 
-         <label >Email:</label>
+          <label>Email:</label>
           <div className="field-group">
             <input
               type="email"
@@ -639,6 +733,8 @@ const MyProfile = () => {
                 setProfile({ ...profile, email: e.target.value })
               }
               required
+              readOnly
+              className="readonly-input" // Optional: for styling
             />
           </div>
 
