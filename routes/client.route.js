@@ -40,6 +40,7 @@ router.post('/signup', signup);
 router.get('/users/:userId', usercontroller.getUserById);
 router.get('/users', usercontroller.getAllUsers);
 router.post('/login', login);
+// router.use(authMiddleware);
 
 router.post('/ForgotPass', usercontroller.forgotPassword);
 router.post('/ChangePass/:id/:token',usercontroller.ChangePass);
@@ -98,7 +99,7 @@ router.post('/jobpost', upload.single('attachment'), jobPostController.createJob
 
 
 router.post('/offerform', authMiddleware, upload.single('attachment'), offerController.createoffer);
- 
+
 router.get('/job-posts', jobPostController.getAllJobPosts);
 router.get('/jobposts', jobPostController.getClientJobPosts);
 
@@ -208,8 +209,9 @@ router.patch('/unban/:id', authMiddleware,usercontroller.ClientUnban);
 
 // const upload = multer({ dest: 'uploads/' });
 
-router.post('/profile', upload.single('profilePicture'), consultantProfileController.createProfile);
-router.get('/profile/:id',  consultantProfileController.getProfileByUserId);
+router.post('/Constprofile', upload.single('profilePicture'),authMiddleware, consultantProfileController.createProfile);
+router.get('/Constprofile/:id', authMiddleware, consultantProfileController.getProfileByUserId);
+router.get('/ConsultantsProfiles', authMiddleware,consultantProfileController.getConsultantProfiles);
 // In your routes file
 router.get('/filtered-jobs', authMiddleware, hireFreelancerController.getFilteredJobs);
 router.get('/count-job-posts/:clientId',authMiddleware, jobPostController.countJobPostsByClientId);

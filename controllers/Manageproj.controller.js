@@ -34,7 +34,8 @@ exports.createProject = async (req, res) => {
       budget,
       due_date,
       client_id,
-      freelancer_id
+      freelancer_id,
+      
     };
 
     const missingFields = Object.entries(requiredFields)
@@ -87,7 +88,8 @@ exports.createProject = async (req, res) => {
       clientApproved: clientApproved || false,
       proposal_id,
       client_id,
-      freelancer_id
+      freelancer_id,
+
     };
 
     const project = new Project(projectData);

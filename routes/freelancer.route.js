@@ -21,6 +21,7 @@ const chatController = require('../controllers/chat.controller'); // Add this
 
 const  aiCoverLetter  = require('../controllers/aiCoverLetter.controller');
 const hireFreelancerController = require('../controllers/hire_freelancer.controller');
+// const offerController=require("../controllers/offer_form.controller");
 
 
 // Set up multer for file uploads
@@ -120,9 +121,13 @@ router.get('/profilebyfreelancerid/:freelancer_id', authMiddleware, freelancerPr
 router.get("/freelancer-profile-exists/:id", freelancerProfileController.freelancerProfileExists);
 // router.get('/offers/:offerId', offerController.getOfferById);
 router.get('/offers/:notificationId', offerController.getOfferById);
+router.get('/offers', offerController.getOffers);
 
+router.post('/offers/:notificationId', offerController.getOfferById);
 // Route to get all chats for a specific freelancer
 // Chat-related routes
+// In routes file (e.g., offerRoutes.js)
+router.patch('/offers/:notificationId', authMiddleware, offerController.updateOfferStatus);
 
 
 router.get('/searchClients',authMiddleware, usercontroller.searchClients);
@@ -210,6 +215,8 @@ router.get('/freelancer-reviews/:freelancerId',authMiddleware, hireFreelancerCon
 
 
 router.get('/:freelancerId/reviews',authMiddleware ,hireFreelancerController.getFreelancerReviews);
+
+router.get('/offer/:freelancerId', authMiddleware,offerController.getOffersByFreelancerId);
 
 
 router.get('/completed-jobs/:freelancerId', authMiddleware, hireFreelancerController.getFreelancerCompletedJobs);
