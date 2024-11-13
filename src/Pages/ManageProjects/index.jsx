@@ -9,7 +9,7 @@ const ManageProjects = () => {
   const location = useLocation();
   const { jobData, proposalData } = location.state || {};
   const [projects, setProjects] = useState([]);
-  const { freelancer_id, client_id , job_id} = location.state || {};
+  const { freelancer_id, client_id } = location.state || {};
   const navigate = useNavigate();
   const extractMilestones = (data) => {
     // Try all possible paths where milestones might be stored
@@ -55,14 +55,14 @@ const ManageProjects = () => {
         freelancer_id: freelancer_id || proposalData?.freelancerProfile?._id || proposalData?.freelancer_id,
         projectType: milestones.length > 0 ? 'milestone' : 'fixed',
         status: 'Ongoing',
-        job_id,
+      
         clientApproved: false
       };
       
       console.log('6. Final Transformed Project:', transformedProject);
       setProjects([transformedProject]);
     }
-  }, [proposalData, jobData, freelancer_id, client_id, job_id]);
+  }, [proposalData, jobData, freelancer_id, client_id]);
 
   const getFullName = (profile) => {
     if (!profile) return 'Not specified';
@@ -119,7 +119,7 @@ const ManageProjects = () => {
       const updatedProjects = [...projects];
       updatedProjects[index] = {
         ...updatedProject,
-        job_id,
+        
         clientInfo: projects[index].clientInfo 
       };
       setProjects(updatedProjects);
