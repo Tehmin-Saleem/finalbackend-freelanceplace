@@ -21,6 +21,7 @@ const chatController = require('../controllers/chat.controller'); // Add this
 
 const  aiCoverLetter  = require('../controllers/aiCoverLetter.controller');
 const hireFreelancerController = require('../controllers/hire_freelancer.controller');
+// const offerController=require("../controllers/offer_form.controller");
 
 
 // Set up multer for file uploads
@@ -214,6 +215,8 @@ router.get('/freelancer-reviews/:freelancerId',authMiddleware, hireFreelancerCon
 
 
 router.get('/:freelancerId/reviews',authMiddleware ,hireFreelancerController.getFreelancerReviews);
+
+router.get('/offer/:freelancerId', authMiddleware,offerController.getOffersByFreelancerId);
 
 
 

@@ -815,6 +815,14 @@ exports.getFreelancerHiredJobs = async (req, res) => {
       });
     }
 
+    // Calculate the count of distinct hired jobs for the freelancer
+    const hiredJobsCount = await HireFreelancer.countDocuments({ 
+      freelancerId: freelancerId,
+      status: 'hired'
+    });
+    console.log("gired count freelancer",hiredJobsCount);
+
+    // Fetch details of the hired jobs
     const hiredJobs = await HireFreelancer.find({ 
       freelancerId: freelancerId,
       status: 'hired'
@@ -846,8 +854,8 @@ exports.getFreelancerHiredJobs = async (req, res) => {
         company: hire.clientId.company
       } : null,
       proposal: hire.proposalId ? {
-        id: hire.proposalId._id,           // Proposal ID
-        proposalId: hire.proposalId._id,   // Adding explicit proposalId
+        id: hire.proposalId._id,
+        proposalId: hire.proposalId._id,
         coverLetter: hire.proposalId.cover_letter,
         projectDuration: hire.proposalId.project_duration,
         portfolioLink: hire.proposalId.portfolio_link,
@@ -868,7 +876,7 @@ exports.getFreelancerHiredJobs = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      count: formattedResponse.length,
+      count: hiredJobsCount,
       data: formattedResponse
     });
 
@@ -881,6 +889,7 @@ exports.getFreelancerHiredJobs = async (req, res) => {
     });
   }
 };
+
 
 
 

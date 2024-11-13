@@ -204,8 +204,11 @@ exports.getOfferById = async (req, res) => {
       console.log('Sending formatted offer:', formattedOffer);
       res.status(200).json(formattedOffer);
   } catch (error) {
-      console.error('Error in getOfferById:', error);
-      res.status(500).json({ message: 'Error fetching offer details', error: error.message });
+    console.error('Error in getOfferById:', error);
+    res.status(500).json({ 
+      message: 'Error fetching offer details', 
+      error: error.message 
+    });
   }
 };
 exports.getOffers = async (req, res) => {
@@ -506,59 +509,38 @@ exports.updateOfferStatus = async (req, res) => {
 //     if (!mongoose.Types.ObjectId.isValid(notificationId)) {
 //       return res.status(400).json({ message: 'Invalid Offer ID format' });
 //     }
+exports.getOffersByFreelancerId = async (req, res) => {
+  console.log('getOffersByFreelancerId called with params:', req.params);
 
-//     // Find offer by job_id instead of _id
-//     const offer = await Offer_Form.findOne({ job_id: notificationId })
-//       .populate('client_id', 'first_name last_name country_name');
+  try {
+    const { freelancerId } = req.params;
 
-//     if (!offer) {
-//       return res.status(404).json({ message: 'Offer not found' });
-//     }
+    // Validate that freelancerId is provided
+    if (!freelancerId) {
+      return res.status(400).json({ message: 'Freelancer ID is required' });
+    }
 
-//     // ... rest of the getOfferById function remains the same
-//     let budgetDetails;
-//     if (offer.budget_type === 'hourly' && offer.hourly_rate) {
-//       budgetDetails = {
-//         budget_type: 'hourly',
-//         hourly_rate: {
-//           from: offer.hourly_rate.from,
-//           to: offer.hourly_rate.to
-//         }
-//       };
-//     } else if (offer.budget_type === 'fixed' && offer.fixed_price) {
-//       budgetDetails = {
-//         budget_type: 'fixed',
-//         fixed_price: offer.fixed_price
-//       };
-//     } else {
-//       budgetDetails = {
-//         budget_type: 'unknown',
-//         message: 'Budget details are not available'
-//       };
-//     }
+    // Validate that freelancerId is a valid ObjectId
+    if (!mongoose.Types.ObjectId.isValid(freelancerId)) {
+      return res.status(400).json({ message: 'Invalid Freelancer ID format' });
+    }
 
-//     const formattedOffer = {
-//       _id: offer._id,
-//       job_id: offer.job_id,  // Include job_id in response
-//       status: offer.status,  // Include status in response
-//       clientFirstName: offer.client_id.first_name,
-//       clientLastName: offer.client_id.last_name,
-//       clientCountry: offer.client_id.country_name,
-//       location: offer.location,
-//       job_title: offer.job_title,
-//       ...budgetDetails,
-//       description: offer.description,
-//       detailed_description: offer.detailed_description,
-//       preferred_skills: offer.preferred_skills,
-//       attachment: offer.attachment ? {
-//         fileName: offer.attachment.fileName,
-//         path: offer.attachment.path
-//       } : null 
-//     };
+    // Find all offers where freelancer_id matches the provided ID
+    const offers = await Offer_Form.find({ freelancer_id: freelancerId }).populate('client_id', 'name'); // Populate client details if needed
 
-//     res.status(200).json(formattedOffer);
-//   } catch (error) {
-//     console.error('Error in getOfferById:', error);
-//     res.status(500).json({ message: 'Error fetching offer details', error: error.message });
-//   }
-// };
+    // Check if offers were found
+    if (offers.length === 0) {
+      return res.status(404).json({ message: 'No offers found for this freelancer' });
+    }
+
+    // Send the offers as the response
+    res.status(200).json(offers);
+
+  } catch (error) {
+    console.error('Error fetching offers for freelancer:', error);
+    res.status(500).json({ 
+      message: 'Error fetching offers for freelancer', 
+      error: error.message 
+    });
+  }
+};
