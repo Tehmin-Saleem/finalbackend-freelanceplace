@@ -3,6 +3,9 @@ import './styles.scss';
 import axios from "axios";
 import { useNavigate } from 'react-router-dom';
 const EditableProjectCard = ({ project, onSave, onComplete }) => {
+ 
+ 
+ 
   const [freelancerData, setFreelancerData] = useState({
     projectName: '',
     progress: 0,
@@ -26,6 +29,8 @@ const EditableProjectCard = ({ project, onSave, onComplete }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
+
+
   useEffect(() => {
     setFreelancerData({
       projectName: project.projectName || '',
@@ -48,7 +53,8 @@ const EditableProjectCard = ({ project, onSave, onComplete }) => {
       client_id: project.client_id || '',
       freelancer_id: project.freelancer_id || ''
     });
-
+      console.log("project type", project.projectType);
+      
     setClientInfo({
       clientName: project.clientInfo?.clientName || 'Not specified'
     });
@@ -184,15 +190,17 @@ const EditableProjectCard = ({ project, onSave, onComplete }) => {
           value={freelancerData.progress}
           onChange={handleChange}
           max="100"
-        />
+          />
         <div className="progress-bar">
           <div
             className="progress"
             style={{ width: `${freelancerData.progress}%` }}
-          ></div>
+            ></div>
         </div>
       </div>
 
+
+           
       {freelancerData.projectType === 'milestone' && freelancerData.milestones.length > 0 && (
         <div className="milestones">
           <h5>Edit Milestones</h5>

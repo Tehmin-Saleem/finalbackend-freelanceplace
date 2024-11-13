@@ -2,8 +2,13 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import "./styles.scss";
 import { jwtDecode } from "jwt-decode";
-import { useNavigate } from 'react-router-dom';
-import { UserReview, CommonButton, Header, Spinner } from "../../components/index";
+import { useNavigate } from "react-router-dom";
+import {
+  UserReview,
+  CommonButton,
+  Header,
+  Spinner,
+} from "../../components/index";
 import {
   Australia,
   UStates,
@@ -20,10 +25,52 @@ function ProfileView() {
   const [error, setError] = useState(null);
   const [country, setCountry] = useState("");
 
+  const [reviews, setReviews] = useState(null);
+
+  const fetchFreelancerReviews = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        throw new Error("No token found");
+      }
+
+      const decodedToken = jwtDecode(token);
+      const freelancerId = decodedToken.userId;
+
+      console.log("Token:", token);
+
+      console.log("freelancerid", freelancerId)
+      setLoading(true)
+      
+      ;
+      const response = await axios.get(
+        `http://localhost:5000/api/freelancer/${freelancerId}/reviews`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      console.log("response review", response.data.data);
+      setReviews(response.data.data);
+
+      setError(null);
+    } catch (err) {
+      setError(err.response?.data?.message || "Failed to fetch reviews");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchFreelancerReviews();
+  }, []);
+
   const navigate = useNavigate();
 
   const handleClick = () => {
-    navigate('/chat');
+    navigate("/chat");
   };
 
   useEffect(() => {
@@ -67,44 +114,42 @@ function ProfileView() {
   if (error) return <div>{error}</div>;
   if (!profileData) return <div>No profile data found</div>;
 
-
-
   //   console.log('Profile data:', profileData);
 
   // console.log('Profile image path:', `http://localhost:5000${profileData.image}`);
   // console.log('Profile data:', profileData.image);
   // console.log('Portfolio path:', `http://localhost:5000/api/freelancer/profile/portfolios/${profileData.attachment}`);
 
-  const userReviews = [
-    {
-      id: 1,
-      name: "Usman Shahid",
-      location: "Australia",
-      description:
-        "Lorem ipsum dolor sit amet consectetur. Dictum blandit turpis hac elit nunc vitae quis adipiscing. Eu pellentesque a curabitur facilisi velit est vestibulum laoreet diam.",
-      rating: 3,
-      locationIcon: <Australia />,
-    },
-    {
-      id: 2,
-      name: "Aqib Ali",
-      location: "United States",
-      description:
-        "Lorem ipsum dolor sit amet consectetur. Dictum blandit turpis hac elit nunc vitae quis adipiscing. Eu pellentesque a curabitur facilisi velit est vestibulum laoreet diam.",
-      rating: 5,
-      locationIcon: <UStates />,
-    },
-    {
-      id: 3,
-      name: "Shehroz Mubarik",
-      location: "Saudi Arabia",
-      description:
-        "Lorem ipsum dolor sit amet consectetur. Dictum blandit turpis hac elit nunc vitae quis adipiscing. Eu pellentesque a curabitur facilisi velit est vestibulum laoreet diam.",
-      rating: 4,
-      locationIcon: <SArabia />,
-    },
-    // Add more user reviews as needed
-  ];
+  // const userReviews = [
+  //   {
+  //     id: 1,
+  //     name: "Usman Shahid",
+  //     location: "Australia",
+  //     description:
+  //       "Lorem ipsum dolor sit amet consectetur. Dictum blandit turpis hac elit nunc vitae quis adipiscing. Eu pellentesque a curabitur facilisi velit est vestibulum laoreet diam.",
+  //     rating: 3,
+  //     locationIcon: <Australia />,
+  //   },
+  //   {
+  //     id: 2,
+  //     name: "Aqib Ali",
+  //     location: "United States",
+  //     description:
+  //       "Lorem ipsum dolor sit amet consectetur. Dictum blandit turpis hac elit nunc vitae quis adipiscing. Eu pellentesque a curabitur facilisi velit est vestibulum laoreet diam.",
+  //     rating: 5,
+  //     locationIcon: <UStates />,
+  //   },
+  //   {
+  //     id: 3,
+  //     name: "Shehroz Mubarik",
+  //     location: "Saudi Arabia",
+  //     description:
+  //       "Lorem ipsum dolor sit amet consectetur. Dictum blandit turpis hac elit nunc vitae quis adipiscing. Eu pellentesque a curabitur facilisi velit est vestibulum laoreet diam.",
+  //     rating: 4,
+  //     locationIcon: <SArabia />,
+  //   },
+  //   // Add more user reviews as needed
+  // ];
   return (
     <div>
       <Header />
@@ -154,7 +199,7 @@ function ProfileView() {
 
               <div className="flex items-center justify-between buttons">
                 <CommonButton
-                 onClick={() => navigate(`/myprofile`)}
+                  onClick={() => navigate(`/myprofile`)}
                   text="Edit"
                   className="bg-[#4BCBEB] text-[18px] font-Poppins text-[#FFFFFF] rounded-lg font-semibold font-Poppins py-2 px-6 w-full focus:outline-none focus:shadow-outline"
                 />
@@ -253,20 +298,63 @@ function ProfileView() {
                   ))}
                 </div>
               </div>
-
               <div className="">
                 <div className="review">
                   <h2 className="reviewtitle">Reviews</h2>
-                  {userReviews.map((review) => (
-                    <UserReview
-                      key={review.id}
-                      name={review.name}
-                      location={review.location}
-                      description={review.description}
-                      rating={review.rating}
-                      locationIcon={review.locationIcon}
-                    />
-                  ))}
+                  {reviews && reviews.reviews ? (
+                    <>
+                      <div className="review-summary mb-4">
+                        <div className="flex items-center gap-4 mb-2">
+                          <div className="flex">
+                            {[...Array(5)].map((_, index) => (
+                              <Star
+                                key={index}
+                                className={`h-5 w-5 ${
+                                  index < Math.round(reviews.average_rating)
+                                    ? "text-[#4BCBEB]"
+                                    : "text-gray-300"
+                                }`}
+                              />
+                            ))}
+                          </div>
+                          <span className="text-gray-600">
+                            ({reviews.total_reviews} reviews)
+                          </span>
+                        </div>
+                      </div>
+
+                      {reviews.reviews.map((review) => (
+                        <UserReview
+                          key={review.review_id}
+                          name={review.client.name}
+                          location={review.client.country || "Unknown"}
+                          description={review.review_message}
+                          rating={review.rating}
+                          locationIcon={
+                            review.client.country === "Australia" ? (
+                              <Australia />
+                            ) : review.client.country === "United States" ? (
+                              <UStates />
+                            ) : review.client.country === "Saudi Arabia" ? (
+                              <SArabia />
+                            ) : (
+                              <UStates /> // Default icon
+                            )
+                          }
+                          date={new Date(
+                            review.posted_date
+                          ).toLocaleDateString()}
+                          jobTitle={review.job.title}
+                        />
+                      ))}
+                    </>
+                  ) : loading ? (
+                    <div className="text-center py-4">Loading reviews...</div>
+                  ) : error ? (
+                    <div className="text-red-500 py-4">{error}</div>
+                  ) : (
+                    <div className="text-center py-4">No reviews found</div>
+                  )}
                 </div>
               </div>
             </div>
