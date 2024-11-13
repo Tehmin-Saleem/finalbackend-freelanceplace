@@ -98,7 +98,7 @@ router.post('/jobpost', upload.single('attachment'), jobPostController.createJob
 
 
 router.post('/offerform', authMiddleware, upload.single('attachment'), offerController.createoffer);
- 
+
 router.get('/job-posts', jobPostController.getAllJobPosts);
 router.get('/jobposts', jobPostController.getClientJobPosts);
 

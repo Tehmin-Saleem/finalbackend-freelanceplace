@@ -7,6 +7,15 @@ const Offer_FormSchema = new Schema({
     path: String,
     description: String
   },
+  job_id: {
+    type: mongoose.Schema.Types.ObjectId,
+    
+  },
+  status: {
+    type: String,
+    enum: ['pending', 'accepted', 'declined'],
+    default: 'pending'
+  },
   budget_type: { 
     type: String, 
     enum: ['hourly', 'fixed'], 
