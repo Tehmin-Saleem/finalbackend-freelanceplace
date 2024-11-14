@@ -226,3 +226,131 @@ console.log("Job Post Count:", jobPostCount);
   }
 };
 
+
+
+exports.getJobStatus = async (req, res) => {
+  try {
+      const { jobId } = req.params;
+
+      // Find the job post
+      const jobPost = await Job_Post.findById(jobId);
+      
+      if (!jobPost) {
+          return res.status(404).json({
+              success: false,
+              message: 'Job post not found'
+          });
+      }
+
+      // Find hired proposal if exists
+      const hiredProposal = await Proposal.findOne({ 
+          job_id: jobId, 
+          status: 'hired' 
+      }).populate('freelancer_id', 'name email profile_image')
+        .populate('client_id', 'name email')
+        .select('-attachment'); // Exclude attachment for faster query
+
+      // Get total proposals count
+      const proposalCount = await Proposal.countDocuments({ job_id: jobId });
+
+      return res.status(200).json({
+          success: true,
+          data: {
+              jobId: jobPost._id,
+              isJobFilled: !!hiredProposal,
+              jobDetails: {
+                  title: jobPost.job_title,
+                  budget_type: jobPost.budget_type,
+                  status: jobPost.status,
+                  project_duration: jobPost.project_duration
+              },
+              proposalCount,
+              hiredProposal: hiredProposal ? {
+                  proposalId: hiredProposal._id,
+                  freelancer: {
+                      id: hiredProposal.freelancer_id._id,
+                      name: hiredProposal.freelancer_id.name,
+                      email: hiredProposal.freelancer_id.email,
+                      profile_image: hiredProposal.freelancer_id.profile_image
+                  },
+                  hired_at: hiredProposal.hired_at,
+                  project_duration: hiredProposal.project_duration,
+                  bid_details: hiredProposal.add_requirements
+              } : null
+          }
+      });
+
+  } catch (error) {
+      console.error('Error in getJobStatus:', error);
+      return res.status(500).json({
+          success: false,
+          message: 'Internal server error',
+          error: error.message
+      });
+  }
+};
+
+// Add a function to update proposal status
+exports.updateProposalStatus = async (req, res) => {
+  try {
+      const { proposalId } = req.params;
+      const { status } = req.body;
+
+      if (!['pending', 'hired', 'rejected'].includes(status)) {
+          return res.status(400).json({
+              success: false,
+              message: 'Invalid status value'
+          });
+      }
+
+      const proposal = await Proposal.findById(proposalId);
+      
+      if (!proposal) {
+          return res.status(404).json({
+              success: false,
+              message: 'Proposal not found'
+          });
+      }
+
+      // If marking as hired, check if another proposal is already hired for this job
+      if (status === 'hired') {
+          const existingHired = await Proposal.findOne({
+              job_id: proposal.job_id,
+              status: 'hired'
+          });
+
+          if (existingHired) {
+              return res.status(400).json({
+                  success: false,
+                  message: 'Another freelancer is already hired for this job'
+              });
+          }
+
+          // Update the proposal with hired status and timestamp
+          proposal.status = 'hired';
+          proposal.hired_at = new Date();
+      } else {
+          proposal.status = status;
+      }
+
+      await proposal.save();
+
+      return res.status(200).json({
+          success: true,
+          message: `Proposal marked as ${status}`,
+          data: {
+              proposalId: proposal._id,
+              status: proposal.status,
+              hired_at: proposal.hired_at
+          }
+      });
+
+  } catch (error) {
+      console.error('Error in updateProposalStatus:', error);
+      return res.status(500).json({
+          success: false,
+          message: 'Internal server error',
+          error: error.message
+      });
+  }
+};
