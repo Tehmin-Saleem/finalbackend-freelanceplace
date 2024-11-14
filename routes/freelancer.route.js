@@ -226,4 +226,13 @@ router.get('/completed-jobs/:freelancerId', authMiddleware, hireFreelancerContro
 router.get('/users/:userId', usercontroller.getUserById);
 
 
+
+router.get('/project-progress/:project_id', manageProject.getProjectProgressById);
+
+
+router.get('/progress/:client_id/:proposal_id',authMiddleware, manageProject.getProgressByIds);
+
+router.put('/:project_id/progress',authMiddleware, manageProject.updateProjectProgress);
+
+
 module.exports = router;
