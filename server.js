@@ -7,6 +7,7 @@ const authMiddleware = require("./middleware/auth.middleware");
 const Chat = require("./models/Chatting.model");
 const Freelancer = require("./models/freelancer_profile.model");
 const { deleteMessage } = require("./controllers/chat.controller");
+const cookieParser = require('cookie-parser');
 
 const app = express();
 const dotenv = require("dotenv");
@@ -19,7 +20,6 @@ const jwt = require("jsonwebtoken");
 app.use(cors());
 dotenv.config();
 connectDB();
-
 app.use(corsMiddleware);
 app.use(express.json());
 app.use(bodyParser.json());
