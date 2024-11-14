@@ -9,6 +9,7 @@ const Freelancer_Profile = require('../models/freelancer_profile.model');
 const Job = require('../models/post_job.model'); // Import the Job model
 const Notification = require('../controllers/notifications.controller');
 const { Types } = require('mongoose');
+const HireFreelancer= require('../models/hire_freelancer.model')
 exports.createProposal = async (req, res) => {
   try {
     const {
@@ -72,7 +73,6 @@ exports.createProposal = async (req, res) => {
     res.status(500).json({ message: 'Internal server error', error: err.message });
   }
 };
-
 exports.getFreelancerProposals = async (req, res) => {
   try {
     const jobId = req.query.jobId;
@@ -81,6 +81,14 @@ exports.getFreelancerProposals = async (req, res) => {
     if (!jobId || !Types.ObjectId.isValid(jobId)) {
       return res.status(400).json({ message: 'Invalid or missing Job ID' });
     }
+    
+    // Check if any freelancer is already hired for this job
+    const existingHire = await HireFreelancer.findOne({ 
+      jobId,
+      status: { $in: ['hired', 'completed'] }
+    }).lean();
+    
+    const isJobHired = !!existingHire;
     
     // Populate both job and client details
     const proposals = await Proposal.find({ 'job_id': jobId })
@@ -91,7 +99,7 @@ exports.getFreelancerProposals = async (req, res) => {
         populate: {
           path: 'client_id',
           model: 'User',
-          select: 'first_name last_name email' // Include necessary user fields
+          select: 'first_name last_name email'
         }
       })
       .lean();
@@ -109,6 +117,11 @@ exports.getFreelancerProposals = async (req, res) => {
       
       // Fetch freelancer profile
       const profile = await Freelancer_Profile.findOne({ freelancer_id: freelancerId }).lean();
+      
+      // Check hiring status for this specific proposal
+      const hireStatus = await HireFreelancer.findOne({ 
+        proposalId: proposal._id 
+      }).lean();
       
       // Format due date
       let due_date;
@@ -142,24 +155,27 @@ exports.getFreelancerProposals = async (req, res) => {
         first_name: clientUser?.first_name || '',
         last_name: clientUser?.last_name || '',
         email: clientUser?.email || '',
-        // Include the formatted full name for convenience
         name: clientUser 
           ? `${clientUser.first_name || ''} ${clientUser.last_name || ''}`.trim() || 'Not specified'
           : 'Not specified'
       };
       
-      console.log('Formatted client info:', clientInfo);
-    
       // Format milestone data if present
       const formattedMilestones = proposal.add_requirements?.by_milestones?.map(milestone => ({
         description: milestone.description,
         amount: milestone.amount,
         due_date: milestone.due_date,
-        status: 'Not Started' // Default status for new milestones
+        status: 'Not Started'
       })) || [];
+
+      // Determine if hire button should be disabled
+      const isHireDisabled = isJobHired || // disable if any freelancer is hired for this job
+                            hireStatus?.status === 'completed' || // disable if this proposal is completed
+                            hireStatus?.status === 'hired'; // disable if this freelancer is hired
 
       return {
         id: proposal._id,
+        freelancer_id: freelancerId, // Added freelancer ID here
         coverLetter: proposal.cover_letter || 'No cover letter',
         timeline: proposal.project_duration || 'Not specified',
         rate,
@@ -170,8 +186,10 @@ exports.getFreelancerProposals = async (req, res) => {
         },
         jobTitle: job.job_title || 'Job title not available',
         clientLocation: job.client_location || 'Not specified',
-        clientInfo, // Now includes both formatted name and individual fields
-        status: proposal.status || 'Not specified',
+        clientInfo,
+        status: hireStatus?.status || proposal.status || 'pending',
+        isHireDisabled,
+        hireStatus: hireStatus?.status || 'pending',
         isAuthenticatedUser: freelancerId?.toString() === authenticatedUserId?.toString(),
         freelancerProfile: profile ? {
           id: profile._id,
@@ -196,13 +214,145 @@ exports.getFreelancerProposals = async (req, res) => {
       };
     }));
     
-    console.log("Formatted proposals:", formattedProposals);
-    res.status(200).json({ proposals: formattedProposals });
+    res.status(200).json({ 
+      proposals: formattedProposals,
+      isJobHired // Include this in the response to let frontend know if job is already hired
+    });
   } catch (err) {
     console.error('Error in getFreelancerProposals:', err);
     res.status(500).json({ message: 'Internal server error', error: err.message });
   }
 };
+// exports.getFreelancerProposals = async (req, res) => {
+//   try {
+//     const jobId = req.query.jobId;
+//     const authenticatedUserId = req.user.userId;
+
+//     if (!jobId || !Types.ObjectId.isValid(jobId)) {
+//       return res.status(400).json({ message: 'Invalid or missing Job ID' });
+//     }
+    
+//     // Populate both job and client details
+//     const proposals = await Proposal.find({ 'job_id': jobId })
+//       .populate('freelancer_id')
+//       .populate({
+//         path: 'job_id',
+//         select: 'job_title client_location client_id',
+//         populate: {
+//           path: 'client_id',
+//           model: 'User',
+//           select: 'first_name last_name email' // Include necessary user fields
+//         }
+//       })
+//       .lean();
+
+//     if (!proposals || proposals.length === 0) {
+//       return res.status(404).json({ message: 'No proposals found for this job' });
+//     }
+    
+//     const formattedProposals = await Promise.all(proposals.map(async (proposal) => {
+//       const job = proposal.job_id || {};
+//       const freelancerId = proposal.freelancer_id?._id;
+      
+//       // Get client details directly from populated job data
+//       const clientUser = job.client_id;
+      
+//       // Fetch freelancer profile
+//       const profile = await Freelancer_Profile.findOne({ freelancer_id: freelancerId }).lean();
+      
+//       // Format due date
+//       let due_date;
+//       if (proposal.add_requirements?.by_project) {
+//         due_date = proposal.add_requirements.by_project.due_date;
+//       } else if (proposal.add_requirements?.by_milestones) {
+//         due_date = proposal.add_requirements.by_milestones.map(milestone => milestone.due_date).reduce((earliest, date) => {
+//           return new Date(earliest) < new Date(date) ? earliest : date;
+//         }, proposal.add_requirements.by_milestones[0]?.due_date);
+//       } else {
+//         due_date = 'Not specified';
+//       }
+
+//       // Format rate
+//       let rate;
+//       if (proposal.add_requirements?.by_project) {
+//         const bidAmount = proposal.add_requirements.by_project.bid_amount;
+//         rate = `By Project: ${bidAmount ? `$${bidAmount}` : 'Not specified'}`;
+//       } else if (proposal.add_requirements?.by_milestones) {
+//         const milestoneTotal = proposal.add_requirements.by_milestones.reduce((total, milestone) => {
+//           return total + (parseFloat(milestone.amount) || 0);
+//         }, 0);
+//         rate = `By Milestone: $${milestoneTotal}`;
+//       } else {
+//         rate = 'Not specified';
+//       }
+
+//       // Format client info with proper error handling
+//       const clientInfo = {
+//         id: clientUser?._id || job.client_id,
+//         first_name: clientUser?.first_name || '',
+//         last_name: clientUser?.last_name || '',
+//         email: clientUser?.email || '',
+//         // Include the formatted full name for convenience
+//         name: clientUser 
+//           ? `${clientUser.first_name || ''} ${clientUser.last_name || ''}`.trim() || 'Not specified'
+//           : 'Not specified'
+//       };
+      
+//       console.log('Formatted client info:', clientInfo);
+    
+//       // Format milestone data if present
+//       const formattedMilestones = proposal.add_requirements?.by_milestones?.map(milestone => ({
+//         description: milestone.description,
+//         amount: milestone.amount,
+//         due_date: milestone.due_date,
+//         status: 'Not Started' // Default status for new milestones
+//       })) || [];
+
+//       return {
+//         id: proposal._id,
+//         coverLetter: proposal.cover_letter || 'No cover letter',
+//         timeline: proposal.project_duration || 'Not specified',
+//         rate,
+//         due_date,
+//         add_requirements: {
+//           ...proposal.add_requirements,
+//           by_milestones: formattedMilestones
+//         },
+//         jobTitle: job.job_title || 'Job title not available',
+//         clientLocation: job.client_location || 'Not specified',
+//         clientInfo, // Now includes both formatted name and individual fields
+//         status: proposal.status || 'Not specified',
+//         isAuthenticatedUser: freelancerId?.toString() === authenticatedUserId?.toString(),
+//         freelancerProfile: profile ? {
+//           id: profile._id,
+//           userId: freelancerId,
+//           first_name: profile.first_name || '',
+//           last_name: profile.last_name || '',
+//           name: `${profile.first_name || ''} ${profile.last_name || ''}`.trim() || 'No Name',
+//           image: profile.image || null,
+//           title: profile.title || '',
+//           skills: profile.skills || [],
+//           availability: profile.availability || {},
+//           languages: profile.languages || [],
+//           portfolios: profile.portfolios || [],
+//           location: profile.location,
+//           totalHours: profile.experience?.total_hours || 0,
+//           totalJobs: profile.experience?.completed_projects || 0,
+//           experience: {
+//             title: profile.title || '',
+//             description: profile.profile_overview || '',
+//           },
+//         } : null,
+//       };
+//     }));
+    
+//     console.log("Formatted proposals:", formattedProposals);
+//     res.status(200).json({ proposals: formattedProposals });
+//   } catch (err) {
+//     console.error('Error in getFreelancerProposals:', err);
+//     res.status(500).json({ message: 'Internal server error', error: err.message });
+//   }
+// };
 
 exports.getProposalById = async (req, res) => {
   try {
@@ -215,7 +365,7 @@ exports.getProposalById = async (req, res) => {
       return res.status(404).json({ message: 'Proposal not found or unauthorized' });
     }
 
-    res.status(200).json({ proposal });
+    res.status(200).json({ proposal, freelancer_id  });
   } catch (err) {
     console.error('Error getting proposal:', err); 
     res.status(500).json({ message: 'Internal server error', error: err.message });

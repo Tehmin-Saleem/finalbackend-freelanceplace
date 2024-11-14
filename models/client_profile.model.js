@@ -33,7 +33,7 @@ const Client_ProfileSchema = new Schema({
   },
   email: {
     type: String,
-    required: true,
+    // required: true,
     match: /.+\@.+\..+/  
   },
   languages: [{

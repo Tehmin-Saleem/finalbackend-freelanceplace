@@ -52,11 +52,17 @@ const ProposalSchema = new Schema({
   portfolio_link: {
     type: String,
   },
-  status: { // Adding the status field
+  status: {
     type: String,
-    enum: ["Pending", "Hired", "Declined"], // Define possible statuses
-    default: "Pending", // Default value
+    enum: ['pending', 'hired', 'rejected'],
+    default: 'pending'
   },
+  hired_at: {
+    type: Date,
+    default: null
+  }
+}, {
+  timestamps: true // This will add createdAt and updatedAt fields
 });
 
 const Proposal = mongoose.model("Proposal", ProposalSchema);

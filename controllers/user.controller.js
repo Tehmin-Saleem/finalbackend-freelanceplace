@@ -137,6 +137,9 @@ const login = async (req, res) => {
     if (user.softBanned) {
       return res.status(403).json({ message: 'Your account has been soft-banned. Please contact support.' });
     }
+    if (user.isLoggedIn) {
+      return res.status(403).json({ message: 'User already logged in on another device' });
+    }
 
     // Check if the password matches
     const isMatch = await bcrypt.compare(password, user.password);
@@ -150,7 +153,8 @@ const login = async (req, res) => {
       process.env.JWT_SECRET,
       { expiresIn: '7h' }
     );
-
+    user.isLoggedIn = true; // Update the user’s login status
+    await user.save();
     // Prepare user data for the response
     const userData = {
       email: user.email,
@@ -199,6 +203,8 @@ const getUserById = async (req, res) => {
     res.status(500).json({ message: 'Internal server error' });
   }
 };
+
+
 const getAllUsers = async (req, res) => {
   try {
     const users = await User.find(); // Retrieve all users with all fields
@@ -208,6 +214,8 @@ const getAllUsers = async (req, res) => {
     res.status(500).json({ message: 'Internal server error' });
   }
 };
+
+
 // Function to create an admin user
 const createAdminUser = async (req, res) => {
   try {

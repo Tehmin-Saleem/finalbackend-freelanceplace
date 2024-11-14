@@ -852,6 +852,8 @@ exports.getFreelancerHiredJobs = async (req, res) => {
     })
     .sort({ _id: -1 });
 
+    console.log("hired jobs", hiredJobs)
+
     const formattedResponse = hiredJobs.map(hire => ({
       hireId: hire._id,
       job: hire.jobId ? {
@@ -1280,10 +1282,15 @@ exports.getFreelancerReviews = async (req, res) => {
 
     console.log('Found reviews:', reviews.length); // Debug log
 
+    // Instead of returning 404, return success with empty array
     if (!reviews || reviews.length === 0) {
-      return res.status(404).json({
-        success: false,
-        message: 'No reviews found for this freelancer'
+      return res.status(200).json({
+        success: true,
+        data: {
+          total_reviews: 0,
+          average_rating: 0,
+          reviews: []
+        }
       });
     }
 
@@ -1332,6 +1339,120 @@ exports.getFreelancerReviews = async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Failed to fetch freelancer reviews',
+      error: error.message
+    });
+  }
+};
+
+
+exports.getFreelancerCompletedJobs = async (req, res) => {
+  try {
+    const { freelancerId } = req.params;
+    
+    if (!freelancerId) {
+      return res.status(400).json({
+        success: false,
+        message: 'Freelancer ID is required'
+      });
+    }
+
+    // Find all completed hire requests for the freelancer
+    const completedJobs = await HireFreelancer.find({ 
+      freelancerId: freelancerId,
+      status: 'completed'
+    })
+    .populate({
+      path: 'jobId',
+      select: '_id job_title description budget deadline category skills completion_date'
+    })
+    .populate({
+      path: 'clientId',
+      select: '_id name email company profile_image'
+    })
+    .populate({
+      path: 'proposalId',
+      select: '_id add_requirements cover_letter project_duration portfolio_link attachment'
+    })
+    .sort({ completedAt: -1 }); // Sort by completion date
+
+    // Get reviews for these jobs
+    const jobIds = completedJobs.map(job => job.jobId._id);
+    const reviews = await Review.find({
+      freelancer_id: freelancerId,
+      job_id: { $in: jobIds }
+    }).lean();
+
+    // Create a map of reviews by job ID
+    const reviewsByJob = reviews.reduce((acc, review) => {
+      acc[review.job_id.toString()] = review;
+      return acc;
+    }, {});
+
+    const formattedResponse = completedJobs.map(job => ({
+      hireId: job._id,
+      job: job.jobId ? {
+        id: job.jobId._id,
+        title: job.jobId.job_title,
+        description: job.jobId.description,
+        budget: job.jobId.budget,
+        deadline: job.jobId.deadline,
+        category: job.jobId.category,
+        skills: job.jobId.skills,
+        completionDate: job.jobId.completion_date
+      } : null,
+      client: job.clientId ? {
+        id: job.clientId._id,
+        name: job.clientId.name,
+        email: job.clientId.email,
+        company: job.clientId.company,
+        profileImage: job.clientId.profile_image
+      } : null,
+      proposal: job.proposalId ? {
+        id: job.proposalId._id,
+        coverLetter: job.proposalId.cover_letter,
+        projectDuration: job.proposalId.project_duration,
+        portfolioLink: job.proposalId.portfolio_link,
+        attachment: job.proposalId.attachment,
+        milestones: job.proposalId.add_requirements?.by_milestones?.map(milestone => ({
+          amount: milestone.amount,
+          description: milestone.description,
+          dueDate: milestone.due_date
+        })) || [],
+        projectBid: job.proposalId.add_requirements?.by_project ? {
+          bidAmount: job.proposalId.add_requirements.by_project.bid_amount,
+          dueDate: job.proposalId.add_requirements.by_project.due_date
+        } : null
+      } : null,
+      review: reviewsByJob[job.jobId._id.toString()] ? {
+        rating: reviewsByJob[job.jobId._id.toString()].stars,
+        message: reviewsByJob[job.jobId._id.toString()].message,
+        reviewDate: reviewsByJob[job.jobId._id.toString()].createdAt
+      } : null,
+      completedAt: job.completedAt,
+      earnings: job.terms?.rate || 0
+    }));
+
+    // Calculate statistics
+    const totalEarnings = formattedResponse.reduce((sum, job) => sum + job.earnings, 0);
+    const averageRating = reviews.length > 0 
+      ? reviews.reduce((sum, review) => sum + review.stars, 0) / reviews.length 
+      : 0;
+
+    res.status(200).json({
+      success: true,
+      data: {
+        totalCompletedJobs: formattedResponse.length,
+        totalEarnings: totalEarnings,
+        averageRating: parseFloat(averageRating.toFixed(1)),
+        completedJobs: formattedResponse
+      }
+    });
+
+  } catch (error) {
+    console.error('Error in getFreelancerCompletedJobs:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to fetch completed jobs',
       error: error.message
     });
   }
