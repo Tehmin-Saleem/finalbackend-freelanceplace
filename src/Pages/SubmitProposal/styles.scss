@@ -309,6 +309,21 @@ textarea {
        
     }
   } }  
+  .error-message {
+    color: #dc3545;
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+  }
+  
+  .form-field {
+    margin-bottom: 1rem;
+    
+    input, textarea {
+      &.error {
+        border-color:  #dc3545;
+      }
+    }
+  }
 
 
 

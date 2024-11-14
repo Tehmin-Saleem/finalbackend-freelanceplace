@@ -21,6 +21,92 @@ const SubmitProposal = () => {
   // Toggle modal
   const handleShowModal = () => setShowCoverLetter(true);
   const handleCloseModal = () => setShowCoverLetter(false);
+  const [errors, setErrors] = useState({
+    paymentMethod: "",
+    milestones: [],
+    projectAmount: "",
+    projectDueDate: "",
+    project_duration: "",
+    cover_letter: "",
+    portfolio_link: "",
+    attachment: "",
+  });
+
+  const validateForm = () => {
+    let isValid = true;
+    const newErrors = {
+      paymentMethod: "",
+      milestones: [],
+      projectAmount: "",
+      projectDueDate: "",
+      project_duration: "",
+      cover_letter: "",
+      portfolio_link: "",
+      attachment: "",
+    };
+
+    // Validate payment method
+    if (!paymentMethod) {
+      newErrors.paymentMethod = "Please select a payment method";
+      isValid = false;
+    }
+
+    // Validate milestones if payment method is milestone
+     // Validate milestones if payment method is milestone
+  if (paymentMethod === "milestone") {
+    const milestoneErrors = [];
+    milestones.forEach((milestone, index) => {
+      const milestoneError = {};
+      if (!milestone.description.trim()) {
+        milestoneError.description = "Description is required";
+        isValid = false;
+      }
+      if (!milestone.dueDate) {
+        milestoneError.dueDate = "Due date is required";
+        isValid = false;
+      }
+      if (!milestone.amount || milestone.amount <= 0) {
+        milestoneError.amount = "Valid amount is required";
+        isValid = false;
+      }
+      milestoneErrors[index] = milestoneError;
+    });
+    newErrors.milestones = milestoneErrors;
+  }
+
+    // Validate project fields if payment method is project
+    if (paymentMethod === "project") {
+      if (!formData.projectAmount || formData.projectAmount <= 0) {
+        newErrors.projectAmount = "Valid project amount is required";
+        isValid = false;
+      }
+      if (!formData.projectDueDate) {
+        newErrors.projectDueDate = "Project due date is required";
+        isValid = false;
+      }
+    }
+
+    // Validate project duration
+    if (!formData.project_duration.trim()) {
+      newErrors.project_duration = "Project duration is required";
+      isValid = false;
+    }
+
+    // Validate cover letter
+    if (!freelancerCoverLetter.trim()) {
+      newErrors.cover_letter = "Cover letter is required";
+      isValid = false;
+    }
+
+    // Validate portfolio link
+    if (!formData.portfolio_link.trim()) {
+      newErrors.portfolio_link = "Portfolio link is required";
+      isValid = false;
+    }
+
+    setErrors(newErrors);
+    return isValid;
+  };
 
   // Step 2: Function to show the popup
   const showPopup = () => {
@@ -71,43 +157,6 @@ const SubmitProposal = () => {
       <circle cx="12" cy="12" r="10" fill="#00BFFF" />
       <line x1="12" y1="8" x2="12" y2="16" stroke="white" strokeWidth="2" />
       <line x1="8" y1="12" x2="16" y2="12" stroke="white" strokeWidth="2" />
-    </svg>
-  );
-
-  const CalendarIcon = () => (
-    <svg
-      className="calendar-icon"
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-      <line x1="16" y1="2" x2="16" y2="6"></line>
-      <line x1="8" y1="2" x2="8" y2="6"></line>
-      <line x1="3" y1="10" x2="21" y2="10"></line>
-    </svg>
-  );
-
-  const FileIcon = () => (
-    <svg
-      className="file-icon"
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-      <polyline points="14 2 14 8 20 8"></polyline>
-      <line x1="16" y1="13" x2="8" y2="13"></line>
-      <line x1="16" y1="17" x2="8" y2="17"></line>
-      <polyline points="10 9 9 9 8 9"></polyline>
     </svg>
   );
 
@@ -199,10 +248,10 @@ const SubmitProposal = () => {
 
   const handleInputChange = async (e) => {
     const { name, value } = e.target;
-  
+
     // Update the form data with the new value
     setFormData((prevData) => ({ ...prevData, [name]: value }));
-  
+
     // If the updated field is the portfolio link, fetch the thumbnail
     if (name === "portfolio_link" && value) {
       try {
@@ -215,7 +264,9 @@ const SubmitProposal = () => {
   };
   const fetchThumbnail = async (url) => {
     try {
-      const response = await fetch(`https://api.linkpreview.net/?key=YOUR_API_KEY&q=${url}`);
+      const response = await fetch(
+        `https://api.linkpreview.net/?key=YOUR_API_KEY&q=${url}`
+      );
       const data = await response.json();
       return data.image; // Assuming the API returns the image in the `data.image` field
     } catch (error) {
@@ -241,6 +292,11 @@ const SubmitProposal = () => {
       formData.freelancerCoverLetter
     );
     e.preventDefault();
+    if (!validateForm()) {
+      // Show error message
+      alert("Please fill in all required fields");
+      return;
+    }
     try {
       const token = localStorage.getItem("token");
       const formDataToSend = new FormData();
@@ -319,7 +375,6 @@ const SubmitProposal = () => {
 
   // Fetch cover letter from the backend
   const generateCoverLetter = async () => {
-
     setLoading(true);
     try {
       const token = localStorage.getItem("token");
@@ -383,28 +438,13 @@ const SubmitProposal = () => {
         freelancerCoverLetter
       );
 
-      // Call API to save the generated cover letter to the proposal
-      // const response = await axios.post(
-      //   "http://localhost:5000/api/freelancer/save-cover-letter",
-      //   {
-      //     freelancerId, // The freelancer's ID
-      //     jobPostId, // The job post's ID
-      //     coverLetter: freelancerCoverLetter, // The generated or edited cover letter
-      //   },
-      //   {
-      //     headers: {
-      //       Authorization: `Bearer ${token}`,
-      //     },
-      //   }
-      // );
-
       if (freelancerCoverLetter) {
         console.log("Cover letter saved successfully!");
         // Optionally, trigger any additional actions, like refreshing the proposal list
         handleCloseModal(); // Close the modal after saving
       } else {
         console.error(
-          "Failed to save the cover letter:",
+          "Failed to save the cover letter:"
           // response.data.message
         );
       }
@@ -470,6 +510,7 @@ const SubmitProposal = () => {
                   <label className="Label">
                     Select how do you want to be paid:
                   </label>
+                  {/* <div className="form-field"> */}
                   <div className="payment-options">
                     <div className="option">
                       <label htmlFor="milestone">By milestones</label>
@@ -479,6 +520,9 @@ const SubmitProposal = () => {
                         name="payment"
                         onChange={() => handlePaymentMethodChange("milestone")}
                       />
+                      {/* {errors.paymentMethod && (
+    <div className="error-message">{errors.paymentMethod}</div>
+  )} */}
                     </div>
                     <div className="option">
                       <label htmlFor="project">By project</label>
@@ -488,6 +532,11 @@ const SubmitProposal = () => {
                         name="payment"
                         onChange={() => handlePaymentMethodChange("project")}
                       />
+                      {errors.paymentMethod && (
+                        <div className="error-message">
+                          {errors.paymentMethod}
+                        </div>
+                      )}
                     </div>
                   </div>
 
@@ -510,7 +559,6 @@ const SubmitProposal = () => {
                               <label>{index + 1}. Milestone Description:</label>
                               <input
                                 type="text"
-                                placeholder=""
                                 value={milestone.description}
                                 onChange={(e) =>
                                   handleMilestoneChange(
@@ -520,70 +568,88 @@ const SubmitProposal = () => {
                                   )
                                 }
                               />
+                              {errors.milestones[index]?.description && (
+                                <div className="error-message">
+                                  {errors.milestones[index].description}
+                                </div>
+                              )}
                             </div>
+
                             <div className="milestone-field">
-                              <label>Due date:</label>
-                              <div className="date-input">
-                                <input
-                                  type="date"
-                                  value={milestone.dueDate}
-                                  onChange={(e) =>
-                                    handleMilestoneChange(
-                                      index,
-                                      "dueDate",
-                                      e.target.value
-                                    )
-                                  }
-                                />
-                              </div>
-                            </div>
-                            <div className="milestone-field">
-                              <label>Amount:</label>
-                              <div className="date-input">
-                                <input
-                                  type="number"
-                                  placeholder="$12,00 per milestone"
-                                  value={milestone.amount}
-                                  onChange={(e) =>
-                                    handleMilestoneChange(
-                                      index,
-                                      "amount",
-                                      e.target.value
-                                    )
-                                  }
-                                />
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                    </>
-                  )}
+            <label>Due date:</label>
+            <div className="date-input">
+              <input
+                type="date"
+                value={milestone.dueDate}
+                onChange={(e) =>
+                  handleMilestoneChange(index, "dueDate", e.target.value)
+                }
+              />
+              {errors.milestones[index]?.dueDate && (
+                <div className="error-message">
+                  {errors.milestones[index].dueDate}
+                </div>
+              )}
+            </div>
+          </div>
+
+          <div className="milestone-field">
+            <label>Amount:</label>
+            <div className="date-input">
+              <input
+                type="number"
+                placeholder="\$12,00 per milestone"
+                value={milestone.amount}
+                onChange={(e) =>
+                  handleMilestoneChange(index, "amount", e.target.value)
+                }
+              />
+              {errors.milestones[index]?.amount && (
+                <div className="error-message">
+                  {errors.milestones[index].amount}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+    ))}
+  </>
+)}
+
+
 
                   {paymentMethod === "project" && (
                     <>
-                      <div className="milestone-field">
-                        <label>Amount:</label>
-                        <input
-                          type="number"
-                          name="projectAmount"
-                          value={formData.projectAmount}
-                          onChange={handleInputChange}
-                          placeholder="$12,00"
-                        />
-                      </div>
-                      <div className="milestone-field">
-                        <label>Due Date:</label>
-                        <input
-                          type="date"
-                          name="projectDueDate"
-                          value={formData.projectDueDate}
-                          onChange={handleInputChange}
-                        />
-                      </div>
-                    </>
-                  )}
+                     <div className="milestone-field">
+      <label>Amount:</label>
+      <input
+        type="number"
+        name="projectAmount"
+        value={formData.projectAmount}
+        onChange={handleInputChange}
+        placeholder="\$12,00"
+      />
+      {errors.projectAmount && (
+        <div className="error-message">{errors.projectAmount}</div>
+      )}
+    </div>
+    <div className="milestone-field">
+      <label>Due Date:</label>
+      <input
+        type="date"
+        name="projectDueDate"
+        value={formData.projectDueDate}
+        onChange={handleInputChange}
+      />
+      {errors.projectDueDate && (
+        <div className="error-message">{errors.projectDueDate}</div>
+      )}
+    </div>
+  </>
+)}
 
+                  {/* <div className="form-field"> */}
                   <label className="Label">
                     How long will this project take?
                   </label>
@@ -595,14 +661,15 @@ const SubmitProposal = () => {
                     placeholder="Hours, Days or Months"
                     className="project-duration"
                   />
-
+                  {errors.project_duration && (
+                    <div className="error-message">
+                      {errors.project_duration}
+                    </div>
+                  )}
+                  {/* </div> */}
+                  {/* <div className="form-field"> */}
                   <label className="Label">Cover letter</label>
-                  {/* <textarea
-                    name="cover_letter"
-                    value={formData.cover_letter}
-                    onChange={handleInputChange}
-                    placeholder="Write your cover letter here"
-                  ></textarea> */}
+
                   <div>
                     <Button variant="primary" onClick={handleShowModal}>
                       Generate Cover Letter
@@ -624,10 +691,15 @@ const SubmitProposal = () => {
                         additionalSkills={additionalSkills}
                         handleSkillsChange={handleSkillsChange}
                         handleInputChange={handleInputChange}
-                        loading = {loading}
+                        loading={loading}
                       />
                     )}
+                    {errors.cover_letter && (
+                      <div className="error-message">{errors.cover_letter}</div>
+                    )}
                   </div>
+                  {/* </div> */}
+
                   <label className="Label">Attachment</label>
                   <div className="attachment-box">
                     <div className="attachment">
@@ -635,25 +707,32 @@ const SubmitProposal = () => {
                     </div>
                   </div>
 
+                  {/* <div className="form-field"> */}
                   <label className="Label">Add portfolio link</label>
-  <input
-    type="text"
-    name="portfolio_link"
-    value={formData.portfolio_link}
-    onChange={handleInputChange}
-    placeholder="Enter your portfolio link"
-    className="portfolio-link"
-  />
-  {formData.thumbnail ? (
-  <div className="thumbnail-preview">
-    <img src={formData.thumbnail} alt="Portfolio Thumbnail" />
-  </div>
-) : (
-  <div className="thumbnail-preview">
-    <img src="https://picsum.photos/200/300" alt="Default Thumbnail" />
-  </div>
-)}
-
+                  <input
+                    type="text"
+                    name="portfolio_link"
+                    value={formData.portfolio_link}
+                    onChange={handleInputChange}
+                    placeholder="Enter your portfolio link"
+                    className="portfolio-link"
+                  />
+                  {errors.portfolio_link && (
+                    <div className="error-message">{errors.portfolio_link}</div>
+                  )}
+                  {/* </div> */}
+                  {formData.thumbnail ? (
+                    <div className="thumbnail-preview">
+                      <img src={formData.thumbnail} alt="Portfolio Thumbnail" />
+                    </div>
+                  ) : (
+                    <div className="thumbnail-preview">
+                      <img
+                        src="https://picsum.photos/200/300"
+                        alt="Default Thumbnail"
+                      />
+                    </div>
+                  )}
 
                   <div className="actions">
                     <button
