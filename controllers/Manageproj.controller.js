@@ -899,207 +899,207 @@ exports.getProjectProgressById = async (req, res) => {
 
 
 
-exports.getProgressByIds = async (req, res) => {
-  try {
-    if (!req.user) {
-      return res.status(401).json({
-        success: false,
-        message: 'Authentication required'
-      });
-    }
+// exports.getProgressByIds = async (req, res) => {
+//   try {
+//     if (!req.user) {
+//       return res.status(401).json({
+//         success: false,
+//         message: 'Authentication required'
+//       });
+//     }
 
-    const { client_id, proposal_id } = req.params;
+//     const { client_id, proposal_id } = req.params;
 
-    // Validate IDs
-    const validateId = (id, fieldName) => {
-      if (!mongoose.Types.ObjectId.isValid(id)) {
-        return res.status(400).json({
-          success: false,
-          message: `Invalid ${fieldName} format`
-        });
-      }
-    };
+//     // Validate IDs
+//     const validateId = (id, fieldName) => {
+//       if (!mongoose.Types.ObjectId.isValid(id)) {
+//         return res.status(400).json({
+//           success: false,
+//           message: `Invalid ${fieldName} format`
+//         });
+//       }
+//     };
 
-    validateId(client_id, 'client ID');
-    validateId(proposal_id, 'proposal ID');
+//     validateId(client_id, 'client ID');
+//     validateId(proposal_id, 'proposal ID');
 
-    // Find project using aggregation pipeline
-    const project = await Project.aggregate([
-      {
-        $match: {
-          client_id: new mongoose.Types.ObjectId(client_id),
-          proposal_id: new mongoose.Types.ObjectId(proposal_id)
-        }
-      },
-      {
-        $lookup: {
-          from: 'freelancerprofiles',
-          localField: 'freelancer_profile_id',
-          foreignField: '_id',
-          as: 'freelancerInfo'
-        }
-      },
-      {
-        $lookup: {
-          from: 'proposals',
-          localField: 'proposal_id',
-          foreignField: '_id',
-          as: 'proposalDetails'
-        }
-      }
-    ]).exec();
+//     // Find project using aggregation pipeline
+//     const project = await Project.aggregate([
+//       {
+//         $match: {
+//           client_id: new mongoose.Types.ObjectId(client_id),
+//           proposal_id: new mongoose.Types.ObjectId(proposal_id)
+//         }
+//       },
+//       {
+//         $lookup: {
+//           from: 'freelancerprofiles',
+//           localField: 'freelancer_profile_id',
+//           foreignField: '_id',
+//           as: 'freelancerInfo'
+//         }
+//       },
+//       {
+//         $lookup: {
+//           from: 'proposals',
+//           localField: 'proposal_id',
+//           foreignField: '_id',
+//           as: 'proposalDetails'
+//         }
+//       }
+//     ]).exec();
 
-    if (!project || project.length === 0) {
-      return res.status(404).json({
-        success: false,
-        message: 'Project not found'
-      });
-    }
+//     if (!project || project.length === 0) {
+//       return res.status(404).json({
+//         success: false,
+//         message: 'Project not found'
+//       });
+//     }
 
-    const currentProject = project[0];
+//     const currentProject = project[0];
 
-    // Calculate time-based metrics
-    const now = new Date();
-    const startDate = new Date(currentProject.createdAt);
-    const dueDate = new Date(currentProject.due_date);
+//     // Calculate time-based metrics
+//     const now = new Date();
+//     const startDate = new Date(currentProject.createdAt);
+//     const dueDate = new Date(currentProject.due_date);
     
-    const timeMetrics = {
-      totalDays: Math.max(0, Math.ceil((dueDate - startDate) / (1000 * 60 * 60 * 24))),
-      daysElapsed: Math.max(0, Math.ceil((now - startDate) / (1000 * 60 * 60 * 24))),
-      daysRemaining: Math.max(0, Math.ceil((dueDate - now) / (1000 * 60 * 60 * 24))),
-      isOverdue: now > dueDate
-    };
+//     const timeMetrics = {
+//       totalDays: Math.max(0, Math.ceil((dueDate - startDate) / (1000 * 60 * 60 * 24))),
+//       daysElapsed: Math.max(0, Math.ceil((now - startDate) / (1000 * 60 * 60 * 24))),
+//       daysRemaining: Math.max(0, Math.ceil((dueDate - now) / (1000 * 60 * 60 * 24))),
+//       isOverdue: now > dueDate
+//     };
 
-    // Calculate milestone statistics and progress
-    const milestones = currentProject.milestones || [];
-    const totalMilestones = milestones.length;
-    const completedMilestones = milestones.filter(m => m.status === 'Completed').length;
+//     // Calculate milestone statistics and progress
+//     const milestones = currentProject.milestones || [];
+//     const totalMilestones = milestones.length;
+//     const completedMilestones = milestones.filter(m => m.status === 'Completed').length;
 
-    // Calculate overall progress based on completed milestones
-    const overallProgress = totalMilestones > 0 
-      ? Math.round((completedMilestones / totalMilestones) * 100)
-      : 0;
+//     // Calculate overall progress based on completed milestones
+//     const overallProgress = totalMilestones > 0 
+//       ? Math.round((completedMilestones / totalMilestones) * 100)
+//       : 0;
 
-    // Update project progress in database
-    await Project.findByIdAndUpdate(currentProject._id, {
-      progress: overallProgress
-    });
+//     // Update project progress in database
+//     await Project.findByIdAndUpdate(currentProject._id, {
+//       progress: overallProgress
+//     });
 
-    const milestoneStats = {
-      total: totalMilestones,
-      completed: completedMilestones,
-      inProgress: milestones.filter(m => m.status === 'In Progress').length,
-      pending: milestones.filter(m => m.status === 'Not Started').length
-    };
+//     const milestoneStats = {
+//       total: totalMilestones,
+//       completed: completedMilestones,
+//       inProgress: milestones.filter(m => m.status === 'In Progress').length,
+//       pending: milestones.filter(m => m.status === 'Not Started').length
+//     };
 
-    // Format milestone details with progress calculation
-    const formattedMilestones = milestones.map(milestone => ({
-      name: milestone.name,
-      status: milestone.status,
-      amount: milestone.amount,
-      due_date: milestone.due_date,
-      progress: milestone.status === 'Completed' ? 100 : 
-               milestone.status === 'In Progress' ? 50 : 0,
-      isOverdue: now > new Date(milestone.due_date),
-      daysRemaining: Math.max(0, Math.ceil((new Date(milestone.due_date) - now) / (1000 * 60 * 60 * 24)))
-    }));
+//     // Format milestone details with progress calculation
+//     const formattedMilestones = milestones.map(milestone => ({
+//       name: milestone.name,
+//       status: milestone.status,
+//       amount: milestone.amount,
+//       due_date: milestone.due_date,
+//       progress: milestone.status === 'Completed' ? 100 : 
+//                milestone.status === 'In Progress' ? 50 : 0,
+//       isOverdue: now > new Date(milestone.due_date),
+//       daysRemaining: Math.max(0, Math.ceil((new Date(milestone.due_date) - now) / (1000 * 60 * 60 * 24)))
+//     }));
 
-    const response = {
-      success: true,
-      data: {
-        projectDetails: {
-          projectId: currentProject._id,
-          projectName: currentProject.projectName,
-          description: currentProject.description,
-          status: currentProject.status,
-          overallProgress: overallProgress,
-          projectType: currentProject.projectType,
-          budget: currentProject.budget,
-          clientApproved: currentProject.clientApproved,
-          startDate: currentProject.createdAt,
-          dueDate: currentProject.due_date
-        },
-        timeMetrics,
-        progressDetails: {
-          milestoneStats,
-          milestones: formattedMilestones
-        },
-        freelancerInfo: currentProject.freelancerInfo[0] || null,
-        proposalDetails: currentProject.proposalDetails[0] || null,
-        timestamp: new Date()
-      }
-    };
+//     const response = {
+//       success: true,
+//       data: {
+//         projectDetails: {
+//           projectId: currentProject._id,
+//           projectName: currentProject.projectName,
+//           description: currentProject.description,
+//           status: currentProject.status,
+//           overallProgress: overallProgress,
+//           projectType: currentProject.projectType,
+//           budget: currentProject.budget,
+//           clientApproved: currentProject.clientApproved,
+//           startDate: currentProject.createdAt,
+//           dueDate: currentProject.due_date
+//         },
+//         timeMetrics,
+//         progressDetails: {
+//           milestoneStats,
+//           milestones: formattedMilestones
+//         },
+//         freelancerInfo: currentProject.freelancerInfo[0] || null,
+//         proposalDetails: currentProject.proposalDetails[0] || null,
+//         timestamp: new Date()
+//       }
+//     };
 
-    res.status(200).json(response);
+//     res.status(200).json(response);
 
-  } catch (error) {
-    console.error('Error in getProgressByIds:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Error fetching project progress',
-      error: error.message
-    });
-  }
-};
+//   } catch (error) {
+//     console.error('Error in getProgressByIds:', error);
+//     res.status(500).json({
+//       success: false,
+//       message: 'Error fetching project progress',
+//       error: error.message
+//     });
+//   }
+// };
 
-exports.updateProjectProgress = async (req, res) => {
-  try {
-    const { project_id } = req.params;
-    const { progress, message, milestones } = req.body;
+// exports.updateProjectProgress = async (req, res) => {
+//   try {
+//     const { project_id } = req.params;
+//     const { progress, message, milestones } = req.body;
 
-    // Find the project
-    const project = await Project.findById(project_id);
-    if (!project) {
-      return res.status(404).json({
-        success: false,
-        message: 'Project not found'
-      });
-    }
+//     // Find the project
+//     const project = await Project.findById(project_id);
+//     if (!project) {
+//       return res.status(404).json({
+//         success: false,
+//         message: 'Project not found'
+//       });
+//     }
 
-    // Create progress history entry
-    const progressEntry = {
-      progress: progress,
-      updatedBy: "test-user-id", // Hardcoded for testing
-      updateMessage: message || '',
-      milestones: project.milestones.map(m => ({
-        milestone_id: m._id,
-        name: m.name,
-        status: m.status,
-        amount: m.amount,
-        due_date: m.due_date
-      })),
-      timestamp: new Date()
-    };
+//     // Create progress history entry
+//     const progressEntry = {
+//       progress: progress,
+//       updatedBy: "test-user-id", // Hardcoded for testing
+//       updateMessage: message || '',
+//       milestones: project.milestones.map(m => ({
+//         milestone_id: m._id,
+//         name: m.name,
+//         status: m.status,
+//         amount: m.amount,
+//         due_date: m.due_date
+//       })),
+//       timestamp: new Date()
+//     };
 
-    // Update project fields
-    project.progress = progress;
-    project.progressHistory.push(progressEntry);
+//     // Update project fields
+//     project.progress = progress;
+//     project.progressHistory.push(progressEntry);
 
-    // Update milestone statuses if provided
-    if (milestones && Array.isArray(milestones)) {
-      milestones.forEach(updatedMilestone => {
-        const milestone = project.milestones.id(updatedMilestone.milestone_id);
-        if (milestone) {
-          milestone.status = updatedMilestone.status;
-        }
-      });
-    }
+//     // Update milestone statuses if provided
+//     if (milestones && Array.isArray(milestones)) {
+//       milestones.forEach(updatedMilestone => {
+//         const milestone = project.milestones.id(updatedMilestone.milestone_id);
+//         if (milestone) {
+//           milestone.status = updatedMilestone.status;
+//         }
+//       });
+//     }
 
-    // Save the updated project
-    await project.save();
+//     // Save the updated project
+//     await project.save();
 
-    res.status(200).json({
-      success: true,
-      data: project,
-      message: 'Progress updated successfully'
-    });
+//     res.status(200).json({
+//       success: true,
+//       data: project,
+//       message: 'Progress updated successfully'
+//     });
 
-  } catch (error) {
-    console.error('Error updating progress:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Error updating progress',
-      error: error.message
-    });
-  }
-};
+//   } catch (error) {
+//     console.error('Error updating progress:', error);
+//     res.status(500).json({
+//       success: false,
+//       message: 'Error updating progress',
+//       error: error.message
+//     });
+//   }
+// };

@@ -759,12 +759,12 @@ exports.getAllHireData = async (req, res) => {
 
     const { freelancerId } = req.params;
 
-    if (!freelancerId) {
-      return res.status(400).json({
-        success: false,
-        message: 'Freelancer ID is required'
-      });
-    }
+    // if (!freelancerId) {
+    //   return res.status(400).json({
+    //     success: false,
+    //     message: 'Freelancer ID is required'
+    //   });
+    // }
 
     // Fetch and count hire requests where the status is "hired" for the specified freelancer
     const hiredJobCount = await HireFreelancer.countDocuments({
@@ -1459,34 +1459,34 @@ exports.getFreelancerCompletedJobs = async (req, res) => {
 };
 
 
-exports.getFreelancerHiredJobsCount = async (req, res) => {
-  try {
-    const { freelancerId } = req.params;
+// exports.getFreelancerHiredJobsCount = async (req, res) => {
+//   try {
+//     const { freelancerId } = req.params;
     
-    if (!freelancerId) {
-      return res.status(400).json({
-        success: false,
-        message: 'Freelancer ID is required'
-      });
-    }
+//     if (!freelancerId) {
+//       return res.status(400).json({
+//         success: false,
+//         message: 'Freelancer ID is required'
+//       });
+//     }
 
-    // Calculate the count of jobs where the freelancer is hired
-    const hiredJobsCount = await HireFreelancer.countDocuments({
-      freelancerId: freelancerId,
-      status: 'hired'
-    });
+//     // Calculate the count of jobs where the freelancer is hired
+//     const hiredJobsCount = await HireFreelancer.countDocuments({
+//       freelancerId: freelancerId,
+//       status: 'hired'
+//     });
 
-    return res.status(200).json({
-      success: true,
-      count: hiredJobsCount
-    });
+//     return res.status(200).json({
+//       success: true,
+//       count: hiredJobsCount
+//     });
 
-  } catch (error) {
-    console.error('Error in getFreelancerHiredJobsCount:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Failed to fetch hired jobs count',
-      error: error.message
-    });
-  }
-};
+//   } catch (error) {
+//     console.error('Error in getFreelancerHiredJobsCount:', error);
+//     res.status(500).json({
+//       success: false,
+//       message: 'Failed to fetch hired jobs count',
+//       error: error.message
+//     });
+//   }
+// };
