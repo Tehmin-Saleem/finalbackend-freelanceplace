@@ -1,5 +1,3 @@
-
-
 // export default AllJobsPage;
 import React, { useState, useEffect } from "react";
 import { Header, Alljobs, Spinner } from "../../components";
@@ -42,14 +40,14 @@ const AllJobsPage = () => {
         }
       );
 
-      console.log('Response data:', response.data);
+      console.log("Response data:", response.data);
 
       if (response.data.success) {
         setJobs(response.data.data);
       } else {
-        setError('Failed to fetch jobs: ' + response.data.message);
+        setError("Failed to fetch jobs: " + response.data.message);
       }
-
+      console.log("jobs in all jobs page ", response.data.data);
       setLoading(false);
     } catch (err) {
       console.error("Error fetching job posts:", err);
@@ -85,12 +83,12 @@ const AllJobsPage = () => {
     const matchesSearch = job.job_title
       .toLowerCase()
       .includes(searchTerm.toLowerCase());
-    
-    const matchesFilter = 
+
+    const matchesFilter =
       selectedFilter === "All" ||
-      (selectedFilter === "Ongoing" && job.status === "ongoing") ||
-      (selectedFilter === "Completed" && job.status === "completed") ||
-      (selectedFilter === "Pending" && job.status === "pending");
+      (selectedFilter === "Ongoing" && job.jobstatus === "ongoing") ||
+      (selectedFilter === "Completed" && job.jobstatus === "completed") ||
+      (selectedFilter === "Pending" && job.jobstatus === "pending");
 
     return matchesSearch && matchesFilter;
   });
@@ -109,7 +107,7 @@ const AllJobsPage = () => {
   };
 
   const handlePostJob = () => {
-    navigate('/jobposting');
+    navigate("/jobposting");
   };
 
   // Generate pagination numbers
@@ -121,11 +119,26 @@ const AllJobsPage = () => {
       }
     } else {
       if (currentPage <= 3) {
-        pages.push(1, 2, 3, 4, '...', totalPages);
+        pages.push(1, 2, 3, 4, "...", totalPages);
       } else if (currentPage >= totalPages - 2) {
-        pages.push(1, '...', totalPages - 3, totalPages - 2, totalPages - 1, totalPages);
+        pages.push(
+          1,
+          "...",
+          totalPages - 3,
+          totalPages - 2,
+          totalPages - 1,
+          totalPages
+        );
       } else {
-        pages.push(1, '...', currentPage - 1, currentPage, currentPage + 1, '...', totalPages);
+        pages.push(
+          1,
+          "...",
+          currentPage - 1,
+          currentPage,
+          currentPage + 1,
+          "...",
+          totalPages
+        );
       }
     }
     return pages;
@@ -151,14 +164,17 @@ const AllJobsPage = () => {
           </div>
 
           <div className="filter-wrapper">
-            <button className="filter-button" onClick={() => setIsDropdownOpen(!isDropdownOpen)}>
+            <button
+              className="filter-button"
+              onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+            >
               <Filter className="filter-icon" />
               All Filters
             </button>
 
             {isDropdownOpen && (
               <div className="filter-Dropdown">
-                {['All', 'Ongoing', 'Pending', 'Completed'].map((filter) => (
+                {["All", "Ongoing", "Pending", "Completed"].map((filter) => (
                   <span key={filter} className="filter-dropdown__inner">
                     <input
                       type="radio"
@@ -166,10 +182,16 @@ const AllJobsPage = () => {
                       checked={selectedFilter === filter}
                       onChange={() => handleFilterChange(filter)}
                     />
-                    <label htmlFor={`filter-${filter.toLowerCase()}`}>{filter} Jobs</label> {/* Fixed template literal usage */}
+                    <label htmlFor={`filter-${filter.toLowerCase()}`}>
+                      {filter} Jobs
+                    </label>{" "}
+                    {/* Fixed template literal usage */}
                   </span>
                 ))}
-                <button className="filter-done-Button" onClick={() => setIsDropdownOpen(false)}>
+                <button
+                  className="filter-done-Button"
+                  onClick={() => setIsDropdownOpen(false)}
+                >
                   Done
                 </button>
               </div>
@@ -192,13 +214,23 @@ const AllJobsPage = () => {
                 key={job._id}
                 jobId={job._id}
                 title={job.job_title}
-                rate={job.budget_type === "hourly"
-                  ? `${job.hourly_rate.from}-${job.hourly_rate.to}/hr`
-                  : `${job.fixed_price}/fixed`}
-                postedBy={job.posted_by || "Unknown"}
-                proposals={job.proposalCount || 0}
+                rate={
+                  job.budget_type === "hourly"
+                    ? `${job.hourly_rate.from}-${job.hourly_rate.to}/hr`
+                    : `${job.fixed_price}/fixed`
+                }
+                postedBy={job.client_id.email || "Unknown"}
+                proposals={job.proposals?.length || 0}
                 messages={job.messages?.length || 0}
-                status={job.status}
+                status={job.jobstatus}
+                budgetType={job.budget_type}
+                createdAt={job.createdAt}
+                description={job.description}
+                dueDate={job.dueDate}
+                attachment={job.attachment}
+                preferredSkills={job.preferred_skills}
+                projectDuration={job.project_duration}
+                proposalCount={job.proposalCount}
                 onViewClick={handleViewClick}
               />
             ))
@@ -212,8 +244,10 @@ const AllJobsPage = () => {
             <div className="rows-per-page">
               <span>Rows per page:</span>
               <select value={rowsPerPage} onChange={handleRowsPerPageChange}>
-                {[5, 10, 15, 20].map(value => (
-                  <option key={value} value={value}>{value}</option>
+                {[5, 10, 15, 20].map((value) => (
+                  <option key={value} value={value}>
+                    {value}
+                  </option>
                 ))}
               </select>
             </div>
@@ -226,12 +260,16 @@ const AllJobsPage = () => {
               >
                 ←
               </button>
-              
+
               {getPaginationNumbers().map((page, index) => (
                 <span
                   key={index}
-                  className={`page-number ${currentPage === page ? "active" : ""} ${page === "..." ? "dots" : ""}`} // Fixed template literal usage
-                  onClick={() => typeof page === "number" && handlePageChange(page)}
+                  className={`page-number ${
+                    currentPage === page ? "active" : ""
+                  } ${page === "..." ? "dots" : ""}`} // Fixed template literal usage
+                  onClick={() =>
+                    typeof page === "number" && handlePageChange(page)
+                  }
                 >
                   {page}
                 </span>
@@ -254,7 +292,10 @@ const AllJobsPage = () => {
                 max={totalPages}
                 value={currentPage}
                 onChange={(e) => {
-                  const page = Math.min(Math.max(1, Number(e.target.value)), totalPages);
+                  const page = Math.min(
+                    Math.max(1, Number(e.target.value)),
+                    totalPages
+                  );
                   handlePageChange(page);
                 }}
               />
