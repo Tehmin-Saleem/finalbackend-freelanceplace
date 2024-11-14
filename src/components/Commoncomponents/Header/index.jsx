@@ -425,6 +425,7 @@ const Header = () => {
     } else if (option === "LOGOUT") {
       localStorage.clear();
       navigate("/signin");
+      
     }
   };
 
@@ -460,7 +461,7 @@ const Header = () => {
     <header className="header">
       <div className="header-top">
         <div className="logo">
-          <Logo width="100" height="40" onClick={handleLogoClick} />
+          <Logo style={{ cursor: 'pointer' }} width="100" height="40"  onClick={handleLogoClick} />
         </div>
         <div className="dropdown-container">
           <h2 className="find-work">

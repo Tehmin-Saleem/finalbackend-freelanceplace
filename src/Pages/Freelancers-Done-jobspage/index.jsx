@@ -124,13 +124,14 @@ const FreelancersJobsPage = () => {
     status: offer.status,
     // New fields available from backend
     clientName: offer.clientName,
+    
     clientCountry: offer.clientCountry,
     attachment: offer.attachment,
     // Fields that need to be added to backend response
     timeline: "1 to 3 months", // Add to backend if needed
-    level: "Intermediate", // Add to backend if needed
+   
     verified: false, // Add to backend if needed
-    jobStatus: "pending", // Add to backend if needed
+    jobStatus: "ongoing", // Add to backend if needed
     source: 'offer' // Add if needed for frontend differentiation
   }));
     
@@ -168,7 +169,7 @@ const FreelancersJobsPage = () => {
             job.jobStatus === "ongoing"
           );
         case "pending":
-          return job.status === "pending" || job.status === "accepted";
+          return job.status === "pending" || job.status === "accepted" ;
         case "completed":
           return job.status === "completed" || job.jobStatus === "completed";
         default:

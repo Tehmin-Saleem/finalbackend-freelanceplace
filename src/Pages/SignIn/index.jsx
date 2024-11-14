@@ -20,6 +20,28 @@ function SignIn() {
   const navigate = useNavigate(); // Initialize useNavigate for navigation
 
   useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      const userInfo = JSON.parse(localStorage.getItem("userInfo"));
+      const role = userInfo?.user?.role;
+
+      switch (role) {
+        case "client":
+          navigate("/ClientDashboard");
+          break;
+        case "freelancer":
+          navigate("/FreelanceDashBoard");
+          break;
+        case "consultant":
+          navigate("/ConsultantDash");
+          break;
+        case "admin":
+          navigate("/AdminDashboard");
+          break;
+        default:
+          break;
+      }
+    }
     const savedEmail = Cookies.get("savedEmail");
     const savedPassword = Cookies.get("savedPassword");
     if (savedEmail && savedPassword) {
@@ -27,7 +49,7 @@ function SignIn() {
       setPassword(savedPassword);
       setRememberMe(true);
     }
-  }, []);
+  }, [navigate]);
 
   const handlePasswordChange = (e) => {
     const newPassword = e.target.value;
