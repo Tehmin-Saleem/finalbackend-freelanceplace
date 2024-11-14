@@ -371,6 +371,18 @@ $font-poppins: "Poppins", sans-serif;
         }
       }
 
+
+
+
+      .readonly-input {
+        background-color: #f5f5f5;
+        cursor: not-allowed;
+        // or make it look more like text:
+        border: none;
+        outline: none;
+        padding: 8px;
+      }
+
       .availability-group {
         margin-bottom: 1.5rem;
 

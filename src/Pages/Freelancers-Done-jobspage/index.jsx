@@ -20,7 +20,7 @@ const FreelancersJobsPage = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [statusFilter, setStatusFilter] = useState("all"); // all, ongoing, pending, completed
 
-  const fetchJobs = async () => {
+  const fetchOffersAndJobs = async () => {
     try {
       setLoading(true);
       setError(null);
@@ -30,64 +30,50 @@ const FreelancersJobsPage = () => {
         throw new Error("No authentication token found");
       }
 
-    
-     
+      const decodedToken = jwtDecode(token);
+      const loggedInUserId = decodedToken.userId;
 
-      // First fetch job IDs from /hire API
-      const hireResponse = await axios.get(
-        "http://localhost:5000/api/client/hire",
-        // `http://localhost:5000/api/freelancer/hired-jobs/${freelancerId}`,
-        {
+      if (!loggedInUserId) {
+        throw new Error('Unable to decode user ID from token');
+      }
+
+      // Fetch both hired jobs and offers in parallel
+      const [hireResponse, offersResponse] = await Promise.all([
+        axios.get("http://localhost:5000/api/client/hire", {
           headers: {
             Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
           },
-        }
-      );
-      const decodedToken = jwtDecode(token);
-      const loggedInUserId = decodedToken.userId; // Adjust this field based on your token structure
-      if (!loggedInUserId) {
-        throw new Error('Unable to decode user ID from token');
-      }
-      console.log("hire response", hireResponse.data);
-      if (!hireResponse.data || !Array.isArray(hireResponse.data.data)) {
-        console.log("Hire response structure:", hireResponse.data);
-        setJobs([]);
-        return;
-      }
+        }),
+        axios.get("http://localhost:5000/api/freelancer/offers", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        })
+      ]);
 
-      // Create maps for hire status and freelancer IDs
-      const hireStatusMap = hireResponse.data.data.reduce((map, hire) => {
+      // Process hired jobs
+      console.log('offers',offersResponse.data )
+      const hireStatusMap = (hireResponse.data.data || []).reduce((map, hire) => {
         if (hire?.jobId?.id) {
           map[hire.jobId.id] = {
             status: hire.status,
             freelancerId: hire.freelancerId?.id,
           };
+          
         }
         return map;
       }, {});
 
-      // const jobToFreelancerMap = hireResponse.data.data.reduce((map, hire) => {
-      //   if (hire?.jobId?.id && hire?.freelancerId?.id) {
-      //     map[hire.jobId.id] = hire.freelancerId.id;
-      //   }
-      //   return map;
-      // }, {});
-      const jobToFreelancerMap = hireResponse.data.data.reduce((map, hire) => {
+      const jobToFreelancerMap = (hireResponse.data.data || []).reduce((map, hire) => {
         if (hire?.jobId?.id && hire?.freelancerId?.id && hire.freelancerId.id === loggedInUserId) {
           map[hire.jobId.id] = hire.freelancerId.id;
         }
         return map;
       }, {});
-      const hiredJobIds = new Set(
-        hireResponse.data.data
-          .filter((hire) => hire?.jobId?.id)
-          .map((hire) => hire.jobId.id)
-      );
-      // Extract job IDs from hire data
 
-      console.log("hire response", hireResponse.data);
-      // Fetch all jobs from /job-posts API
+      // Fetch job posts
       const jobsResponse = await axios.get(
         "http://localhost:5000/api/client/job-posts",
         {
@@ -98,16 +84,8 @@ const FreelancersJobsPage = () => {
         }
       );
 
-      if (!jobsResponse.data?.jobPosts) {
-        throw new Error("Invalid job posts data");
-      }
-      // console.log('response', jobsResponse.data)
-      // Filter jobs to only include those with matching IDs
-      console.log("jobsprespinse", jobsResponse.data);
-      
-      
-      
-      const matchedJobs = jobsResponse.data.jobPosts
+      // Process hired jobs
+      const hiredJobs = (jobsResponse.data?.jobPosts || [])
         .filter((job) => jobToFreelancerMap[job._id])
         .map((job) => ({
           job_id: job._id,
@@ -115,11 +93,9 @@ const FreelancersJobsPage = () => {
           title: job.job_title || "Untitled Job",
           client_id: job.client_id._id,
           freelancer_id: hireStatusMap[job._id].freelancerId,
-          // freelancer_id: jobToFreelancerMap[job._id], // Add freelancer_id from the map
-          rate:
-            job.budget_type === "fixed"
-              ? `$${job.fixed_price}`
-              : `$${job.hourly_rate?.from}-$${job.hourly_rate?.to}/hr`,
+          rate: job.budget_type === "fixed"
+            ? `$${job.fixed_price}`
+            : `$${job.hourly_rate?.from}-$${job.hourly_rate?.to}/hr`,
           timeline: job.project_duration?.duration_of_work || "Not specified",
           level: job.project_duration?.experience_level || "Not specified",
           description: job.description || "No description provided",
@@ -127,99 +103,56 @@ const FreelancersJobsPage = () => {
           verified: job.paymentMethodStatus === "Payment method verified",
           location: job.country || "Not specified",
           postedTime: new Date(job.createdAt).toLocaleDateString(),
-          status: hireStatusMap[job._id].status || "pending", // Use hire status
-          jobStatus: job.jobstatus || "pending", // Use job status
+          status: hireStatusMap[job._id].status || "pending",
+          jobStatus: job.jobstatus || "pending",
+          source: 'hired'
         }));
 
-      setJobs(matchedJobs);
-      console.log("matched jobs", matchedJobs);
-      
-      
-      console.log("id", matchedJobs.job_id);
+     
+  const acceptedOffers = (offersResponse.data?.offers || []).map(offer => ({
+    // No need to filter by freelancer_id as backend already handles this
+    type: offer.type, // Backend already formats this
+    title: offer.title, // Backend provides formatted title
+    client_id: offer.client_id,
+    freelancer_id: offer.freelancer_id,
+    rate: offer.rate, // Backend already formats the rate string
+    description: offer.description,
+    detailed_description: offer.detailed_description,
+    tags: offer.tags,
+    location: offer.location,
+    postedTime: offer.postedTime, // Backend already formats the date
+    status: offer.status,
+    // New fields available from backend
+    clientName: offer.clientName,
+    
+    clientCountry: offer.clientCountry,
+    attachment: offer.attachment,
+    // Fields that need to be added to backend response
+    timeline: "1 to 3 months", // Add to backend if needed
+   
+    verified: false, // Add to backend if needed
+    jobStatus: "ongoing", // Add to backend if needed
+    source: 'offer' // Add if needed for frontend differentiation
+  }));
+    
+      // Combine and deduplicate jobs and offers
+      const combinedJobs = [...hiredJobs, ...acceptedOffers];
+      const uniqueJobs = Array.from(new Map(combinedJobs.map(item => [item.job_id, item])).values());
+      console.log('accepted offer',acceptedOffers )
+      setJobs(uniqueJobs);
     } catch (error) {
-      console.error("Error in fetchJobs:", error);
-      setError("Failed to fetch jobs. Please try again.");
+      console.error("Error in fetchOffersAndJobs:", error);
+      setError("Failed to fetch jobs and offers. Please try again.");
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchJobs();
+    fetchOffersAndJobs();
   }, []);
 
-  // const fetchFreelancerHiredJobs = async () => {
-  //   try {
-  //     setLoading(true);
-  //     setError(null);
-
-  //     const token = localStorage.getItem("token");
-  //     if (!token) {
-  //       throw new Error("No authentication token found");
-  //     }
-
-  //     const decodedToken = jwtDecode(token);
-  //     const freelancerId = decodedToken.userId;
-
-  //     if (!freelancerId) {
-  //       throw new Error("Freelancer ID not found");
-  //     }
-
-  //     const response = await axios.get(
-  //       `http://localhost:5000/api/freelancer/hired-jobs/${freelancerId}`,
-  //       {
-  //         headers: {
-  //           Authorization: `Bearer ${token}`,
-  //           "Content-Type": "application/json",
-  //         },
-  //       }
-  //     );
-
-  //     if (!response.data || !Array.isArray(response.data.data)) {
-  //       setSpecificJobs([]);
-  //       return;
-  //     }
-
-  //     const formattedJobs = response.data.data.map((hire) => ({
-  //       id: hire.hireId,
-  //       jobId: hire.job?.jobId || hire.job?.id,
-  //       proposalId: hire.proposal?.proposalId || hire.proposal?.id, // Adding proposal ID
-  //       type: hire.job?.budget_type === "fixed" ? "Fixed" : "Hourly",
-  //       title: hire.job?.title || "Untitled Job",
-  //       client_id: hire.client?.id,
-  //       freelancer_id: freelancerId,
-  //       rate: hire.job?.budget || "Not specified",
-  //       timeline: hire.job?.deadline || "Not specified",
-  //       level: hire.job?.category || "Not specified",
-  //       description: hire.job?.description || "No description provided",
-  //       tags: hire.job?.skills || [],
-  //       verified: true,
-  //       location: "Not specified",
-  //       postedTime: new Date(hire.hiredDate).toLocaleDateString(),
-  //       status: hire.status,
-  //       dueDate: hire.job?.deadline ? new Date(hire.job.deadline) : null,
-  //       proposalDetails: {
-  //         ...hire.proposal,
-  //         id: hire.proposal?.id || hire.proposal?.proposalId, // Including proposal ID in details
-  //         milestones: hire.proposal?.milestones || [],
-  //         projectBid: hire.proposal?.projectBid || null,
-  //       },
-  //     }));
-
-  //     setSpecificJobs(formattedJobs);
-  //   } catch (error) {
-  //     console.error("Error in fetchFreelancerHiredJobs:", error);
-  //     setError("Failed to fetch your hired jobs. Please try again.");
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
-
-  // useEffect(() => {
-  //   fetchFreelancerHiredJobs();
-  // }, []);
-
-  // Filter jobs based on status and search term
+  // Rest of your existing code remains the same...
   const getFilteredJobs = () => {
     return jobs.filter((job) => {
       const matchesSearch = job.title
@@ -236,7 +169,7 @@ const FreelancersJobsPage = () => {
             job.jobStatus === "ongoing"
           );
         case "pending":
-          return job.status === "pending";
+          return job.status === "pending" || job.status === "accepted" ;
         case "completed":
           return job.status === "completed" || job.jobStatus === "completed";
         default:
@@ -244,6 +177,7 @@ const FreelancersJobsPage = () => {
       }
     });
   };
+
 
   const filteredJobs = getFilteredJobs();
   const totalPages = Math.ceil(filteredJobs.length / pageSize);
@@ -346,6 +280,7 @@ const FreelancersJobsPage = () => {
                 job_id={job.job_id}
                 client_id={job.client_id}
                 freelancer_id={job.freelancer_id}
+                source={job.source}
                 {...job}
                 statusBadge={
                   <StatusBadge status={job.status} jobStatus={job.jobStatus} />

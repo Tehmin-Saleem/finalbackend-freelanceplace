@@ -17,6 +17,50 @@ const FreelanceDashboardPage = () => {
   });
   const navigate = useNavigate();
 
+
+  const [reviews, setReviews] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  const fetchFreelancerReviews = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        throw new Error("No token found");
+      }
+
+      const decodedToken = jwtDecode(token);
+      const freelancerId = decodedToken.userId;
+
+      console.log("Token:", token);
+
+      console.log("freelancerid", freelancerId);
+      setLoading(true);
+      const response = await axios.get(
+        `http://localhost:5000/api/freelancer/${freelancerId}/reviews`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      console.log("response review", response.data.data.average_rating);
+      setReviews(response.data.data.average_rating);
+
+      setError(null);
+    } catch (err) {
+      setError(err.response?.data?.message || "Failed to fetch reviews");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchFreelancerReviews();
+  }, []);
+
+
   useEffect(() => {
     const fetchUser = async () => {
       try {
@@ -42,6 +86,22 @@ const FreelanceDashboardPage = () => {
         setQuickStats(prevStats => ({
           ...prevStats,
           totalJobsApplied: statsResponse.data.totalProposals
+        }));
+        const responses = await axios.get(`http://localhost:5000/api/freelancer/hired-jobs/${userId}`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        setQuickStats(prevStats => ({
+          ...prevStats,
+          ongoingJobs: responses.data.count
+        }));
+
+        const completedresponses = await axios.get(`http://localhost:5000/api/freelancer/completed-jobs/${userId}`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        console.log("completed " , completedresponses.data.data.totalCompletedJobs)
+        setQuickStats(prevStats => ({
+          ...prevStats,
+          completedJobs: completedresponses.data.data.totalCompletedJobs
         }));
 
         const ongoingJobsResponse = await axios.get(`http://localhost:5000/api/freelancer/hired-jobs/${userId}`, {
@@ -121,7 +181,7 @@ const FreelanceDashboardPage = () => {
         </div>
         <div className="stat-item">
           <h3>Client Ratings</h3>
-          <p>{quickStats.clientRatings}</p>
+          <p>{reviews}</p>
         </div>
       </div>
 
