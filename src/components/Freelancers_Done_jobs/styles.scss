@@ -1,255 +1,562 @@
-// Variables
-$primary-color: #4BCBEB;
-$secondary-color: #94A3B8;
-$font-family: 'Poppins', sans-serif;
-$text-color: #64748b;
-$background-color: #F8FAFC;
-$border-color: #dae0e7;
-$button-color: #00BFFF;
-$button-hover-color: darken($button-color, 10%);
+// // Variables
+// $primary-color: #4BCBEB;
+// $secondary-color: #94A3B8;
+// $font-family: 'Poppins', sans-serif;
+// $text-color: #64748b;
+// $background-color: #F8FAFC;
+// $border-color: #dae0e7;
+// $button-color: #00BFFF;
+// $button-hover-color: darken($button-color, 10%);
 
-// Job Card Styling
+// // Job Card Styling
+
+
+
+
 
 .job-card {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  border-bottom: 1px solid $border-color;
-  margin: 0% 5%;
-  padding: 25px;
-  padding-right:5%;
-  padding-left: 5%;
-
-
-  &__rated , &__timeline , &__level{
-    color: $secondary-color;
-  }
-
-  
-  &__rate-head , &__timeline-head, &__level-head{
-    color: #0f172a;
-    font-weight: 400;
-  }
-
+  background: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 20px;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 
   &:hover {
-    background-color: #e7eaee;
-    border-color: $text-color;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+  }
+
+
+
+  .job-card__progress-section {
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    margin: 24px 0;
+    overflow: hidden;
+  
+    .progress-container {
+      padding: 24px;
+    }
+  
+    // Header Styles
+    .progress-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid #eef0f2;
+  
+      .project-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #1a1f36;
+        margin: 0;
+      }
+  
+      .project-due-date {
+        padding: 6px 12px;
+        background: #f7f9fc;
+        border-radius: 6px;
+        color: #4a5568;
+        font-size: 0.875rem;
+      }
+    }
+  
+    // Progress Stats
+    .progress-stats {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+  
+      .progress-percentage {
+        h2 {
+          font-size: 2.5rem;
+          font-weight: 700;
+          color: #2d3748;
+          margin: 0;
+          line-height: 1;
+        }
+  
+        span {
+          font-size: 0.875rem;
+          color: #718096;
+        }
+      }
+  
+      .time-metrics {
+        display: flex;
+        gap: 24px;
+  
+        .metric {
+          text-align: center;
+  
+          .value {
+            display: block;
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #2d3748;
+          }
+  
+          .label {
+            font-size: 0.875rem;
+            color: #718096;
+          }
+        }
+      }
+    }
+  
+    // Overall Progress Bar
+    .overall-progress-bar {
+      height: 8px;
+      background: #edf2f7;
+      border-radius: 4px;
+      margin-bottom: 32px;
+      overflow: hidden;
+  
+      .progress-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #3182ce 0%, #63b3ed 100%);
+        border-radius: 4px;
+        transition: width 0.3s ease;
+      }
+    }
+  
+    // Milestones Section
+    .milestones-section {
+      .milestone-header {
+        font-size: 1rem;
+        font-weight: 600;
+        color: #2d3748;
+        margin-bottom: 16px;
+      }
+  
+      .milestone-list {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+  
+        .milestone-item {
+          background: #f8fafc;
+          border-radius: 8px;
+          padding: 16px;
+  
+          .milestone-main {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 12px;
+          }
+  
+          .milestone-info {
+            h5 {
+              margin: 0 0 4px 0;
+              font-size: 1rem;
+              font-weight: 500;
+              color: #2d3748;
+            }
+  
+            .due-date {
+              margin-left: 20px;
+              font-size: 0.875rem;
+              color: #718096;
+            }
+          }
+  
+          .milestone-status-amount {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+  
+            .status {
+              padding: 4px 8px;
+              border-radius: 4px;
+              font-size: 0.75rem;
+              font-weight: 500;
+  
+              &.completed {
+                background: #c6f6d5;
+                color: #22543d;
+              }
+  
+              &.not-started {
+                background: #edf2f7;
+                color: #4a5568;
+              }
+  
+              &.in-progress {
+                background: #bee3f8;
+                color: #2c5282;
+              }
+            }
+  
+            .amount {
+              font-weight: 600;
+              color: #2d3748;
+            }
+          }
+  
+          .milestone-progress-bar {
+            height: 6px;
+            background: #edf2f7;
+            border-radius: 3px;
+            overflow: hidden;
+  
+            .progress-fill {
+              height: 100%;
+              background: #4BCBEB;
+              border-radius: 3px;
+              transition: width 0.3s ease;
+            }
+          }
+        }
+      }
+    }
+  }
+  
+  .job-card__no-progress {
+    padding: 48px 24px;
+    text-align: center;
+    background: #f8fafc;
+    border-radius: 12px;
+    margin: 24px 0;
+  
+    .loading, .no-data {
+      color: #718096;
+      font-size: 1rem;
+      
+      &::before {
+        content: '';
+        display: block;
+        width: 40px;
+        height: 40px;
+        margin: 0 auto 16px;
+        background: #e2e8f0;
+        border-radius: 50%;
+      }
+    }
+  
+    .loading::before {
+      animation: pulse 1.5s infinite;
+    }
+  }
+  
+  @keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.5; }
+    100% { opacity: 1; }
   }
 
   &__content {
     display: flex;
     flex-direction: column;
-    width: 100%; // Ensure the content takes full width
+    gap: 16px;
   }
 
   &__header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 15px; // Increased spacing for better visual hierarchy
+    margin-bottom: 8px;
   }
 
   &__title {
-    font-size: 20px;
-    font-weight: bold;
-    color: #0f172a;
-    font-family: $font-family;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #1a1a1a;
+    flex: 1;
+  }
+
+  &__posted-time {
+    font-size: 0.875rem;
+    color: #666;
+    margin-right: 800px;
   }
 
   &__view-button {
-    background-color: $button-color;
-    color: #ffffff;
-    padding: 10px 20px;
+    background: #4BCBEB;
+    color: white;
+    padding: 8px 16px;
+    border-radius: 6px;
     border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-family: $font-family;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    
+    &:hover:not(.disabled) {
+      background: #1dc4ee;
+    }
 
-    &:hover {
-      background-color: $button-hover-color;
+    &.disabled {
+      background: #ccc;
+      cursor: not-allowed;
+    }
+  }
+
+
+  &__no-progress {
+    padding: 20px;
+    border-radius: 8px;
+    background-color: #f8f9fa;
+    margin: 15px 0;
+
+    .no-progress-message {
+      text-align: center;
+      color: #6c757d;
+      font-size: 0.9rem;
+      
+      span {
+        display: block;
+        padding: 10px;
+      }
+    }
+  }
+
+  .no-milestones-message {
+    text-align: center;
+    color: #6c757d;
+    padding: 15px;
+    font-size: 0.9rem;
+  }
+
+  
+
+  &__client-info {
+    background: #f8fafb;
+    border-radius: 8px;
+    padding: 16px;
+    margin: 12px 0;
+    border: 1px solid #edf2f7;
+  }
+
+  &__client-details {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  &__client-label {
+    font-size: 0.9rem;
+    color: #4a5568;
+    font-weight: 500;
+  }
+
+  &__client-name {
+    font-size: 0.95rem;
+    color: #2557a7;
+    font-weight: 600;
+  }
+
+  &__client-location {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: #718096;
+    font-size: 0.9rem;
+
+    i {
+      color: #a0aec0;
     }
   }
 
   &__information {
-    display: flex;
-    gap: 30px;
-    font-size: 14px;
-    margin-bottom: 15px;
-    color: $text-color;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    padding: 16px 0;
+    border-top: 1px solid #edf2f7;
+    border-bottom: 1px solid #edf2f7;
+  }
+
+  &__rate-head,
+  &__timeline-head,
+  &__level-head {
+    font-size: 0.9rem;
+    color: #4a5568;
+    font-weight: 500;
+    margin-right: 8px;
+  }
+
+  &__rated,
+  &__timeline,
+  &__level {
+    color: #2d3748;
+    font-weight: 500;
   }
 
   &__description {
-    font-size: 14px;
-    color: $text-color;
-    margin-bottom: 20px;
-    line-height: 1.5; // Improved readability
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: #4a5568;
+    margin: 16px 0;
   }
 
-  .job-card__tags {
-  display: flex;
-  flex-wrap: wrap;
-  margin-bottom: 6px; /* equivalent to mb-6 in Tailwind */
+  // Enhanced attachment styling
+  &__attachment {
+    background: linear-gradient(to right, #f8fafb, #ffffff);
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 16px;
+    margin: 16px 0;
+    transition: all 0.2s ease;
 
-  .job-card__tag {
-    border: 1px solid #94A3B8;  /* equivalent to border-[#94A3B8] in Tailwind */
-    border-radius: 20px;        /* equivalent to rounded-2xl in Tailwind */
-    padding: 8px;               /* equivalent to p-2 in Tailwind */
-    margin-right: 8px;          /* equivalent to mr-2 in Tailwind */
-    margin-bottom: 8px;         /* equivalent to mb-2 in Tailwind */
-    font-size: 14px;            /* equivalent to text-[14px] in Tailwind */
-    color: #94A3B8;             /* equivalent to text-[#94A3B8] in Tailwind */
-    font-family: 'Poppins', sans-serif; /* equivalent to font-Poppins in Tailwind */
-    background-color: #f4f7f9;
+    &:hover {
+      background: linear-gradient(to right, #f1f5f9, #f8fafb);
+      border-color: #cbd5e0;
+    }
+
+    &-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 12px;
+      color: #4a5568;
+      font-size: 0.9rem;
+      font-weight: 600;
+
+      i {
+        color: #718096;
+      }
+    }
+
+    &-content {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px;
+      background: white;
+      border-radius: 8px;
+      border: 1px solid #e2e8f0;
+      cursor: pointer;
+      transition: all 0.2s ease;
+
+      &:hover {
+        background: #f8fafb;
+        border-color: #cbd5e0;
+        transform: translateX(4px);
+
+        .job-card__attachment-name {
+          color: #1a365d;
+        }
+
+        i {
+          color: #2557a7;
+        }
+      }
+
+      i {
+        font-size: 1.1rem;
+        color: #4a5568;
+        transition: color 0.2s ease;
+      }
+    }
+
+    &-name {
+      color: #2d3748;
+      font-size: 0.95rem;
+      font-weight: 500;
+      transition: color 0.2s ease;
+    }
   }
-}
 
+  &__tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 16px;
+  }
 
+  &__tag {
+    background: #edf2f7;
+    color: #4a5568;
+    padding: 6px 12px;
+    border-radius: 16px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
 
+    &:hover {
+      background: #e2e8f0;
+      transform: translateY(-1px);
+    }
+  }
 
   &__extra {
     display: flex;
-    gap: 15px;
-    align-items: center;  // Ensures stars align well
-    font-size: 14px;
-    color: $text-color;
+    align-items: center;
+    gap: 16px;
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid #edf2f7;
   }
 
-  &__verified , &__location , &__rating {
-    color: darken($secondary-color, 1%);
-    font-weight: 300;
-  }
+  &__verified {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: #38a169;
+    font-size: 0.9rem;
+    font-weight: 500;
 
-
-  &__posted-time { // New style for posted time
-    color: $secondary-color;
-    font-weight: 300;
-  }
-
- 
-}
-
-
-.job-card {
-  // ... existing styles ...
-
-  &__view-button {
-    // ... existing button styles ...
-
-    &.disabled {
-      background-color: #cccccc;
-      cursor: not-allowed;
-      opacity: 0.7;
-
-      &:hover {
-        background-color: #cccccc;
-      }
+    i {
+      color: #48bb78;
     }
   }
-}
-
-
-// .job-card {
-//   // ... existing styles ...
-
-//   &__review {
-//     margin-top: 8px;
-//     padding: 8px;
-//     border-radius: 4px;
-//     background-color: #f8f9fa;
-
-//     &-rating {
-//       display: flex;
-//       align-items: center;
-//       gap: 8px;
-
-//       span {
-//         font-size: 14px;
-//         color: #666;
-//       }
-//     }
-
-//     &-message {
-//       margin-top: 4px;
-//       font-size: 14px;
-//       color: #444;
-//       line-height: 1.4;
-//     }
-
-//     &-loading {
-//       font-size: 14px;
-//       color: #666;
-//       font-style: italic;
-//     }
-
-//     &-error {
-//       font-size: 14px;
-//       color: #dc3545;
-//     }
-//   }
-// }
-
-
-
-.job-card {
-  // ... existing styles ...
 
   &__review-container {
-    margin-top: 1rem;
-    padding: 1rem;
-    background-color: #f8f9fa;
-    border-radius: 8px;
-    border: 1px solid #e9ecef;
+    background: #f8fafb;
+    border-radius: 10px;
+    padding: 16px;
+    margin-top: 16px;
   }
 
   &__review-header {
     display: flex;
     align-items: center;
-    gap: 1rem;
-    margin-bottom: 0.5rem;
+    justify-content: space-between;
+    margin-bottom: 12px;
 
     h4 {
-      margin: 0;
+      color: #2d3748;
       font-size: 1rem;
-      color: #343a40;
+      font-weight: 600;
     }
   }
 
   &__review-content {
-    padding: 0.5rem 0;
+    background: white;
+    border-radius: 8px;
+    padding: 16px;
+    border: 1px solid #e2e8f0;
   }
 
   &__review-message {
-    margin: 0;
-    font-size: 0.9rem;
-    color: #6c757d;
+    color: #4a5568;
+    font-size: 0.95rem;
+    line-height: 1.6;
     font-style: italic;
-    line-height: 1.4;
   }
 }
 
+// Add these utility classes if you need them
+.disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
 
-
-// Loading and Error States
-.loading-review {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  color: #6c757d;
+.error-message {
+  color: #e53e3e;
   font-size: 0.9rem;
-  
-  &::before {
-    content: "";
-    width: 16px;
-    height: 16px;
-    border: 2px solid #f3f3f3;
-    border-top: 2px solid #3498db;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-  }
+  margin-top: 8px;
 }
 
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+// Animation for hover effects
+@keyframes subtle-bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-2px); }
 }
+

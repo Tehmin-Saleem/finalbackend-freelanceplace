@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import "./styles.scss";
-import { CommonButton } from "../../components/index";
+import { CommonButton , StarRating} from "../../components/index";
 import { Chat } from "../../svg/index";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -47,44 +47,55 @@ const ProposalCard = ({
   const [reviews, setReviews] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // const fetchFreelancerReviews = async () => {
-  //   try {
-  //     const token = localStorage.getItem("token");
-  //     if (!token) {
-  //       throw new Error("No token found");
-  //     }
+  console.log("freelancer id in proposal card", freelancerId);
 
-  //     const decodedToken = jwtDecode(token);
-  //     const freelancerId = freelancerId;
-  //     // console("freelnacer id in card" , freelancerId)
+  const fetchFreelancerReviews = async (freelancerId) => {
+    try {
+      if (!freelancerId) {
+        console.error("No freelancerId provided");
+        return;
+      }
 
-  //     console.log("Token:", token);
+      const token = localStorage.getItem("token");
+      if (!token) {
+        throw new Error("No token found");
+      }
 
-  //     console.log("freelancerid", freelancerId);
-  //     setLoading(true);
-  //     const response = await axios.get(
-  //       `http://localhost:5000/api/freelancer/${freelancerId}/reviews`,
-  //       {
-  //         headers: {
-  //           Authorization: `Bearer ${token}`,
-  //           "Content-Type": "application/json",
-  //         },
-  //       }
-  //     );
-  //     console.log("response review", response.data.data.average_rating);
-  //     setReviews(response.data.data.average_rating);
+      console.log("Fetching reviews for freelancerId:", freelancerId);
+      setLoading(true);
 
-  //     setError(null);
-  //   } catch (err) {
-  //     setError(err.response?.data?.message || "Failed to fetch reviews");
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
+      const response = await axios.get(
+        `http://localhost:5000/api/freelancer/${freelancerId}/reviews`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
 
-  // useEffect(() => {
-  //   fetchFreelancerReviews();
-  // }, []);
+      if (response.data && response.data.data) {
+        console.log("Reviews response:", response.data);
+        setReviews(response.data.data.average_rating);
+      }
+
+      setError(null);
+    } catch (err) {
+      console.error("Error fetching reviews:", err);
+      setError(err.response?.data?.message || "Failed to fetch reviews");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (freelancerId) {
+      // Add this check
+      fetchFreelancerReviews(freelancerId);
+    }
+  }, [freelancerId]); // Add freelancerId as dependency
+
+  console.log("reviews", reviews);
 
   // Fetch current proposal status when component mounts
   useEffect(() => {
@@ -254,10 +265,21 @@ const ProposalCard = ({
           <span className="proposal-card__job-title-head">Job Title: </span>
           <span className="proposal-card__job-title">{jobTitle}</span>
         </div>
-        {/* <div>
+        <div>
           <span className="proposal-card__cover-letter-head">Ratings</span>
-          <p className="proposal-card__cover-letter">{reviews}</p>
-        </div> */}
+          {loading ? (
+            <p>Loading reviews...</p>
+          ) : error ? (
+            <p className="text-red-500">{error}</p>
+          ) : reviews !== null ? (
+            <StarRating 
+              rating={Number(reviews)} 
+              showRatingValue={true}
+            />
+          ) : (
+            <p>No reviews available</p>
+          )}
+        </div>
         <div>
           <span className="proposal-card__cover-letter-head">Cover Letter</span>
           <p className="proposal-card__cover-letter">{coverLetter}</p>
