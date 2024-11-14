@@ -461,11 +461,7 @@ const Header = () => {
     <header className="header">
       <div className="header-top">
         <div className="logo">
-<<<<<<< HEAD
-          <Logo width="250" height="100" onClick={handleLogoClick} />
-=======
-          <Logo style={{ cursor: 'pointer' }} width="100" height="40"  onClick={handleLogoClick} />
->>>>>>> 7a23596c75e64ae6e320a203f2fa0d4e7c7ab59d
+          <Logo style={{ cursor: 'pointer' }} width="250" height="100" onClick={handleLogoClick} />
         </div>
         <div className="dropdown-container">
           <h2 className="find-work">

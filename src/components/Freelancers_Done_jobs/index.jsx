@@ -53,7 +53,7 @@ const JobsCard = ({
         if (!token) throw new Error("No authentication token found");
 
         const response = await axios.get(
-          `http://localhost:5000/api/freelancer/progress/${client_id}/${proposal_id}`,
+          `http://localhost:5000/api/client/project-progress/${proposal_id}?client_id=${client_id}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -62,10 +62,10 @@ const JobsCard = ({
           }
         );
 
-        console.log("fetch progress response", response);
+        console.log("fetch progress response", response.data);
 
         if (response.data.success) {
-          setProgressData(response.data.data);
+          setProgressData(response.data);
         }
       } catch (error) {
         console.error("Error fetching project progress:", error);
@@ -316,7 +316,7 @@ const JobsCard = ({
                 <span className="project-due-date">
                   Due:{" "}
                   {new Date(
-                    progressData.projectDetails.dueDate
+                    progressData.projectDetails.due_date
                   ).toLocaleDateString("en-US", {
                     year: "numeric",
                     month: "long",
@@ -328,7 +328,7 @@ const JobsCard = ({
               {/* Progress Stats */}
               <div className="progress-stats">
                 <div className="progress-percentage">
-                  <h2>{progressData.projectDetails.overallProgress}%</h2>
+                  <h2>{progressData.progressData.overallProgress}%</h2>
                   <span>Complete</span>
                 </div>
                 <div className="time-metrics">
@@ -352,7 +352,7 @@ const JobsCard = ({
                 <div
                   className="progress-fill"
                   style={{
-                    width: `${progressData.projectDetails.overallProgress}%`,
+                    width: `${progressData.progressData.overallProgress}%`,
                   }}
                 />
               </div>
@@ -360,13 +360,13 @@ const JobsCard = ({
               {/* Milestones Section */}
               <div className="milestones-section">
                 <h4 className="milestone-header">
-                  {progressData.progressDetails.milestoneStats.completed} of{" "}
-                  {progressData.progressDetails.milestoneStats.total} milestones
+                  {progressData.progressData.completedMilestones} of{" "}
+                  {progressData.progressData.totalMilestones} milestones
                   completed
                 </h4>
 
                 <div className="milestone-list">
-                  {progressData.progressDetails.milestones.map(
+                  {progressData.progressData.milestones.map(
                     (milestone, index) => (
                       <div key={index} className="milestone-item">
                         <div className="milestone-main">

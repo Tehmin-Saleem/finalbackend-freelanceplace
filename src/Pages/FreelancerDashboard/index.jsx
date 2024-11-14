@@ -212,7 +212,7 @@ const FreelanceDashboardPage = () => {
         <div className="card" onClick={() => navigate('/freelancersjobpage')}>
           <h2>My Jobs</h2>
           <p>Review your past jobs and client feedback.</p>
-          <button>View History</button>
+          <button>View Your Jobs</button>
         </div>
       </div>
 
