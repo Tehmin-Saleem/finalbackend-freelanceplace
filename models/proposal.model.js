@@ -28,34 +28,34 @@ const ProposalSchema = new Schema({
   attachment: {
     type: String,
   },
-  Proposal_id:{
+  Proposal_id: {
     type: mongoose.Types.ObjectId,
-
   },
   client_id: {
     type: mongoose.Types.ObjectId,
-    
     ref: "User",
   },
   cover_letter: {
     type: String,
   },
- 
   job_id: {
     type: mongoose.Types.ObjectId,
-    
     ref: "Job_Post",
   },
   freelancer_id: { 
     type: Schema.Types.ObjectId, 
-    ref: 'User' ,  
+    ref: 'User',
   },
-  
   project_duration: {
     type: String,
   },
   portfolio_link: {
     type: String,
+  },
+  status: { // Adding the status field
+    type: String,
+    enum: ["Pending", "Hired", "Declined"], // Define possible statuses
+    default: "Pending", // Default value
   },
 });
 
