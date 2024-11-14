@@ -104,7 +104,14 @@ const FreelanceDashboardPage = () => {
           completedJobs: completedresponses.data.data.totalCompletedJobs
         }));
 
-
+        const ongoingJobsResponse = await axios.get(`http://localhost:5000/api/freelancer/hired-jobs/${userId}`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        console.log("dattaatattatatata",ongoingJobsResponse.data.count);
+        setQuickStats(prevStats => ({
+          ...prevStats,
+          ongoingJobs: ongoingJobsResponse.data.count
+        }));
 
 
 

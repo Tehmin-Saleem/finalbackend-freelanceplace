@@ -135,33 +135,33 @@ const FreelancersJobsPage = () => {
           } : null,
         }));
 
-      const acceptedOffers = (offersResponse.data?.offers || []).map(
-        (offer) => ({
-          // No need to filter by freelancer_id as backend already handles this
-          type: offer.type, // Backend already formats this
-          title: offer.title, // Backend provides formatted title
-          client_id: offer.client_id,
-          freelancer_id: offer.freelancer_id,
-          rate: offer.rate, // Backend already formats the rate string
-          description: offer.description,
-          detailed_description: offer.detailed_description,
-          tags: offer.tags,
-          location: offer.location,
-          postedTime: offer.postedTime, // Backend already formats the date
-          status: offer.status,
-          // New fields available from backend
-          clientName: offer.clientName,
-          clientCountry: offer.clientCountry,
-          attachment: offer.attachment,
-          // Fields that need to be added to backend response
-          timeline: "1 to 3 months", // Add to backend if needed
-          level: "Intermediate", // Add to backend if needed
-          verified: false, // Add to backend if needed
-          jobStatus: "pending", // Add to backend if needed
-          source: "offer", // Add if needed for frontend differentiation
-        })
-      );
-
+     
+  const acceptedOffers = (offersResponse.data?.offers || []).map(offer => ({
+    // No need to filter by freelancer_id as backend already handles this
+    type: offer.type, // Backend already formats this
+    title: offer.title, // Backend provides formatted title
+    client_id: offer.client_id,
+    freelancer_id: offer.freelancer_id,
+    rate: offer.rate, // Backend already formats the rate string
+    description: offer.description,
+    detailed_description: offer.detailed_description,
+    tags: offer.tags,
+    location: offer.location,
+    postedTime: offer.postedTime, // Backend already formats the date
+    status: offer.status,
+    // New fields available from backend
+    clientName: offer.clientName,
+    
+    clientCountry: offer.clientCountry,
+    attachment: offer.attachment,
+    // Fields that need to be added to backend response
+    timeline: "1 to 3 months", // Add to backend if needed
+   
+    verified: false, // Add to backend if needed
+    jobStatus: "ongoing", // Add to backend if needed
+    source: 'offer' // Add if needed for frontend differentiation
+  }));
+    
       // Combine and deduplicate jobs and offers
       const combinedJobs = [...hiredJobs, ...acceptedOffers];
       const uniqueJobs = Array.from(
@@ -198,7 +198,7 @@ const FreelancersJobsPage = () => {
             job.jobStatus === "ongoing"
           );
         case "pending":
-          return job.status === "pending" || job.status === "accepted";
+          return job.status === "pending" || job.status === "accepted" ;
         case "completed":
           return job.status === "completed" || job.jobStatus === "completed";
         default:

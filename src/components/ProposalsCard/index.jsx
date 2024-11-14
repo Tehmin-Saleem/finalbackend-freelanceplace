@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import "./styles.scss";
 import { CommonButton , StarRating} from "../../components/index";
 import { Chat } from "../../svg/index";
@@ -30,13 +30,14 @@ const ProposalCard = ({
   coverLetter,
   image,
   due_date,
+ 
   jobTitle,
   initialStatus,
   onHireSuccess,
   freelancerId,
 }) => {
   const navigate = useNavigate();
-  const { jobStatuses, updateJobStatus } = useJobStatus();
+  const { jobStatuses, updateJobStatus, isAnyProposalHired } = useJobStatus();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const [status, setStatus] = useState(jobStatuses[ProposalID] || "pending"); // Initialize as null instead of initialStatus
@@ -122,6 +123,7 @@ const ProposalCard = ({
       );
 
       // Update the status based on the response from the database
+      console.log('status', response.data)
       if (response.data && response.data.status) {
         setStatus(response.data.status);
         updateJobStatus(ProposalID, response.data.status); // Update context with fetched status
@@ -146,7 +148,13 @@ const ProposalCard = ({
     setShowToast(true);
     setTimeout(() => setShowToast(false), 5000);
   };
-
+  const isHireButtonDisabled = useMemo(() => {
+    // If this proposal is already hired, we don't want to disable the button
+    if (status === 'hired') return false;
+    
+    // If any proposal is hired (including this one), disable the button
+    return isAnyProposalHired;
+  }, [status, isAnyProposalHired]);
   const handleHireClick = async (e) => {
     e.stopPropagation();
 
@@ -231,7 +239,7 @@ const ProposalCard = ({
   if (status === null) {
     return <div>Loading...</div>;
   }
-
+ 
   return (
     <div className="proposal-card relative">
       {showToast && (
@@ -292,18 +300,28 @@ const ProposalCard = ({
             onClick={handleChatClick}
             disabled={isLoading}
           />
+           {status !== 'hired' ? (
           <CommonButton
-            text={
-              status === "hired" ? "Hired" : isLoading ? "Hiring..." : "Hire"
-            }
-            className={`${
-              status === "hired" ? "bg-gray-400" : "bg-[#4BCBEB]"
-            } text-[18px] font-Poppins text-[#FFFFFF] rounded-lg font-semibold font-Poppins py-2 px-6 w-full focus:outline-none focus:shadow-outline`}
+            text={isLoading ? "Hiring..." : "Hire"}
+            className={`text-[18px] font-Poppins text-[#FFFFFF] rounded-lg font-semibold font-Poppins py-2 px-6 w-full focus:outline-none focus:shadow-outline ${
+              isHireButtonDisabled 
+                ? 'bg-gray-400 cursor-not-allowed opacity-50' 
+                : 'bg-[#4BCBEB] hover:bg-[#3babcb]'
+            }`}
             onClick={handleHireClick}
-            disabled={status === "hired" || isLoading}
+            disabled={isLoading || isHireButtonDisabled}
           />
-        </div>
-        {error && <div className="text-red-500 mt-2 text-sm">{error}</div>}
+        ) : (
+          <CommonButton
+            text="Hired"
+            className="bg-gray-400 text-[18px] font-Poppins text-[#FFFFFF] rounded-lg font-semibold font-Poppins py-2 px-6 w-full cursor-not-allowed"
+            disabled={true}
+          />
+        )}
+      </div>
+        {error && (
+          <div className="text-red-500 mt-2 text-sm">{error}</div>
+        )}
       </div>
     </div>
   );
