@@ -20,14 +20,7 @@ const IndexPage = () => {
 
 
 
-
-
-
-  
-
   useEffect(() => {
-
-
 
     const fetchData = async () => {
       try {

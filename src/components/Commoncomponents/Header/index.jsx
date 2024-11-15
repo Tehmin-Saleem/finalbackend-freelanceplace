@@ -461,7 +461,7 @@ const Header = () => {
     <header className="header">
       <div className="header-top">
         <div className="logo">
-          <Logo  style={{ cursor: 'pointer' }} width="250" height="100" onClick={handleLogoClick} />
+          <Logo style={{ cursor: 'pointer' }} width="250" height="100" onClick={handleLogoClick} />
         </div>
         <div className="dropdown-container">
           <h2 className="find-work">

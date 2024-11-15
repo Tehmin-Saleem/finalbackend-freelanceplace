@@ -210,9 +210,9 @@ const FreelanceDashboardPage = () => {
           <button>Update Profile</button>
         </div>
         <div className="card" onClick={() => navigate('/freelancersjobpage')}>
-          <h2>Job History</h2>
+          <h2>My Jobs</h2>
           <p>Review your past jobs and client feedback.</p>
-          <button>View History</button>
+          <button>View Your Jobs</button>
         </div>
       </div>
 
