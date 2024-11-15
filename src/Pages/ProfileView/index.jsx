@@ -237,16 +237,16 @@ function ProfileView() {
                       {profileData.totalJobs}
                     </span>
                     <span className="font-Poppins text-[#94A3B8] text-[16px]">
-                      Completed Jobs
+                      years
                     </span>
                   </div>
                   <div className="flex flex-col">
-                    <span className="text-[24px] text-[#2C3E50] font-Poppins">
+                    {/* <span className="text-[24px] text-[#2C3E50] font-Poppins">
                       {profileData.totalHours}
-                    </span>
-                    <span className="font-Poppins text-[#94A3B8] text-[16px]">
+                    </span> */}
+                    {/* <span className="font-Poppins text-[#94A3B8] text-[16px]">
                       Total Hours
-                    </span>
+                    </span> */}
                   </div>
                 </div>
               </div>
@@ -306,27 +306,6 @@ function ProfileView() {
                   <>
                     {reviews && reviews.total_reviews > 0 ? (
                       <>
-                        <div className="review-summary mb-6 bg-white rounded-lg p-6 shadow-sm">
-                          <div className="flex items-center justify-between">
-                            <div className="flex flex-col">
-                              <div className="flex items-center gap-2 mb-2">
-                              <h2 className="reviewtitle">Average Ratings</h2>
-                                <span className="text-3xl font-bold text-[#2C3E50]">
-                                  {reviews.average_rating.toFixed(1)}
-                                </span>
-                             
-                              </div>
-                              <span className="text-gray-600 text-sm">
-                                {reviews.total_reviews}{" "}
-                                {reviews.total_reviews === 1
-                                  ? "review"
-                                  : "reviews"}
-                              </span>
-                            </div>
-
-                          </div>
-                        </div>
-
                         {/* Existing reviews mapping */}
                         {reviews.reviews.map((review) => (
                           <UserReview
@@ -352,6 +331,25 @@ function ProfileView() {
                             jobTitle={review.job.title}
                           />
                         ))}
+
+                        <div className="review-summary mb-6 bg-white rounded-lg p-6 shadow-sm">
+                          <div className="flex items-center justify-between">
+                            <div className="flex flex-col">
+                              <div className="flex items-center gap-2 mb-2">
+                                <h2 className="reviewtitle">Average Ratings</h2>
+                                <span className="text-3xl font-bold text-[#2C3E50]">
+                                  {reviews.average_rating.toFixed(1)}
+                                </span>
+                              </div>
+                              <span className="text-gray-600 text-sm">
+                                {reviews.total_reviews}{" "}
+                                {reviews.total_reviews === 1
+                                  ? "review"
+                                  : "reviews"}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
                       </>
                     ) : (
                       <div className="text-center py-4 text-gray-500 bg-gray-50 rounded-lg">
