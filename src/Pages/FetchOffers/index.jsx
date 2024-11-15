@@ -2,9 +2,14 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import './styles.scss';
 import { Header } from '../../components';
+import {
+
+  Spinner,
+} from "../../components/index";
 import { MapPin, Briefcase, Clock, DollarSign, Paperclip } from 'lucide-react';
 const OfferCards = () => {
   const [offers, setOffers] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [submitLoading, setSubmitLoading] = useState(false);
   // Function to get freelancer ID from the JWT token stored in localStorage
@@ -23,6 +28,7 @@ const OfferCards = () => {
       const freelancerId = getFreelancerIdFromToken();
       if (!freelancerId) {
         setError('Freelancer ID not found.');
+        setLoading(false);
         return;
       }
 
@@ -48,6 +54,9 @@ const OfferCards = () => {
         setOffers(sortedOffers);
       } catch (err) {
         setError('Failed to fetch offers.');
+      }
+      finally {
+        setLoading(false); // Stop loading after fetching data
       }
     };
 
@@ -116,7 +125,7 @@ const OfferCards = () => {
       alert("No file available to view.");
     }
   };
-
+  if (loading) return <Spinner size={100} alignCenter />;
   if (error) {
     return (
       <div className="flex justify-center items-center min-h-screen text-red-500">
@@ -128,6 +137,8 @@ const OfferCards = () => {
 return (
   <div className="min-h-screen bg-gray-50">
     <Header />
+
+    
     <main className="max-w-4xl mx-auto p-6">
       {offers.length === 0 ? (
         <div className="text-center py-8 text-gray-600">
