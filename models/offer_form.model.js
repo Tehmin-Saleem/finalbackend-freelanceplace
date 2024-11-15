@@ -63,7 +63,11 @@ const Offer_FormSchema = new Schema({
   preferred_skills: {
     type: [String],
   }, 
- 
+  job_id: {
+    type: mongoose.Schema.Types.ObjectId,
+    required: true,
+    default: new mongoose.Types.ObjectId()
+  },
 });
 
 const Offer_Form = mongoose.model("Offer_Form", Offer_FormSchema);

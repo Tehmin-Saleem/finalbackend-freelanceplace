@@ -1,3 +1,4 @@
+
 const HireFreelancer = require('../models/hire_freelancer.model');
 const notificationController = require('../controllers/notifications.controller');
 const Notification = require('../models/notifications.model');
@@ -756,23 +757,6 @@ exports.getFreelancerHiredJobs = async (req, res) => {
 
 exports.getAllHireData = async (req, res) => {
   try {
-
-    const { freelancerId } = req.params;
-
-    if (!freelancerId) {
-      return res.status(400).json({
-        success: false,
-        message: 'Freelancer ID is required'
-      });
-    }
-
-    // Fetch and count hire requests where the status is "hired" for the specified freelancer
-    const hiredJobCount = await HireFreelancer.countDocuments({
-      freelancerId: freelancerId,
-      status: 'hired'
-    });
-
-
    
     const hireRequests = await HireFreelancer.find()
       .populate('proposalId', '_id')
@@ -837,7 +821,7 @@ exports.getFreelancerHiredJobs = async (req, res) => {
       freelancerId: freelancerId,
       status: 'hired'
     });
-    console.log("Hired count freelancer",hiredJobsCount);
+    console.log("gired count freelancer",hiredJobsCount);
 
     // Fetch details of the hired jobs
     const hiredJobs = await HireFreelancer.find({ 
@@ -1453,39 +1437,6 @@ exports.getFreelancerCompletedJobs = async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Failed to fetch completed jobs',
-      error: error.message
-    });
-  }
-};
-
-
-exports.getFreelancerHiredJobsCount = async (req, res) => {
-  try {
-    const { freelancerId } = req.params;
-    
-    if (!freelancerId) {
-      return res.status(400).json({
-        success: false,
-        message: 'Freelancer ID is required'
-      });
-    }
-
-    // Calculate the count of jobs where the freelancer is hired
-    const hiredJobsCount = await HireFreelancer.countDocuments({
-      freelancerId: freelancerId,
-      status: 'hired'
-    });
-
-    return res.status(200).json({
-      success: true,
-      count: hiredJobsCount
-    });
-
-  } catch (error) {
-    console.error('Error in getFreelancerHiredJobsCount:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Failed to fetch hired jobs count',
       error: error.message
     });
   }
