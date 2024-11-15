@@ -252,6 +252,7 @@ router.post(
 
 router.get('/job-status/:jobId',authMiddleware, jobPostController.getJobStatus);
 router.patch('/proposals/:proposalId/status', authMiddleware, jobPostController.updateProposalStatus);
+router.get('/completed-jobs-count/:clientId', authMiddleware, hireFreelancerController.getClientCompletedJobsCount);
 
 
 

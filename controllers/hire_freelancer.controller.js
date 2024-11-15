@@ -6,7 +6,8 @@ const Job= require('../models/post_job.model')
 const mongoose = require('mongoose');
 const User = require('../models/user.model');
 const Freelancer_Profile = require('../models/freelancer_profile.model')
-const Review = require('../models/review.model')
+const Review = require('../models/review.model');
+const consultantprofile = require('../models/consultantprofile');
 
 
 // Get hire request status by proposal ID
@@ -1490,3 +1491,74 @@ exports.getFreelancerCompletedJobs = async (req, res) => {
 //     });
 //   }
 // };
+
+exports.getClientCompletedJobsCount = async (req, res) => {
+  try {
+    const { clientId } = req.params;
+    
+    // Validate client ID
+    if (!clientId) {
+      return res.status(400).json({
+        success: false,
+        message: 'Client ID is required'
+      });
+    }
+
+    // Validate if client ID is a valid MongoDB ObjectId
+    if (!mongoose.Types.ObjectId.isValid(clientId)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid client ID format'
+      });
+    }
+
+    // Count completed jobs for the client
+    const completedJobsCount = await HireFreelancer.countDocuments({
+      clientId: clientId,
+      status: 'completed'
+    });
+
+    console.log("complaeted jobs client",completedJobsCount);
+
+    // Get total amount spent on completed jobs (optional)
+    const completedJobs = await HireFreelancer.find({
+      clientId: clientId,
+      status: 'completed'
+    }).populate('jobId', 'budget_type fixed_price hourly_rate');
+
+    // Calculate total spent
+    const totalSpent = completedJobs.reduce((total, job) => {
+      if (job.jobId) {
+        if (job.jobId.budget_type === 'fixed') {
+          return total + (job.jobId.fixed_price || 0);
+        } else if (job.jobId.budget_type === 'hourly') {
+          // For hourly jobs, you might want to calculate based on actual hours worked
+          // This is a simplified calculation using the average of hourly rate range
+          const averageRate = (job.jobId.hourly_rate?.from + job.jobId.hourly_rate?.to) / 2 || 0;
+          return total + averageRate;
+        }
+      }
+      return total;
+    }, 0);
+
+    return res.status(200).json({
+      success: true,
+      data: {
+        clientId: clientId,
+        completedJobsCount: completedJobsCount,
+        totalAmountSpent: parseFloat(totalSpent.toFixed(2)),
+        averageJobCost: completedJobsCount > 0 
+          ? parseFloat((totalSpent / completedJobsCount).toFixed(2)) 
+          : 0
+      }
+    });
+
+  } catch (error) {
+    console.error('Error in getClientCompletedJobsCount:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to fetch completed jobs count',
+      error: error.message
+    });
+  }
+};
