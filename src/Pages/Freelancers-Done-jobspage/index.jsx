@@ -167,7 +167,7 @@ const FreelancersJobsPage = () => {
       const uniqueJobs = Array.from(
         new Map(combinedJobs.map((item) => [item.job_id, item])).values()
       );
-      console.log("accepted offer", acceptedOffers);
+      console.log("accepted offer", acceptedOffers.description);
       setJobs(uniqueJobs);
     } catch (error) {
       console.error("Error in fetchOffersAndJobs:", error);
@@ -329,6 +329,7 @@ const FreelancersJobsPage = () => {
           )}
         </div>
       )}
+      
       {filteredJobs.length > 0 && (
         <div className="pagination">
           <div className="rows-per-page">
