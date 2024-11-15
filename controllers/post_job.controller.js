@@ -57,10 +57,14 @@ exports.createJobPost = async (req, res) => {
     res.status(500).json({ message: 'Internal server error', error: err.message });
   }
 };
+
+
+
+
 exports.getAllJobPosts = async (req, res) => {
   try {
     const jobPosts = await Job_Post.find()
-    .populate('client_id', 'email')
+    .populate('client_id', 'email  first_name last_name country_name' )
     .sort({ createdAt: -1 })  // Sort by createdAt, descending order (newest first)
     .lean();
 
@@ -70,10 +74,21 @@ exports.getAllJobPosts = async (req, res) => {
       // Check if the client has a payment method
       const hasPaymentMethod = await Payment_Method.exists({ client_id: job.client_id });
 
+      // Combine first_name and last_name into a full name
+      const clientFullName = job.client_id ? 
+        `${job.client_id.first_name || ''} ${job.client_id.last_name || ''}`.trim() : 
+        'Unknown Client';
+
       return {
         ...job,
         proposalCount,
-        paymentMethodStatus: hasPaymentMethod ? "Payment method verified" : "Payment method unverified"
+        paymentMethodStatus: hasPaymentMethod ? "Payment method verified" : "Payment method unverified",
+        client: {
+          id: job.client_id?._id,
+          name: clientFullName,
+          email: job.client_id?.email,
+          country: job.client_id?.country_name
+        }
       };
     }));
 

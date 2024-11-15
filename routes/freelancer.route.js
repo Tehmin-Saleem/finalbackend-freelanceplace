@@ -218,7 +218,8 @@ router.get('/:freelancerId/reviews',authMiddleware ,hireFreelancerController.get
 
 router.get('/offer/:freelancerId', authMiddleware,offerController.getOffersByFreelancerId);
 
-//router.get('/hired-jobs-count/:freelancerId', authMiddleware,hireFreelancerController.getFreelancerHiredJobsCount);
+ router.get('/hired-jobs-count/:freelancerId', authMiddleware,hireFreelancerController.getFreelancerHiredJobsCount);
+
 
 router.put('/hireProposal/:proposalId', authMiddleware, proposalController.hireProposal);
 
@@ -229,6 +230,17 @@ router.get('/completed-jobs/:freelancerId', authMiddleware, hireFreelancerContro
 // router.get('/users/:userId', usercontroller.getAllUsers);
 
 router.get('/users/:userId', usercontroller.getUserById);
+
+
+
+router.get('/project-progress/:project_id', manageProject.getProjectProgressById);
+
+router.get('/project-progress/:proposal_id', authMiddleware, manageProject.getProjectProgress);
+
+
+// router.get('/progress/:client_id/:proposal_id',authMiddleware, manageProject.getProgressByIds);
+
+// router.put('/:project_id/progress',authMiddleware, manageProject.updateProjectProgress);
 
 
 module.exports = router;

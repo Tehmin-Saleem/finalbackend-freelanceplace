@@ -13,7 +13,7 @@ const HireFreelancer = new mongoose.Schema({
   freelancerId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
-    required: true
+    
   },
   jobId: {
     type: mongoose.Schema.Types.ObjectId,
