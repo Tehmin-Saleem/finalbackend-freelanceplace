@@ -159,33 +159,34 @@ const JobsCard = ({
               type,
               title,
               rate,
-              timeline,
-              level,
+              due_date,  // Add due_date
+            timeline: `${estimated_timeline?.duration} ${estimated_timeline?.unit}`,
               description:  description,
               tags,
               verified,
               rating,
               location,
               postedTime,
+              projectType: 'byproject' 
             },
             proposalData: {
               _id,
               freelancer_id,
               client_id,
+              status: 'accepted',
+              projectType: 'byproject',
               add_requirements: {
-                by_milestones: [
-                  {
-                    
-                    amount: parseFloat(rate.replace(/[^0-9.-]+/g, "")),
-                    due_date: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
-                    status: "Not Started"
-                  }
-                ]
+                byproject: {
+                  amount: parseFloat(rate.replace(/[^0-9.-]+/g, "")),
+                  due_date: due_date,
+                  status: "Not Started"
+                }
               }
             },
             freelancer_id,
             client_id,
-          },
+            isOffer: true // Flag to identify this is an offer
+          }
         });
         return;
       }
@@ -284,9 +285,13 @@ const JobsCard = ({
           <span className="job-card__rated">{rate}</span>
           <span className="job-card__timeline-head">Estimated time:</span>
           <span className="job-card__timeline"> {timeline}</span>
-          <span className="job-card__level-head">Level:</span>
-          <span className="job-card__level"> {level}</span>
-        </div>
+          {source !== 'offer' && (
+          <>
+            <span className="job-card__level-head">Level:</span>
+            <span className="job-card__level">{level}</span>
+          </>
+        )}
+      </div>
 
         <p className="job-card__description">{description}</p>
 
