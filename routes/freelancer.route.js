@@ -218,7 +218,7 @@ router.get('/:freelancerId/reviews',authMiddleware ,hireFreelancerController.get
 
 router.get('/offer/:freelancerId', authMiddleware,offerController.getOffersByFreelancerId);
 
- router.get('/hired-jobs-count/:freelancerId', authMiddleware,hireFreelancerController.getFreelancerHiredJobsCount);
+ //router.get('/hired-jobs-count/:freelancerId', authMiddleware,hireFreelancerController.getFreelancerHiredJobsCount);
 
 
 router.put('/hireProposal/:proposalId', authMiddleware, proposalController.hireProposal);
