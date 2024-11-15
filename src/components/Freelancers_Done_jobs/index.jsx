@@ -7,6 +7,7 @@ import { JobSucces } from "../../svg";
 import { jwtDecode } from "jwt-decode";
 
 const JobsCard = ({
+  _id,
   job_id,
   type,
   title,
@@ -99,32 +100,41 @@ const JobsCard = ({
         navigate("/manageproj", {
           state: {
             jobData: {
-              job_id,
+              job_id: _id,
               type,
               title,
               rate,
               timeline,
               level,
-              description,
+              description:  description,
               tags,
               verified,
               rating,
               location,
-              postedTime
+              postedTime,
             },
-            // Create minimal proposal data structure for offers
             proposalData: {
-              _id: job_id,
-              freelancer_id: freelancer_id,
-              client_id: client_id
+              _id,
+              freelancer_id,
+              client_id,
+              add_requirements: {
+                by_milestones: [
+                  {
+                    
+                    amount: parseFloat(rate.replace(/[^0-9.-]+/g, "")),
+                    due_date: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+                    status: "Not Started"
+                  }
+                ]
+              }
             },
-            freelancer_id: freelancer_id,
-            client_id: client_id,
-            job_id: job_id,
+            freelancer_id,
+            client_id,
           },
         });
         return;
       }
+  
       const headers = {
         Authorization: `Bearer ${token}`, // Fixed template literal
         "Content-Type": "application/json",
