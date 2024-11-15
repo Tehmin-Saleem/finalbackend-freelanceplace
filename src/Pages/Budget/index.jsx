@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import {ProgressBar , Header} from "../../components/index";
+import { ProgressBar, Header } from '../../components/index';
 import './styles.scss';
-import {ClientFrame, HourlyRate, FixedRate} from '../../svg/index.js';
+import { ClientFrame, HourlyRate, FixedRate } from '../../svg/index.js';
 import { useNavigate } from 'react-router-dom';
 
 const Budget = () => {
   const [budgetType, setBudgetType] = useState("");
   const [minRate, setMinRate] = useState("");
   const [maxRate, setMaxRate] = useState("");
+  const [error, setError] = useState("");
   const navigate = useNavigate();
 
   const steps = [
@@ -20,7 +21,6 @@ const Budget = () => {
   ];
 
   useEffect(() => {
-    // Load data from local storage if available
     const storedData = JSON.parse(localStorage.getItem('jobBudget')) || {};
     setBudgetType(storedData.type || "");
     setMinRate(storedData.minRate || "");
@@ -28,6 +28,15 @@ const Budget = () => {
   }, []);
 
   const handleProjectDurationButtonClick = () => {
+    if (budgetType === "hourly" && (!minRate || !maxRate)) {
+      setError("Please enter both minimum and maximum hourly rates.");
+      return;
+    }
+    if (budgetType === "fixed" && !maxRate) {
+      setError("Please enter a total fixed price.");
+      return;
+    }
+    setError("");
     localStorage.setItem('jobBudget', JSON.stringify({
       type: budgetType,
       minRate,
@@ -43,9 +52,9 @@ const Budget = () => {
   const handleBudgetTypeChange = (type) => {
     setBudgetType(type);
     if (type === 'fixed') {
-      // Set minRate to null when fixed rate is selected
       setMinRate("");
     }
+    setError("");
     localStorage.setItem('jobBudget', JSON.stringify({
       type,
       minRate: type === 'fixed' ? "" : minRate,
@@ -57,7 +66,7 @@ const Budget = () => {
     const value = e.target.value;
     if (field === 'min') setMinRate(value);
     if (field === 'max') setMaxRate(value);
-
+    setError("");
     localStorage.setItem('jobBudget', JSON.stringify({
       type: budgetType,
       minRate: field === 'min' ? value : minRate,
@@ -66,11 +75,11 @@ const Budget = () => {
   };
 
   const handleFixedPriceChange = (e) => {
-    setMaxRate(e.target.value); // Set maxRate for fixed price
-
+    setMaxRate(e.target.value);
+    setError("");
     localStorage.setItem('jobBudget', JSON.stringify({
       type: budgetType,
-      minRate: "", // Clear minRate when fixed rate is used
+      minRate: "",
       maxRate: e.target.value
     }));
   };
@@ -96,7 +105,6 @@ const Budget = () => {
               <div className="box-content">
                 <span>
                   <HourlyRate />
-                  
                 </span>
                 <p>Hourly rate</p>
                 <input
@@ -111,7 +119,6 @@ const Budget = () => {
               <div className="box-content">
                 <span>
                   <FixedRate/>
-                 
                 </span>
                 <p>Fixed price</p>
                 <input
@@ -123,6 +130,7 @@ const Budget = () => {
               </div>
             </div>
           </div>
+          {error && <p className="error-message">{error}</p>}
           {budgetType === 'hourly' && (
             <div className="rate-inputs">
               <div className="labels">
