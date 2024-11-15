@@ -1,3 +1,4 @@
+
 const HireFreelancer = require('../models/hire_freelancer.model');
 const notificationController = require('../controllers/notifications.controller');
 const Notification = require('../models/notifications.model');
@@ -758,6 +759,7 @@ exports.getFreelancerHiredJobs = async (req, res) => {
 exports.getAllHireData = async (req, res) => {
   try {
 
+
     const { freelancerId } = req.params;
 
     // if (!freelancerId) {
@@ -838,7 +840,7 @@ exports.getFreelancerHiredJobs = async (req, res) => {
       freelancerId: freelancerId,
       status: 'hired'
     });
-    console.log("Hired count freelancer",hiredJobsCount);
+    console.log("gired count freelancer",hiredJobsCount);
 
     // Fetch details of the hired jobs
     const hiredJobs = await HireFreelancer.find({ 
@@ -1457,7 +1459,10 @@ exports.getFreelancerCompletedJobs = async (req, res) => {
       error: error.message
     });
   }
+
 };
+
+
 
 
 // exports.getFreelancerHiredJobsCount = async (req, res) => {
