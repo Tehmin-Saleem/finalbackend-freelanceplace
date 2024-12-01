@@ -20,11 +20,27 @@ exports.createoffer = async (req, res) => {
       freelancer_id,
       job_title,
       preferred_skills,
-    
+      due_date,
+      estimated_timeline_duration,  // New field
+      estimated_timeline_unit 
     } = req.body;
+    if (!due_date) {
+      return res.status(400).json({ message: 'Due date is required' });
+    }
+    if (!estimated_timeline_duration || !estimated_timeline_unit) {
+      return res.status(400).json({ 
+        message: 'Both duration and unit are required for estimated timeline' 
+      });
+    }
     console.log('Budget type:', budget_type);
     console.log('Hourly rates (raw):', { from: hourly_rate_from, to: hourly_rate_to });
     console.log('Fixed price (raw):', fixed_price);
+    const duration = parseFloat(estimated_timeline_duration);
+    if (isNaN(duration) || duration <= 0) {
+      return res.status(400).json({ 
+        message: 'Timeline duration must be a positive number' 
+      });
+    }
     let budget = {
       budget_type: budget_type
     };
@@ -84,6 +100,11 @@ exports.createoffer = async (req, res) => {
     const newOffer = new Offer_Form({
       attachment,
       ...budget,
+      due_date: new Date(due_date),
+      estimated_timeline: {
+        duration: duration,
+        unit: estimated_timeline_unit
+      },
       client_id,
       description,
       detailed_description,
@@ -245,6 +266,11 @@ exports.getOfferById = async (req, res) => {
         completedJobs: completedJobsCount,
         recentReviews: clientStats.reviews.slice(0, 5) // Get last 5 reviews
       },
+      due_date: offer.due_date,
+      estimated_timeline: {
+        duration: offer.estimated_timeline.duration,
+        unit: offer.estimated_timeline.unit
+      },
       location: offer.location,
       job_title: offer.job_title,
       ...budgetDetails,
@@ -310,6 +336,14 @@ exports.getOffers = async (req, res) => {
       location: offer.location || "Not specified",
       postedTime: new Date(offer.createdAt).toLocaleDateString(),
       status: 'accepted',
+      due_date: offer.due_date ? new Date(offer.due_date).toLocaleDateString() : "Not specified",
+      estimated_timeline: offer.estimated_timeline ? {
+        duration: offer.estimated_timeline.duration,
+        unit: offer.estimated_timeline.unit
+      } : {
+        duration: 0,
+        unit: "Not specified"
+      },
       clientName: offer.client_id 
         ? `${offer.client_id.first_name} ${offer.client_id.last_name}`
         : "Unknown Client",
