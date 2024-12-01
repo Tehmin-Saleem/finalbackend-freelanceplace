@@ -9,7 +9,7 @@ import {
 import "./styles.scss";
 import { Filter, IconSearchBar } from "../../svg";
 import axios from "axios";
-import {jwtDecode} from "jwt-decode";
+import { jwtDecode } from "jwt-decode";
 const FreelancersJobsPage = () => {
   const [jobs, setJobs] = useState([]);
   const [specificjobs, setSpecificJobs] = useState([]);
@@ -19,6 +19,7 @@ const FreelancersJobsPage = () => {
   const [pageSize, setPageSize] = useState(5);
   const [currentPage, setCurrentPage] = useState(1);
   const [statusFilter, setStatusFilter] = useState("all"); // all, ongoing, pending, completed
+  
 
   const fetchOffersAndJobs = async () => {
     try {
@@ -34,7 +35,7 @@ const FreelancersJobsPage = () => {
       const loggedInUserId = decodedToken.userId;
 
       if (!loggedInUserId) {
-        throw new Error('Unable to decode user ID from token');
+        throw new Error("Unable to decode user ID from token");
       }
 
       // Fetch both hired jobs and offers in parallel
@@ -50,28 +51,41 @@ const FreelancersJobsPage = () => {
             Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
           },
-        })
+        }),
       ]);
 
       // Process hired jobs
-      console.log('offers',offersResponse.data )
-      const hireStatusMap = (hireResponse.data.data || []).reduce((map, hire) => {
-        if (hire?.jobId?.id) {
-          map[hire.jobId.id] = {
-            status: hire.status,
-            freelancerId: hire.freelancerId?.id,
-          };
-          
-        }
-        return map;
-      }, {});
+      console.log("offers", offersResponse.data);
+      console.log("hire response", hireResponse.data.data);
 
-      const jobToFreelancerMap = (hireResponse.data.data || []).reduce((map, hire) => {
-        if (hire?.jobId?.id && hire?.freelancerId?.id && hire.freelancerId.id === loggedInUserId) {
-          map[hire.jobId.id] = hire.freelancerId.id;
-        }
-        return map;
-      }, {});
+
+      const hireStatusMap = (hireResponse.data.data || []).reduce(
+        (map, hire) => {
+          if (hire?.jobId?.id) {
+            map[hire.jobId.id] = {
+              status: hire.status,
+              freelancerId: hire.freelancerId?.id,
+              proposalId: hire.proposalId // Add this line to include proposalId
+            };
+          }
+          return map;
+        },
+        {}
+      );
+
+      const jobToFreelancerMap = (hireResponse.data.data || []).reduce(
+        (map, hire) => {
+          if (
+            hire?.jobId?.id &&
+            hire?.freelancerId?.id &&
+            hire.freelancerId.id === loggedInUserId
+          ) {
+            map[hire.jobId.id] = hire.freelancerId.id;
+          }
+          return map;
+        },
+        {}
+      );
 
       // Fetch job posts
       const jobsResponse = await axios.get(
@@ -84,6 +98,8 @@ const FreelancersJobsPage = () => {
         }
       );
 
+      console.log("job response", jobsResponse.data);
+
       // Process hired jobs
       const hiredJobs = (jobsResponse.data?.jobPosts || [])
         .filter((job) => jobToFreelancerMap[job._id])
@@ -92,10 +108,16 @@ const FreelancersJobsPage = () => {
           type: job.budget_type === "fixed" ? "Fixed" : "Hourly",
           title: job.job_title || "Untitled Job",
           client_id: job.client_id._id,
+          // client_id: job.client.id,
+          clientName: job.client.name,
+          clientEmail: job.client.email,
+          clientCountry: job.client.country,
           freelancer_id: hireStatusMap[job._id].freelancerId,
-          rate: job.budget_type === "fixed"
-            ? `$${job.fixed_price}`
-            : `$${job.hourly_rate?.from}-$${job.hourly_rate?.to}/hr`,
+          proposal_id: hireStatusMap[job._id].proposalId, // Add this line
+          rate:
+            job.budget_type === "fixed"
+              ? `$${job.fixed_price}`
+              : `$${job.hourly_rate?.from}-$${job.hourly_rate?.to}/hr`,
           timeline: job.project_duration?.duration_of_work || "Not specified",
           level: job.project_duration?.experience_level || "Not specified",
           description: job.description || "No description provided",
@@ -105,7 +127,12 @@ const FreelancersJobsPage = () => {
           postedTime: new Date(job.createdAt).toLocaleDateString(),
           status: hireStatusMap[job._id].status || "pending",
           jobStatus: job.jobstatus || "pending",
-          source: 'hired'
+          
+          source: "hired",
+          attachment: job.attachment ? {
+            fileName: job.attachment.fileName || job.attachment.originalname,
+            path: job.attachment.path
+          } : null,
         }));
 
      
@@ -137,8 +164,10 @@ const FreelancersJobsPage = () => {
     
       // Combine and deduplicate jobs and offers
       const combinedJobs = [...hiredJobs, ...acceptedOffers];
-      const uniqueJobs = Array.from(new Map(combinedJobs.map(item => [item.job_id, item])).values());
-      console.log('accepted offer',acceptedOffers )
+      const uniqueJobs = Array.from(
+        new Map(combinedJobs.map((item) => [item.job_id, item])).values()
+      );
+      console.log("accepted offer", acceptedOffers.description);
       setJobs(uniqueJobs);
     } catch (error) {
       console.error("Error in fetchOffersAndJobs:", error);
@@ -177,7 +206,6 @@ const FreelancersJobsPage = () => {
       }
     });
   };
-
 
   const filteredJobs = getFilteredJobs();
   const totalPages = Math.ceil(filteredJobs.length / pageSize);
@@ -279,7 +307,12 @@ const FreelancersJobsPage = () => {
                 key={job.title}
                 job_id={job.job_id}
                 client_id={job.client_id}
+                clientName={job.clientName}
+                clientEmail={job.clientEmail}
+                clientCountry={job.clientCountry}
                 freelancer_id={job.freelancer_id}
+                attachment={job.attachment}  // Add this prop
+                proposal_id={job.proposal_id} // Add this line
                 source={job.source}
                 {...job}
                 statusBadge={
@@ -296,6 +329,7 @@ const FreelancersJobsPage = () => {
           )}
         </div>
       )}
+      
       {filteredJobs.length > 0 && (
         <div className="pagination">
           <div className="rows-per-page">
@@ -311,8 +345,8 @@ const FreelancersJobsPage = () => {
               <option value={10}>10</option>
               <option value={15}>15</option>
               <option value={20}>20</option>
-          <option value={25}>25</option>
-        </select>
+              <option value={25}>25</option>
+            </select>
           </div>
           <div className="page-controls">
             <button

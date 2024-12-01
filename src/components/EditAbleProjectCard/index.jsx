@@ -131,8 +131,10 @@ const EditableProjectCard = ({ project, onSave, onComplete }) => {
         data: projectData
       });
   
+      console.log("saved progress", response.data.data)
       if (response.data.success) {
         const data = response.data.data;
+        
       
         // Determine the action based on `shouldShowPendingApproval`
         if (shouldShowPendingApproval()) {

@@ -25,19 +25,13 @@ const ManageProjects = () => {
     // Find the first path that contains a valid milestone array
     const milestones = possiblePaths.find(path => Array.isArray(path) && path.length > 0);
     
-    console.log('Extracted milestones from all possible paths:', milestones);
     return milestones || [];
   };
   useEffect(() => {
     if (proposalData) {
-      console.log('=== DEBUG LOGS ===');
-      console.log('1. Raw Proposal Data:', proposalData);
-      console.log('2. Add Requirements:', proposalData.add_requirements);
-      console.log('3. Direct Milestones:', proposalData.by_milestones);
-      console.log('4. Nested Milestones:', proposalData.add_requirements?.by_milestones);
-
+  
       const milestones = extractMilestones(proposalData);
-      console.log('5. Extracted Milestones:', milestones);
+    
 
       const transformedProject = {
         projectName: jobData?.job_title || jobData?.title || 'Untitled Project',

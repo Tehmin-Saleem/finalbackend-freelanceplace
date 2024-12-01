@@ -7,6 +7,7 @@ import { JobSucces } from "../../svg";
 import { jwtDecode } from "jwt-decode";
 
 const JobsCard = ({
+  _id,
   job_id,
   type,
   title,
@@ -17,14 +18,18 @@ const JobsCard = ({
   freelancer_id,
   client_id,
   tags,
+  proposalId,
   verified,
   rating,
   location,
   postedTime,
   source,
-  proposalId,
+  proposal_id,
   status, // Add status prop
   jobStatus, // Add jobStatus prop
+  clientName, // Add these new props
+  clientCountry, // Add these new props
+  attachment,
 }) => {
   const navigate = useNavigate();
 
@@ -34,9 +39,60 @@ const JobsCard = ({
   const [ratings, setRatings] = useState(null);
   const [message, setMessage] = useState(null);
 
+  // ... existing state ...
+  const [progressData, setProgressData] = useState(null);
+  const [loadingProgress, setLoadingProgress] = useState(false);
+
+  console.log("clientid", client_id);
+  console.log("proposalid", proposal_id);
+
+  useEffect(() => {
+    const fetchProgress = async () => {
+      try {
+        setLoadingProgress(true);
+        const token = localStorage.getItem("token");
+        if (!token) throw new Error("No authentication token found");
+
+        const response = await axios.get(
+          `http://localhost:5000/api/client/project-progress/${proposal_id}?client_id=${client_id}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        console.log("fetch progress response", response.data);
+
+        if (response.data.success) {
+          setProgressData(response.data);
+        }
+      } catch (error) {
+        console.error("Error fetching project progress:", error);
+      } finally {
+        setLoadingProgress(false);
+      }
+    };
+
+    if (client_id && proposal_id) {
+      fetchProgress();
+    }
+  }, [client_id, proposal_id]); // Remove the parameters from useEffect and add them as dependencies
+
   // const [error, setError] = useState(null);
 
-
+  const handleAttachmentClick = (path) => {
+    if (path) {
+      // If the path is a full URL
+      if (path.startsWith("http")) {
+        window.open(path, "_blank");
+      } else {
+        // If it's a relative path, prepend your backend URL
+        window.open(`http://localhost:5000/${path}`, "_blank");
+      }
+    }
+  };
 
   useEffect(() => {
     const fetchReview = async () => {
@@ -94,37 +150,46 @@ const JobsCard = ({
       if (!token) {
         throw new Error("No authentication token found");
       }
-      if (source === 'offer') {
+      if (source === "offer") {
         // Navigate directly without fetching proposal
         navigate("/manageproj", {
           state: {
             jobData: {
-              job_id,
+              job_id: _id,
               type,
               title,
               rate,
               timeline,
               level,
-              description,
+              description:  description,
               tags,
               verified,
               rating,
               location,
-              postedTime
+              postedTime,
             },
-            // Create minimal proposal data structure for offers
             proposalData: {
-              _id: job_id,
-              freelancer_id: freelancer_id,
-              client_id: client_id
+              _id,
+              freelancer_id,
+              client_id,
+              add_requirements: {
+                by_milestones: [
+                  {
+                    
+                    amount: parseFloat(rate.replace(/[^0-9.-]+/g, "")),
+                    due_date: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+                    status: "Not Started"
+                  }
+                ]
+              }
             },
-            freelancer_id: freelancer_id,
-            client_id: client_id,
-            job_id: job_id,
+            freelancer_id,
+            client_id,
           },
         });
         return;
       }
+  
       const headers = {
         Authorization: `Bearer ${token}`, // Fixed template literal
         "Content-Type": "application/json",
@@ -175,6 +240,10 @@ const JobsCard = ({
     }
   };
 
+  useEffect(() => {
+    console.log("Current job attachment:", attachment);
+  }, [attachment]);
+
   return (
     <div className="job-card">
       <div className="job-card__content">
@@ -194,6 +263,22 @@ const JobsCard = ({
             View
           </button>
         </div>
+
+        {/* Add Client Information Section */}
+        <div className="job-card__client-info">
+          <div className="job-card__client-details">
+            <span className="job-card__client-label">Client:</span>
+            <span className="job-card__client-name">
+              {clientName || "Unknown Client"}
+            </span>
+            <span className="job-card__client-location">
+              <i className="fas fa-map-marker-alt"></i>{" "}
+              {/* If you're using Font Awesome */}
+              {clientCountry || "Unknown Location"}
+            </span>
+          </div>
+        </div>
+
         <div className="job-card__information">
           <span className="job-card__rate-head">{type}:</span>
           <span className="job-card__rated">{rate}</span>
@@ -202,7 +287,145 @@ const JobsCard = ({
           <span className="job-card__level-head">Level:</span>
           <span className="job-card__level"> {level}</span>
         </div>
+
         <p className="job-card__description">{description}</p>
+
+        {/* Add Attachment Section */}
+        {attachment && (
+          <div className="job-card__attachment">
+            <div className="job-card__attachment-header">
+              <i className="fas fa-paperclip"></i>
+              <span>Attachment</span>
+            </div>
+            <div
+              className="job-card__attachment-content"
+              onClick={() => {
+                if (attachment.path) {
+                  handleAttachmentClick(attachment.path);
+                }
+              }}
+              style={{ cursor: attachment.path ? "pointer" : "default" }}
+            >
+              <i className="fas fa-file"></i>
+              <span className="job-card__attachment-name">
+                {attachment.fileName ||
+                  attachment.originalname ||
+                  "View Attachment"}
+              </span>
+            </div>
+          </div>
+        )}
+        {progressData ? (
+          <div className="job-card__progress-section">
+            <div className="progress-container">
+              {/* Header */}
+              <div className="progress-header">
+                <h3 className="project-title">
+                  Progress
+                </h3>
+                <span className="project-due-date">
+                  Due:{" "}
+                  {new Date(
+                    progressData.projectDetails.due_date
+                  ).toLocaleDateString("en-US", {
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric",
+                  })}
+                </span>
+              </div>
+
+              {/* Progress Stats */}
+              <div className="progress-stats">
+                <div className="progress-percentage">
+                  <h2>{progressData.progressData.overallProgress}%</h2>
+                  <span>Complete</span>
+                </div>
+                <div className="time-metrics">
+                  <div className="metric">
+                    <span className="value">
+                      {progressData.timeMetrics.daysRemaining}
+                    </span>
+                    <span className="label">Days Left</span>
+                  </div>
+                  <div className="metric">
+                    <span className="value">
+                      {progressData.timeMetrics.daysElapsed}
+                    </span>
+                    <span className="label">Days Elapsed</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Overall Progress Bar */}
+              <div className="overall-progress-bar">
+                <div
+                  className="progress-fill"
+                  style={{
+                    width: `${progressData.progressData.overallProgress}%`,
+                  }}
+                />
+              </div>
+
+              {/* Milestones Section */}
+              <div className="milestones-section">
+                <h4 className="milestone-header">
+                  {progressData.progressData.completedMilestones} of{" "}
+                  {progressData.progressData.totalMilestones} milestones
+                  completed
+                </h4>
+
+                <div className="milestone-list">
+                  {progressData.progressData.milestones.map(
+                    (milestone, index) => (
+                      <div key={index} className="milestone-item">
+                        <div className="milestone-main">
+                          <div className="milestone-info">
+                            <h5>{milestone.name}</h5>
+                            <span className="due-date">
+                              Due:{" "}
+                              {new Date(milestone.due_date).toLocaleDateString(
+                                "en-US",
+                                {
+                                  month: "short",
+                                  day: "numeric",
+                                }
+                              )}
+                            </span>
+                          </div>
+                          <div className="milestone-status-amount">
+                            <span
+                              className={`status ${milestone.status
+                                .toLowerCase()
+                                .replace(" ", "-")}`}
+                            >
+                              {milestone.status}
+                            </span>
+                            <span className="amount">${milestone.amount}</span>
+                          </div>
+                        </div>
+                        <div className="milestone-progress-bar">
+                          <div
+                            className="progress-fill"
+                            style={{ width: `${milestone.progress}%` }}
+                          />
+                        </div>
+                      </div>
+                    )
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div className="job-card__no-progress">
+            {loadingProgress ? (
+              <div className="loading">Loading progress data...</div>
+            ) : (
+              <div className="no-data">No progress data available yet</div>
+            )}
+          </div>
+        )}
         <div className="job-card__tags">
           {tags.map((tag, index) => (
             <span key={index} className="job-card__tag">
@@ -222,10 +445,6 @@ const JobsCard = ({
             {message && <p className="job-card__review-message">{message}</p>}
           </div> */}
 
-
-
-
-
           {/* Replace the existing review div with this */}
           {isJobCompleted() && (
             <div className="job-card__review-container">
@@ -240,9 +459,6 @@ const JobsCard = ({
               )}
             </div>
           )}
-
-
-
 
           {/* Show loading state */}
           {loading && <span>Loading review...</span>}

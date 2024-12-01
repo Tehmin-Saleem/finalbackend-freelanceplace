@@ -214,3 +214,48 @@ button {
 }
 
 
+.proposal-card {
+  // ... existing styles ...
+
+  &__ratings {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 8px 0;
+
+    &-head {
+      font-weight: 600;
+      color: #333;
+    }
+  }
+}
+
+// You might also want to add these styles for the StarRating component
+.star-rating-container {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+
+  .star-rating {
+    display: flex;
+    gap: 2px;
+
+    .star {
+      font-size: 18px;
+      
+      &.filled {
+        color: #ffd700; // Gold color for filled stars
+      }
+      
+      &.empty {
+        color: #d4d4d4; // Grey color for empty stars
+      }
+    }
+  }
+
+  .rating-value {
+    font-size: 14px;
+    color: #666;
+  }
+}
+
