@@ -48,6 +48,7 @@ router.post('/ChangePass/:id/:token',usercontroller.ChangePass);
 
 router.use(authMiddleware);
 
+router.get('/validate-token', authMiddleware, usercontroller.validateToken);
 
 router.post('/uploads', upload.single('File'), (req, res) => {
   try {
