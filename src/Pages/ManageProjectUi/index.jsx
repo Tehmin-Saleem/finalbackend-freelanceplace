@@ -6,6 +6,7 @@ import axios from "axios";
 import { useParams } from "react-router-dom";
 import ReviewModal from "../../components/ReviewsModal";
 import { jwtDecode } from "jwt-decode";
+import { useNavigate } from 'react-router-dom';
 import {
   Card,
   Progress,
@@ -24,6 +25,8 @@ import {
 } from "antd";
 const { Title, Text, Paragraph  } = Typography;
 import Spinner from "../../components/chatcomponents/Spinner";
+import ConsultantCard from "../../components/ConsultantCards";
+
 
 const ManageProjectsByClient = () => {
   const [loading, setLoading] = useState(false);
@@ -31,6 +34,7 @@ const ManageProjectsByClient = () => {
   const [profileData, setProfileData] = useState(null);
   const [projects, setProjects] = useState([]);
   const [selectedProject, setSelectedProject] = useState(null);
+ 
 
   useEffect(() => {
     const fetchData = async () => {
@@ -207,11 +211,20 @@ const ProjectDetails = ({ project, onProjectStatusChange }) => {
   const [showReviewModal, setShowReviewModal] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [ProjectId, setProjectId] = useState(false);
+  const navigate = useNavigate();
 
   const handleMarkAsComplete = () => {
     // Instead of making the API call here, just show the modal
     setShowReviewModal(true);
   };
+  const handleHireConsultant = () => {
+    // Instead of making the API call here, just show the modal
+    // setShowReviewModal(true);
+    navigate('/Consultantprofiles');
+  
+  };
+
+
 
   const fetchProgress = async () => {
     // if (!projectId) return;
@@ -488,7 +501,18 @@ const ProjectDetails = ({ project, onProjectStatusChange }) => {
         >
           Mark as Completed
         </Button>
+
+        
+
       )}
+      <Button
+          type="primary"
+          className="hire-consulatnt-btn"
+          onClick={handleHireConsultant}
+          style={{ marginTop: 16 }}
+        >
+          Hire Consultant
+        </Button>
     </div>
   );
 };

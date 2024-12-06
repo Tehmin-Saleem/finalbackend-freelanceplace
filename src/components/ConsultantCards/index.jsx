@@ -58,6 +58,8 @@ const ConsultantCard = () => {
     }));
   };
 
+ 
+
   useEffect(() => {
     let updatedConsultants = consultants;
 
@@ -69,9 +71,10 @@ const ConsultantCard = () => {
 
     if (filters.skill) {
       updatedConsultants = updatedConsultants.filter((consultant) =>
-        consultant.skills.some((skill) =>
-          skill.toLowerCase().includes(filters.skill.toLowerCase())
-        )
+        consultant.skills
+          ?.split(',')
+          .map((skill) => skill.trim().toLowerCase())
+          .some((skill) => skill.includes(filters.skill.toLowerCase()))
       );
     }
 
@@ -160,6 +163,14 @@ const ConsultantCard = () => {
       <div className="consultant-card-container">
         {filteredConsultants.map((consultant) => (
           <div key={consultant._id} className="consultant-card">
+            <div >
+    <button 
+      className="send-offer-button" 
+      onClick={() => handleSendOffer(consultant._id)}
+    >
+      Send Offer
+    </button>
+  </div>
             <img src={consultant.profilePicture} alt="Profile" className="profile-picture" />
             <h3 className="consultant-name">{consultant.email}</h3>
             <p className="consultant-location">{consultant.address}</p>
