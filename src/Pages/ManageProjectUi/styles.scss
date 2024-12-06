@@ -1226,6 +1226,7 @@ $proposal-shadow: rgba(0, 0, 0, 0.1);
         }
       }
 
+
       .action-buttons {
         display: flex;
         gap: 1rem;
@@ -1286,4 +1287,12 @@ $proposal-shadow: rgba(0, 0, 0, 0.1);
       }
     }
   }
+}
+.mark-complete-btn{
+  background-color: $primary-color;
+}
+.hire-consulatnt-btn{
+  background-color: $primary-color;
+  margin-left: 20rem;
+  // margin-right: 0;
 }
