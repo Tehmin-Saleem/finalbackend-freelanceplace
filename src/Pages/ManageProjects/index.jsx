@@ -37,12 +37,19 @@ const ManageProjects = () => {
         projectName: jobData?.job_title || jobData?.title || 'Untitled Project',
         freelancerName: getFullName(proposalData?.freelancerProfile) || 'Not specified',
         clientInfo: {
-          clientName: formatClientName(proposalData?.clientInfo) || 'Not specified'
+          clientName: jobData?.clientName || formatClientName(
+            proposalData?.clientInfo,
+            proposalData,
+            jobData
+          )
         },
         due_date: proposalData?.due_date || new Date().toISOString(),
         progress: 0,
         milestones: formatMilestones(milestones),
-        budget: formatBudget(milestones),
+        budget: formatBudget(milestones) || 
+        (jobData?.rate ? 
+          `Fixed Price: $${parseFloat(jobData.rate.replace(/[^0-9.-]+/g, ''))}` : 
+          'Not specified'),
         description: jobData?.description || '',
         proposal_id: proposalData?._id || proposalData?.id,
         client_id: client_id || proposalData?.clientInfo?._id || jobData?.client_id,
@@ -66,20 +73,42 @@ const ManageProjects = () => {
     return fullName || 'Not specified';
   };
 
-  const formatClientName = (clientInfo) => {
-    if (!clientInfo) return 'Not specified';
-    if (clientInfo.name && clientInfo.name !== 'Not specified') {
-      return clientInfo.name;
-    }
-    if (clientInfo.first_name || clientInfo.last_name) {
-      const firstName = clientInfo.first_name || '';
-      const lastName = clientInfo.last_name || '';
-      const fullName = `${firstName} ${lastName}`.trim();
-      return fullName || 'Not specified';
-    }
-    return 'Not specified';
+  const formatClientName = (clientInfo, proposalData, jobData) => {
+    console.log('Formatting Client Name - Inputs:', { 
+      clientInfo, 
+     
+      jobData 
+    });
+  
+    const nameOptions = [
+      // More aggressive extraction
+      clientInfo?.name,
+      clientInfo?.full_name,
+      clientInfo?.firstName,
+      clientInfo?.lastName,
+      `${clientInfo?.firstName} ${clientInfo?.lastName}`.trim(),
+      
+      proposalData?.clientName,
+      proposalData?.clientInfo?.name,
+      `${proposalData?.clientInfo?.firstName} ${proposalData?.clientInfo?.lastName}`.trim(),
+      
+      jobData?.clientName,
+      jobData?.client?.name,
+      `${jobData?.client?.firstName} ${jobData?.client?.lastName}`.trim(),
+      `${jobData?.client_first_name} ${jobData?.client_last_name}`.trim()
+    ];
+  
+    const clientName = nameOptions.find(name => 
+      name && 
+      typeof name === 'string' && 
+      name.trim() !== '' && 
+      name.toLowerCase() !== 'not specified'
+    );
+  
+    console.log('Extracted Client Name:', jobData.clientName);
+    return clientName || 'Not specified';
   };
-
+  
   const formatMilestones = (milestones) => {
     if (!Array.isArray(milestones) || milestones.length === 0) {
       return [];
@@ -99,13 +128,29 @@ const ManageProjects = () => {
   };
 
   const formatBudget = (milestones) => {
-    if (!Array.isArray(milestones)) return 'Not specified';
-
-    const totalAmount = milestones.reduce((sum, milestone) => 
-      sum + (parseFloat(milestone.amount) || 0), 0);
+    // If milestones exist and have a total amount, use milestone-based budget
+    if (Array.isArray(milestones) && milestones.length > 0) {
+      const totalAmount = milestones.reduce((sum, milestone) => 
+        sum + (parseFloat(milestone.amount) || 0), 0);
+      return `By Milestone: $${totalAmount.toFixed(2)}`;
+    }
     
-    return `By Milestone: $${totalAmount.toFixed(2)}`;
+    // If no milestones, try to use the rate from the project data
+    const rate = jobData?.rate || proposalData?.add_requirements?.byproject?.amount;
+    
+    if (rate) {
+      const formattedRate = typeof rate === 'string' 
+        ? parseFloat(rate.replace(/[^0-9.-]+/g, '')) 
+        : parseFloat(rate);
+      
+      return formattedRate > 0 
+        ? `Fixed Price: $${formattedRate.toFixed(2)}` 
+        : 'Not specified';
+    }
+    
+    return 'Not specified';
   };
+  
 
   const handleSave = async (index, updatedProject) => {
     console.log('Saving project with updates:', updatedProject);
@@ -114,7 +159,8 @@ const ManageProjects = () => {
       updatedProjects[index] = {
         ...updatedProject,
         
-        clientInfo: projects[index].clientInfo 
+        proposal_id: updatedProject.source === 'offer' ? undefined : updatedProject.proposal_id,
+        clientInfo: projects[index].clientInfo
       };
       setProjects(updatedProjects);
       navigate('/freelancersjobpage');

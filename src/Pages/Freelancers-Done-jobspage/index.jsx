@@ -170,7 +170,8 @@ const FreelancersJobsPage = () => {
       const uniqueJobs = Array.from(
         new Map(combinedJobs.map((item) => [item.job_id, item])).values()
       );
-      console.log("accepted offer", acceptedOffers.description);
+      console.log('Backend Response:', offersResponse.data);
+
       setJobs(uniqueJobs);
     } catch (error) {
       console.error("Error in fetchOffersAndJobs:", error);

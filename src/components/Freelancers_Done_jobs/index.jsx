@@ -9,6 +9,8 @@ import { jwtDecode } from "jwt-decode";
 const JobsCard = ({
   _id,
   job_id,
+estimated_timeline,
+  due_date,
   type,
   title,
   rate,
@@ -167,12 +169,16 @@ const JobsCard = ({
               rating,
               location,
               postedTime,
-              projectType: 'byproject' 
+              projectType: 'byproject' ,
+              clientName,
+              clientCountry,
             },
             proposalData: {
               _id,
               freelancer_id,
               client_id,
+              clientName, // Add these new props
+              clientCountry,
               status: 'accepted',
               projectType: 'byproject',
               add_requirements: {
@@ -243,6 +249,7 @@ const JobsCard = ({
 
   useEffect(() => {
     console.log("Current job attachment:", attachment);
+    console.log("rate", rate);
   }, [attachment]);
 
   return (
