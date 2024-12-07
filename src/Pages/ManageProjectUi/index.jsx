@@ -58,7 +58,7 @@ const ManageProjectsByClient = () => {
         setProfileData(profileResponse.data.data);
         setProjects(projectsResponse.data.data);
 
-        console.log("Project Data:", projectsResponse.data.data);
+        console.log("Projects Data:", projectsResponse.data.data);
       } catch (error) {
         console.error("Error fetching data:", error);
         setError(error.message || "An error occurred while fetching data");
@@ -203,7 +203,7 @@ const ProjectCard = ({ project, onClick, isSelected }) => {
 
 const ProjectDetails = ({ project, onProjectStatusChange }) => {
   const [activeTab, setActiveTab] = useState("overview");
-
+  const [consultantId, setConsultantId] = useState(null);
   const [progressData, setProgressData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -218,12 +218,15 @@ const ProjectDetails = ({ project, onProjectStatusChange }) => {
     setShowReviewModal(true);
   };
   const handleHireConsultant = () => {
-    // Instead of making the API call here, just show the modal
-    // setShowReviewModal(true);
-    navigate('/Consultantprofiles');
-  
+    navigate('/Consultantprofiles', { 
+      state: { 
+        project: project, // Pass the entire project object
+        projectId: project._id,
+        projectName: project.projectName, 
+        projectDescription: project.description 
+      } 
+    });
   };
-
 
 
   const fetchProgress = async () => {

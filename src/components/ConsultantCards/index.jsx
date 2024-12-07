@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import './styles.scss';
 import Header from '../Commoncomponents/Header';
+import { message } from 'antd';
+import { useLocation } from 'react-router-dom';
 
 const ConsultantCard = () => {
   const [consultants, setConsultants] = useState([]);
@@ -11,9 +13,60 @@ const ConsultantCard = () => {
     experienceLevel: '',
     educationDegree: '',
   });
+  const location = useLocation();
+  const [projectDetails, setProjectDetails] = useState({
+    projectName: '',
+    projectDescription: ''
+  });
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  useEffect(() => {
+    // Extract project details from navigation state
+    if (location.state && location.state.project) {
+      setProjectDetails(location.state.project);
+      console.log("Project Details:", location.state.project);
+    }
+  }, [location]);
+
+  const handleSendOffer = async (consultant) => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        message.error('Authorization token is missing');
+        return;
+      }
+      
+      const response = await fetch(
+        `http://localhost:5000/api/client/send-offer-to-consultant/${consultant._id}`,
+        {
+          method: 'POST', 
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            consultant_id: consultant._id,
+            projectId: projectDetails._id,
+            projectName: projectDetails.projectName,
+            projectDescription: projectDetails.description
+          }),
+        }
+      );
+  
+      const data = await response.json();
+  
+      if (data.success) {
+        message.success('Offer sent successfully');
+        // Optionally navigate back or update UI
+      } else {
+        message.error(data.message || 'Failed to send offer');
+      }
+    } catch (error) {
+      console.error('Error sending offer:', error);
+      message.error('An error occurred while sending the offer');
+    }
+  };
   useEffect(() => {
     const fetchConsultants = async () => {
       const token = localStorage.getItem('token');
@@ -166,15 +219,19 @@ const ConsultantCard = () => {
             <div >
     <button 
       className="send-offer-button" 
-      onClick={() => handleSendOffer(consultant._id)}
-    >
+      onClick={() => handleSendOffer(consultant)}
+              disabled={!projectDetails} // Disable if no project selected
+            >
       Send Offer
     </button>
   </div>
             <img src={consultant.profilePicture} alt="Profile" className="profile-picture" />
             <h3 className="consultant-name">{consultant.email}</h3>
             <p className="consultant-location">{consultant.address}</p>
+            <h4 className="section-title"> {`${consultant.firstname || ''} ${consultant.lastname || ''}`.trim()}</h4>
+            <h4 className="section-title">Bio</h4>
             <p className="consultant-bio">{consultant.bio}</p>
+            
 
             <h4 className="section-title">Experience</h4>
             <ul className="experience-list">

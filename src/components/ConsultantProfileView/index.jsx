@@ -118,9 +118,15 @@ const ConsultantProfileView = () => {
             </div>
           )}
 
-          <h2 className="profile-name">{userName || 'Unnamed User'}</h2>
-          {profile.bio && <p className="profile-bio">{profile.bio}</p>}
-        </div>
+<h2 className="profile-name">
+    {profile.firstname && profile.lastname
+      ? `${profile.firstname} ${profile.lastname}`
+      : 'Unnamed User'}
+  </h2>
+
+  {/* Display bio if it exists */}
+  {profile.bio && <p className="profile-bio">{profile.bio}</p>}
+</div>
 
         {/* Other sections like Contact, Experience, Education, etc. */}
         <div className="profile-section contact-info">
