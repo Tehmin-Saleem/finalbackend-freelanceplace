@@ -1,0 +1,96 @@
+$primary-color: #3b82f6;
+$secondary-color: #6b7280;
+$text-color: #374151;
+$background-color: #f7fafb;
+$white: #ffffff;
+$success-color: #10b981;
+$accent-color: #4bcdeb;
+
+.consultant-offers-page {
+  padding: 20px;
+  background-color: $background-color;
+  min-height: 100vh;
+  font-family: "Poppins", sans-serif;
+
+  h1 {
+    text-align: center;
+    font-size: 2rem;
+    color: $text-color;
+    margin-bottom: 20px;
+  }
+
+  .offers-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .offer-card {
+    background: $white;
+    border-radius: 12px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    position: relative;
+    transition: transform 0.2s ease, box-shadow 0.3s ease;
+
+    &:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+
+      h3 {
+        margin: 0;
+        font-size: 1.2rem;
+        color: $text-color;
+      }
+
+      .status {
+        font-size: 0.9rem;
+        padding: 5px 10px;
+        border-radius: 4px;
+        text-transform: capitalize;
+
+        &.pending {
+          background-color: lighten($secondary-color, 30%);
+          color: $text-color;
+        }
+      }
+    }
+
+    p {
+      margin: 8px 0;
+      font-size: 0.95rem;
+      color: $text-color;
+
+      strong {
+        color: $accent-color;
+      }
+    }
+
+    .accept-button {
+      background: $accent-color;
+      color: $white;
+      border: none;
+      border-radius: 8px;
+      padding: 10px 15px;
+      font-size: 1rem;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 10px;
+      width: 100%;
+      transition: background 0.3s ease;
+
+      &:hover {
+        background: darken($accent-color, 10%);
+      }
+    }
+  }
+}
