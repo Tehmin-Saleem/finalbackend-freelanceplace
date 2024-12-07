@@ -13,6 +13,10 @@ import {
 
 const OfferForm = () => {
   const [selectedSkills, setSelectedSkills] = useState([]);
+  const [dueDate, setDueDate] = useState("");
+  const [timelineDuration, setTimelineDuration] = useState("");
+  const [timelineUnit, setTimelineUnit] = useState("days"); // default to days
+
   const [popularSkills, setPopularSkills] = useState([
     "HTML",
     "CSS",
@@ -102,8 +106,12 @@ const OfferForm = () => {
   };
 
   const validateForm = () => {
-    if (!jobTitle || !description || !budgetType) {
+    if (!jobTitle || !description || !budgetType ||!dueDate ||!timelineDuration|| !timelineUnit) {
       setError("Please fill in all required fields");
+      return false;
+    }
+    if (!timelineDuration || parseFloat(timelineDuration) <= 0) {
+      setError("Please provide a valid timeline duration");
       return false;
     }
     if (budgetType === 'hourly' && (!hourlyRate.min || !hourlyRate.max)) {
@@ -154,7 +162,10 @@ const OfferForm = () => {
       formData.append('fixed_price', fixedPrice);
     }
   
-  
+    formData.append('due_date', dueDate);
+    formData.append('estimated_timeline_duration', timelineDuration);
+    formData.append('estimated_timeline_unit', timelineUnit);
+
     formData.append('description', description);
     formData.append('detailed_description', detailedDescription);
     formData.append('freelancer_id', freelancerProfile.freelancer_id);
@@ -227,7 +238,46 @@ const OfferForm = () => {
                   ></textarea>
                 </div>
               </div>
+              <div className="field">
+      <label>Due Date:</label>
+      <div className="input-wrapper">
+  <input
+    type="date"
+    className="roundedInput"
+    value={dueDate}
+    onChange={(e) => setDueDate(e.target.value)}
+    required
+  />
 
+</div>
+    </div>
+
+    <div className="field">
+      <label>Estimated Timeline:</label>
+      <div className="timeline-inputs">
+       
+        <select
+          className="roundedInput timeline-unit"
+          value={timelineUnit}
+          onChange={(e) => setTimelineUnit(e.target.value)}
+          required
+        >
+          <option value="hours">Hours</option>
+          <option value="days">Days</option>
+          <option value="weeks">Weeks</option>
+          <option value="months">Months</option>
+        </select>
+        <input
+          type="number"
+          className="roundedInput timeline-duration"
+          value={timelineDuration}
+          onChange={(e) => setTimelineDuration(e.target.value)}
+          placeholder="Duration"
+          min="1"
+          required
+        />
+      </div>
+    </div>
               {/* Skills section */}
               <div className="field">
         <label>Search skills or add your own:</label>
@@ -283,7 +333,7 @@ const OfferForm = () => {
       </div>
 
               {/* Budget section */}
-  <h3 className="field">Budget</h3>
+  <h3 className="field">Budget:</h3>
 <div className="budget-section">
   <div className="pricing-options">
     <div

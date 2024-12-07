@@ -105,7 +105,9 @@ const EditableProjectCard = ({ project, onSave, onComplete }) => {
     try {
       const projectData = {
         ...freelancerData,
-        status: freelancerData.progress === 100 ? 'Pending Approval' : 'Ongoing'
+        status: freelancerData.progress === 100 ? 'Pending Approval' : 'Ongoing',
+        source: project.source || 'proposal',
+        proposal_id: project.proposal_id || null 
       };
       const token = localStorage.getItem('token');
       if (!token) {

@@ -155,8 +155,11 @@ const FreelancersJobsPage = () => {
     clientCountry: offer.clientCountry,
     attachment: offer.attachment,
     // Fields that need to be added to backend response
-    timeline: "1 to 3 months", // Add to backend if needed
-   
+    due_date: offer.due_date, // Date comes formatted from backend
+    timeline: offer.estimated_timeline 
+      ? `${offer.estimated_timeline.duration} ${offer.estimated_timeline.unit}` 
+      : "Not specified",
+    
     verified: false, // Add to backend if needed
     jobStatus: "ongoing", // Add to backend if needed
     source: 'offer' // Add if needed for frontend differentiation
@@ -167,7 +170,8 @@ const FreelancersJobsPage = () => {
       const uniqueJobs = Array.from(
         new Map(combinedJobs.map((item) => [item.job_id, item])).values()
       );
-      console.log("accepted offer", acceptedOffers.description);
+      console.log('Backend Response:', offersResponse.data);
+
       setJobs(uniqueJobs);
     } catch (error) {
       console.error("Error in fetchOffersAndJobs:", error);

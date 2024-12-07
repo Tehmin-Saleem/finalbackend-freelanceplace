@@ -1,6 +1,6 @@
 import { useState,useEffect } from "react";
 import React from "react";
-import { useNavigate } from "react-router-dom"; // Import useNavigate for navigation
+import { useNavigate, useLocation } from "react-router-dom"; // Import useNavigate for navigation
 import CHARACTER from "../../images/CHARACTER.png";
 import Group from "../../images/Group.png";
 import Cookies from "js-cookie"; // Import js-cookie for managing cookies
@@ -16,32 +16,69 @@ function SignIn() {
   const [emailError, setEmailError] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const navigate = useNavigate(); 
+  const location = useLocation();
+  const clearUserSession = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("userInfo");
+    Cookies.remove("savedEmail");
+    Cookies.remove("savedPassword");
+  };
 
-  const navigate = useNavigate(); // Initialize useNavigate for navigation
+  const getDashboardRoute = (role) => {
+    switch (role) {
+      case "client":
+        return "/ClientDashboard";
+      case "freelancer":
+        return "/FreelanceDashBoard";
+      case "consultant":
+        return "/ConsultantDash";
+      case "admin":
+        return "/AdminDashboard";
+      default:
+        return null;
+    }
+  };
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    if (token) {
-      const userInfo = JSON.parse(localStorage.getItem("userInfo"));
-      const role = userInfo?.user?.role;
 
-      switch (role) {
-        case "client":
-          navigate("/ClientDashboard");
-          break;
-        case "freelancer":
-          navigate("/FreelanceDashBoard");
-          break;
-        case "consultant":
-          navigate("/ConsultantDash");
-          break;
-        case "admin":
-          navigate("/AdminDashboard");
-          break;
-        default:
-          break;
+    // Function to validate token
+    const checkTokenValidity = async () => {
+      if (token && location.pathname === "/signin") {
+        try {
+          const response = await fetch("http://localhost:5000/api/client/validate-token", {
+            method: "GET",
+            headers: {
+              "Authorization": `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+          });
+
+          if (response.ok) {
+            const userInfo = JSON.parse(localStorage.getItem("userInfo"));
+            const role = userInfo?.user?.role;
+            const dashboardRoute = getDashboardRoute(role);
+
+            if (dashboardRoute) {
+              navigate(dashboardRoute, { replace: true });
+            }
+          } else {
+            // Token is invalid or expired
+            clearUserSession();
+          }
+        } catch (error) {
+          console.error("Token validation error:", error);
+          clearUserSession();
+        }
       }
-    }
+      setIsLoading(false); // Finished checking authentication
+    };
+
+    checkTokenValidity();
+
+    // Load saved credentials if any
     const savedEmail = Cookies.get("savedEmail");
     const savedPassword = Cookies.get("savedPassword");
     if (savedEmail && savedPassword) {
@@ -49,7 +86,8 @@ function SignIn() {
       setPassword(savedPassword);
       setRememberMe(true);
     }
-  }, [navigate]);
+  }, [navigate, location, location.pathname]);
+
 
   const handlePasswordChange = (e) => {
     const newPassword = e.target.value;
@@ -124,31 +162,43 @@ function SignIn() {
       console.log("Token received:", data.token);
 
 
-        const userType = data.user.role; 
-        if (userType === "client") {
-          navigate("/ClientDashboard");
-        } 
-        else if (userType === "freelancer") {
-          navigate("/FreelanceDashBoard");
-        }
-        else if (userType === "consultant") {
-          navigate("/ConsultantDash");
-        }
-        else if (userType === "admin") {
-          navigate("/AdminDashboard");
-        }
-         else {
+      const userType = data.user.role;
+        const dashboardRoute = getDashboardRoute(userType);
+
+        if (dashboardRoute) {
+          navigate(dashboardRoute, { replace: true });
+        } else {
           setErrorMessage("Unknown user type.");
         }
       } else {
-        setErrorMessage(data.message || "Login failed. Please try again.");
+        // Handle specific error messages
+        switch (data.message) {
+          case "Token has expired":
+            setErrorMessage("Your session has expired. Please log in again.");
+            clearUserSession();
+            break;
+          case "Token is invalid":
+            setErrorMessage("Invalid session. Please log in again.");
+            clearUserSession();
+            break;
+          default:
+            setErrorMessage(data.message || "Login failed. Please try again.");
+        }
       }
     } catch (error) {
       console.error("Error during login:", error);
       setErrorMessage("An error occurred. Please try again later.");
     }
   };
-  
+
+  // If authentication check is in progress, show a loading indicator
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div className="text-xl">Loading...</div>
+      </div>
+    );
+  }
   
 
   return (
