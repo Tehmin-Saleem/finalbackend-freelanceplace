@@ -12,7 +12,11 @@ const notificationsSchema = new Schema({
     required: true,
     ref: "User",
   }, 
-  
+  consultant_id: {
+    type: mongoose.Types.ObjectId,
+    required: true,
+    ref: "ConsultantProfile",
+  }, 
   is_read: {
     type: Boolean,
     default: false,

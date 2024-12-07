@@ -20,6 +20,8 @@ const consultantProfileSchema = new mongoose.Schema({
   experience: [experienceSchema],
   skills: String,
   linkedIn: String,
+  firstname:String,
+  lastname:String,
   phoneNumber: String,
   address: String,
   education: [educationSchema],

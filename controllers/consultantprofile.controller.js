@@ -1,5 +1,11 @@
 const ConsultantProfile = require('../models/consultantprofile');
-
+const Project = require('../models/manageProject.model')
+const User = require('../models/consultantprofile'); // Adjust the path as needed
+const Client_Profile = require('../models/client_profile.model'); // Adjust the path as needed
+const HireFreelancer = require('../models/hire_freelancer.model'); // Adjust the path as needed
+const ConsultantOffer = require('../models/hire_consultant.model'); // Adjust the path as needed
+const Review= require('../models/review.model')
+const { createNotification } = require('../controllers/notifications.controller');
 // exports.createProfile = async (req, res) => {
 //   try {
 //     const profileData = req.body;
@@ -23,12 +29,15 @@ exports.createProfile = async (req, res) => {
 
     // Ensure skills is always a string, joining them if it's an array
     if (profileData.skills && Array.isArray(profileData.skills)) {
-      // Convert array to comma-separated string
       profileData.skills = profileData.skills.join(', ');
     }
 
     // Assign userId to the profile from the authenticated user
     profileData.userId = req.user.id; // Assuming req.user contains the authenticated user's info
+
+    // Assign first name and last name explicitly
+    if (req.body.firstname) profileData.firstname = req.body.firstname;
+    if (req.body.lastname) profileData.lastname = req.body.lastname;
 
     // If profile picture is uploaded, store the file path
     if (req.file) {
@@ -43,10 +52,16 @@ exports.createProfile = async (req, res) => {
     const sortedProfiles = await ConsultantProfile.find({ userId: req.user.id })
       .sort({ createdAt: -1 });
 
-    res.status(201).json({ message: 'Profile created successfully', profiles: sortedProfiles });
+    res.status(201).json({ 
+      message: 'Profile created successfully', 
+      profiles: sortedProfiles 
+    });
   } catch (error) {
     console.error(error); // Log the error for debugging
-    res.status(500).json({ message: 'Error creating profile', error });
+    res.status(500).json({ 
+      message: 'Error creating profile', 
+      error 
+    });
   }
 };
 
@@ -54,6 +69,167 @@ exports.createProfile = async (req, res) => {
   
   
 
+exports.sendOfferToConsultant = async (req, res) => {
+  try {
+    // Log incoming request
+    console.log("Incoming request:", req.body, req.params);
+
+    // Extract data from request
+    const { consultant_id } = req.params;
+    const { projectName, projectDescription } = req.body;
+    const clientId = req.user.userId;
+
+    // Find the project by name
+    const project = await Project.findOne({ projectName: projectName });
+
+    if (!project) {
+      return res.status(404).json({
+        success: false,
+        message: 'Project not found',
+        details: {
+          searchedProjectName: projectName
+        }
+      });
+    }
+
+    // Find the client's profile
+    const clientProfile = await Client_Profile.findOne({ client_id: clientId })
+      .populate('client_id', 'first_name last_name email');
+    
+    if (!clientProfile) {
+      return res.status(404).json({
+        success: false,
+        message: 'Client profile not found',
+      });
+    }
+
+    // Find the consultant's profile
+    const consultantProfile = await ConsultantProfile.findById(consultant_id)
+      .populate('userId', 'first_name last_name email');
+
+    if (!consultantProfile) {
+      return res.status(404).json({
+        success: false,
+        message: 'Consultant profile not found',
+      });
+    }
+
+    // Fetch client reviews
+    const clientReviews = await Review.find({ 
+      client_id: clientId, 
+      status: 'Completed' 
+    }).populate('freelancer_id', 'first_name last_name');
+
+    // Calculate client review statistics
+    const reviewStats = {
+      totalReviews: clientReviews.length,
+      averageRating: clientReviews.length > 0 
+        ? clientReviews.reduce((sum, review) => sum + review.stars, 0) / clientReviews.length 
+        : null,
+      reviews: clientReviews.map(review => ({
+        freelancerName: `${review.freelancer_id.first_name} ${review.freelancer_id.last_name}`,
+        stars: review.stars,
+        message: review.message,
+        date: review.createdAt
+      }))
+    };
+
+    // Prepare offer details
+    const offerDetails = {
+      client: {
+        id: clientProfile.client_id._id,
+        name: `${clientProfile.client_id.first_name} ${clientProfile.client_id.last_name}`,
+        email: clientProfile.client_id.email,
+        rating: clientProfile.rating || null,
+        reviews: reviewStats
+      },
+      project: {
+        id: project._id,
+        name: projectName,
+        description: projectDescription
+      },
+      consultant: {
+        id: consultantProfile._id,
+        name: `${consultantProfile.firstname} ${consultantProfile.lastname}`,
+        email: consultantProfile.email
+      }
+    };
+
+    // Create the offer
+    const newOffer = await ConsultantOffer.create({
+      consultant_id: consultant_id,
+      client_id: clientId,
+      project_id: project._id,
+      project_name: projectName,
+      offerDetails,
+      status: 'pending',
+    });
+
+    // Create notification
+    // await createNotification({
+    //   client_id: clientId,
+    //   freelancer_id: consultant_id,
+    //   project_id: project._id,
+    //   project_name: projectName,
+    //   message: `You have a new offer for the project "${projectName}"`,
+    //   type: 'offer',
+    // });
+
+    // Return success response
+    res.status(200).json({
+      success: true,
+      message: 'Offer sent successfully',
+      offerDetails,
+      offerId: newOffer._id
+    });
+  } catch (error) {
+    console.error('Error in sendOfferToConsultant:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to send offer to consultant',
+      error: error.message,
+    });
+  }
+};
+
+
+
+
+
+
+// Helper function to calculate client ratings
+async function calculateClientRatings(clientId) {
+  // This is a placeholder. You'll need to implement actual rating calculation
+  // based on your specific ratings model or logic
+  try {
+    // Example of a simple rating calculation
+    const completedProjects = await HireFreelancer.find({
+      clientId: clientId,
+      status: 'completed'
+    });
+
+    // If you have a separate ratings model, you'd fetch and calculate ratings from there
+    const ratings = completedProjects.map(project => project.clientRating || 0);
+    
+    const averageRating = ratings.length > 0 
+      ? ratings.reduce((a, b) => a + b, 0) / ratings.length 
+      : 0;
+
+    return {
+      averageRating: averageRating.toFixed(1),
+      totalProjects: completedProjects.length
+    };
+  } catch (error) {
+    console.error('Error calculating client ratings:', error);
+    return {
+      averageRating: '0.0',
+      totalProjects: 0
+    };
+  }
+}
+
+// Add this to your routes file
+// router.get('/send-offer-to-consultant/:consultantId', authMiddleware, sendOfferToConsultant);
 
 
   exports.getProfileByUserId = async (req, res) => {
