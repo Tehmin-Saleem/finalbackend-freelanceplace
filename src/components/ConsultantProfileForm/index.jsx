@@ -19,6 +19,9 @@ function ConsultantProfileForm() {
         education: [{ degree: '', institution: '', year: '' }],
         certifications: '',
         email: '',
+        firstname:'',
+        lastname:''
+
     });
 
     useEffect(() => {
@@ -246,7 +249,27 @@ function ConsultantProfileForm() {
                     />
                 )}
             </div>
-
+           
+            <div className="form-group">
+                <label>Firs Name</label>
+                <input
+                    type="text"
+                    name="firstname"
+                    value={profile.name}
+                    onChange={handleInputChange}
+                    placeholder="Your First Name"
+                />
+            </div>
+            <div className="form-group">
+                <label>Last Name</label>
+                <input
+                    type="text"
+                    name="lastname"
+                    // value={profile.name}
+                    onChange={handleInputChange}
+                    placeholder="Your Last Name"
+                />
+            </div>
             <div className="form-group">
                 <label>Bio</label>
                 <textarea
