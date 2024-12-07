@@ -1,0 +1,91 @@
+$primary-color:  #4bcdeb;
+$text-color: #374151;
+$background-color: #f9fafb;
+$white: #ffffff;
+$border-color: #e5e7eb;
+$error-color: #dc2626;
+
+.send-offer-form-container {
+  max-width: 600px;
+  margin: 50px auto;
+  padding: 20px;
+  background-color: $background-color;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  font-family: "Poppins", sans-serif;
+
+  h1 {
+    text-align: center;
+    font-size: 1.8rem;
+    color: $text-color;
+    margin-bottom: 20px;
+  }
+
+  .send-offer-form {
+    display: flex;
+    flex-direction: column;
+
+    .form-group {
+      margin-bottom: 15px;
+
+      label {
+        display: block;
+        font-size: 1rem;
+        font-weight: 600;
+        color: $text-color;
+        margin-bottom: 5px;
+      }
+
+      input,
+      textarea {
+        width: 100%;
+        padding: 10px;
+        font-size: 0.95rem;
+        color: $text-color;
+        border: 1px solid $border-color;
+        border-radius: 8px;
+        background-color: $white;
+        transition: border-color 0.3s;
+
+        &:focus {
+          outline: none;
+          border-color: $primary-color;
+        }
+      }
+
+      textarea {
+        resize: vertical;
+      }
+    }
+
+    .checkbox-group {
+      display: flex;
+      align-items: center;
+
+      input[type="checkbox"] {
+        margin-right: 10px;
+      }
+
+      label {
+        font-size: 0.95rem;
+        color: $text-color;
+      }
+    }
+
+    .submit-button {
+      background-color: $primary-color;
+      color: $white;
+      border: none;
+      padding: 12px;
+      font-size: 1rem;
+      font-weight: bold;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+
+      &:hover {
+        background-color: darken($primary-color, 10%);
+      }
+    }
+  }
+}
