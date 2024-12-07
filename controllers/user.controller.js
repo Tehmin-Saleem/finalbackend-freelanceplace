@@ -517,7 +517,19 @@ const ClientUnban=async (req, res) => {
     return res.status(500).send({ message: "Error unbanning freelancer" });
   }
 };
-
+const validateToken = async (req, res) => {
+  try {
+    // The authMiddleware will already handle token validation
+    // If we reach this point, the token is valid
+    res.status(200).json({ 
+      message: 'Token is valid', 
+      user: req.user 
+    });
+  } catch (error) {
+    console.error('Token validation error:', error);
+    res.status(401).json({ message: 'Invalid token' });
+  }
+};
 
 // Example route for fetching profile by user ID
  const fetchprofile=async (req, res) => {
@@ -541,4 +553,4 @@ const ClientUnban=async (req, res) => {
 
 
   
-module.exports = { signup, login, hashPassword,ChangePass, checkUserExists,getUserById, getAllUsers, SearchallUsers, forgotPassword, searchFreelancers, searchClients, getallfreelancer,getAllClient,getallfreelancerlist,getallclientlist,freelancersoftban,clientsoftban,freelancerban,clientban,freelancerUnban,ClientUnban,fetchprofile };
+module.exports = { signup, login, hashPassword,ChangePass,validateToken, checkUserExists,getUserById, getAllUsers, SearchallUsers, forgotPassword, searchFreelancers, searchClients, getallfreelancer,getAllClient,getallfreelancerlist,getallclientlist,freelancersoftban,clientsoftban,freelancerban,clientban,freelancerUnban,ClientUnban,fetchprofile };
