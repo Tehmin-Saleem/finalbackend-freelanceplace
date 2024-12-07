@@ -689,12 +689,7 @@ exports.getFreelancerHiredJobs = async (req, res) => {
   try {
     const { freelancerId } = req.params;
     
-    if (!freelancerId) {
-      return res.status(400).json({
-        success: false,
-        message: 'Freelancer ID is required'
-      });
-    }
+    
 
     const hiredJobs = await HireFreelancer.find({ 
       freelancerId: freelancerId,
@@ -994,18 +989,7 @@ exports.markProjectAsCompleted = async (req, res) => {
 
       await reviewData.save({ session });
 
-      // Create notification for freelancer
-      // const notificationData = {
-      //   freelancer_id: hireRequest.freelancerId._id,
-      //   client_id: clientId,
-      //   job_id: hireRequest.jobId._id,
-      //   message: `Project "${hireRequest.jobId.job_title}" has been marked as completed. Client has left a ${stars}-star review.`,
-      //   type: 'project_completed'
-      // };
-
-      // await notificationController.createNotification(notificationData);
-
-      // Update freelancer's profile statistics
+     
       await Freelancer_Profile.findOneAndUpdate(
         { freelancer_id: hireRequest.freelancerId._id },
         {
@@ -1057,203 +1041,7 @@ exports.markProjectAsCompleted = async (req, res) => {
 
 
 
-// =====
 
-// exports.getJobReview = async (req, res) => {
-//   try {
-//     const { freelancerId, jobId } = req.params;
-
-//     // Validate the provided IDs
-//     if (!freelancerId || !jobId) {
-//       return res.status(400).json({
-//         success: false,
-//         message: 'Freelancer ID and Job ID are required'
-//       });
-//     }
-
-//     // Find the review that matches both freelancer_id and job_id
-//     const review = await Review.findOne({
-//       freelancer_id: freelancerId,
-//       job_id: jobId
-//     })
-//     .populate('client_id', 'name email') // Populate client details if needed
-//     .select('client_id freelancer_id job_id message stars status createdAt');
-
-//     if (!review) {
-//       return res.status(404).json({
-//         success: false,
-//         message: 'No review found for this job and freelancer combination'
-//       });
-//     }
-
-//     // Format the response
-//     const formattedReview = {
-//       review_id: review._id,
-//       client: {
-//         id: review.client_id._id,
-//         name: review.client_id.name,
-//         email: review.client_id.email
-//       },
-//       freelancer_id: review.freelancer_id,
-//       job_id: review.job_id,
-//       rating: review.stars,
-//       review_message: review.message,
-//       status: review.status,
-//       posted_date: review.createdAt
-//     };
-
-//     res.status(200).json({
-//       success: true,
-//       data: formattedReview
-//     });
-
-//   } catch (error) {
-//     console.error('Error in getJobReview:', error);
-//     res.status(500).json({
-//       success: false,
-//       message: 'Failed to fetch review',
-//       error: error.message
-//     });
-//   }
-// };
-
-
-// reviewController.js
-exports.getJobReview = async (req, res) => {
-  try {
-    const { jobId } = req.params;
-    
-    console.log('Received jobId:', jobId); // Debug log
-
-    // Validate the provided ID
-    if (!jobId) {
-      return res.status(400).json({
-        success: false,
-        message: 'Job ID is required'
-      });
-    }
-
-    // Find the review that matches the job_id
-    const review = await Review.findOne({ job_id: jobId })
-      .populate('client_id', 'name email')
-      .populate('freelancer_id', 'name email')
-      .select('client_id freelancer_id job_id message stars status createdAt');
-
-    console.log('Found review:', review); // Debug log
-
-    if (!review) {
-      return res.status(404).json({
-        success: false,
-        message: 'No review found for this job'
-      });
-    }
-
-    // Format the response
-    const formattedReview = {
-      review_id: review._id,
-      client: {
-        id: review.client_id._id,
-        name: review.client_id.name,
-        email: review.client_id.email
-      },
-      freelancer: {
-        id: review.freelancer_id._id,
-        name: review.freelancer_id.name,
-        email: review.freelancer_id.email
-      },
-      job_id: review.job_id,
-      rating: review.stars,
-      review_message: review.message,
-      status: review.status,
-      posted_date: review.createdAt
-    };
-
-    res.status(200).json({
-      success: true,
-      data: formattedReview
-    });
-
-  } catch (error) {
-    console.error('Error in getJobReview:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Failed to fetch review',
-      error: error.message
-    });
-  }
-};
-
-// =======
-
-
-
-// exports.getFreelancerReviews = async (req, res) => {
-//   try {
-//     const { freelancerId } = req.params;
-
-//     // Validate freelancer ID
-//     if (!freelancerId) {
-//       return res.status(400).json({
-//         success: false,
-//         message: 'Freelancer ID is required'
-//       });
-//     }
-
-//     // Find all reviews for the freelancer
-//     const reviews = await Review.find({
-//       freelancer_id: freelancerId
-//     })
-//     .populate('client_id', 'name email') // Populate client details
-//     .populate('job_id', 'job_title') // Populate job details
-//     .sort({ createdAt: -1 }) // Sort by newest first
-//     .select('client_id freelancer_id job_id message stars status createdAt');
-
-//     if (!reviews || reviews.length === 0) {
-//       return res.status(404).json({
-//         success: false,
-//         message: 'No reviews found for this freelancer'
-//       });
-//     }
-
-//     // Format the response
-//     const formattedReviews = reviews.map(review => ({
-//       review_id: review._id,
-//       client: {
-//         id: review.client_id._id,
-//         name: review.client_id.name,
-//         email: review.client_id.email
-//       },
-//       job: {
-//         id: review.job_id._id,
-//         title: review.job_id.job_title
-//       },
-//       rating: review.stars,
-//       review_message: review.message,
-//       status: review.status,
-//       posted_date: review.createdAt
-//     }));
-
-//     // Calculate average rating
-//     const averageRating = reviews.reduce((acc, review) => acc + review.stars, 0) / reviews.length;
-
-//     res.status(200).json({
-//       success: true,
-//       data: {
-//         reviews: formattedReviews,
-//         total_reviews: reviews.length,
-//         average_rating: parseFloat(averageRating.toFixed(1))
-//       }
-//     });
-
-//   } catch (error) {
-//     console.error('Error in getFreelancerReviews:', error);
-//     res.status(500).json({
-//       success: false,
-//       message: 'Failed to fetch reviews',
-//       error: error.message
-//     });
-//   }
-// };
 
 
 
