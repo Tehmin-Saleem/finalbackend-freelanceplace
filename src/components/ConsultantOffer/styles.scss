@@ -12,73 +12,131 @@ $color-accent: #4bcdeb;
 $bg-color: #f7f8fa;
 
 .client-offers-page {
-  padding: 20px;
-  font-family: $font-poppins;
-  background-color: $bg-color;
-  min-height: 100vh;
-
-  .offers-container {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 20px;
-    max-width: 1200px;
-    margin: 0 auto;
-  }
-
-  .offer-card {
-    background: $color-white;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     padding: 20px;
-    border-left: 5px solid $color-accent;
+    background-color: $bg-color;
     font-family: $font-poppins;
-    transition: transform 0.2s ease, box-shadow 0.3s ease;
-
-    &:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+  
+    .offers-container {
+      display: grid;
+      grid-template-rows: repeat(auto-fit, minmax(350px, 1fr));
+      gap: 20px;
+      max-width: 1200px;
+    //   margin: 0 auto;
+    margin-left: 10rem;
     }
-
-    .card-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 10px;
-
-      h3 {
-        margin: 0;
-        color: $color-accent;
-        font-size: 20px;
-        font-weight: 600;
+  
+    .offer-card {
+      background: $color-white;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+      padding: 20px;
+      transition: transform 0.2s, box-shadow 0.3s ease;
+  
+      &:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
       }
-
-      .status {
-        font-size: 14px;
-        padding: 5px 10px;
-        border-radius: 4px;
-        text-transform: capitalize;
-        font-weight: 500;
-
-        &.pending {
-          background-color: lighten($secondary-color, 30%);
-          color: $text-color;
+  
+      .card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 2px solid $border-color;
+        padding-bottom: 10px;
+  
+        h3 {
+          font-size: 20px;
+          font-weight: 600;
+          color: $color-accent;
         }
-
-        &.accepted {
-          background-color: lighten($color-accent, 40%);
-          color: $color-dark;
+  
+        .status {
+          font-size: 14px;
+          font-weight: 500;
+          padding: 5px 10px;
+          border-radius: 4px;
+          text-transform: capitalize;
+  
+          &.pending {
+            background-color: lighten($secondary-color, 30%);
+            color: $text-color;
+          }
+  
+          &.accepted {
+            background-color: lighten($color-accent, 40%);
+            color: $color-dark;
+          }
         }
       }
-    }
-
-    p {
-      margin: 8px 0;
-      color: $text-color;
-      font-size: 14px;
-
-      strong {
-        color: $color-dark;
+  
+      .card-content {
+        margin-top: 15px;
+  
+        .consultant-info {
+          margin-bottom: 15px;
+  
+          h4 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 8px;
+          }
+  
+          p {
+            font-size: 14px;
+            margin: 4px 0;
+            strong {
+              font-weight: 600;
+            }
+          }
+        }
+  
+        .experience-education {
+          display: flex;
+          gap: 20px;
+  
+          div {
+            flex: 1;
+  
+            h4 {
+              font-size: 16px;
+              font-weight: 600;
+              margin-bottom: 8px;
+            }
+  
+            ul {
+              list-style: disc;
+              margin-left: 20px;
+              font-size: 14px;
+  
+              li {
+                margin: 4px 0;
+              }
+            }
+  
+            p {
+              font-size: 14px;
+              color: $secondary-color;
+            }
+          }
+        }
+      }
+  
+      .project-description {
+        margin-top: 15px;
+  
+        h4 {
+          font-size: 16px;
+          font-weight: 600;
+        }
+  
+        p {
+          margin: 4px 0;
+          font-size: 14px;
+          strong {
+            font-weight: 600;
+          }
+        }
       }
     }
   }
-}
+  

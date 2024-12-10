@@ -4,6 +4,7 @@ $text-color: #374151;
 $background-color: #f7fafb;
 $white: #ffffff;
 $success-color: #10b981;
+$error-color: #ef4444;
 $accent-color: #4bcdeb;
 
 .consultant-offers-page {
@@ -32,8 +33,7 @@ $accent-color: #4bcdeb;
     border-radius: 12px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     padding: 20px;
-    position: relative;
-    transition: transform 0.2s ease, box-shadow 0.3s ease;
+    transition: transform 0.2s, box-shadow 0.3s;
 
     &:hover {
       transform: translateY(-5px);
@@ -44,52 +44,79 @@ $accent-color: #4bcdeb;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 10px;
 
       h3 {
-        margin: 0;
         font-size: 1.2rem;
         color: $text-color;
       }
 
       .status {
-        font-size: 0.9rem;
         padding: 5px 10px;
         border-radius: 4px;
-        text-transform: capitalize;
+        font-size: 0.9rem;
 
         &.pending {
-          background-color: lighten($secondary-color, 30%);
-          color: $text-color;
+          background: $secondary-color;
+          color: $white;
+        }
+
+        &.accepted {
+          background: $success-color;
+          color: $white;
+        }
+
+        &.declined {
+          background: $error-color;
+          color: $white;
         }
       }
     }
 
     p {
-      margin: 8px 0;
       font-size: 0.95rem;
-      color: $text-color;
-
-      strong {
-        color: $accent-color;
-      }
+      margin: 8px 0;
     }
 
-    .accept-button {
-      background: $accent-color;
-      color: $white;
-      border: none;
-      border-radius: 8px;
-      padding: 10px 15px;
-      font-size: 1rem;
-      font-weight: bold;
-      cursor: pointer;
+    .action-buttons {
+      display: flex;
+      gap: 10px;
       margin-top: 10px;
-      width: 100%;
-      transition: background 0.3s ease;
 
-      &:hover {
-        background: darken($accent-color, 10%);
+      .accept-button {
+        background: $success-color;
+        color: $white;
+        border: none;
+        border-radius: 8px;
+        padding: 8px 12px;
+        cursor: pointer;
+        font-weight: bold;
+
+        &:hover {
+          background: darken($success-color, 10%);
+        }
+      }
+
+      .decline-button {
+        background: $error-color;
+        color: $white;
+        border: none;
+        border-radius: 8px;
+        padding: 8px 12px;
+        cursor: pointer;
+
+        &:hover {
+          background: darken($error-color, 10%);
+        }
+      }
+
+      .status-message {
+        &.success {
+          color: $success-color;
+        }
+
+        &.error {
+          color: $error-color;
+        }
       }
     }
   }
