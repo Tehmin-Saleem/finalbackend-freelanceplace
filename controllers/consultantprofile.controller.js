@@ -6,51 +6,82 @@ const HireFreelancer = require('../models/hire_freelancer.model'); // Adjust the
 const ConsultantOffer = require('../models/hire_consultant.model'); // Adjust the path as needed
 const Review= require('../models/review.model')
 const { createNotification } = require('../controllers/notifications.controller');
-const mongoose = require("mongoose");
+
 
 exports.createProfile = async (req, res) => {
   try {
+    console.log('Received profile data:', req.body);
+    console.log('Authenticated user:', req.user);
+
+    const consultant_id = req.user && (req.user.userId || req.user.id); // Extract consultant_id
     const profileData = req.body;
 
-    // Ensure skills is always a string, joining them if it's an array
+    // Ensure `skills` is always a string
     if (profileData.skills && Array.isArray(profileData.skills)) {
       profileData.skills = profileData.skills.join(', ');
     }
 
-    // Assign userId to the profile from the authenticated user
-    profileData.userId = req.user.id; // Assuming req.user contains the authenticated user's info
+    // Assign `consultant_id` and `userId`
+    profileData.consultant_id = consultant_id;
+    profileData.userId = req.user.id;
 
-    // Assign first name and last name explicitly
-    if (req.body.firstname) profileData.firstname = req.body.firstname;
-    if (req.body.lastname) profileData.lastname = req.body.lastname;
+    console.log('Processed profile data:', profileData);
 
-    // If profile picture is uploaded, store the file path
+    // Handle profile picture upload
     if (req.file) {
       profileData.profilePicture = req.file.path;
+      console.log('Profile picture uploaded:', req.file.path);
     }
 
-    // Save the new profile
-    const newProfile = new ConsultantProfile(profileData);
-    await newProfile.save();
+    // Check if a profile already exists for this `consultant_id`
+    let profile = await ConsultantProfile.findOne({ consultant_id });
 
-    // Fetch and sort all profiles for this user by `createdAt` in descending order
-    const sortedProfiles = await ConsultantProfile.find({ userId: req.user.id })
-      .sort({ createdAt: -1 });
+    if (profile) {
+      // Update the existing profile
+      profile = await ConsultantProfile.findOneAndUpdate(
+        { consultant_id },
+        profileData,
+        { new: true, runValidators: true } // Return the updated profile
+      );
+      console.log('Profile updated successfully:', profile);
 
-    res.status(201).json({ 
-      message: 'Profile created successfully', 
-      profiles: sortedProfiles 
-    });
+      res.status(200).json({
+        message: 'Profile updated successfully',
+        profile,
+        toast: {
+          type: 'success',
+          message: 'Your profile has been updated successfully!',
+        },
+      });
+    } else {
+      // Create a new profile
+      const newProfile = new ConsultantProfile(profileData);
+      await newProfile.save();
+
+      console.log('New profile created successfully:', newProfile);
+
+      res.status(201).json({
+        message: 'Profile created successfully',
+        profile: newProfile,
+        toast: {
+          type: 'success',
+          message: 'Your profile has been created successfully!',
+        },
+      });
+    }
   } catch (error) {
-    console.error(error); // Log the error for debugging
-    res.status(500).json({ 
-      message: 'Error creating profile', 
-      error 
+    console.error('Error in createOrUpdateProfile:', error);
+    res.status(500).json({
+      message: 'Error processing profile',
+      error: error.message,
+      toast: {
+        type: 'error',
+        message: 'Failed to process profile. Please try again.',
+      },
     });
   }
 };
 
-  
   
   
 
@@ -87,12 +118,23 @@ exports.sendOfferToConsultant = async (req, res) => {
         message: 'Client profile not found',
       });
     }
+    const mongoose = require('mongoose');
+    if (!mongoose.Types.ObjectId.isValid(consultant_id)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid consultant ID format',
+      });
+    }
+
+    const consultantId = new mongoose.Types.ObjectId(consultant_id);
 
     // Find the consultant's profile
-    const consultantProfile = await ConsultantProfile.findById(consultant_id)
-      .populate('userId', 'first_name last_name email experience linkedIn education bio skills');
-      console.log("consultantprofiledata",consultantProfile);
-
+  // Find the consultant's profile
+console.log("Finding consultant profile with ID:", consultant_id);
+const consultantProfile = await ConsultantProfile.findOne({ 
+  consultant_id: consultant_id 
+}).populate('userId', 'first_name last_name email experience linkedIn education bio skills');
+console.log("Consultant Profile Found:", consultantProfile);
     if (!consultantProfile) {
       return res.status(404).json({
         success: false,
@@ -297,48 +339,37 @@ exports.getConsultantProfiles = async (req, res) => {
 
   exports.getOffersByConsultantId = async (req, res) => {
     try {
-      const consultantId = req.params.consultantId;
-      console.log("Consultant ID:", consultantId);
-  
-      // Validate consultantId format
-      if (!mongoose.Types.ObjectId.isValid(consultantId)) {
-        return res.status(400).json({
-          success: false,
-          message: 'Invalid consultant ID format',
+        const consultantId = req.params.consultantId;
+        console.log("Consultant ID received:", consultantId);
+
+        const offers = await ConsultantOffer.find({ consultant_id: consultantId })
+            .populate('client_id', 'first_name last_name email')
+            .populate('project_id', 'projectName projectDescription');
+
+        console.log("Offers fetched from database:", offers);
+
+        if (!offers || offers.length === 0) {
+            return res.status(404).json({
+                success: false,
+                message: 'No offers found for this consultant',
+            });
+        }
+
+        return res.status(200).json({
+            success: true,
+            message: 'Offers fetched successfully',
+            offers,
         });
-      }
-  
-      // Fetch offers from the database
-      const offers = await ConsultantOffer.find({
-        consultant_id: new mongoose.Types.ObjectId(consultantId), // Use 'new'
-      })
-        .populate('client_id', 'first_name last_name email')
-        .populate('project_id', 'projectName projectDescription');
-  
-      console.log("Offers fetched:", offers);
-  
-      if (!offers || offers.length === 0) {
-        return res.status(404).json({
-          success: false,
-          message: 'No offers found for this consultant',
-        });
-      }
-  
-      return res.status(200).json({
-        success: true,
-        message: 'Offers fetched successfully',
-        offers,
-      });
     } catch (error) {
-      console.error('Error fetching offers by consultant ID:', error);
-      res.status(500).json({
-        success: false,
-        message: 'Failed to fetch offers',
-        error: error.message,
-      });
+        console.error('Error fetching offers by consultant ID:', error.message);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to fetch offers',
+            error: error.message,
+        });
     }
-  };
-  
+};
+
 
   exports.updateOfferStatus = async (req, res) => {
     try {
