@@ -255,6 +255,11 @@ router.post(
 router.get('/job-status/:jobId',authMiddleware, jobPostController.getJobStatus);
 router.patch('/proposals/:proposalId/status', authMiddleware, jobPostController.updateProposalStatus);
 
+///Consulatnts Routes/////
+router.get('/consultantoffers/:clientId', authMiddleware, consultantProfileController.getOffersByClientId);
+router.get('/offer/:consultantId',authMiddleware, consultantProfileController.getOffersByConsultantId);
+router.put('/offer/:offerId', authMiddleware, consultantProfileController.updateOfferStatus);
+
 
 
 module.exports = router;

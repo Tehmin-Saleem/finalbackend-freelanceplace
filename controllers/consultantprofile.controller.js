@@ -6,23 +6,7 @@ const HireFreelancer = require('../models/hire_freelancer.model'); // Adjust the
 const ConsultantOffer = require('../models/hire_consultant.model'); // Adjust the path as needed
 const Review= require('../models/review.model')
 const { createNotification } = require('../controllers/notifications.controller');
-// exports.createProfile = async (req, res) => {
-//   try {
-//     const profileData = req.body;
 
-//     // If there is a file, store its path
-//     if (req.file) {
-//       profileData.profilePicture = req.file.path;
-//     }
-
-//     const newProfile = new ConsultantProfile(profileData);
-//     await newProfile.save();
-//     res.status(201).json({ message: 'Profile created successfully', profile: newProfile });
-//   } catch (error) {
-//     res.status(500).json({ message: 'Error creating profile', error });
-//   }
-// };// Controller: createProfile
-// Controller: createProfile
 exports.createProfile = async (req, res) => {
   try {
     const profileData = req.body;
@@ -105,7 +89,8 @@ exports.sendOfferToConsultant = async (req, res) => {
 
     // Find the consultant's profile
     const consultantProfile = await ConsultantProfile.findById(consultant_id)
-      .populate('userId', 'first_name last_name email');
+      .populate('userId', 'first_name last_name email experience linkedIn education bio skills');
+      console.log("consultantprofiledata",consultantProfile);
 
     if (!consultantProfile) {
       return res.status(404).json({
@@ -150,9 +135,14 @@ exports.sendOfferToConsultant = async (req, res) => {
       },
       consultant: {
         id: consultantProfile._id,
-        name: `${consultantProfile.firstname} ${consultantProfile.lastname}`,
-        email: consultantProfile.email
-      }
+        name: `${consultantProfile.firstname || 'N/A'} ${consultantProfile.lastname || 'N/A'}`,
+        email: consultantProfile.email || 'N/A',
+        experience: consultantProfile.experience || [],
+        linkedIn: consultantProfile.linkedIn || 'N/A',
+        education: consultantProfile.education || [],
+        bio: consultantProfile.bio || 'N/A',
+        skills: consultantProfile.skills || 'N/A',
+      },
     };
 
     // Create the offer
@@ -245,35 +235,14 @@ async function calculateClientRatings(clientId) {
 
         res.status(200).json({ profile }); // Return a single profile object
     } catch (error) {
-        res.status(500).json({ message: 'Error fetching consultant profile', error });
+        return res.status(500).json({ message: 'Error fetching consultant profile', error });
     }
 };
 
 
 
 
-// Optional: Get all profiles (for admin purposes)
-// exports.getAllProfiles = async (req, res) => {
-//     try {
-//         const profiles = await ConsultantProfile.find({})
-//             .select('-__v')
-//             .sort({ createdAt: -1 });
 
-//         return res.status(200).json({
-//             success: true,
-//             count: profiles.length,
-//             data: profiles
-//         });
-
-//     } catch (error) {
-//         console.error('Error fetching all profiles:', error);
-//         return res.status(500).json({
-//             success: false,
-//             message: 'Error fetching profiles',
-//             error: error.message
-//         });
-//     }
-// };
 
 
 
@@ -287,6 +256,114 @@ exports.getConsultantProfiles = async (req, res) => {
       res.status(500).json({ message: 'Server error' });
     }
   };
+
+  exports.getOffersByClientId = async (req, res) => {
+    try {
+      // Extract client ID from the request (assuming it's passed in the request params)
+      const clientId = req.params.clientId;
+  
+      // Fetch all offers where client_id matches the given clientId
+      const offers = await ConsultantOffer.find({ client_id: clientId })
+        .populate('consultant_id', 'first_name last_name email experience linkedIn education bio skills') // Populate consultant details
+        .populate('project_id', 'projectName projectDescription'); // Populate project details
+        // .sort({ createdAt: -1 }); // Sort by most recent offers
+  
+      // Check if any offers are found
+      if (!offers || offers.length === 0) {
+        return res.status(404).json({
+          success: false,
+          message: 'No offers found for this client',
+        });
+      }
+  
+      // Return the offers in the response
+      res.status(200).json({
+        success: true,
+        message: 'Offers fetched successfully',
+        offers: offers,
+      });
+    } catch (error) {
+      console.error('Error fetching offers by client ID:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Failed to fetch offers',
+        error: error.message,
+      });
+    }
+  };
+  
+  // const ConsultantOffer = require('../models/hire_consultant.model'); // Adjust path as necessary
+
+  exports.getOffersByConsultantId = async (req, res) => {
+    try {
+      const consultantId = req.params.consultantId;
+      console.log("Consultant ID:", consultantId);
+  
+      const offers = await ConsultantOffer.find({ consultant_id: consultantId })
+        .populate('client_id', 'first_name last_name email ')
+        .populate('project_id', 'projectName projectDescription');
+        // .sort({ createdAt: -1 });
+  
+      console.log("Offers fetched:", offers);
+  
+      if (!offers || offers.length === 0) {
+        return res.status(404).json({
+          success: false,
+          message: 'No offers found for this consultant',
+        });
+      }
+  
+      return res.status(200).json({
+        success: true,
+        message: 'Offers fetched successfully',
+        offers,
+      });
+    } catch (error) {
+      console.error('Error fetching offers by consultant ID:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Failed to fetch offers',
+        error: error.message,
+      });
+    }
+  };
+
+  exports.updateOfferStatus = async (req, res) => {
+    try {
+      const offerId = req.params.offerId;
+      const { status } = req.body;
+  
+      const updatedOffer = await ConsultantOffer.findByIdAndUpdate(
+        offerId,
+        { status },
+        { new: true }
+      );
+  
+      if (!updatedOffer) {
+        return res.status(404).json({
+          success: false,
+          message: 'Offer not found',
+        });
+      }
+  
+      return res.status(200).json({
+        success: true,
+        message: 'Offer status updated successfully',
+        offer: updatedOffer,
+      });
+    } catch (error) {
+      console.error('Error updating offer status:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Failed to update offer status',
+        error: error.message,
+      });
+    }
+  };
+  
+  
+  
+
   
 
 
