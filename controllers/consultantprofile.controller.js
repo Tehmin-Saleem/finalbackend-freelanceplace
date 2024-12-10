@@ -6,6 +6,7 @@ const HireFreelancer = require('../models/hire_freelancer.model'); // Adjust the
 const ConsultantOffer = require('../models/hire_consultant.model'); // Adjust the path as needed
 const Review= require('../models/review.model')
 const { createNotification } = require('../controllers/notifications.controller');
+const mongoose = require("mongoose");
 
 exports.createProfile = async (req, res) => {
   try {
@@ -299,10 +300,20 @@ exports.getConsultantProfiles = async (req, res) => {
       const consultantId = req.params.consultantId;
       console.log("Consultant ID:", consultantId);
   
-      const offers = await ConsultantOffer.find({ consultant_id: consultantId })
-        .populate('client_id', 'first_name last_name email ')
+      // Validate consultantId format
+      if (!mongoose.Types.ObjectId.isValid(consultantId)) {
+        return res.status(400).json({
+          success: false,
+          message: 'Invalid consultant ID format',
+        });
+      }
+  
+      // Fetch offers from the database
+      const offers = await ConsultantOffer.find({
+        consultant_id: new mongoose.Types.ObjectId(consultantId), // Use 'new'
+      })
+        .populate('client_id', 'first_name last_name email')
         .populate('project_id', 'projectName projectDescription');
-        // .sort({ createdAt: -1 });
   
       console.log("Offers fetched:", offers);
   
@@ -327,6 +338,7 @@ exports.getConsultantProfiles = async (req, res) => {
       });
     }
   };
+  
 
   exports.updateOfferStatus = async (req, res) => {
     try {
