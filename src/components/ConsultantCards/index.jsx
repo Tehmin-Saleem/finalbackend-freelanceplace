@@ -38,7 +38,7 @@ const ConsultantCard = () => {
       }
       
       const response = await fetch(
-        `http://localhost:5000/api/client/send-offer-to-consultant/${consultant._id}`,
+        `http://localhost:5000/api/client/send-offer-to-consultant/${consultant.consultant_id}`,
         {
           method: 'POST', 
           headers: {
@@ -46,14 +46,14 @@ const ConsultantCard = () => {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            consultant_id: consultant._id,
+            consultant_id: consultant.consultant_id,
             projectId: projectDetails._id,
             projectName: projectDetails.projectName,
             projectDescription: projectDetails.description
           }),
         }
       );
-  
+ 
       const data = await response.json();
   
       if (data.success) {
@@ -85,7 +85,7 @@ const ConsultantCard = () => {
         }
 
         const data = await response.json();
-        console.log("data",data);
+        console.log("profiledata",data);
 
         if (Array.isArray(data)) {
           setConsultants(data);
