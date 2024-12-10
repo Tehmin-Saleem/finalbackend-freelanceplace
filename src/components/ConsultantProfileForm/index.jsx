@@ -59,53 +59,78 @@ function ConsultantProfileForm() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        console.log('Form submission started');
+        console.log('Current profile state:', profile);
+        console.log('Skills:', skills);
+    
         const formData = new FormData();
         const updatedProfile = {
             ...profile,
             skills, // Add the skills from the separate state
-          };
-        
-          for (const key in updatedProfile) {
-            if (key === 'experience' || key === 'education') {
-              updatedProfile[key].forEach((item, index) => {
-                for (const subKey in item) {
-                  formData.append(`${key}[${index}][${subKey}]`, item[subKey]);
-                }
-              });
-            } else if (Array.isArray(updatedProfile[key])) {
-              // Handle array fields such as skills properly
-              updatedProfile[key].forEach((item) => {
-                formData.append(`${key}[]`, item);
-              });
-            } else {
-              formData.append(key, updatedProfile[key]);
-            }
-          }
-        
-          const token = localStorage.getItem('token');
-          if (token) {
-            try {
-              const response = await fetch('http://localhost:5000/api/client/Constprofile', {
-                method: 'POST',
-                headers: {
-                  'Authorization': `Bearer ${token}`,
-                },
-                body: formData,
-              });
-        
-              if (response.ok) {
-                navigate('/ConsultantDash');
-              } else {
-                const errorText = await response.text();
-                console.log('Error saving profile:', errorText);
-              }
-            } catch (error) {
-              console.error('Network or server error:', error);
-            }
-          } else {
-            console.log('No token found, user not authenticated');
-          }
         };
+        
+        console.log('Updated profile before form data:', updatedProfile);
+        
+        for (const key in updatedProfile) {
+            if (key === 'experience' || key === 'education') {
+                updatedProfile[key].forEach((item, index) => {
+                    for (const subKey in item) {
+                        formData.append(`${key}[${index}][${subKey}]`, item[subKey]);
+                    }
+                });
+            } else if (Array.isArray(updatedProfile[key])) {
+                // Handle array fields such as skills properly
+                updatedProfile[key].forEach((item) => {
+                    formData.append(`${key}[]`, item);
+                });
+            } else {
+                formData.append(key, updatedProfile[key]);
+            }
+        }
+    
+        console.log('FormData contents:');
+        for (let [key, value] of formData.entries()) {
+            console.log(key, value);
+        }
+        
+        const token = localStorage.getItem('token');
+        if (token) {
+            try {
+                console.log('Sending request to server');
+                const response = await fetch('http://localhost:5000/api/client/Constprofile', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                    },
+                    body: formData,
+                });
+    
+                console.log('Response received:', response);
+        
+                if (response.ok) {
+                    const result = await response.json();
+                    console.log('Profile saved successfully:', result);
+                    // Add toast notification here
+                    // For example, if using react-toastify:
+                    // toast.success(result.message || 'Profile created successfully');
+                    navigate('/ConsultantDash');
+                } else {
+                    const errorText = await response.text();
+                    console.error('Error saving profile:', errorText);
+                    // Add error toast notification
+                    // toast.error(errorText || 'Failed to save profile');
+                }
+            } catch (error) {
+                console.error('Network or server error:', error);
+                // Add error toast notification
+                // toast.error('Network error. Please try again.');
+            }
+        } else {
+            console.log('No token found, user not authenticated');
+            // Add error toast notification
+            // toast.error('Please log in to save your profile');
+        }
+    };
 
     // Handle changes to input fields
     // const handleInputChange = (e) => {
