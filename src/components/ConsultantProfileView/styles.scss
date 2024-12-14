@@ -53,6 +53,39 @@ $color-accent: #4bcdeb;
         margin-top: 10px;
       }
     }
+/* Container for skill tags */
+.skills-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px; /* Space between tags */
+}
+
+/* Style for each skill tag */
+.skill-tag {
+  background-color: transparent;
+  color: #242020; /* Text color */
+  border: 1px solid #9aa8b8; /* Border color matching the text */
+  padding: 6px 12px;
+  border-radius: 20px; /* Rounded corners */
+  font-size: 14px;
+  font-weight: 500;
+ 
+  display: inline-block;
+ 
+}
+
+/* Hover effect */
+.skill-tag:hover {
+  background-color: #3796ee; /* Light blue background */
+  color: white; /* Change text color to white on hover */
+}
+
+/* Style for "No skills listed" message */
+.no-content {
+  color: #777;
+  font-style: italic;
+  text-align: center;
+}
 
     .profile-section {
       margin-bottom: 30px;

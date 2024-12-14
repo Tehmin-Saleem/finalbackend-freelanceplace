@@ -17,7 +17,7 @@ const ConsultantOffers = () => {
           const token = localStorage.getItem("token");
           const consultantId = JSON.parse(atob(token.split(".")[1])).userId;
           console.log("consultanvvghbjsjdjjbdtid",consultantId);
-      
+          console.log("Token:", token);
           const response = await axios.get(
             `http://localhost:5000/api/client/offer/${consultantId}`,
             {
@@ -25,19 +25,19 @@ const ConsultantOffers = () => {
                 Authorization: `Bearer ${token}`,
                 "Content-Type": "application/json",
               },
+              
             }
           );
           console.log("Offers response:", response.data);
       
           setOffers(response.data.offers);
-        } catch (err) {
-          console.error("Fetch offers error:", err.response || err.message);
-          setError("Failed to fetch offers.");
-        } finally {
-          setLoading(false);
-        }
-      };
-      
+  } catch (err) {
+    console.error("Fetch offers error:", err.response || err.message);
+    setError(err.response?.data?.message || "Failed to fetch offers.");
+  } finally {
+    setLoading(false);
+  }
+};
   
     fetchOffers();
   }, []);
