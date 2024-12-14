@@ -5,8 +5,8 @@ const Client_Profile = require('../models/client_profile.model'); // Adjust the 
 const HireFreelancer = require('../models/hire_freelancer.model'); // Adjust the path as needed
 const ConsultantOffer = require('../models/hire_consultant.model'); // Adjust the path as needed
 const Review= require('../models/review.model')
-const { createNotification } = require('../controllers/notifications.controller');
-
+const { createNotification } = require('../controllers/notifications.controller')
+const mongoose = require('mongoose');
 
 exports.createProfile = async (req, res) => {
   try {
@@ -181,7 +181,9 @@ console.log("Consultant Profile Found:", consultantProfile);
       project: {
         id: project._id,
         name: projectName,
-        description: projectDescription
+        description: projectDescription,
+        
+
       },
       consultant: {
         id: consultantProfile._id,
@@ -370,68 +372,84 @@ exports.getConsultantProfiles = async (req, res) => {
 
   exports.getOffersByConsultantId = async (req, res) => {
     try {
-        const consultantId = req.params.consultantId;
-        console.log("Consultant ID received:", consultantId);
-
-        const offers = await ConsultantOffer.find({ consultant_id: consultantId })
-            .populate('client_id', 'first_name last_name email')
-            .populate('project_id', 'projectName projectDescription');
-
-        console.log("Offers fetched from database:", offers);
-
-        if (!offers || offers.length === 0) {
-            return res.status(404).json({
-                success: false,
-                message: 'No offers found for this consultant',
-            });
-        }
-
-        return res.status(200).json({
-            success: true,
-            message: 'Offers fetched successfully',
-            offers,
-        });
-    } catch (error) {
-        console.error('Error fetching offers by consultant ID:', error.message);
-        res.status(500).json({
-            success: false,
-            message: 'Failed to fetch offers',
-            error: error.message,
-        });
-    }
-};
-
-
-  exports.updateOfferStatus = async (req, res) => {
-    try {
-      const offerId = req.params.offerId;
-      const { status } = req.body;
+      const consultantId = req.params.consultantId;
+      console.log("Consultant ID received:", consultantId);
   
-      const updatedOffer = await ConsultantOffer.findByIdAndUpdate(
-        offerId,
-        { status },
-        { new: true }
-      );
+      const offers = await ConsultantOffer.find({ consultant_id: consultantId })
+        .populate('client_id', 'first_name last_name email')
+        .populate('project_id', 'projectName projectDescription')
+        .lean(); // Ensure the response is a plain object
   
-      if (!updatedOffer) {
+      // Map and ensure the nested structure is preserved
+      const formattedOffers = offers.map((offer) => ({
+        ...offer,
+        offerDetails: {
+          project: {
+            name: offer.project_id?.projectName || "N/A",
+            description: offer.project_id?.projectDescription || "N/A",
+            status: offer.status || "pending", // Include status here
+          },
+          client: {
+            name: `${offer.client_id?.first_name || "N/A"} ${offer.client_id?.last_name || ""}`.trim(),
+          },
+        },
+      }));
+  
+      console.log("Formatted Offers:", formattedOffers);
+  
+      if (!formattedOffers.length) {
         return res.status(404).json({
           success: false,
-          message: 'Offer not found',
+          message: "No offers found for this consultant",
         });
       }
   
       return res.status(200).json({
         success: true,
-        message: 'Offer status updated successfully',
+        message: "Offers fetched successfully",
+        offers: formattedOffers,
+      });
+    } catch (error) {
+      console.error("Error fetching offers by consultant ID:", error.message);
+      res.status(500).json({
+        success: false,
+        message: "Failed to fetch offers",
+        error: error.message,
+      });
+    }
+  };
+  
+  
+
+
+  exports.updateOfferStatus = async (req, res) => {
+    try {
+      const { offerId } = req.params;
+      const { status } = req.body;
+  
+      // Validate the status
+      if (!['Accepted', 'Declined'].includes(status)) {
+        return res.status(400).json({ message: 'Invalid status value.' });
+      }
+  
+      // Update the offer in the database
+      const updatedOffer = await ConsultantOffer.findByIdAndUpdate(
+        offerId,
+        { status },
+        { new: true } // Return the updated document
+      );
+  
+      if (!updatedOffer) {
+        return res.status(404).json({ message: 'Offer not found.' });
+      }
+  
+      res.status(200).json({
+        message: 'Offer status updated successfully.',
         offer: updatedOffer,
       });
     } catch (error) {
       console.error('Error updating offer status:', error);
-      res.status(500).json({
-        success: false,
-        message: 'Failed to update offer status',
-        error: error.message,
-      });
+      res.status(500).json({ message: 'Server error.', error: error.message });
     }
   };
   
