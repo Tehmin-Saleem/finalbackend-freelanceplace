@@ -211,7 +211,7 @@ router.patch('/unban/:id', authMiddleware,usercontroller.ClientUnban);
 // const upload = multer({ dest: 'uploads/' });
 
 router.post('/Constprofile', upload.single('profilePicture'),authMiddleware, consultantProfileController.createProfile);
-router.get('/Constprofile/:id', authMiddleware, consultantProfileController.getProfileByUserId);
+router.get('/Constprofile/:consultantId', authMiddleware, consultantProfileController.getProfileByUserId);
 router.get('/ConsultantsProfiles', authMiddleware,consultantProfileController.getConsultantProfiles);
 // In your routes file
 router.get('/filtered-jobs', authMiddleware, hireFreelancerController.getFilteredJobs);

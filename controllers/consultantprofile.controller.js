@@ -17,9 +17,16 @@ exports.createProfile = async (req, res) => {
     const profileData = req.body;
 
     // Ensure `skills` is always a string
-    if (profileData.skills && Array.isArray(profileData.skills)) {
-      profileData.skills = profileData.skills.join(', ');
-    }
+    // if (profileData.skills && Array.isArray(profileData.skills)) {
+    //   profileData.skills = profileData.skills.join(', ');
+    // }
+    const skills = Array.isArray(req.body.skills)
+    ? req.body.skills
+    : JSON.parse(req.body.skills || "[]");
+
+if (!Array.isArray(skills)) {
+    throw new Error("Invalid skills format. Expected an array.");
+}
 
     // Assign `consultant_id` and `userId`
     profileData.consultant_id = consultant_id;
@@ -188,27 +195,41 @@ console.log("Consultant Profile Found:", consultantProfile);
       },
     };
 
+    const clientName = `${clientProfile.client_id.first_name} ${clientProfile.client_id.last_name}`;
+
     // Create the offer
     const newOffer = await ConsultantOffer.create({
       consultant_id: consultant_id,
       client_id: clientId,
       project_id: project._id,
       project_name: projectName,
-      offerDetails,
+      offerDetails: {
+        client: {
+          id: clientProfile.client_id._id,
+          name: clientName,
+          email: clientProfile.client_id.email
+        },
+        project: {
+          id: project._id,
+          name: projectName,
+          description: projectDescription
+        }
+      },
       status: 'pending',
     });
 
     // Create notification
-    // await createNotification({
-    //   client_id: clientId,
-    //   freelancer_id: consultant_id,
-    //   project_id: project._id,
-    //   project_name: projectName,
-    //   message: `You have a new offer for the project "${projectName}"`,
-    //   type: 'offer',
-    // });
-
-    // Return success response
+    const notificationData = {
+      client_id: clientId,
+      consultant_id: consultant_id,
+      job_id: project._id,
+      message: `${clientName} has sent you an offer for his job ${projectName}`,
+      type: 'new_offer',
+      senderId: clientId,
+     
+      
+    };
+    await createNotification(notificationData);
     res.status(200).json({
       success: true,
       message: 'Offer sent successfully',
@@ -265,22 +286,32 @@ async function calculateClientRatings(clientId) {
 // router.get('/send-offer-to-consultant/:consultantId', authMiddleware, sendOfferToConsultant);
 
 
-  exports.getProfileByUserId = async (req, res) => {
-    try {
-        const profile = await ConsultantProfile.findOne({ userId: req.params.userId })
-            .sort({ createdAt: -1 }); // Fetch the most recent profile if there are multiple profiles for the user.
-            if (profile.skills && typeof profile.skills === 'string') {
-              profile.skills = profile.skills.split(', ');  // Split the string into an array
-            }
-        if (!profile) {
-            return res.status(404).json({ message: 'Consultant profile not found' });
-        }
-
-        res.status(200).json({ profile }); // Return a single profile object
-    } catch (error) {
-        return res.status(500).json({ message: 'Error fetching consultant profile', error });
+exports.getProfileByUserId = async (req, res) => {
+  try {
+    const consultantId = req.params.consultantId; // Use consultantId from route params
+    if (!consultantId) {
+      return res.status(400).json({ message: 'Consultant ID is required' });
     }
+
+    const profile = await ConsultantProfile.findOne({ consultant_id: consultantId }) // Find profile by consultant_id
+      .sort({ createdAt: -1 }); // Get the most recent profile
+
+    if (!profile) {
+      return res.status(404).json({ message: 'Consultant profile not found' });
+    }
+
+    // Ensure skills are returned as an array
+    if (profile.skills && typeof profile.skills === 'string') {
+      profile.skills = profile.skills.split(', ');
+    }
+
+    res.status(200).json({ profile });
+  } catch (error) {
+    res.status(500).json({ message: 'Error fetching consultant profile', error });
+  }
 };
+
+
 
 
 
