@@ -3,7 +3,6 @@ import axios from "axios";
 import "./styles.scss";
 import Header from "../Commoncomponents/Header";
 import Spinner from "../chatcomponents/Spinner";
-// import Spinner from "../../components/index";
 
 const ConsultantOffers = () => {
   const [offers, setOffers] = useState([]);
@@ -13,35 +12,31 @@ const ConsultantOffers = () => {
   // Fetch offers on component mount
   useEffect(() => {
     const fetchOffers = async () => {
-        try {
-          const token = localStorage.getItem("token");
-          const consultantId = JSON.parse(atob(token.split(".")[1])).userId;
-          console.log("consultanvvghbjsjdjjbdtid",consultantId);
-      
-          const response = await axios.get(
-            `http://localhost:5000/api/client/offer/${consultantId}`,
-            {
-              headers: {
-                Authorization: `Bearer ${token}`,
-                "Content-Type": "application/json",
-              },
-            }
-          );
-          console.log("Offers response:", response.data);
-      
-          setOffers(response.data.offers);
-        } catch (err) {
-          console.error("Fetch offers error:", err.response || err.message);
-          setError("Failed to fetch offers.");
-        } finally {
-          setLoading(false);
-        }
-      };
-      
-  
+      try {
+        const token = localStorage.getItem("token");
+        const consultantId = JSON.parse(atob(token.split(".")[1])).userId;
+
+        const response = await axios.get(
+          `http://localhost:5000/api/client/offer/${consultantId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+          }
+        );
+        console.log("Offers data:", response.data);
+        setOffers(response.data.offers || []); // Ensure offers is always an array
+      } catch (err) {
+        console.error("Fetch offers error:", err.response || err.message);
+        setError("Failed to fetch offers.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
     fetchOffers();
   }, []);
-  
 
   // Handle offer actions
   const handleAction = async (offerId, action) => {
@@ -61,7 +56,18 @@ const ConsultantOffers = () => {
       // Update offer status locally
       setOffers((prevOffers) =>
         prevOffers.map((offer) =>
-          offer.id === offerId ? { ...offer, status: action } : offer
+          (offer.id || offer._id) === offerId
+            ? {
+                ...offer,
+                offerDetails: {
+                  ...offer.offerDetails,
+                  project: {
+                    ...offer.offerDetails.project,
+                    status: action,
+                  },
+                },
+              }
+            : offer
         )
       );
     } catch (err) {
@@ -69,7 +75,7 @@ const ConsultantOffers = () => {
     }
   };
 
-  if (loading) return <Spinner size={100} alignCenter/>;
+  if (loading) return <Spinner size={100} alignCenter />;
   if (error)
     return (
       <div className="error-message">
@@ -86,56 +92,74 @@ const ConsultantOffers = () => {
           {offers.length === 0 ? (
             <div className="no-offers">No offers received.</div>
           ) : (
-            offers.map((offer) => (
-              <div className="offer-card" key={offer.id}>
-                <div className="card-header">
-                  <h3>{offer.projectName}</h3>
-                  <span className={`status ${offer.status.toLowerCase()}`}>
-                    {offer.status}
-                  </span>
-                </div>
-                <p>
-                  <strong>Client:</strong> {offer.clientName || "N/A"}
-                </p>
-                <p>
-                  <strong>Rating:</strong> ⭐ {offer.clientRating || "N/A"}
-                </p>
-                <p>
-                  <strong>Deadline:</strong> {offer.deadline || "N/A"}
-                </p>
-                <p>
-                  <strong>Budget:</strong> {offer.budget || "N/A"}
-                </p>
-                <div className="action-buttons">
-                  {offer.status === "Pending" && (
-                    <>
+            offers.map((offer) => {
+              // Safely extract values with optional chaining
+              const project = offer.offerDetails?.project || {};
+              const client = offer.offerDetails?.client || {};
+              const status =
+                offer.offerDetails?.project?.status?.toLowerCase() || "pending";
+
+              return (
+                <div className="offer-card" key={offer.id || offer._id}>
+                  <div className="card-header">
+                    <h3>{project.name || "N/A"}</h3>
+                    <span className={`status ${status}`}>
+                      {project.status || "N/A"}
+                    </span>
+                  </div>
+                  <p>
+                    <strong>Client:</strong> {client.name || "N/A"}
+                  </p>
+                  <p>
+                    <strong>Description:</strong> {project.description|| "N/A"}
+                  </p>
+                  <p>
+                    <strong>Rating:</strong> {offer.clientRating || "N/A"}
+                  </p>
+                  <p>
+                    <strong>Deadline:</strong> {project.deadline || "N/A"}
+                  </p>
+                  <p>
+                    <strong>Budget:</strong> {project.budget || "N/A"}
+                  </p>
+                  <div className="action-buttons">
+                    {status === "pending" && (
+                      <>
+                        <button
+                          className="accept-button"
+                          onClick={() =>
+                            handleAction(offer.id || offer._id, "Accepted")
+                          }
+                        >
+                          Accept
+                        </button>
+                        <button
+                          className="decline-button"
+                          onClick={() =>
+                            handleAction(offer.id || offer._id, "Declined")
+                          }
+                        >
+                          Decline
+                        </button>
+                      </>
+                    )}
+                    {status === "accepted" && (
                       <button
                         className="accept-button"
-                        onClick={() => handleAction(offer.id, "Accepted")}
+                        onClick={() => alert("Redirect to offer details")}
                       >
-                        Accept
+                        See Project Details
                       </button>
-                      <button
-                        className="decline-button"
-                        onClick={() => handleAction(offer.id, "Declined")}
-                      >
-                        Decline
-                      </button>
-                    </>
-                  )}
-                  {offer.status === "Accepted" && (
-                    <span className="status-message success">
-                      You have accepted this offer.
-                    </span>
-                  )}
-                  {offer.status === "Declined" && (
-                    <span className="status-message error">
-                      You have declined this offer.
-                    </span>
-                  )}
+                    )}
+                    {status === "declined" && (
+                      <span className="status-message error">
+                        You have declined this offer.
+                      </span>
+                    )}
+                  </div>
                 </div>
-              </div>
-            ))
+              );
+            })
           )}
         </div>
       </div>
