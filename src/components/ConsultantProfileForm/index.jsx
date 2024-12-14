@@ -1,12 +1,27 @@
 import React, { useState, useEffect } from 'react';
 import './styles.scss';
+import Header from '../Commoncomponents/Header';
 //  import {jwtdecode} from 'jwt-decode';
 // import jwt_decode from 'jwt-decode';
-
+import { CrossIcon, PlusIcon } from "../../svg/index"; // Dummy SVG icons, replace with your own SVGs
 import { useNavigate } from "react-router-dom";
-
+const SearchIcon = () => (
+    <svg
+      width="16"
+      height="16"
+      viewBox="0 0 16 16"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M11.7428 10.1254H11.2284L10.9872 9.88367C11.6571 9.00653 12.0007 7.87679 12.0007 6.65882C12.0007 2.97597 9.02403 0 5.34118 0C1.65833 0 -1.31727 2.97597 -1.31727 6.65882C-1.31727 10.3417 1.65833 13.3173 5.34118 13.3173C6.70964 13.3173 7.98657 12.8944 9.08524 12.1272L9.32812 12.3692V12.8837L10.7886 14.3442L12.2189 12.9139L11.7428 10.1254ZM5.34118 10.1254C3.62413 10.1254 2.1254 8.62671 2.1254 6.65882C2.1254 4.69093 3.62413 3.1922 5.34118 3.1922C7.05823 3.1922 8.55696 4.69093 8.55696 6.65882C8.55696 8.62671 7.05823 10.1254 5.34118 10.1254Z"
+        fill="#6B6B6B"
+      />
+    </svg>
+  );
 function ConsultantProfileForm() {
     const navigate = useNavigate();
+     const [searchTerm, setSearchTerm] = useState("");
     const [profile, setProfile] = useState({
         userId:'',
         profilePicture: null,
@@ -23,6 +38,10 @@ function ConsultantProfileForm() {
         lastname:''
 
     });
+    const [availableSkills, setAvailableSkills] = useState([
+        "HTML", "CSS", "JavaScript", "React", "Figma", "Mobile App Design", "Prototyping", "Mockups"
+      ]);
+      const [filteredSkills, setFilteredSkills] = useState([...availableSkills]);
 
     useEffect(() => {
         const fetchEmailFromToken = async () => {
@@ -56,7 +75,12 @@ function ConsultantProfileForm() {
             [name]: value,
         }));
     };
-
+    const handleKeyDown = (e) => {
+        if (e.key === "Enter" && searchTerm.trim()) {
+          handleAddSkill(searchTerm.trim());
+          setSearchTerm(""); // Clear the search input
+        }
+      };
     const handleSubmit = async (e) => {
         e.preventDefault();
         console.log('Form submission started');
@@ -78,15 +102,21 @@ function ConsultantProfileForm() {
                         formData.append(`${key}[${index}][${subKey}]`, item[subKey]);
                     }
                 });
-            } else if (Array.isArray(updatedProfile[key])) {
-                // Handle array fields such as skills properly
-                updatedProfile[key].forEach((item) => {
-                    formData.append(`${key}[]`, item);
-                });
-            } else {
+            } else if (key === 'skills') {
+                for (const skill of skills) {
+                    formData.append('skills[]', skill); // Append each skill
+                }
+            } else if (updatedProfile[key]) {
                 formData.append(key, updatedProfile[key]);
             }
         }
+    
+         // Explicitly append skills as a comma-separated string
+        //  if (Array.isArray(skills) && skills.length > 0) {
+        //     skills.forEach((skill, index) => {
+        //         formData.append(`skills[${index}]`, skill); // Send array format
+        //     });
+        // }
     
         console.log('FormData contents:');
         for (let [key, value] of formData.entries()) {
@@ -177,7 +207,20 @@ function ConsultantProfileForm() {
         newEducation[index][field] = value;
         setProfile((prevProfile) => ({ ...prevProfile, education: newEducation }));
     };
-
+    const handleAddSkill = (skill) => {
+        if (!skills.includes(skill)) {
+          setSkills([...skills, skill]);
+          // Remove the added skill from available skills and filtered skills
+          setAvailableSkills(availableSkills.filter((s) => s !== skill));
+          setFilteredSkills(filteredSkills.filter((s) => s !== skill));
+        }
+      };
+    
+      const handleRemoveSkill = (skill) => {
+        setSkills(skills.filter((s) => s !== skill));
+        setAvailableSkills([...availableSkills, skill]);
+        setFilteredSkills([...filteredSkills, skill]);
+      };
     // Add new education entry
     const handleAddEducation = () => {
         setProfile((prevProfile) => ({
@@ -185,7 +228,22 @@ function ConsultantProfileForm() {
             education: [...prevProfile.education, { degree: '', institution: '', year: '' }],
         }));
     };
-
+    const handleSearchChange = (e) => {
+        const value = e.target.value.toLowerCase();
+        setSearchTerm(value);
+    
+        // Filter available skills based on search input
+        const filtered = availableSkills.filter((skill) =>
+          skill.toLowerCase().includes(value)
+        );
+    
+        // If the input is not empty, include previously selected skills
+        if (value) {
+          setFilteredSkills([...filtered, ...skills]);
+        } else {
+          setFilteredSkills(availableSkills);
+        }
+      };
     // Remove education entry
     const handleRemoveEducation = (index) => {
         const newEducation = profile.education.filter((_, i) => i !== index);
@@ -210,15 +268,23 @@ function ConsultantProfileForm() {
     
         const [skills, setSkills] = useState([]);
       
-        const handleAddSkill = (newSkill) => {
-          if (newSkill && !skills.includes(newSkill)) {
-            setSkills([...skills, newSkill]); // Add the new skill if it doesn't already exist
-          }
-        };
+        // const handleAddSkill = (skillInput) => {
+        //     // Split the input by comma and trim each skill
+        //     const newSkills = skillInput.split(',').map(skill => skill.trim()).filter(skill => skill !== '');
+            
+        //     // Add new skills that don't already exist
+        //     const updatedSkills = [
+        //       ...skills,
+        //       ...newSkills.filter(skill => !skills.includes(skill))
+        //     ];
+          
+        //     setSkills(updatedSkills);
+        //   };
       
-        const handleRemoveSkill = (index) => {
-          setSkills(skills.filter((_, i) => i !== index)); // Remove skill by index
-        };
+        // const handleRemoveSkill = (index) => {
+        //   setSkills(skills.filter((_, i) => i !== index)); // Remove skill by index
+        // };
+      
     // Handle form submission
     // const handleSubmit = async (e) => {
     //     e.preventDefault();
@@ -260,6 +326,8 @@ function ConsultantProfileForm() {
     // };
 
     return (
+        <>
+        <Header/>
         <form className="consultant-profile-form" onSubmit={handleSubmit}>
             <h1 className="profile-heading">My Profile</h1>
 
@@ -403,30 +471,75 @@ function ConsultantProfileForm() {
                 </button>
             </div>
 
-            <div className="form-group">
-      <label>Skills</label>
-      <div className="skills-input">
-        {skills.map((skill, index) => (
-          <span key={index} className="skill-tag">
-            {skill}
-            <button type="button" onClick={() => handleRemoveSkill(index)}>
-              &times;
-            </button>
-          </span>
-        ))}
-        <input
-          type="text"
-          placeholder="Add a skill"
-          onKeyDown={(e) => {
-            if (e.key === 'Enter') {
-              e.preventDefault();
-              handleAddSkill(e.target.value.trim());
-              e.target.value = ''; // Clear the input field
-            }
-          }}
-        />
-      </div>
-    </div>
+            {/* <div className="form-group">
+  <label>Skills</label>
+  <div className="skills-input">
+    <input
+      type="text"
+      placeholder="Add skills (comma-separated)"
+      onKeyDown={(e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          handleAddSkill(e.target.value);
+          e.target.value = ''; // Clear the input field
+        }
+      }}
+    />
+    {skills.map((skill, index) => (
+      <span key={index} className="skill-tag">
+        {skill}
+        <button type="button" onClick={() => handleRemoveSkill(index)}>
+          &times;
+        </button>
+      </span>
+    ))}
+  </div>
+</div> */}
+
+          <label htmlFor="search">Search skills or add your own</label>
+          <div className="search-bar">
+            <input
+              id="search"
+              type="text"
+              placeholder="Search skills or add your own"
+              value={searchTerm}
+              onChange={handleSearchChange} // Search handler
+              onKeyDown={handleKeyDown} // Handle Enter key
+            />
+            <SearchIcon />
+          </div>
+
+          <div className="skills-section">
+            <h3>Selected Skills</h3>
+            <div className="skills-list">
+              {skills.map((skill) => (
+                <button
+                  key={skill}
+                  onClick={() => handleRemoveSkill(skill)}
+                  className="skill-button"
+                >
+                  {skill}
+                  <CrossIcon />
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="skills-section">
+            <h3>Skills </h3>
+            <div className="skills-list">
+              {filteredSkills.map((skill) => (
+                <button
+                  key={skill}
+                  onClick={() => handleAddSkill(skill)}
+                  className="skill-button"
+                >
+                  {skill}
+                  <PlusIcon />
+                </button>
+              ))}
+            </div>
+          </div>
 
             <div className="form-group">
                 <label>Certifications</label>
@@ -454,6 +567,7 @@ function ConsultantProfileForm() {
                 Save Profile
             </button>
         </form>
+        </>
     );
 }
 

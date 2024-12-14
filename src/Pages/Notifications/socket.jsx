@@ -39,8 +39,11 @@ class SocketManager {
 
       // Set up notification listener with role-based filtering
       this.setupNotificationListener();
+
+      return this.socket;
     } catch (error) {
       console.error('Socket connection error:', error);
+      throw error;
     }
   }
 
@@ -58,25 +61,60 @@ class SocketManager {
   }
 
   shouldReceiveNotification(notification) {
+     console.log('Checking Notification:', {
+    notificationType: notification.type,
+    currentUserId: this.userId,
+    currentUserRole: this.userRole,
+    notificationDetails: {
+      senderId: notification.sender_id,
+      clientId: notification.client_id,
+      freelancerId: notification.freelancer_id,
+      consultantId: notification.consultant_id
+    }
+  })
     // Define notification routing rules
     const routingRules = {
-      'hired': { role: 'freelancer', idField: 'freelancer_id' },
-      'new_proposal': { role: 'client', idField: 'client_id' },
-      'new_offer': { role: 'freelancer', idField: 'freelancer_id' },
-      'milestone_completed': { role: 'client', idField: 'client_id' },
-      'payment_received': { role: 'freelancer', idField: 'freelancer_id' }
+      'hired': { 
+        role: 'freelancer', 
+        idField: 'freelancer_id' 
+      },
+      'new_proposal': { 
+        role: 'client', 
+        idField: 'client_id' 
+      },
+      'new_offer': { 
+        roles: ['freelancer', 'consultant'], 
+        idFields: ['freelancer_id', 'consultant_id'] 
+      },
+      'milestone_completed': { 
+        role: 'client', 
+        idField: 'client_id' 
+      },
+      'payment_received': { 
+        role: 'freelancer', 
+        idField: 'freelancer_id' 
+      }
     };
 
     const rule = routingRules[notification.type];
     if (!rule) return false;
 
-    // Check if user role matches and the ID matches
+    // Handle special case for 'new_offer' with multiple possible roles
+    if (rule.roles) {
+      return rule.roles.includes(this.userRole) && 
+             rule.idFields.some(field => 
+               notification[field]?.toString() === this.userId?.toString()
+             );
+    }
+
+    // Standard case for other notification types
     return this.userRole === rule.role && 
            notification[rule.idField]?.toString() === this.userId?.toString();
   }
 
   addNotificationListener(callback) {
     this.notificationListeners.add(callback);
+    return () => this.removeNotificationListener(callback);
   }
 
   removeNotificationListener(callback) {
