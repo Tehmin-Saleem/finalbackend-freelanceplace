@@ -61,37 +61,27 @@ const { TextArea } = Input;
         message.error('Authorization token is missing');
         return;
       }
-      const reviewsResponse = await fetch('http://localhost:5000/api/client/reviews', {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      });
   
-      const reviewsData = await reviewsResponse.json();
-  
-      // Construct payload with all necessary details
       const offerPayload = {
         projectName: formValues.projectName,
         projectDescription: formValues.projectDescription,
         budget_type: formValues.budget_type,
-        ...(formValues.budget_type === 'hourly' 
-          ? { 
-              hourly_rate_from: formValues.hourly_rate_from, 
-              hourly_rate_to: formValues.hourly_rate_to 
+        ...(formValues.budget_type === 'hourly'
+          ? {
+              hourly_rate_from: formValues.hourly_rate_from,
+              hourly_rate_to: formValues.hourly_rate_to
             }
-          : { 
-              fixed_price: formValues.fixed_price 
+          : {
+              fixed_price: formValues.fixed_price
             }
         ),
         consultant_id: selectedConsultant.consultant_id
       };
-
+  
       const response = await fetch(
         `http://localhost:5000/api/client/send-offer-to-consultant/${selectedConsultant.consultant_id}`,
         {
-          method: 'POST', 
+          method: 'POST',
           headers: {
             Authorization: `Bearer ${token}`,
             'Content-Type': 'application/json',
@@ -99,34 +89,11 @@ const { TextArea } = Input;
           body: JSON.stringify(offerPayload),
         }
       );
- 
+  
       const data = await response.json();
-
+  
       if (data.success) {
         message.success('Offer sent successfully');
-        // if (data.reviewStats) {
-        //   message.info(`Client Rating: ${data.reviewStats.averageRating} 
-        //     (${data.reviewStats.totalReviews} reviews)`);
-        //   }
-        //    Modal.info({
-        //   title: 'Client Reviews',
-        //   content: (
-        //     <div>
-        //       {data.clientReviews.map((review, index) => (
-        //         <div key={index}>
-        //           <p>Project: {review.projectTitle}</p>
-        //           <p>Freelancer: {review.freelancerName}</p>
-        //           <p>Rating: {review.rating}/5</p>
-        //           <p>Review: {review.message}</p>
-        //           <p>Date: {new Date(review.date).toLocaleDateString()}</p>
-        //           <Divider />
-        //         </div>
-        //       ))}
-        //     </div>
-        //   ),
-        //   width: 600
-        // });
-        
         setIsOfferModalVisible(false);
         offerForm.resetFields();
       } else {
@@ -137,6 +104,7 @@ const { TextArea } = Input;
       message.error('An error occurred while sending the offer');
     }
   };
+  
   useEffect(() => {
     const fetchConsultants = async () => {
       const token = localStorage.getItem('token');
