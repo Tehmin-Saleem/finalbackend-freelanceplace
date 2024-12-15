@@ -486,9 +486,10 @@ exports.getConsultantProfiles = async (req, res) => {
   
 
 // Endpoint to send project details
-exports.sendProjectDetailsToConsultant= async (req, res) => {
+exports.sendProjectDetailsToConsultant = async (req, res) => {
   const { consultantId } = req.params;
-  const { projectTitle, projectDescription, deadline, githubUrl, additionalNotes } = req.body;
+  console.log("consultant id recibsdfgsgsh",consultantId)
+  const { githubUrl, additionalNotes, confidentialityAgreement } = req.body;
 
   try {
     // Validate consultant offer exists
@@ -503,11 +504,9 @@ exports.sendProjectDetailsToConsultant= async (req, res) => {
 
     // Save project details to the offer
     offer.projectDetails = {
-      projectTitle,
-      projectDescription,
-      deadline,
       githubUrl,
       additionalNotes,
+      confidentialityAgreement,
     };
 
     await offer.save();
@@ -518,6 +517,7 @@ exports.sendProjectDetailsToConsultant= async (req, res) => {
     res.status(500).json({ message: 'Internal server error' });
   }
 };
+
   
 
   
