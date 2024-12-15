@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { jwtDecode } from "jwt-decode";
 import './styles.scss';
-
+import Header from '../Commoncomponents/Header';
 const ConsultantProfileView = () => {
   const [profile, setProfile] = useState(null);
   const [userName, setUserName] = useState('');
@@ -12,7 +12,6 @@ const ConsultantProfileView = () => {
   useEffect(() => {
     const fetchProfile = async () => {
       setLoading(true);
-      
       try {
         const token = localStorage.getItem('token');
         if (!token) {
@@ -20,13 +19,13 @@ const ConsultantProfileView = () => {
         }
   
         const decodedToken = jwtDecode(token);
-        const userId = decodedToken.userId;
+        const consultantId = decodedToken.userId;
   
-        if (!userId) {
+        if (!consultantId) {
           throw new Error('No consultant ID found in token');
         }
   
-        const response = await fetch(`http://localhost:5000/api/client/Constprofile/${userId}`, {
+        const response = await fetch(`http://localhost:5000/api/client/Constprofile/${consultantId}`, {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -40,9 +39,7 @@ const ConsultantProfileView = () => {
           throw new Error(data.message || 'Failed to fetch profile');
         }
   
-        // Ensure skills is always an array
         const skills = Array.isArray(data.profile.skills) ? data.profile.skills : data.profile.skills ? [data.profile.skills] : [];
-  
         setProfile({
           ...data.profile,
           skills, // ensure skills is an array
@@ -51,7 +48,7 @@ const ConsultantProfileView = () => {
         // Handle profile picture and name
         const profilePicture = data.profile?.profilePicture || '/default-profile.png';
         setUserPicture(profilePicture);
-        const response1 = await fetch(`http://localhost:5000/api/client/users/${userId}`, {
+        const response1 = await fetch(`http://localhost:5000/api/client/users/${consultantId}`, {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -101,6 +98,8 @@ const ConsultantProfileView = () => {
   }
 
   return (
+    <>
+    <Header/>
     <div className="consultant-profile-view">
       <div className="profile-card">
         <div className="profile-header">
@@ -206,17 +205,19 @@ const ConsultantProfileView = () => {
 <div className="profile-section skills">
   <h3>Skills & Expertise</h3>
   {Array.isArray(profile.skills) && profile.skills.length > 0 ? (
-    <ul className="skills-list">
+    <div className="skills-container">
       {profile.skills.map((skill, index) => (
-        <li key={index}>{skill}</li>
+        <span key={index} className="skill-tag">{skill}</span>
       ))}
-    </ul>
+    </div>
   ) : (
     <p className="no-content">No skills listed</p>
   )}
 </div>
+
       </div>
     </div>
+    </>
   );
 };
 
