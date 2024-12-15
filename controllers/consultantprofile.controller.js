@@ -345,14 +345,23 @@ exports.getConsultantProfiles = async (req, res) => {
 
   exports.getOffersByClientId = async (req, res) => {
     try {
-      // Extract client ID from the request (assuming it's passed in the request params)
+      // Extract client ID from the request params
       const clientId = req.params.clientId;
+      const { status } = req.query; // Extract status filter from query parameters
   
-      // Fetch all offers where client_id matches the given clientId
-      const offers = await ConsultantOffer.find({ client_id: clientId })
+      // Prepare the query object
+      const query = { client_id: clientId };
+  
+      // Add status filter if provided and not 'all'
+      if (status && status !== 'all') {
+        query.status = status;
+      }
+  
+      // Fetch offers based on the query
+      const offers = await ConsultantOffer.find(query)
         .populate('consultant_id', 'first_name last_name email experience linkedIn education bio skills') // Populate consultant details
-        .populate('project_id', 'projectName projectDescription'); // Populate project details
-        // .sort({ createdAt: -1 }); // Sort by most recent offers
+        .populate('project_id', 'projectName projectDescription') // Populate project details
+        .sort({ createdAt: -1 }); // Sort by most recent offers
   
       // Check if any offers are found
       if (!offers || offers.length === 0) {
