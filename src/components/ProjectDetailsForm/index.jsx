@@ -1,7 +1,8 @@
 import React, { useState } from "react";
+import axios from "axios";
 import "./styles.scss";
 
-const SendProjectDetails= () => {
+const SendProjectDetails = ({ consultantId, onProjectSent }) => {
   const [formData, setFormData] = useState({
     projectTitle: "",
     projectDescription: "",
@@ -19,25 +20,53 @@ const SendProjectDetails= () => {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Submit form data (e.g., via API)
-    console.log("Form Submitted:", formData);
-    alert("Offer sent successfully!");
-    setFormData({
-      projectTitle: "",
-      projectDescription: "",
-      deadline: "",
-      githubUrl: "",
-      additionalNotes: "",
-      ndaAgreement: false,
-    });
+
+    try {
+      const token = localStorage.getItem("token");
+
+      const response = await axios.post(
+        `http://localhost:5000/api/consultantOffers/sendProjectDetails/${consultantId}`,
+        {
+          projectTitle: formData.projectTitle,
+          projectDescription: formData.projectDescription,
+          deadline: formData.deadline,
+          githubUrl: formData.githubUrl,
+          additionalNotes: formData.additionalNotes,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      console.log("Project details sent successfully:", response.data);
+      alert("Project details sent successfully!");
+      setFormData({
+        projectTitle: "",
+        projectDescription: "",
+        deadline: "",
+        githubUrl: "",
+        additionalNotes: "",
+        ndaAgreement: false,
+      });
+
+      // Trigger callback after successful submission
+      if (onProjectSent) onProjectSent();
+    } catch (error) {
+      console.error("Error sending project details:", error);
+      alert("Failed to send project details. Please try again.");
+    }
   };
 
   return (
     <div className="send-offer-form-container">
       <h1>Send Project Details</h1>
       <form className="send-offer-form" onSubmit={handleSubmit}>
+        {/* Form Fields */}
         <div className="form-group">
           <label htmlFor="projectTitle">Project Title</label>
           <input
@@ -50,7 +79,6 @@ const SendProjectDetails= () => {
             required
           />
         </div>
-
         <div className="form-group">
           <label htmlFor="projectDescription">Project Description</label>
           <textarea
@@ -63,7 +91,6 @@ const SendProjectDetails= () => {
             required
           ></textarea>
         </div>
-
         <div className="form-group">
           <label htmlFor="deadline">Deadline</label>
           <input
@@ -75,7 +102,6 @@ const SendProjectDetails= () => {
             required
           />
         </div>
-
         <div className="form-group">
           <label htmlFor="githubUrl">Confidential Link (GitHub, Figma, etc.)</label>
           <input
@@ -87,7 +113,6 @@ const SendProjectDetails= () => {
             placeholder="Enter URL (e.g., GitHub)"
           />
         </div>
-
         <div className="form-group">
           <label htmlFor="additionalNotes">Additional Notes</label>
           <textarea
@@ -99,7 +124,6 @@ const SendProjectDetails= () => {
             rows="3"
           ></textarea>
         </div>
-
         <div className="form-group checkbox-group">
           <input
             type="checkbox"
@@ -113,9 +137,8 @@ const SendProjectDetails= () => {
             I agree to share this information under confidentiality (NDA).
           </label>
         </div>
-
         <button type="submit" className="submit-button">
-          Send 
+          Send
         </button>
       </form>
     </div>
