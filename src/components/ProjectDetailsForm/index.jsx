@@ -2,9 +2,11 @@ import React, { useState } from "react";
 import axios from "axios";
 import "./styles.scss";
 
-const SendProjectDetails = ({ consultantId, onProjectSent, onClose }) => {
+const SendProjectDetails = ({ consultantId, onProjectSent, onClose, clientId }) => {
   const [formData, setFormData] = useState({
     githubUrl: "",
+    clientId,
+    deadline:"",
     additionalNotes: "",
     confidentialityAgreement: false,
   });
@@ -21,14 +23,25 @@ const SendProjectDetails = ({ consultantId, onProjectSent, onClose }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
     try {
       const token = localStorage.getItem("token");
-
+  
+      console.log('Sending project details with:', {
+        consultantId,
+        deadline,
+        clientId: clientId,
+        githubUrl: formData.githubUrl,
+        additionalNotes: formData.additionalNotes,
+        confidentialityAgreement: formData.confidentialityAgreement
+      });
+      console.log("Sending deadline:", formData.deadline);
       const response = await axios.post(
-        `http://localhost:5000/api/consultantOffers/sendProjectDetails/${consultantId}`,
+        `http://localhost:5000/api/client/sendProjectDetails/${consultantId}`,
         {
           githubUrl: formData.githubUrl,
+          deadline: formData.deadline,
+          clientId,
           additionalNotes: formData.additionalNotes,
           confidentialityAgreement: formData.confidentialityAgreement,
         },
@@ -39,28 +52,27 @@ const SendProjectDetails = ({ consultantId, onProjectSent, onClose }) => {
           },
         }
       );
-      console.log("Consultant ID in API Call:", consultantId);
-
-      
-
+  
       console.log("Project details sent successfully:", response.data);
       alert("Project details sent successfully!");
-
-      // Change the button to show that the details are sent
+  
       setIsSent(true);
-
-      // Clear the form data after successful submission
       setFormData({
         githubUrl: "",
+        clientId: clientId,
         additionalNotes: "",
         confidentialityAgreement: false,
+        deadline: "",
       });
-
-      // Trigger callback after successful submission
+  
       if (onProjectSent) onProjectSent();
     } catch (error) {
-      console.error("Error sending project details:", error);
-      alert("Failed to send project details. Please try again.");
+      console.error("Full error details:", {
+        message: error.message,
+        response: error.response ? error.response.data : 'No response',
+        config: error.config
+      });
+      console.log("Failed to send project details. Please check the console for details.");
     }
   };
 
@@ -100,7 +112,17 @@ const SendProjectDetails = ({ consultantId, onProjectSent, onClose }) => {
               rows="3"
             ></textarea>
           </div>
-
+          <div className="form-group">
+            <label htmlFor="deadline">Deadline</label>
+            <input
+              type="date"
+              id="deadline"
+              name="deadline"
+              value={formData.deadline}
+              onChange={handleChange}
+              required
+            />
+          </div>
           {/* Confidentiality Agreement Checkbox */}
           <div className="form-group checkbox-group">
             <input
