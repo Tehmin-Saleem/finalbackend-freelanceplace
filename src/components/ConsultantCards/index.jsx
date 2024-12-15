@@ -3,7 +3,7 @@ import './styles.scss';
 import Header from '../Commoncomponents/Header';
 import { message } from 'antd';
 import { useLocation } from 'react-router-dom';
-
+import { Modal,Divider, Form, Input, Select, InputNumber } from 'antd';
 const ConsultantCard = () => {
   const [consultants, setConsultants] = useState([]);
   const [filteredConsultants, setFilteredConsultants] = useState([]);
@@ -13,11 +13,17 @@ const ConsultantCard = () => {
     experienceLevel: '',
     educationDegree: '',
   });
+  const { Option } = Select;
+const { TextArea } = Input;
   const location = useLocation();
   const [projectDetails, setProjectDetails] = useState({
     projectName: '',
     projectDescription: ''
   });
+  const [isOfferModalVisible, setIsOfferModalVisible] = useState(false);
+  const [selectedConsultant, setSelectedConsultant] = useState(null);
+  const [offerForm] = Form.useForm();
+
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -28,37 +34,101 @@ const ConsultantCard = () => {
       console.log("Project Details:", location.state.project);
     }
   }, [location]);
+  const showOfferModal = (consultant) => {
+    // Ensure project details exist before opening modal
+    if (!projectDetails || !projectDetails.projectName) {
+      message.error('Please select a project first');
+      return;
+    }
 
-  const handleSendOffer = async (consultant) => {
+    setSelectedConsultant(consultant);
+    setIsOfferModalVisible(true);
+    
+    // Preset form with project details
+    offerForm.setFieldsValue({
+      projectName: projectDetails.projectName,
+      projectDescription: projectDetails.description,
+      budget_type: 'hourly',
+      hourly_rate_from: null,
+      hourly_rate_to: null,
+      fixed_price: null
+    });
+  };
+  const handleSendOffer = async (formValues) => {
     try {
       const token = localStorage.getItem('token');
       if (!token) {
         message.error('Authorization token is missing');
         return;
       }
-      
+      const reviewsResponse = await fetch('http://localhost:5000/api/client/reviews', {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+  
+      const reviewsData = await reviewsResponse.json();
+  
+      // Construct payload with all necessary details
+      const offerPayload = {
+        projectName: formValues.projectName,
+        projectDescription: formValues.projectDescription,
+        budget_type: formValues.budget_type,
+        ...(formValues.budget_type === 'hourly' 
+          ? { 
+              hourly_rate_from: formValues.hourly_rate_from, 
+              hourly_rate_to: formValues.hourly_rate_to 
+            }
+          : { 
+              fixed_price: formValues.fixed_price 
+            }
+        ),
+        consultant_id: selectedConsultant.consultant_id
+      };
+
       const response = await fetch(
-        `http://localhost:5000/api/client/send-offer-to-consultant/${consultant.consultant_id}`,
+        `http://localhost:5000/api/client/send-offer-to-consultant/${selectedConsultant.consultant_id}`,
         {
           method: 'POST', 
           headers: {
             Authorization: `Bearer ${token}`,
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({
-            consultant_id: consultant.consultant_id,
-            projectId: projectDetails._id,
-            projectName: projectDetails.projectName,
-            projectDescription: projectDetails.description
-          }),
+          body: JSON.stringify(offerPayload),
         }
       );
  
       const data = await response.json();
-  
+
       if (data.success) {
         message.success('Offer sent successfully');
-        // Optionally navigate back or update UI
+        // if (data.reviewStats) {
+        //   message.info(`Client Rating: ${data.reviewStats.averageRating} 
+        //     (${data.reviewStats.totalReviews} reviews)`);
+        //   }
+        //    Modal.info({
+        //   title: 'Client Reviews',
+        //   content: (
+        //     <div>
+        //       {data.clientReviews.map((review, index) => (
+        //         <div key={index}>
+        //           <p>Project: {review.projectTitle}</p>
+        //           <p>Freelancer: {review.freelancerName}</p>
+        //           <p>Rating: {review.rating}/5</p>
+        //           <p>Review: {review.message}</p>
+        //           <p>Date: {new Date(review.date).toLocaleDateString()}</p>
+        //           <Divider />
+        //         </div>
+        //       ))}
+        //     </div>
+        //   ),
+        //   width: 600
+        // });
+        
+        setIsOfferModalVisible(false);
+        offerForm.resetFields();
       } else {
         message.error(data.message || 'Failed to send offer');
       }
@@ -123,12 +193,25 @@ const ConsultantCard = () => {
     }
 
     if (filters.skill) {
-      updatedConsultants = updatedConsultants.filter((consultant) =>
-        consultant.skills
-          ?.split(',')
-          .map((skill) => skill.trim().toLowerCase())
-          .some((skill) => skill.includes(filters.skill.toLowerCase()))
-      );
+      updatedConsultants = updatedConsultants.filter((consultant) => {
+        // If skills is an array, use it directly
+        if (Array.isArray(consultant.skills)) {
+          return consultant.skills
+            .map(skill => skill.trim().toLowerCase())
+            .some(skill => skill.includes(filters.skill.toLowerCase()));
+        }
+        
+        // If skills is a string, split it
+        if (typeof consultant.skills === 'string') {
+          return consultant.skills
+            .split(',')
+            .map(skill => skill.trim().toLowerCase())
+            .some(skill => skill.includes(filters.skill.toLowerCase()));
+        }
+        
+        // If skills is neither array nor string, return false
+        return false;
+      });
     }
 
     if (filters.experienceLevel) {
@@ -164,6 +247,7 @@ const ConsultantCard = () => {
 
   return (
     <>
+     
     <Header/>
     <div className="filter-container">
     
@@ -213,18 +297,18 @@ const ConsultantCard = () => {
   </div>
 </div>
 
-      <div className="consultant-card-container">
+<div className="consultant-card-container">
         {filteredConsultants.map((consultant) => (
           <div key={consultant._id} className="consultant-card">
-            <div >
-    <button 
-      className="send-offer-button" 
-      onClick={() => handleSendOffer(consultant)}
-              disabled={!projectDetails} // Disable if no project selected
-            >
-      Send Offer
-    </button>
-  </div>
+            <div>
+              <button 
+                className="send-offer-button" 
+                onClick={() => showOfferModal(consultant)}
+                disabled={!projectDetails || !projectDetails.projectName}
+              >
+                Send Offer
+              </button>
+            </div>
             <img src={consultant.profilePicture} alt="Profile" className="profile-picture" />
             <h3 className="consultant-name">{consultant.email}</h3>
             <p className="consultant-location">{consultant.address}</p>
@@ -251,15 +335,17 @@ const ConsultantCard = () => {
               ))}
             </ul>
             <h4 className="section-title">Skills</h4>
-<div className="skills">
-  {Array.isArray(consultant.skills) ? (
-    consultant.skills.map((skill, index) => (
-      <span key={index} className="skill-tag">{skill.trim()}</span>
-    ))
-  ) : consultant.skills ? (
-    consultant.skills.split(',').map((skill, index) => (
-      <span key={index} className="skill-tag">{skill.trim()}</span>
-    ))
+            <div className="skills">
+  {consultant.skills ? (
+    Array.isArray(consultant.skills) ? (
+      consultant.skills.map((skill, index) => (
+        <span key={index} className="skill-tag">{skill.trim()}</span>
+      ))
+    ) : (
+      consultant.skills.split(',').map((skill, index) => (
+        <span key={index} className="skill-tag">{skill.trim()}</span>
+      ))
+    )
   ) : (
     <p>No skills listed</p>
   )}
@@ -274,6 +360,103 @@ const ConsultantCard = () => {
         ))}
       </div>
     </div>
+    <Modal
+      title="Send Offer to Consultant"
+      visible={isOfferModalVisible}
+      onCancel={() => setIsOfferModalVisible(false)}
+      onOk={() => offerForm.submit()}
+    >
+      <Form
+        form={offerForm}
+        layout="vertical"
+        onFinish={handleSendOffer}
+      >
+        <Form.Item
+          name="projectName"
+          label="Project Name"
+          rules={[{ required: true, message: 'Project name is required' }]}
+        >
+          <Input disabled />
+        </Form.Item>
+
+        <Form.Item
+          name="projectDescription"
+          label="Project Description"
+          rules={[{ required: true, message: 'Project description is required' }]}
+        >
+          <TextArea rows={4} disabled />
+        </Form.Item>
+
+        <Form.Item
+          name="budget_type"
+          label="Budget Type"
+          rules={[{ required: true, message: 'Please select budget type' }]}
+        >
+          <Select placeholder="Select Budget Type">
+            <Option value="hourly">Hourly</Option>
+            <Option value="fixed">Fixed Price</Option>
+          </Select>
+        </Form.Item>
+
+        <Form.Item
+          noStyle
+          shouldUpdate={(prevValues, currentValues) => prevValues.budget_type !== currentValues.budget_type}
+        >
+          {({ getFieldValue }) => 
+            getFieldValue('budget_type') === 'hourly' ? (
+              <>
+                <Form.Item
+                  name="hourly_rate_from"
+                  label="Hourly Rate (From)"
+                  rules={[{ required: true, message: 'Please input minimum hourly rate' }]}
+                >
+                  <InputNumber 
+                    min={0} 
+                    placeholder="Minimum Hourly Rate" 
+                    style={{ width: '100%' }} 
+                  />
+                </Form.Item>
+                <Form.Item
+                  name="hourly_rate_to"
+                  label="Hourly Rate (To)"
+                  rules={[{ 
+                    required: true, 
+                    message: 'Please input maximum hourly rate' 
+                  }, 
+                  ({ getFieldValue }) => ({
+                    validator(_, value) {
+                      const from = getFieldValue('hourly_rate_from');
+                      if (!value || !from || value >= from) {
+                        return Promise.resolve();
+                      }
+                      return Promise.reject(new Error('Maximum rate must be greater than minimum rate'));
+                    },
+                  })]}
+                >
+                  <InputNumber 
+                    min={0} 
+                    placeholder="Maximum Hourly Rate" 
+                    style={{ width: '100%' }} 
+                  />
+                </Form.Item>
+              </>
+            ) : (
+              <Form.Item
+                name="fixed_price"
+                label="Fixed Price"
+                rules={[{ required: true, message: 'Please input fixed price' }]}
+              >
+                <InputNumber 
+                  min={0} 
+                  placeholder="Fixed Project Price" 
+                  style={{ width: '100%' }} 
+                />
+              </Form.Item>
+            )
+          }
+        </Form.Item>
+      </Form>
+    </Modal>
     </>
   );
 };
