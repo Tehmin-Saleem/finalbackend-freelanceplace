@@ -4,7 +4,7 @@ import "./styles.scss";
 import { Header, Spinner } from "../../components/index"; // Assuming these are already created.
 import SendProjectDetails from "../ProjectDetailsForm";
 
-const ClientOffersPage = ({ consultantId }) => {
+const ClientOffersPage = () => {
   const [offers, setOffers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -12,18 +12,14 @@ const ClientOffersPage = ({ consultantId }) => {
   const [filteredOffers, setFilteredOffers] = useState([]);
   const [activeOfferId, setActiveOfferId] = useState(null);
   const [selectedConsultantId, setSelectedConsultantId] = useState(null); // New state
-
+  const [selectedClientId, setSelectedClientId] = useState(null); // New state
 
 
 
   const [showForm, setShowForm] = useState(false); // State to toggle form visibility
 
 
-  const handleAddProjectClick = (offerId, consultantId) => {
-    console.log("Consultant ID:", consultantId);
-    setActiveOfferId(offerId);
-    setSelectedConsultantId(consultantId); // Set the consultantId in state
-  };
+ 
 
   const handleProjectSent = () => {
     setActiveOfferId(null); // Hide form after successfully sending details
@@ -94,7 +90,20 @@ const ClientOffersPage = ({ consultantId }) => {
 
     fetchOffers();
   }, [statusFilter]);
-
+  const handleAddProjectClick = (offerId) => {
+    // Find the specific offer by its ID
+    const selectedOffer = offers.find(offer => offer.id === offerId);
+    
+    // Extract the consultant ID correctly
+    const consultantId = selectedOffer?.consultant_id?._id;
+    const clientId = selectedOffer?.client_id;
+    
+    console.log("Consultant ID:", consultantId);
+    console.log("Client ID:", clientId);
+    setActiveOfferId(offerId);
+    setSelectedClientId(clientId); 
+    setSelectedConsultantId(consultantId); // Set the consultantId in state
+  };
   const handleStatusFilterChange = (status) => {
     setStatusFilter(status);
   };
@@ -149,7 +158,8 @@ const ClientOffersPage = ({ consultantId }) => {
             offers.map((offer, index) => (
               <div className="offer-card" key={offer.id || index}>
                 <div className="card-header">
-                  <h3>{offer?.offerDetails?.project?.name|| "Untitled Project"}</h3>
+                <h3>{offer?.project_name|| "Untitled Project"}</h3>
+                 
                   <span className={`status ${offer?.status?.toLowerCase() || ""}`}>
                     {offer?.status || "Unknown"}
                   </span>
@@ -229,6 +239,7 @@ const ClientOffersPage = ({ consultantId }) => {
                         {/* Send Project Details Form */}
                         <SendProjectDetails
                           consultantId={selectedConsultantId}
+                          clientId={selectedClientId}
                           // onProjectSent={handleProjectSent}
                           onClose={() => setActiveOfferId(null)} // Close function to reset state
                         />
