@@ -96,13 +96,13 @@ exports.sendOfferToConsultant = async (req, res) => {
   try {
     console.log("Incoming request:", req.body, req.params);
     const { consultant_id } = req.params;
-    const { 
-      projectName, 
-      projectDescription, 
-      budget_type, 
-      hourly_rate_from, 
-      hourly_rate_to, 
-      fixed_price 
+    const {
+      projectName,
+      projectDescription,
+      budget_type,
+      hourly_rate_from,
+      hourly_rate_to,
+      fixed_price
     } = req.body;
     const clientId = req.user.userId;
 
@@ -118,7 +118,7 @@ exports.sendOfferToConsultant = async (req, res) => {
     // Find client profile
     const clientProfile = await Client_Profile.findOne({ client_id: clientId })
       .populate('client_id', 'first_name last_name email');
-    
+
     if (!clientProfile) {
       return res.status(404).json({
         success: false,
@@ -127,20 +127,20 @@ exports.sendOfferToConsultant = async (req, res) => {
     }
 
     // Find consultant profile
-    const consultantProfile = await ConsultantProfile.findOne({ 
-      consultant_id: consultant_id 
-    }).populate('userId', 'first_name last_name email');
-
+    const consultantProfile = await ConsultantProfile.findOne({
+      consultant_id: consultant_id
+    }).populate('userId', 'first_name last_name email experience linkedIn education bio skills');
+    console.log("Consultant Profile Found:", consultantProfile);
     if (!consultantProfile) {
       return res.status(404).json({
         success: false,
-        message: 'Consultant profile not found'
+        message: 'Consultant profile not found',
       });
     }
 
-    const clientReviews = await Review.find({ 
-      client_id: clientId, 
-      status: 'Completed' 
+    const clientReviews = await Review.find({
+      client_id: clientId,
+      status: 'Completed'
     }).populate({
       path: 'freelancer_id',
       select: 'first_name last_name'
@@ -165,7 +165,7 @@ exports.sendOfferToConsultant = async (req, res) => {
     // Calculate review statistics
     const reviewStats = {
       totalReviews: clientReviews.length,
-      averageRating: clientReviews.length > 0 
+      averageRating: clientReviews.length > 0
         ? (clientReviews.reduce((sum, review) => sum + review.stars, 0) / clientReviews.length).toFixed(1)
         : '0.0'
     };
@@ -180,18 +180,17 @@ exports.sendOfferToConsultant = async (req, res) => {
       project_name: projectName,
       project_description: projectDescription,
       budget_type: budget_type,
-      ...(budget_type === 'hourly' 
-        ? { 
-            hourly_rate: { 
-              from: hourly_rate_from, 
-              to: hourly_rate_to 
-            } 
-          } 
-        : { 
-            fixed_price: fixed_price 
+      ...(budget_type === 'hourly'
+        ? {
+            hourly_rate: {
+              from: hourly_rate_from,
+              to: hourly_rate_to
+            }
+          }
+        : {
+            fixed_price: fixed_price
           }
       ),
-      client_reviews: clientReviews.map(review => review._id),
       client_review_stats: {
         average_rating: parseFloat(reviewStats.averageRating),
         total_reviews: reviewStats.totalReviews
@@ -199,9 +198,8 @@ exports.sendOfferToConsultant = async (req, res) => {
       offer_details: {
         client: {
           id: clientProfile.client_id._id,
-          name: clientName,
+          fullName: clientName,
           email: clientProfile.client_id.email,
-          reviews: formattedReviews,  // Ensure reviews are added
           reviewStats: {
             averageRating: reviewStats.averageRating,
             totalReviews: reviewStats.totalReviews
@@ -212,15 +210,25 @@ exports.sendOfferToConsultant = async (req, res) => {
           name: projectName,
           description: projectDescription
         },
+        consultant: {
+          id: consultantProfile._id,
+          name: `${consultantProfile.firstname || 'N/A'} ${consultantProfile.lastname || 'N/A'}`,
+          email: consultantProfile.email || 'N/A',
+          experience: consultantProfile.experience || [],
+          linkedIn: consultantProfile.linkedIn || 'N/A',
+          education: consultantProfile.education || [],
+          bio: consultantProfile.bio || 'N/A',
+          skills: consultantProfile.skills || 'N/A',
+        },
         budget: {
           type: budget_type,
-          ...(budget_type === 'hourly' 
-            ? { 
-                hourlyRateFrom: hourly_rate_from, 
-                hourlyRateTo: hourly_rate_to 
-              } 
-            : { 
-                fixedPrice: fixed_price 
+          ...(budget_type === 'hourly'
+            ? {
+                hourlyRateFrom: hourly_rate_from,
+                hourlyRateTo: hourly_rate_to
+              }
+            : {
+                fixedPrice: fixed_price
               }
           )
         }
@@ -259,6 +267,9 @@ exports.sendOfferToConsultant = async (req, res) => {
     });
   }
 };
+
+
+
 
 
 

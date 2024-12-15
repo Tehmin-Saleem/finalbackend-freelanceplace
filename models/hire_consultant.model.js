@@ -16,26 +16,30 @@ const ConsultantOfferSchema = new mongoose.Schema({
     ref: 'Project',
     required: true
   },
-  budget_type: { 
-    type: String, 
-    enum: ['hourly', 'fixed'], 
-    // required: true 
+  budget_type: {
+    type: String,
+    enum: ['hourly', 'fixed'],
+    required: true
   },
   hourly_rate: {
-    from: { 
-      type: Number, 
-      required: function() { return this.budget_type === 'hourly'; } 
+    from: {
+      type: Number,
+      required: function() { return this.budget_type === 'hourly'; }
     },
-    to: { 
-      type: Number, 
-      required: function() { return this.budget_type === 'hourly'; } 
+    to: {
+      type: Number,
+      required: function() { return this.budget_type === 'hourly'; }
     }
   },
   fixed_price: {
     type: Number,
     required: function() { return this.budget_type === 'fixed'; }
   },
-  offerDetails: {
+  client_review_stats: {
+    average_rating: Number,
+    total_reviews: Number
+  },
+  offer_details: {
     client: {
       id: {
         type: mongoose.Schema.Types.ObjectId,
@@ -43,33 +47,45 @@ const ConsultantOfferSchema = new mongoose.Schema({
       },
       fullName: {
         type: String,
-        
       },
       email: {
         type: String,
-      
       },
-      client_reviews: [{
-        type: mongoose.Types.ObjectId,
-        ref: 'Review'
-      }],
-      client_review_stats: {
-        average_rating: Number,
-        total_reviews: Number
-      },
-      offer_details: {
-        type: Object
-      },
-      status: {
-        type: String,
-        enum: ['pending', 'accepted', 'rejected'],
-        default: 'pending'
-      },
-      created_at: {
-        type: Date,
-        default: Date.now
+      reviewStats: {
+        averageRating: Number,
+        totalReviews: Number
       }
-    
+    },
+    project: {
+      id: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Project'
+      },
+      name: String,
+      description: String
+    },
+    consultant: {
+      id: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'ConsultantProfile'
+      },
+      name: String,
+      email: String,
+      experience: [Object],
+      linkedIn: String,
+      education: [Object],
+      bio: String,
+      skills: [String]
+    },
+    budget: {
+      type: {
+        type: String,
+        enum: ['hourly', 'fixed'],
+        required: true
+      },
+      hourlyRateFrom: Number,
+      hourlyRateTo: Number,
+      fixedPrice: Number
     }
   },
   project_name: {
