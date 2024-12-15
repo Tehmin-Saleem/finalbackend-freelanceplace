@@ -126,7 +126,7 @@ const ClientOffersPage = () => {
             offers.map((offer, index) => (
               <div className="offer-card" key={offer.id || index}>
                 <div className="card-header">
-                  <h3>{offer?.offerDetails?.project?.name || "Untitled Project"}</h3>
+                  <h3>{offer?.offerDetails?.project?.name|| "Untitled Project"}</h3>
                   <span className={`status ${offer?.status?.toLowerCase() || ""}`}>
                     {offer?.status || "Unknown"}
                   </span>

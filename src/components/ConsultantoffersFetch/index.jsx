@@ -3,11 +3,13 @@ import axios from "axios";
 import "./styles.scss";
 import Header from "../Commoncomponents/Header";
 import Spinner from "../chatcomponents/Spinner";
+import ProjectDetailsModal from "../PopUps/SeeProjectDetails";
 
 const ConsultantOffers = () => {
   const [offers, setOffers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [showProjectDetails, setShowProjectDetails] = useState(false);
 
   // Fetch offers on component mount
   useEffect(() => {
@@ -157,12 +159,18 @@ const ConsultantOffers = () => {
                       </>
                     )}
                     {status === "accepted" && (
-                      <button
-                        className="accept-button"
-                        onClick={() => alert("Redirect to offer details")}
-                      >
-                        See Project Details
-                      </button>
+                      <div>
+                      {!showProjectDetails ? (
+                        <button
+                          className="accept-button"
+                          onClick={() => setShowProjectDetails(true)}
+                        >
+                          See Project Details
+                        </button>
+                      ) : (
+                        <ProjectDetailsModal/>
+                      )}
+                    </div>
                     )}
                     {status === "declined" && (
                       <span className="status-message error">
@@ -176,6 +184,7 @@ const ConsultantOffers = () => {
           )}
         </div>
       </div>
+      
     </>
   );
 };
