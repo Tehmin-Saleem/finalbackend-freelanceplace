@@ -239,6 +239,7 @@ exports.createNotification = async (notificationData) => {
       job_id,
       message,
       type,
+      receiverId,
       senderId // Sender's ID
     } = notificationData;
 
@@ -249,16 +250,19 @@ exports.createNotification = async (notificationData) => {
     }
 
     // Determine the recipient based on notification type
-    let recipientId = null;
-    if (type === 'new_offer') {
-      recipientId = consultant_id || freelancer_id;
-    } else if (type === 'new_proposal') {
-      recipientId = client_id;
-    } else if (['hired', 'milestone_completed', 'payment_received'].includes(type)) {
-      recipientId = freelancer_id;
+    let recipientId = receiverId || null;
+    if (!recipientId) {
+      if (type === 'new_offer') {
+        recipientId = consultant_id || freelancer_id;
+      } else if (type === 'new_proposal') {
+        recipientId = client_id;
+      } else if (['hired', 'milestone_completed', 'payment_received'].includes(type)) {
+        recipientId = freelancer_id;
+      }
     }
 
     console.log('Recipient ID:', recipientId, 'Sender ID:', senderId);
+
 
     // Block notifications if the recipient is the sender
     if (recipientId && recipientId.toString() === senderId.toString()) {
@@ -274,6 +278,7 @@ exports.createNotification = async (notificationData) => {
       job_id,
       message,
       type,
+      receiver_id: recipientId,
       sender_id: senderId,
       is_read: false,
       timestamp: new Date()
@@ -284,9 +289,9 @@ exports.createNotification = async (notificationData) => {
     const savedNotification = await newNotification.save();
 
     // Emit the notification to the recipient's room
-      if (global.io) {
-      const targetRoom = getNotificationRoom(type, client_id, freelancer_id, consultant_id, senderId,);
-      
+    if (global.io) {
+      const targetRoom = `user_${recipientId}`; // Use user-specific room
+
       if (targetRoom) {
         console.log(`Emitting ${type} notification to room:`, targetRoom);
         global.io.to(targetRoom).emit('notification', savedNotification);
@@ -300,6 +305,8 @@ exports.createNotification = async (notificationData) => {
   }
 };
 
+
+// Helper function to determine the correct notification room
 // Helper function to determine the correct notification room
 function getNotificationRoom(type, senderId, clientId, freelancerId, consultantId) {
   const routingRules = {
@@ -312,23 +319,40 @@ function getNotificationRoom(type, senderId, clientId, freelancerId, consultantI
 
   const rule = routingRules[type];
   if (!rule) return null;
+
+  // Ensure the targetId is not the senderId
+  if (rule.targetId && rule.targetId.toString() === rule.excludeId.toString()) {
+    return null;
+  }
+
   return `${rule.role}_${rule.targetId}`;
 }
 
+
 // Updated socket server setup function
+// Socket Server Setup
 function setupSocketServer(io) {
   io.on('connection', (socket) => {
-    const { userId, role } = socket.handshake.auth;
+    const { userId } = socket.handshake.auth;
 
+    if (userId) {
+      // Join a user-specific room
+      const userRoom = `user_${userId}`;
+      socket.join(userRoom);
+      console.log(`User ${userId} joined room ${userRoom}`);
+    }
+
+    // Optional: Add specific room joining logic if needed
     socket.on('join-rooms', (data) => {
-      if (data.userId !== data.excludeId) {
-        const room = `${data.role}_${data.userId}`;
-        socket.join(room);
-        console.log(`User ${data.userId} joined room ${room}`);
+      if (data.userId) {
+        const userRoom = `user_${data.userId}`;
+        socket.join(userRoom);
+        console.log(`User ${data.userId} explicitly joined room ${userRoom}`);
       }
     });
   });
 }
+
 
 // Function to fetch notifications
 exports.getNotifications = async (req, res) => {

@@ -94,160 +94,171 @@ if (!Array.isArray(skills)) {
 
 exports.sendOfferToConsultant = async (req, res) => {
   try {
-    // Log incoming request
     console.log("Incoming request:", req.body, req.params);
-
-    // Extract data from request
     const { consultant_id } = req.params;
-    const { projectName, projectDescription } = req.body;
+    const { 
+      projectName, 
+      projectDescription, 
+      budget_type, 
+      hourly_rate_from, 
+      hourly_rate_to, 
+      fixed_price 
+    } = req.body;
     const clientId = req.user.userId;
 
-    // Find the project by name
-    const project = await Project.findOne({ projectName: projectName });
-
+    // Find project
+    const project = await Project.findOne({ projectName });
     if (!project) {
       return res.status(404).json({
         success: false,
-        message: 'Project not found',
-        details: {
-          searchedProjectName: projectName
-        }
+        message: 'Project not found'
       });
     }
 
-    // Find the client's profile
+    // Find client profile
     const clientProfile = await Client_Profile.findOne({ client_id: clientId })
       .populate('client_id', 'first_name last_name email');
     
     if (!clientProfile) {
       return res.status(404).json({
         success: false,
-        message: 'Client profile not found',
-      });
-    }
-    const mongoose = require('mongoose');
-    if (!mongoose.Types.ObjectId.isValid(consultant_id)) {
-      return res.status(400).json({
-        success: false,
-        message: 'Invalid consultant ID format',
+        message: 'Client profile not found'
       });
     }
 
-    const consultantId = new mongoose.Types.ObjectId(consultant_id);
+    // Find consultant profile
+    const consultantProfile = await ConsultantProfile.findOne({ 
+      consultant_id: consultant_id 
+    }).populate('userId', 'first_name last_name email');
 
-    // Find the consultant's profile
-  // Find the consultant's profile
-console.log("Finding consultant profile with ID:", consultant_id);
-const consultantProfile = await ConsultantProfile.findOne({ 
-  consultant_id: consultant_id 
-}).populate('userId', 'first_name last_name email experience linkedIn education bio skills');
-console.log("Consultant Profile Found:", consultantProfile);
     if (!consultantProfile) {
       return res.status(404).json({
         success: false,
-        message: 'Consultant profile not found',
+        message: 'Consultant profile not found'
       });
     }
 
-    // Fetch client reviews
     const clientReviews = await Review.find({ 
       client_id: clientId, 
       status: 'Completed' 
-    }).populate('freelancer_id', 'first_name last_name');
+    }).populate({
+      path: 'freelancer_id',
+      select: 'first_name last_name'
+    }).populate({
+      path: 'job_id',
+      select: 'title'
+    }).populate({
+      path: 'client_id',
+      select: 'first_name last_name'
+    });
 
-    // Calculate client review statistics
+    // Prepare review details for sending with complete information
+    const formattedReviews = clientReviews.map(review => ({
+      clientName: `${review.client_id.first_name} ${review.client_id.last_name}`,
+      freelancerName: `${review.freelancer_id.first_name} ${review.freelancer_id.last_name}`,
+      projectTitle: review.job_id.title,
+      rating: review.stars,
+      message: review.message,
+      date: review.createdAt
+    }));
+
+    // Calculate review statistics
     const reviewStats = {
       totalReviews: clientReviews.length,
       averageRating: clientReviews.length > 0 
-        ? clientReviews.reduce((sum, review) => sum + review.stars, 0) / clientReviews.length 
-        : null,
-      reviews: clientReviews.map(review => ({
-        freelancerName: `${review.freelancer_id.first_name} ${review.freelancer_id.last_name}`,
-        stars: review.stars,
-        message: review.message,
-        date: review.createdAt
-      }))
-    };
-
-    // Prepare offer details
-    const offerDetails = {
-      client: {
-        id: clientProfile.client_id._id,
-        name: `${clientProfile.client_id.first_name} ${clientProfile.client_id.last_name}`,
-        email: clientProfile.client_id.email,
-        rating: clientProfile.rating || null,
-        reviews: reviewStats
-      },
-      project: {
-        id: project._id,
-        name: projectName,
-        description: projectDescription,
-        
-
-      },
-      consultant: {
-        id: consultantProfile._id,
-        name: `${consultantProfile.firstname || 'N/A'} ${consultantProfile.lastname || 'N/A'}`,
-        email: consultantProfile.email || 'N/A',
-        experience: consultantProfile.experience || [],
-        linkedIn: consultantProfile.linkedIn || 'N/A',
-        education: consultantProfile.education || [],
-        bio: consultantProfile.bio || 'N/A',
-        skills: consultantProfile.skills || 'N/A',
-      },
+        ? (clientReviews.reduce((sum, review) => sum + review.stars, 0) / clientReviews.length).toFixed(1)
+        : '0.0'
     };
 
     const clientName = `${clientProfile.client_id.first_name} ${clientProfile.client_id.last_name}`;
 
-    // Create the offer
+    // Create the offer with review details
     const newOffer = await ConsultantOffer.create({
       consultant_id: consultant_id,
       client_id: clientId,
       project_id: project._id,
       project_name: projectName,
-      offerDetails: {
+      project_description: projectDescription,
+      budget_type: budget_type,
+      ...(budget_type === 'hourly' 
+        ? { 
+            hourly_rate: { 
+              from: hourly_rate_from, 
+              to: hourly_rate_to 
+            } 
+          } 
+        : { 
+            fixed_price: fixed_price 
+          }
+      ),
+      client_reviews: clientReviews.map(review => review._id),
+      client_review_stats: {
+        average_rating: parseFloat(reviewStats.averageRating),
+        total_reviews: reviewStats.totalReviews
+      },
+      offer_details: {
         client: {
           id: clientProfile.client_id._id,
           name: clientName,
-          email: clientProfile.client_id.email
+          email: clientProfile.client_id.email,
+          reviews: formattedReviews,  // Ensure reviews are added
+          reviewStats: {
+            averageRating: reviewStats.averageRating,
+            totalReviews: reviewStats.totalReviews
+          }
         },
         project: {
           id: project._id,
           name: projectName,
           description: projectDescription
+        },
+        budget: {
+          type: budget_type,
+          ...(budget_type === 'hourly' 
+            ? { 
+                hourlyRateFrom: hourly_rate_from, 
+                hourlyRateTo: hourly_rate_to 
+              } 
+            : { 
+                fixedPrice: fixed_price 
+              }
+          )
         }
       },
       status: 'pending',
     });
 
     // Create notification
-    const notificationData = {
+    await createNotification({
       client_id: clientId,
       consultant_id: consultant_id,
       job_id: project._id,
-      message: `${clientName} has sent you an offer for his job ${projectName}`,
+      message: `${clientName} has sent you an offer for project ${projectName}`,
       type: 'new_offer',
-      senderId: clientId,
-     
-      
-    };
-    await createNotification(notificationData);
+      senderId: clientId
+    });
+
     res.status(200).json({
       success: true,
       message: 'Offer sent successfully',
-      offerDetails,
+      offerDetails: newOffer.offer_details,
+      reviewStats: {
+        averageRating: reviewStats.averageRating,
+        totalReviews: reviewStats.totalReviews
+      },
+      clientReviews: formattedReviews,
       offerId: newOffer._id
     });
+
   } catch (error) {
     console.error('Error in sendOfferToConsultant:', error);
     res.status(500).json({
       success: false,
       message: 'Failed to send offer to consultant',
-      error: error.message,
+      error: error.message
     });
   }
 };
-
 
 
 
@@ -284,8 +295,7 @@ async function calculateClientRatings(clientId) {
   }
 }
 
-// Add this to your routes file
-// router.get('/send-offer-to-consultant/:consultantId', authMiddleware, sendOfferToConsultant);
+
 
 
 exports.getProfileByUserId = async (req, res) => {

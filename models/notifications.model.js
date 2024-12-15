@@ -35,6 +35,7 @@ const notificationsSchema = new Schema({
     type: String,
     required: true,
   },
+  receiver_id: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
   type: {
     type: String,
     required: true,

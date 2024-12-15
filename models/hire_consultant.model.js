@@ -16,6 +16,25 @@ const ConsultantOfferSchema = new mongoose.Schema({
     ref: 'Project',
     required: true
   },
+  budget_type: { 
+    type: String, 
+    enum: ['hourly', 'fixed'], 
+    // required: true 
+  },
+  hourly_rate: {
+    from: { 
+      type: Number, 
+      required: function() { return this.budget_type === 'hourly'; } 
+    },
+    to: { 
+      type: Number, 
+      required: function() { return this.budget_type === 'hourly'; } 
+    }
+  },
+  fixed_price: {
+    type: Number,
+    required: function() { return this.budget_type === 'fixed'; }
+  },
   offerDetails: {
     client: {
       id: {
@@ -24,32 +43,41 @@ const ConsultantOfferSchema = new mongoose.Schema({
       },
       fullName: {
         type: String,
-        required: true
+        
       },
       email: {
         type: String,
-        required: true
+      
       },
-      reviews: [{
-        type: mongoose.Schema.Types.ObjectId,
+      client_reviews: [{
+        type: mongoose.Types.ObjectId,
         ref: 'Review'
       }],
-      averageRating: {
-        type: Number,
-        default: 0
+      client_review_stats: {
+        average_rating: Number,
+        total_reviews: Number
       },
-      totalReviews: {
-        type: Number,
-        default: 0
+      offer_details: {
+        type: Object
+      },
+      status: {
+        type: String,
+        enum: ['pending', 'accepted', 'rejected'],
+        default: 'pending'
+      },
+      created_at: {
+        type: Date,
+        default: Date.now
       }
+    
     }
   },
   project_name: {
     type: String,
     required: true
   },
-  offerDetails: {
-    type: mongoose.Schema.Types.Mixed,
+  project_description: {
+    type: String,
     required: true
   },
   status: {
