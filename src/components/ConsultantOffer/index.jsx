@@ -43,6 +43,7 @@ const ClientOffersPage = () => {
             },
           }
         );
+        console.log("response data",response.data);
 
         // Sorting offers by created date (newest first)
         const sortedOffers = [...response.data.offers].sort((a, b) => {

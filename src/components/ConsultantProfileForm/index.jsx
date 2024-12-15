@@ -533,6 +533,7 @@ function ConsultantProfileForm() {
                   key={skill}
                   onClick={() => handleAddSkill(skill)}
                   className="skill-button"
+                  placeholder="Add skills and press enter"
                 >
                   {skill}
                   <PlusIcon />

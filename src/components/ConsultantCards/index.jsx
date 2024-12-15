@@ -250,10 +250,13 @@ const ConsultantCard = () => {
                 </li>
               ))}
             </ul>
-
             <h4 className="section-title">Skills</h4>
 <div className="skills">
-  {consultant.skills ? (
+  {Array.isArray(consultant.skills) ? (
+    consultant.skills.map((skill, index) => (
+      <span key={index} className="skill-tag">{skill.trim()}</span>
+    ))
+  ) : consultant.skills ? (
     consultant.skills.split(',').map((skill, index) => (
       <span key={index} className="skill-tag">{skill.trim()}</span>
     ))
