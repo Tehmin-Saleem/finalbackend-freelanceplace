@@ -423,6 +423,40 @@ exports.getConsultantProfiles = async (req, res) => {
   };
   
   
+
+// Endpoint to send project details
+exports.sendProjectDetailsToConsultant= async (req, res) => {
+  const { consultantId } = req.params;
+  const { projectTitle, projectDescription, deadline, githubUrl, additionalNotes } = req.body;
+
+  try {
+    // Validate consultant offer exists
+    const offer = await ConsultantOffer.findOne({
+      consultantId,
+      status: 'Accepted',
+    });
+
+    if (!offer) {
+      return res.status(404).json({ message: 'Accepted offer not found for this consultant.' });
+    }
+
+    // Save project details to the offer
+    offer.projectDetails = {
+      projectTitle,
+      projectDescription,
+      deadline,
+      githubUrl,
+      additionalNotes,
+    };
+
+    await offer.save();
+
+    res.status(200).json({ message: 'Project details sent successfully!', offer });
+  } catch (error) {
+    console.error('Error sending project details:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+};
   
 
   
