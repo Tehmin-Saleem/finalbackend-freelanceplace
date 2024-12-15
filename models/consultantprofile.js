@@ -19,7 +19,7 @@ const consultantProfileSchema = new mongoose.Schema({
   profilePicture: String, // Store the file path or URL
   bio: String,
   experience: [experienceSchema],
-  skills: String,
+  skills: [String],
   linkedIn: String,
   firstname:String,
   lastname:String,
