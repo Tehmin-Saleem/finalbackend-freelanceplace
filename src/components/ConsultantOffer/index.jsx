@@ -2,13 +2,34 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import "./styles.scss";
 import { Header, Spinner } from "../../components/index"; // Assuming these are already created.
+import SendProjectDetails from "../ProjectDetailsForm";
 
-const ClientOffersPage = () => {
+const ClientOffersPage = ({ consultantId }) => {
   const [offers, setOffers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [filteredOffers, setFilteredOffers] = useState([]);
+  const [activeOfferId, setActiveOfferId] = useState(null);
+  const [selectedConsultantId, setSelectedConsultantId] = useState(null); // New state
+
+
+
+
+  const [showForm, setShowForm] = useState(false); // State to toggle form visibility
+
+
+  const handleAddProjectClick = (offerId, consultantId) => {
+    console.log("Consultant ID:", consultantId);
+    setActiveOfferId(offerId);
+    setSelectedConsultantId(consultantId); // Set the consultantId in state
+  };
+
+  const handleProjectSent = () => {
+    setActiveOfferId(null); // Hide form after successfully sending details
+  };
+  
+  
   // Function to get client ID from the JWT token stored in localStorage
   const getClientIdFromToken = () => {
     const token = localStorage.getItem("token");
@@ -49,6 +70,8 @@ const ClientOffersPage = () => {
             }
           }
         );
+
+        
         console.log('full response:', response.data);
         console.log('offers reci:', response.data.offers);
 
@@ -135,34 +158,34 @@ const ClientOffersPage = () => {
                   <div className="consultant-info">
                     <h4>Consultant Information</h4>
                     <p>
-                      <strong>Name:</strong> {offer?.offerDetails?.consultant?.name || "N/A"}
+                      <strong>Name:</strong> {offer?.offer_details?.consultant?.name || "N/A"}
                     </p>
                     <p>
-                      <strong>Email:</strong> {offer?.offerDetails?.consultant?.email || "N/A"}
+                      <strong>Email:</strong> {offer?.offer_details?.consultant?.email || "N/A"}
                     </p>
                     <p>
-                      <strong>Skills:</strong> {offer?.offerDetails?.consultant?.skills || "N/A"}
+                      <strong>Skills:</strong> {offer?.offer_details?.consultant?.skills || "N/A"}
                     </p>
                     <p>
-                      <strong>Bio:</strong> {offer?.offerDetails?.consultant?.bio || "N/A"}
+                      <strong>Bio:</strong> {offer?.offer_details?.consultant?.bio || "N/A"}
                     </p>
                     <p>
                       <strong>LinkedIn:</strong>{" "}
                       <a
-                        href={offer?.offerDetails?.consultant?.linkedIn || "#"}
+                        href={offer?.offer_details?.consultant?.linkedIn || "#"}
                         target="_blank"
                         rel="noopener noreferrer"
                       >
-                        {offer?.offerDetails?.consultant?.linkedIn || "N/A"}
+                        {offer?.offer_details?.consultant?.linkedIn || "N/A"}
                       </a>
                     </p>
                   </div>
                   <div className="experience-education">
                     <div>
                       <h4>Experience</h4>
-                      {offer?.offerDetails?.consultant?.experience?.length > 0 ? (
+                      {offer?.offer_details?.consultant?.experience?.length > 0 ? (
                         <ul>
-                          {offer.offerDetails.consultant.experience.map((exp, index) => (
+                          {offer.offer_details.consultant.experience.map((exp, index) => (
                             <li key={index}>
                               <strong>{exp.title || "N/A"}</strong> at {exp.company || "N/A"} (
                               {exp.years || "N/A"})
@@ -175,9 +198,9 @@ const ClientOffersPage = () => {
                     </div>
                     <div>
                       <h4>Education</h4>
-                      {offer?.offerDetails?.consultant?.education?.length > 0 ? (
+                      {offer?.offer_details?.consultant?.education?.length > 0 ? (
                         <ul>
-                          {offer.offerDetails.consultant.education.map((edu, index) => (
+                          {offer.offer_details.consultant.education.map((edu, index) => (
                             <li key={index}>
                               <strong>{edu.degree || "N/A"}</strong> from {edu.institution || "N/A"} (
                               {edu.year || "N/A"})
@@ -192,11 +215,25 @@ const ClientOffersPage = () => {
                 </div>
                 <div className="project-description">
                   <h4>Project Details</h4>
-                  <p>{offer?.offerDetails?.project?.description || "N/A"}</p>
+                  <p>{offer?.offer_details?.project?.description || "N/A"}</p>
                 </div>
                 {offer?.status === "Accepted" && (
                   <div className="add-project-button">
-                    <button className="btn-primary">Add Project Details</button>
+                    <button className="btn-primary"onClick={() => handleAddProjectClick(offer.id)}>Add Project Details</button>
+                  
+                    {activeOfferId === offer.id && (
+                      <>
+                        {/* Backdrop */}
+                        <div className="backdrop"onClick={() => setActiveOfferId(null)}></div>
+
+                        {/* Send Project Details Form */}
+                        <SendProjectDetails
+                          consultantId={selectedConsultantId}
+                          // onProjectSent={handleProjectSent}
+                          onClose={() => setActiveOfferId(null)} // Close function to reset state
+                        />
+                      </>
+                    )}
                   </div>
                 )}
               </div>

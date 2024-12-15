@@ -1,91 +1,119 @@
-$primary-color:  #4bcdeb;
-$text-color: #374151;
-$background-color: #f9fafb;
-$white: #ffffff;
-$border-color: #e5e7eb;
-$error-color: #dc2626;
+/* Fullscreen overlay */
+// .send-offer-overlay {
+//   position: fixed; /* Position it fixed to cover the entire screen */
+//   top: 0;
+//   left: 0;
+//   width: 100vw;  /* Take the full viewport width */
+//   height: 100vh; /* Take the full viewport height */
+//   background-color: rgba(0, 0, 0, 0.7); /* Dark background with transparency */
+//   z-index: 9998; /* Behind the form */
+// }
 
-.send-offer-form-container {
-  max-width: 600px;
-  margin: 50px auto;
+/* Modal form container */
+.send-offer-form-details {
+  position: fixed; /* Fixed position to keep it on top of the screen */
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%); /* Center the form */
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
   padding: 20px;
-  background-color: $background-color;
-  border-radius: 10px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  font-family: "Poppins", sans-serif;
+  width: 90%;
+  max-width: 500px;
+  max-height: 100vh;
+  overflow-y: auto;
+  z-index: 9999; /* Ensure form appears above the overlay */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
 
-  h1 {
-    text-align: center;
-    font-size: 1.8rem;
-    color: $text-color;
-    margin-bottom: 20px;
+/* Close button */
+.close-popup-button {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: transparent;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  z-index: 10001; /* Ensure the close button is above everything */
+}
+
+/* Form styling */
+h1 {
+  text-align: center;
+  font-size: 1.8rem;
+  color: #374151;
+  margin-bottom: 20px;
+}
+
+.send-offer-form {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group {
+  margin-bottom: 15px;
+
+  label {
+    display: block;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 5px;
   }
 
-  .send-offer-form {
-    display: flex;
-    flex-direction: column;
+  input,
+  textarea {
+    width: 100%;
+    padding: 10px;
+    font-size: 0.95rem;
+    color: #374151;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    background-color: #ffffff;
+    transition: border-color 0.3s;
 
-    .form-group {
-      margin-bottom: 15px;
-
-      label {
-        display: block;
-        font-size: 1rem;
-        font-weight: 600;
-        color: $text-color;
-        margin-bottom: 5px;
-      }
-
-      input,
-      textarea {
-        width: 100%;
-        padding: 10px;
-        font-size: 0.95rem;
-        color: $text-color;
-        border: 1px solid $border-color;
-        border-radius: 8px;
-        background-color: $white;
-        transition: border-color 0.3s;
-
-        &:focus {
-          outline: none;
-          border-color: $primary-color;
-        }
-      }
-
-      textarea {
-        resize: vertical;
-      }
+    &:focus {
+      outline: none;
+      border-color: #4bcdeb; /* Primary color */
     }
+  }
 
-    .checkbox-group {
-      display: flex;
-      align-items: center;
+  textarea {
+    resize: vertical;
+  }
+}
 
-      input[type="checkbox"] {
-        margin-right: 10px;
-      }
+.checkbox-group {
+  display: flex;
+  align-items: center;
 
-      label {
-        font-size: 0.95rem;
-        color: $text-color;
-      }
-    }
+  input[type="checkbox"] {
+    margin-right: 10px;
+  }
 
-    .submit-button {
-      background-color: $primary-color;
-      color: $white;
-      border: none;
-      padding: 12px;
-      font-size: 1rem;
-      font-weight: bold;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: background-color 0.3s;
+  label {
+    font-size: 0.95rem;
+    color: #374151;
+  }
+}
 
-      &:hover {
-        background-color: darken($primary-color, 10%);
-      }
-    }
+.submit-button {
+  background-color: #4bcdeb;
+  color: white;
+  border: none;
+  padding: 12px;
+  font-size: 1rem;
+  font-weight: bold;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+
+  &:hover {
+    background-color: darken(#4bcdeb, 10%);
   }
 }
