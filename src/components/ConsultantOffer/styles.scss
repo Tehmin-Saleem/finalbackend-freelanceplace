@@ -139,4 +139,32 @@ $bg-color: #f7f8fa;
       }
     }
   }
+
+  .add-project-button {
+    position: absolute;
+    top: 10px;
+    right: 120px;
+    
+    .btn-primary {
+      background-color: #00b8d4; /* Accent color */
+      color: #fff;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 14px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      transition: background-color 0.3s ease, transform 0.2s ease;
+  
+      &:hover {
+        background-color: #008ba3; /* Darker shade of accent */
+        transform: translateY(-2px);
+      }
+  
+      &:active {
+        background-color: #006c81; /* Even darker shade */
+        transform: translateY(0);
+      }
+    }
+  }
   

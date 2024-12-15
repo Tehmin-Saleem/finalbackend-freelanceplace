@@ -12,8 +12,12 @@ const ClientOffersPage = () => {
   const getClientIdFromToken = () => {
     const token = localStorage.getItem("token");
     if (token) {
-      const payload = JSON.parse(atob(token.split(".")[1]));
-      return payload.userId;
+      try {
+        const payload = JSON.parse(atob(token.split(".")[1]));
+        return payload.userId;
+      } catch (e) {
+        console.error("Invalid token format", e);
+      }
     }
     return null;
   };
@@ -49,6 +53,7 @@ const ClientOffersPage = () => {
 
         setOffers(sortedOffers);
       } catch (err) {
+        console.error("Error fetching offers:", err);
         setError("Failed to fetch offers.");
       } finally {
         setLoading(false);
@@ -77,58 +82,51 @@ const ClientOffersPage = () => {
               No offers received.
             </div>
           ) : (
-            offers.map((offer) => (
-              <div className="offer-card" key={offer.id}>
+            offers.map((offer, index) => (
+              <div className="offer-card" key={offer.id || index}>
                 <div className="card-header">
-                  <h3>{offer.offerDetails.project.name || "Untitled Project"}</h3>
-                  <span className={`status ${offer.status.toLowerCase()}`}>
-                    {offer.status}
+                  <h3>{offer?.offerDetails?.project?.name || "Untitled Project"}</h3>
+                  <span className={`status ${offer?.status?.toLowerCase() || ""}`}>
+                    {offer?.status || "Unknown"}
                   </span>
                 </div>
                 <div className="card-content">
                   <div className="consultant-info">
                     <h4>Consultant Information</h4>
                     <p>
-                      <strong>Name:</strong>{" "}
-                      {offer.offerDetails.consultant.name || "N/A"}
+                      <strong>Name:</strong> {offer?.offerDetails?.consultant?.name || "N/A"}
                     </p>
                     <p>
-                      <strong>Email:</strong>{" "}
-                      {offer.offerDetails.consultant.email || "N/A"}
+                      <strong>Email:</strong> {offer?.offerDetails?.consultant?.email || "N/A"}
                     </p>
                     <p>
-                      <strong>Skills:</strong>{" "}
-                      {offer.offerDetails.consultant.skills || "N/A"}
+                      <strong>Skills:</strong> {offer?.offerDetails?.consultant?.skills || "N/A"}
                     </p>
                     <p>
-                      <strong>Bio:</strong>{" "}
-                      {offer.offerDetails.consultant.bio || "N/A"}
+                      <strong>Bio:</strong> {offer?.offerDetails?.consultant?.bio || "N/A"}
                     </p>
                     <p>
                       <strong>LinkedIn:</strong>{" "}
                       <a
-                        href={offer.offerDetails.consultant.linkedIn}
+                        href={offer?.offerDetails?.consultant?.linkedIn || "#"}
                         target="_blank"
                         rel="noopener noreferrer"
                       >
-                        {offer.offerDetails.consultant.linkedIn || "N/A"}
+                        {offer?.offerDetails?.consultant?.linkedIn || "N/A"}
                       </a>
                     </p>
                   </div>
                   <div className="experience-education">
                     <div>
                       <h4>Experience</h4>
-                      {offer.offerDetails.consultant.experience &&
-                      offer.offerDetails.consultant.experience.length > 0 ? (
+                      {offer?.offerDetails?.consultant?.experience?.length > 0 ? (
                         <ul>
-                          {offer.offerDetails.consultant.experience.map(
-                            (exp, index) => (
-                              <li key={index}>
-                                <strong>{exp.title}</strong> at{" "}
-                                {exp.company || "N/A"} ({exp.years || "N/A"})
-                              </li>
-                            )
-                          )}
+                          {offer.offerDetails.consultant.experience.map((exp, index) => (
+                            <li key={index}>
+                              <strong>{exp.title || "N/A"}</strong> at {exp.company || "N/A"} (
+                              {exp.years || "N/A"})
+                            </li>
+                          ))}
                         </ul>
                       ) : (
                         <p>No experience provided.</p>
@@ -136,18 +134,14 @@ const ClientOffersPage = () => {
                     </div>
                     <div>
                       <h4>Education</h4>
-                      {offer.offerDetails.consultant.education &&
-                      offer.offerDetails.consultant.education.length > 0 ? (
+                      {offer?.offerDetails?.consultant?.education?.length > 0 ? (
                         <ul>
-                          {offer.offerDetails.consultant.education.map(
-                            (edu, index) => (
-                              <li key={index}>
-                                <strong>{edu.degree}</strong> from{" "}
-                                {edu.institution || "N/A"} (
-                                {edu.year || "N/A"})
-                              </li>
-                            )
-                          )}
+                          {offer.offerDetails.consultant.education.map((edu, index) => (
+                            <li key={index}>
+                              <strong>{edu.degree || "N/A"}</strong> from {edu.institution || "N/A"} (
+                              {edu.year || "N/A"})
+                            </li>
+                          ))}
                         </ul>
                       ) : (
                         <p>No education details provided.</p>
@@ -157,14 +151,13 @@ const ClientOffersPage = () => {
                 </div>
                 <div className="project-description">
                   <h4>Project Details</h4>
-                  <p>{offer.offerDetails.project.description || "N/A"}</p>
-                  {/* <p>
-                    <strong>Client Rating:</strong>{" "}
-                    {offer.offerDetails.client.rating
-                      ? `${offer.offerDetails.client.rating} / 5`
-                      : "N/A"}
-                  </p> */}
+                  <p>{offer?.offerDetails?.project?.description || "N/A"}</p>
                 </div>
+                {offer?.status === "Accepted" && (
+                  <div className="add-project-button">
+                    <button className="btn-primary">Add Project Details</button>
+                  </div>
+                )}
               </div>
             ))
           )}
