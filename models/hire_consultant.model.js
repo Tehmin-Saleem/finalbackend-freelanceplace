@@ -3,13 +3,13 @@ const mongoose = require('mongoose');
 const ConsultantOfferSchema = new mongoose.Schema({
   consultant_id: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'ConsultantProfile',
+    ref: 'User',
     required: true
   },
   client_id: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
-    required: true
+    
   },
   project_id: {
     type: mongoose.Schema.Types.ObjectId,

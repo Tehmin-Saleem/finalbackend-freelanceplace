@@ -354,6 +354,7 @@ exports.getConsultantProfiles = async (req, res) => {
     }
   };
 
+  
   exports.getOffersByClientId = async (req, res) => {
     try {
       // Extract client ID from the request params
@@ -373,6 +374,8 @@ exports.getConsultantProfiles = async (req, res) => {
         .populate('consultant_id', 'first_name last_name email experience linkedIn education bio skills') // Populate consultant details
         .populate('project_id', 'projectName projectDescription') // Populate project details
         .sort({ createdAt: -1 }); // Sort by most recent offers
+  
+     
   
       // Check if any offers are found
       if (!offers || offers.length === 0) {
@@ -397,6 +400,8 @@ exports.getConsultantProfiles = async (req, res) => {
       });
     }
   };
+  
+  
   
   // const ConsultantOffer = require('../models/hire_consultant.model'); // Adjust path as necessary
 
@@ -488,33 +493,66 @@ exports.getConsultantProfiles = async (req, res) => {
 // Endpoint to send project details
 exports.sendProjectDetailsToConsultant = async (req, res) => {
   const { consultantId } = req.params;
-  console.log("consultant id recibsdfgsgsh",consultantId)
-  const { githubUrl, additionalNotes, confidentialityAgreement } = req.body;
+  const { clientId, githubUrl, additionalNotes, confidentialityAgreement, deadline } = req.body;
+
+  // Verify authorization
+  const authHeader = req.headers.authorization;
+  if (!authHeader) {
+    return res.status(401).json({ message: 'Authorization token is missing' });
+  }
 
   try {
-    // Validate consultant offer exists
-    const offer = await ConsultantOffer.findOne({
-      consultantId,
-      status: 'Accepted',
-    });
+    // Detailed logging
+    console.log("Request Details:", { consultantId, clientId, body: req.body });
+
+    // Ensure clientId is a valid ObjectId
+    const clientObjectId = mongoose.Types.ObjectId.isValid(clientId) ? new mongoose.Types.ObjectId(clientId) : clientId;
+
+    // Directly update the offer with the project details
+    const offer = await ConsultantOffer.findOneAndUpdate(
+      { consultant_id: consultantId, client_id: clientObjectId, status: { $regex: /accepted/i } },
+      {
+        $set: {
+          projectDetails: {
+            githubUrl,
+            additionalNotes,
+            deadline,
+            confidentialityAgreement,
+          }
+        }
+      },
+      { new: true }
+    );
 
     if (!offer) {
-      return res.status(404).json({ message: 'Accepted offer not found for this consultant.' });
+      return res.status(404).json({
+        message: 'No accepted offers found',
+        searchCriteria: {
+          consultantId,
+          clientId,
+          status: 'Accepted'
+        }
+      });
     }
 
-    // Save project details to the offer
-    offer.projectDetails = {
-      githubUrl,
-      additionalNotes,
-      confidentialityAgreement,
-    };
-
-    await offer.save();
-
-    res.status(200).json({ message: 'Project details sent successfully!', offer });
+    res.status(200).json({
+      message: 'Project details sent successfully!',
+      offer: {
+        id: offer._id,
+        consultantId: offer.consultant_id,
+        clientId: offer.client_id
+      }
+    });
   } catch (error) {
-    console.error('Error sending project details:', error);
-    res.status(500).json({ message: 'Internal server error' });
+    console.error('Comprehensive Error Details:', {
+      message: error.message,
+      stack: error.stack,
+      name: error.name
+    });
+    res.status(500).json({
+      message: 'Internal server error',
+      error: error.message
+    });
   }
 };
 

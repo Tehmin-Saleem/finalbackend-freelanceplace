@@ -5,8 +5,7 @@ const ConsultantOfferSchema = new mongoose.Schema({
   clientId: { type: mongoose.Schema.Types.ObjectId, ref: 'Client' },
   status: { type: String, default: 'Pending' },
   projectDetails: {
-    projectTitle: String,
-    projectDescription: String,
+    
     deadline: Date,
     githubUrl: String,
     additionalNotes: String,
