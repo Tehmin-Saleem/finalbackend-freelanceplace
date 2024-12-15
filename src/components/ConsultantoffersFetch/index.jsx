@@ -107,21 +107,34 @@ const ConsultantOffers = () => {
                       {project.status || "N/A"}
                     </span>
                   </div>
-                  <p>
-                    <strong>Client:</strong> {client.name || "N/A"}
-                  </p>
-                  <p>
-                    <strong>Description:</strong> {project.description|| "N/A"}
-                  </p>
-                  <p>
-                    <strong>Rating:</strong> {offer.clientRating || "N/A"}
-                  </p>
-                  <p>
-                    <strong>Deadline:</strong> {project.deadline || "N/A"}
-                  </p>
-                  <p>
-                    <strong>Budget:</strong> {project.budget || "N/A"}
-                  </p>
+                  <div className="offer-details">
+                    <div className="detail-section">
+                      <h4>Project Details</h4>
+                      <p>
+                        <strong>Description:</strong> {offer.project_description || project.description || "N/A"}
+                      </p>
+                      {offer.budget_type === 'fixed' && (
+                        <p>
+                          <strong>Fixed Price:</strong> ${offer.fixed_price || "N/A"}
+                        </p>
+                      )}
+                      {offer.budget_type === 'hourly' && (
+                        <p>
+                          <strong>Hourly Rate:</strong> ${offer.hourly_rate?.from || "N/A"} - ${offer.hourly_rate?.to || "N/A"}
+                        </p>
+                      )}
+                    </div>
+
+                    <div className="detail-section">
+                      <h4><strong>Client Information:</strong></h4>
+                      <p>
+                        <strong>Client Name:</strong> {client.name || "N/A"}
+                      </p>
+                      <p>
+                        <strong>Contact:</strong> {offer.client_id?.email || "N/A"}
+                      </p>
+                    </div>
+                  </div>
                   <div className="action-buttons">
                     {status === "pending" && (
                       <>

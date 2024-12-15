@@ -406,16 +406,16 @@ const Header = () => {
       try {
         if (snap.user.role === "client") {
           const response = await axios.get(
-            `http://localhost:5000/api/client/client-profile-exists/${snap.user.id}`,
+            `http://localhost:5000/api/client/client-profile-exists/${userId}`,
             config
           );
           navigate(response.data.exists ? "/ClientProfile" : "/ClientProfileForm");
         } else if (snap.user.role === "freelancer") {
           const response = await axios.get(
-            `http://localhost:5000/api/freelancer/freelancer-profile-exists/${snap.user.id}`,
+            `http://localhost:5000/api/freelancer/freelancer-profile-exists/${userId}`,
             config
           );
-          navigate(response.data.exists ? `/profile/${snap.user.id}` : "/myProfile");
+          navigate(response.data.exists ? `/profile/${userId}` : "/myProfile");
         } else if (snap.user.role === "consultant") {
          
           navigate("/ConsultantProfileView"); 
