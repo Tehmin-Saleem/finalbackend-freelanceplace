@@ -193,12 +193,25 @@ const { TextArea } = Input;
     }
 
     if (filters.skill) {
-      updatedConsultants = updatedConsultants.filter((consultant) =>
-        consultant.skills
-          ?.split(',')
-          .map((skill) => skill.trim().toLowerCase())
-          .some((skill) => skill.includes(filters.skill.toLowerCase()))
-      );
+      updatedConsultants = updatedConsultants.filter((consultant) => {
+        // If skills is an array, use it directly
+        if (Array.isArray(consultant.skills)) {
+          return consultant.skills
+            .map(skill => skill.trim().toLowerCase())
+            .some(skill => skill.includes(filters.skill.toLowerCase()));
+        }
+        
+        // If skills is a string, split it
+        if (typeof consultant.skills === 'string') {
+          return consultant.skills
+            .split(',')
+            .map(skill => skill.trim().toLowerCase())
+            .some(skill => skill.includes(filters.skill.toLowerCase()));
+        }
+        
+        // If skills is neither array nor string, return false
+        return false;
+      });
     }
 
     if (filters.experienceLevel) {
@@ -324,10 +337,16 @@ const { TextArea } = Input;
 
             <h4 className="section-title">Skills</h4>
             <div className="skills">
-  {consultant.skills && Array.isArray(consultant.skills) ? (
-    consultant.skills.map((skill, index) => (
-      <span key={index} className="skill-tag">{skill.trim()}</span>
-    ))
+  {consultant.skills ? (
+    Array.isArray(consultant.skills) ? (
+      consultant.skills.map((skill, index) => (
+        <span key={index} className="skill-tag">{skill.trim()}</span>
+      ))
+    ) : (
+      consultant.skills.split(',').map((skill, index) => (
+        <span key={index} className="skill-tag">{skill.trim()}</span>
+      ))
+    )
   ) : (
     <p>No skills listed</p>
   )}
