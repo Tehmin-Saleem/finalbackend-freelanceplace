@@ -5,6 +5,7 @@ const Client_Profile = require('../models/client_profile.model'); // Adjust the 
 const HireFreelancer = require('../models/hire_freelancer.model'); // Adjust the path as needed
 const ConsultantOffer = require('../models/hire_consultant.model'); // Adjust the path as needed
 const Review= require('../models/review.model')
+const ProjectDetails= require('../models/ProjectDetails.model')
 const { createNotification } = require('../controllers/notifications.controller')
 const mongoose = require('mongoose');
 
@@ -493,7 +494,13 @@ exports.getConsultantProfiles = async (req, res) => {
 // Endpoint to send project details
 exports.sendProjectDetailsToConsultant = async (req, res) => {
   const { consultantId } = req.params;
-  const { clientId, githubUrl, additionalNotes, confidentialityAgreement, deadline } = req.body;
+  const { 
+    clientId, 
+    githubUrl, 
+    additionalNotes, 
+    confidentialityAgreement, 
+    deadline 
+  } = req.body;
 
   // Verify authorization
   const authHeader = req.headers.authorization;
@@ -502,27 +509,12 @@ exports.sendProjectDetailsToConsultant = async (req, res) => {
   }
 
   try {
-    // Detailed logging
-    console.log("Request Details:", { consultantId, clientId, body: req.body });
-
-    // Ensure clientId is a valid ObjectId
-    const clientObjectId = mongoose.Types.ObjectId.isValid(clientId) ? new mongoose.Types.ObjectId(clientId) : clientId;
-
-    // Directly update the offer with the project details
-    const offer = await ConsultantOffer.findOneAndUpdate(
-      { consultant_id: consultantId, client_id: clientObjectId, status: { $regex: /accepted/i } },
-      {
-        $set: {
-          projectDetails: {
-            githubUrl,
-            additionalNotes,
-            deadline,
-            confidentialityAgreement,
-          }
-        }
-      },
-      { new: true }
-    );
+    // Find the accepted offer for this consultant and client
+    const offer = await ConsultantOffer.findOne({
+      consultant_id: consultantId, 
+      client_id: clientId, 
+      status: { $regex: /accepted/i }
+    });
 
     if (!offer) {
       return res.status(404).json({
@@ -535,12 +527,27 @@ exports.sendProjectDetailsToConsultant = async (req, res) => {
       });
     }
 
+    // Create a new ProjectDetails document
+    const projectDetails = new ProjectDetails({
+      offerId: offer._id,
+      consultantId,
+      clientId,
+      githubUrl,
+      additionalNotes,
+      deadline: new Date(deadline),
+      confidentialityAgreement
+    });
+
+    // Save the project details
+    await projectDetails.save();
+
     res.status(200).json({
       message: 'Project details sent successfully!',
-      offer: {
-        id: offer._id,
-        consultantId: offer.consultant_id,
-        clientId: offer.client_id
+      projectDetails: {
+        id: projectDetails._id,
+        offerId: offer._id,
+        consultantId,
+        clientId
       }
     });
   } catch (error) {
