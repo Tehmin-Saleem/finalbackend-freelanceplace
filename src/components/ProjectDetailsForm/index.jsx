@@ -10,7 +10,7 @@ const SendProjectDetails = ({ consultantId, onProjectSent, onClose, clientId }) 
     additionalNotes: "",
     confidentialityAgreement: false,
   });
-
+  const [isModalOpen, setIsModalOpen] = useState(true);
   const [isSent, setIsSent] = useState(false); // Track if the project details were sent
 
   const handleChange = (e) => {
@@ -23,10 +23,10 @@ const SendProjectDetails = ({ consultantId, onProjectSent, onClose, clientId }) 
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
+
     try {
       const token = localStorage.getItem("token");
-  
+
       console.log('Sending project details with:', {
         consultantId,
         deadline,
@@ -52,10 +52,10 @@ const SendProjectDetails = ({ consultantId, onProjectSent, onClose, clientId }) 
           },
         }
       );
-  
+
       console.log("Project details sent successfully:", response.data);
       alert("Project details sent successfully!");
-  
+
       setIsSent(true);
       setFormData({
         githubUrl: "",
@@ -64,7 +64,10 @@ const SendProjectDetails = ({ consultantId, onProjectSent, onClose, clientId }) 
         confidentialityAgreement: false,
         deadline: "",
       });
-  
+
+      // Close the modal
+      setIsModalOpen(false);
+
       if (onProjectSent) onProjectSent();
     } catch (error) {
       console.error("Full error details:", {
@@ -75,6 +78,11 @@ const SendProjectDetails = ({ consultantId, onProjectSent, onClose, clientId }) 
       console.log("Failed to send project details. Please check the console for details.");
     }
   };
+
+  if (!isModalOpen) {
+    return null; // Return null if the modal is not open
+  }
+
 
   return (
     <div className="send-offer-overlay">
