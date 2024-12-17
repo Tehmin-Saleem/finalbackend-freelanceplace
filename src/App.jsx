@@ -61,6 +61,7 @@ import Offers from "./Pages/FetchOffers";
 import ClientOffersPage from "./components/ConsultantOffer";
 import ConsultantOffers from "./components/ConsultantoffersFetch";
 import SendProjectDetails from "./components/ProjectDetailsForm";
+import ProjectDetailsModal from "./components/PopUps/SeeProjectDetails";
 // import PaymentMethod from './components/PaymentMethod';
 
 const freelancers = [
@@ -272,7 +273,9 @@ function App() {
           <Route path="/ClientOfferPage" element={<ClientOffersPage/>} />
 
 <Route path="/ConsultantOfferPage" element={<ConsultantOffers/>} />     
-<Route path="/SendProjectDetails" element={<SendProjectDetails/>} />      
+<Route path="/SendProjectDetails" element={<SendProjectDetails/>} /> 
+<Route path="/SeeProjectDetails" element={<ProjectDetailsModal/>} /> 
+
 
         </Routes>
       </Router>

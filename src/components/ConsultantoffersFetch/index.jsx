@@ -4,12 +4,18 @@ import "./styles.scss";
 import Header from "../Commoncomponents/Header";
 import Spinner from "../chatcomponents/Spinner";
 import ProjectDetailsModal from "../PopUps/SeeProjectDetails";
+import { useNavigate } from 'react-router-dom';
 
 const ConsultantOffers = () => {
   const [offers, setOffers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [showProjectDetails, setShowProjectDetails] = useState(false);
+  const navigate = useNavigate();
+
+  const handleSeeProjectDetails = () => {
+    navigate('/SeeProjectDetails'); // Navigate to ProjectDetails component
+  };
 
   // Fetch offers on component mount
   useEffect(() => {
@@ -159,18 +165,14 @@ const ConsultantOffers = () => {
                       </>
                     )}
                     {status === "accepted" && (
-                      <div>
-                      {!showProjectDetails ? (
-                        <button
-                          className="accept-button"
-                          onClick={() => setShowProjectDetails(true)}
-                        >
-                          See Project Details
-                        </button>
-                      ) : (
-                        <ProjectDetailsModal/>
-                      )}
-                    </div>
+        <div>
+          <button
+            className="accept-button"
+            onClick={handleSeeProjectDetails}
+          >
+            View Project Details
+          </button>
+        </div>
                     )}
                     {status === "declined" && (
                       <span className="status-message error">

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import './styles.scss';
+import Header from '../../Commoncomponents/Header';
 
 const ProjectDetailsModal = () => {
   const [showModal, setShowModal] = useState(false);
@@ -9,6 +10,7 @@ const ProjectDetailsModal = () => {
 
   return (
     <>
+    <Header/>
       {/* The Modal */}
       {showModal && (
         <div className="modal-overlay">
@@ -60,6 +62,12 @@ const ProjectDetailsModal = () => {
           </div>
         </div>
       )}
+
+<div className="confidentiality-instruction">
+        <p>
+          <strong>Note:</strong> By clicking on "See Project Details," you agree to keep all project information confidential. Sharing or misuse of this information is strictly prohibited.
+        </p>
+      </div>
 
       {/* Integrate this into your existing button */}
       <button className="see-details-btn" onClick={openModal}>
