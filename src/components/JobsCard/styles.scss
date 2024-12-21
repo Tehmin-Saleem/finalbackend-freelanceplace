@@ -20,6 +20,39 @@ $button-hover-color: darken($button-color, 10%);
   padding-right:5%;
   padding-left: 5%;
 
+  &__title-container {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  &__title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #333;
+    margin: 0;
+  }
+
+  &__client-info {
+    display: flex;
+    gap: 16px;
+    font-size: 0.875rem;
+    color: #666;
+
+    span {
+      &:first-child {
+        color: #1e88e5; // or any color that matches your design
+      }
+    }
+  }
+
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 16px;
+  }
+
   &__rate , &__timeline , &__level{
     color: $secondary-color;
   }

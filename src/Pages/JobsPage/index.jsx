@@ -2,8 +2,8 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { JobsCard, Header, Spinner } from "../../components/index";
 import "./styles.scss";
-import { useNavigate } from 'react-router-dom';
-import {jwtDecode} from "jwt-decode"; // Corrected jwtDecode import
+import { useNavigate } from "react-router-dom";
+import { jwtDecode } from "jwt-decode"; // Corrected jwtDecode import
 
 const JobsPage = () => {
   const [jobs, setJobs] = useState([]);
@@ -16,9 +16,9 @@ const JobsPage = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const token = localStorage.getItem('token');
+        const token = localStorage.getItem("token");
         if (!token) {
-          navigate('/signin');
+          navigate("/signin");
           return;
         }
 
@@ -26,18 +26,25 @@ const JobsPage = () => {
         const userId = decodedToken.userId;
 
         const headers = {
-          'Authorization': `Bearer ${token}`
+          Authorization: `Bearer ${token}`,
         };
 
         // Fetch jobs, user data, and payment methods concurrently
-        const [jobsResponse, userResponse, paymentMethodsResponse] = await Promise.all([
-          axios.get('http://localhost:5000/api/client/job-posts', { headers }),
-          axios.get(`http://localhost:5000/api/client/users`, { headers }),
-          axios.get('http://localhost:5000/api/client/payment-methods', { headers })
-        ]);
-        
+        const [jobsResponse, userResponse, paymentMethodsResponse] =
+          await Promise.all([
+            axios.get("http://localhost:5000/api/client/job-posts", {
+              headers,
+            }),
+            axios.get(`http://localhost:5000/api/client/users`, { headers }),
+            axios.get("http://localhost:5000/api/client/payment-methods", {
+              headers,
+            }),
+          ]);
+
         // Check if paymentMethodsResponse.data.paymentMethods is an array
-        const paymentMethodsArray = Array.isArray(paymentMethodsResponse.data.paymentMethods)
+        const paymentMethodsArray = Array.isArray(
+          paymentMethodsResponse.data.paymentMethods
+        )
           ? paymentMethodsResponse.data.paymentMethods
           : []; // Fallback to empty array if not
 
@@ -58,21 +65,24 @@ const JobsPage = () => {
         setPaymentMethods(paymentMethodMap);
 
         // Combine job data with payment method status and country name
-        const jobsWithPaymentStatus = jobsResponse.data.jobPosts.map(job => {
-          const clientId = job.client_id && job.client_id._id ? job.client_id._id.toString() : null;
+        const jobsWithPaymentStatus = jobsResponse.data.jobPosts.map((job) => {
+          const clientId =
+            job.client_id && job.client_id._id
+              ? job.client_id._id.toString()
+              : null;
           return {
             ...job,
-            paymentMethodStatus: clientId && paymentMethodMap[clientId]
-              ? "Payment Verified"
-              : "No Payment Method Available",
-            country: clientId ? userCountryMap[clientId] || "Unknown" : "Unknown"
-            
+            paymentMethodStatus:
+              clientId && paymentMethodMap[clientId]
+                ? "Payment Verified"
+                : "No Payment Method Available",
+            country: clientId
+              ? userCountryMap[clientId] || "Unknown"
+              : "Unknown",
           };
-          
         });
         console.log("Jobs with payment status:", jobsWithPaymentStatus);
         setJobs(jobsWithPaymentStatus);
-        
       } catch (error) {
         console.error("Detailed error:", error);
         setError("Error fetching data: " + error.message);
@@ -83,8 +93,6 @@ const JobsPage = () => {
 
     fetchData();
   }, [navigate]);
-
-
 
   const formatRate = (job) => {
     if (job.budget_type === "fixed") {
@@ -116,8 +124,15 @@ const JobsPage = () => {
             level={job.project_duration?.experience_level || "Not specified"}
             description={job.description || "No description provided"}
             tags={job.preferred_skills || []}
-            paymentMethodStatus={job.paymentMethodStatus} 
+            paymentMethodStatus={job.paymentMethodStatus}
             location={job.country}
+            // Add these new props
+            clientName={
+              job.client_id
+                ? `${job.client_id.first_name} ${job.client_id.last_name}`
+                : "Unknown"
+            }
+            clientLocation={job.client_id?.country_name || "Unknown"}
           />
         ))}
       </div>

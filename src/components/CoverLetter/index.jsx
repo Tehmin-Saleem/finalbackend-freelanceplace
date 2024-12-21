@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect, useRef } from 'react';
 import "./styles.scss";
 import Spinner from "../chatcomponents/Spinner";
 
@@ -15,6 +15,32 @@ const CoverLetterComponent = ({
   handleInputChange,
   loading,
 }) => {
+
+
+  // Add refs and state for cursor management
+  const textareaRef = useRef(null);
+  const [cursorPosition, setCursorPosition] = useState(null);
+
+  // Handle textarea changes while maintaining cursor position
+  const handleTextareaChange = (e) => {
+    const textarea = e.target;
+    const newValue = textarea.value;
+    const newPosition = textarea.selectionStart;
+    
+    setFreelancerCoverLetter(newValue); // This will trigger both state updates
+    setCursorPosition(newPosition);
+  };
+
+  // Update cursor position after state change
+  React.useEffect(() => {
+    if (cursorPosition !== null && textareaRef.current) {
+      textareaRef.current.setSelectionRange(cursorPosition, cursorPosition);
+      textareaRef.current.focus(); // Add focus to maintain cursor visibility
+    }
+  }, [freelancerCoverLetter, cursorPosition]);
+
+
+
   return (
     <div className="cover-letter-overlay">
       <div className="cover-letter-container">
@@ -60,11 +86,26 @@ const CoverLetterComponent = ({
             <div className="textarea-container">
               <label>Generated Cover Letter</label>
               <textarea
+              ref={textareaRef}
                 rows="10"
+                spellCheck="true"
                 value={freelancerCoverLetter}
+                onKeyDown={(e) => {
+                  if (e.key === 'ArrowLeft' || e.key === 'ArrowRight' || 
+                      e.key === 'ArrowUp' || e.key === 'ArrowDown') {
+                    setCursorPosition(null);
+                  }
+                }}
+                onClick={(e) => {
+                  setCursorPosition(e.target.selectionStart);
+                }}
+
+                onChange={handleTextareaChange} // Add the onChange handler here
+              
                 // onChange={(e) => setFreelancerCoverLetter(e.target.value)}
-                onChange={handleInputChange}
+                // onChange={handleInputChange}
                 // value={formdata.freelancerCoverLetter}
+                className="editable-cover-letter"
               />
             </div>
           )}

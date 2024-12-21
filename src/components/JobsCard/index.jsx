@@ -16,7 +16,9 @@ const JobsCard = ({
   paymentMethodStatus,
   verified,
   rating,
-  location // Receive location prop here
+  location ,// Receive location prop here
+  clientName,     // Add these new props
+  clientLocation
 }) => {
   const navigate = useNavigate();
 
@@ -33,7 +35,14 @@ const JobsCard = ({
     <div className="job-card">
       <div className="job-card__content">
         <div className="job-card__header">
-          <span className="job-card__title">{title}</span>
+        <div className="job-card__title-container">
+            <h2 className="job-card__title">{title}</h2>
+            <div className="job-card__client-info">
+              <span>Posted by: {clientName}</span>
+              <span>From: {clientLocation}</span>
+            </div>
+          </div>
+          
           <button className="job-card__view-button" onClick={handleViewClick}>
             View
           </button>

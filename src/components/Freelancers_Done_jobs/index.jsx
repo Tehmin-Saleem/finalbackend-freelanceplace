@@ -9,7 +9,7 @@ import { jwtDecode } from "jwt-decode";
 const JobsCard = ({
   _id,
   job_id,
-estimated_timeline,
+  estimated_timeline,
   due_date,
   type,
   title,
@@ -32,6 +32,8 @@ estimated_timeline,
   clientName, // Add these new props
   clientCountry, // Add these new props
   attachment,
+  paymentStatus,
+  paymentDetails,
 }) => {
   const navigate = useNavigate();
 
@@ -161,15 +163,18 @@ estimated_timeline,
               type,
               title,
               rate,
-              due_date,  // Add due_date
-            timeline: `${estimated_timeline?.duration} ${estimated_timeline?.unit}`,
-              description:  description,
+              due_date, // Add due_date
+              timeline: `${estimated_timeline?.duration} ${estimated_timeline?.unit}`,
+
+              // timeline,
+              level,
+              description: description,
               tags,
               verified,
               rating,
               location,
               postedTime,
-              projectType: 'byproject' ,
+              projectType: "byproject",
               clientName,
               clientCountry,
             },
@@ -179,24 +184,28 @@ estimated_timeline,
               client_id,
               clientName, // Add these new props
               clientCountry,
-              status: 'accepted',
-              projectType: 'byproject',
+              status: "accepted",
+              projectType: "byproject",
               add_requirements: {
-                byproject: {
-                  amount: parseFloat(rate.replace(/[^0-9.-]+/g, "")),
-                  due_date: due_date,
-                  status: "Not Started"
-                }
-              }
+                by_milestones: [
+                  {
+                    amount: parseFloat(rate.replace(/[^0-9.-]+/g, "")),
+                    due_date: new Date(
+                      Date.now() + 30 * 24 * 60 * 60 * 1000
+                    ).toISOString(),
+                    status: "Not Started",
+                  },
+                ],
+              },
             },
             freelancer_id,
             client_id,
-            isOffer: true // Flag to identify this is an offer
-          }
+            isOffer: true, // Flag to identify this is an offer
+          },
         });
         return;
       }
-  
+
       const headers = {
         Authorization: `Bearer ${token}`, // Fixed template literal
         "Content-Type": "application/json",
@@ -252,6 +261,43 @@ estimated_timeline,
     console.log("rate", rate);
   }, [attachment]);
 
+  const PaymentStatus = ({ PaymentStatus, details }) => {
+    if (!PaymentStatus || PaymentStatus !== "paid") return null;
+
+    return (
+      <div className="job-card__payment-status">
+        <div className="payment-status-badge">
+          <i className="fas fa-check-circle"></i>
+          <span>Payment Received</span>
+        </div>
+        <div className="payment-details">
+          <div className="payment-detail-item">
+            <span>Amount:</span>
+            <strong>${details.amount}</strong>
+          </div>
+          <div className="payment-detail-item">
+            <span>Date:</span>
+            <strong>
+              {new Date(details.paymentDate).toLocaleDateString("en-US", {
+                year: "numeric",
+                month: "short",
+                day: "numeric",
+              })}
+            </strong>
+          </div>
+          <div className="payment-detail-item">
+            <span>Transaction ID:</span>
+            <strong>{details.transactionId}</strong>
+          </div>
+          <div className="payment-detail-item">
+            <span>Method:</span>
+            <strong>{details.paymentMethod}</strong>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className="job-card">
       <div className="job-card__content">
@@ -292,13 +338,13 @@ estimated_timeline,
           <span className="job-card__rated">{rate}</span>
           <span className="job-card__timeline-head">Estimated time:</span>
           <span className="job-card__timeline"> {timeline}</span>
-          {source !== 'offer' && (
-          <>
-            <span className="job-card__level-head">Level:</span>
-            <span className="job-card__level">{level}</span>
-          </>
-        )}
-      </div>
+          {source !== "offer" && (
+            <>
+              <span className="job-card__level-head">Level:</span>
+              <span className="job-card__level">{level}</span>
+            </>
+          )}
+        </div>
 
         <p className="job-card__description">{description}</p>
 
@@ -332,9 +378,7 @@ estimated_timeline,
             <div className="progress-container">
               {/* Header */}
               <div className="progress-header">
-                <h3 className="project-title">
-                  Progress
-                </h3>
+                <h3 className="project-title">Progress</h3>
                 <span className="project-due-date">
                   Due:{" "}
                   {new Date(
@@ -366,6 +410,14 @@ estimated_timeline,
                     </span>
                     <span className="label">Days Elapsed</span>
                   </div>
+                  {progressData.projectDetails.paymentStatus === "paid" && (
+                    <div className="metric payment-metric">
+                      <span className="value">
+                        ${progressData.projectDetails.paymentDetails.amount}
+                      </span>
+                      <span className="label">Paid</span>
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -413,7 +465,14 @@ estimated_timeline,
                             >
                               {milestone.status}
                             </span>
-                            <span className="amount">${milestone.amount}</span>
+                            <span className="amount">
+                              ${milestone.amount}
+                              {milestone.paid && (
+                                <span className="payment-indicator">
+                                  <i className="fas fa-check-circle"></i> Paid
+                                </span>
+                              )}
+                            </span>
                           </div>
                         </div>
                         <div className="milestone-progress-bar">
@@ -445,6 +504,14 @@ estimated_timeline,
             </span>
           ))}
         </div>
+
+        {progressData &&
+          progressData.projectDetails.paymentStatus === "paid" && (
+            <PaymentStatus
+              PaymentStatus={progressData.projectDetails.paymentStatus}
+              details={progressData.projectDetails.paymentDetails}
+            />
+          )}
         <div className="job-card__extra">
           <JobSucces className="h-3 w-3" />
           {verified && (

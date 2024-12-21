@@ -560,3 +560,113 @@
   50% { transform: translateY(-2px); }
 }
 
+
+
+.job-card {
+  // ... existing styles ...
+
+  &__payment-status {
+    margin: 16px 0;
+    padding: 16px;
+    background: #f6ffed;
+    border: 1px solid #b7eb8f;
+    border-radius: 8px;
+    
+    .payment-status-badge {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 12px;
+      
+      i {
+        color: #52c41a;
+        font-size: 18px;
+      }
+      
+      span {
+        color: #52c41a;
+        font-weight: 600;
+        font-size: 16px;
+      }
+    }
+    
+    .payment-details {
+      background: white;
+      padding: 12px;
+      border-radius: 6px;
+      
+      .payment-detail-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 8px 0;
+        border-bottom: 1px solid #f0f0f0;
+        
+        &:last-child {
+          border-bottom: none;
+        }
+        
+        span {
+          color: #8c8c8c;
+        }
+        
+        strong {
+          color: #262626;
+        }
+      }
+    }
+  }
+}
+
+// Add animation for payment status
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.job-card__payment-status {
+  animation: fadeIn 0.3s ease-out;
+}
+
+
+
+
+.progress-stats {
+  // ... existing styles ...
+  
+  .payment-metric {
+    background: #f6ffed;
+    border: 1px solid #b7eb8f;
+    
+    .value {
+      color: #52c41a;
+    }
+    
+    .label {
+      color: #389e0d;
+    }
+  }
+}
+
+
+
+.payment-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: 8px;
+  padding: 2px 6px;
+  background: #f6ffed;
+  border-radius: 4px;
+  font-size: 12px;
+  color: #52c41a;
+  
+  i {
+    font-size: 10px;
+  }
+}

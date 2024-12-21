@@ -237,16 +237,16 @@ function ProfileView() {
                       {profileData.totalJobs}
                     </span>
                     <span className="font-Poppins text-[#94A3B8] text-[16px]">
-                      Completed Jobs
+                      years
                     </span>
                   </div>
                   <div className="flex flex-col">
-                    <span className="text-[24px] text-[#2C3E50] font-Poppins">
+                    {/* <span className="text-[24px] text-[#2C3E50] font-Poppins">
                       {profileData.totalHours}
-                    </span>
-                    <span className="font-Poppins text-[#94A3B8] text-[16px]">
+                    </span> */}
+                    {/* <span className="font-Poppins text-[#94A3B8] text-[16px]">
                       Total Hours
-                    </span>
+                    </span> */}
                   </div>
                 </div>
               </div>
@@ -306,15 +306,42 @@ function ProfileView() {
                   <>
                     {reviews && reviews.total_reviews > 0 ? (
                       <>
+                        {/* Existing reviews mapping */}
+                        {reviews.reviews.map((review) => (
+                           <UserReview
+                           key={review.review_id}
+                           // Use the client's full name from the response
+                           name={`${review.client.first_name} ${review.client.last_name}`}
+                           // Use the client's country from the response
+                           location={review.client.country || "Unknown"}
+                           description={review.review_message}
+                           rating={review.rating}
+                           // Add profile picture from the client data
+                           profileImage={review.client.profile_picture} // Pass the profile picture
+                           locationIcon={
+                             review.client.country === "Australia" ? (
+                               <Australia />
+                             ) : review.client.country === "United States" ? (
+                               <UStates />
+                             ) : review.client.country === "Saudi Arabia" ? (
+                               <SArabia />
+                             ) : (
+                               <UStates />
+                             )
+                           }
+                           date={new Date(review.posted_date).toLocaleDateString()}
+                           jobTitle={review.job.title || "Untitled Job"}
+                         />
+                        ))}
+
                         <div className="review-summary mb-6 bg-white rounded-lg p-6 shadow-sm">
                           <div className="flex items-center justify-between">
                             <div className="flex flex-col">
                               <div className="flex items-center gap-2 mb-2">
-                              <h2 className="reviewtitle">Average Ratings</h2>
+                                <h2 className="reviewtitle">Average Ratings</h2>
                                 <span className="text-3xl font-bold text-[#2C3E50]">
                                   {reviews.average_rating.toFixed(1)}
                                 </span>
-                             
                               </div>
                               <span className="text-gray-600 text-sm">
                                 {reviews.total_reviews}{" "}
@@ -323,35 +350,8 @@ function ProfileView() {
                                   : "reviews"}
                               </span>
                             </div>
-
                           </div>
                         </div>
-
-                        {/* Existing reviews mapping */}
-                        {reviews.reviews.map((review) => (
-                          <UserReview
-                            key={review.review_id}
-                            name={review.client.name}
-                            location={review.client.country || "Unknown"}
-                            description={review.review_message}
-                            rating={review.rating}
-                            locationIcon={
-                              review.client.country === "Australia" ? (
-                                <Australia />
-                              ) : review.client.country === "United States" ? (
-                                <UStates />
-                              ) : review.client.country === "Saudi Arabia" ? (
-                                <SArabia />
-                              ) : (
-                                <UStates />
-                              )
-                            }
-                            date={new Date(
-                              review.posted_date
-                            ).toLocaleDateString()}
-                            jobTitle={review.job.title}
-                          />
-                        ))}
                       </>
                     ) : (
                       <div className="text-center py-4 text-gray-500 bg-gray-50 rounded-lg">
