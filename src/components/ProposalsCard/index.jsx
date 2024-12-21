@@ -44,11 +44,38 @@ const ProposalCard = ({
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
   const [freelancerData, setFreelancerData] = useState(null);
+  const [completedjob , setCompletedjob] = useState(null);
 
   const [reviews, setReviews] = useState(null);
   const [loading, setLoading] = useState(true);
 
   console.log("freelancer id in proposal card", freelancerId);
+
+
+  
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        if (!token) {
+          navigate('/signin');
+          return;
+        }
+
+        const completedresponses = await axios.get(`http://localhost:5000/api/client/completed-jobs/${freelancerId}`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        console.log("completed " , completedresponses.data.data.totalCompletedJobs)
+        setCompletedjob(completedresponses.data.data.totalCompletedJobs);
+           
+      } catch (error) {
+        // navigate('/signin');
+      }
+    };
+
+    fetchUser();
+  }, [navigate]);
 
   const fetchFreelancerReviews = async (freelancerId) => {
     try {
@@ -255,6 +282,10 @@ const ProposalCard = ({
         <div className="proposal-card__header">
           <span className="proposal-card__name">{name}</span>
           <span className="proposal-card__status">{status}</span>
+        </div>
+        <div className="proposal-card__header">
+          <span className="proposal-card__title">Completed Jobs</span>
+          <span className="proposal-card__status">{completedjob}</span>
         </div>
         <p className="proposal-card__title">{title}</p>
         <p className="proposal-card__due_date">{due_date}</p>

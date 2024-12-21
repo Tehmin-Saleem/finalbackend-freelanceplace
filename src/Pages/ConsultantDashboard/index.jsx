@@ -2,6 +2,7 @@ import React from 'react';
 import './styles.scss';
 import { FaUserCircle, FaEye } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
+import { Header } from '../../components';
 
 const ConsultantDashboard = () => {
     const navigate = useNavigate();
@@ -15,6 +16,8 @@ const ConsultantDashboard = () => {
     };
 
     return (
+        <>
+        <Header/>
         <div className="consultant-dashboard">
             <header className="dashboard-header">
                 <h1>Consultant Dashboard</h1>
@@ -62,6 +65,7 @@ const ConsultantDashboard = () => {
                 </div>
             </div>
         </div>
+        </>
     );
 };
 

@@ -308,28 +308,30 @@ function ProfileView() {
                       <>
                         {/* Existing reviews mapping */}
                         {reviews.reviews.map((review) => (
-                          <UserReview
-                            key={review.review_id}
-                            name={review.client.name}
-                            location={review.client.country || "Unknown"}
-                            description={review.review_message}
-                            rating={review.rating}
-                            locationIcon={
-                              review.client.country === "Australia" ? (
-                                <Australia />
-                              ) : review.client.country === "United States" ? (
-                                <UStates />
-                              ) : review.client.country === "Saudi Arabia" ? (
-                                <SArabia />
-                              ) : (
-                                <UStates />
-                              )
-                            }
-                            date={new Date(
-                              review.posted_date
-                            ).toLocaleDateString()}
-                            jobTitle={review.job.title}
-                          />
+                           <UserReview
+                           key={review.review_id}
+                           // Use the client's full name from the response
+                           name={`${review.client.first_name} ${review.client.last_name}`}
+                           // Use the client's country from the response
+                           location={review.client.country || "Unknown"}
+                           description={review.review_message}
+                           rating={review.rating}
+                           // Add profile picture from the client data
+                           profileImage={review.client.profile_picture} // Pass the profile picture
+                           locationIcon={
+                             review.client.country === "Australia" ? (
+                               <Australia />
+                             ) : review.client.country === "United States" ? (
+                               <UStates />
+                             ) : review.client.country === "Saudi Arabia" ? (
+                               <SArabia />
+                             ) : (
+                               <UStates />
+                             )
+                           }
+                           date={new Date(review.posted_date).toLocaleDateString()}
+                           jobTitle={review.job.title || "Untitled Job"}
+                         />
                         ))}
 
                         <div className="review-summary mb-6 bg-white rounded-lg p-6 shadow-sm">

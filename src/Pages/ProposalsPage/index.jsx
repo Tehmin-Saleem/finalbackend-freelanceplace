@@ -20,6 +20,10 @@ const IndexPage = () => {
 
 
 
+  
+
+
+
   useEffect(() => {
 
     const fetchData = async () => {
@@ -40,6 +44,7 @@ const IndexPage = () => {
             { headers }
           ),
           axios.get(`http://localhost:5000/api/client/users`, { headers }),
+          
         ]);
 
         console.log("Proposals Response:", proposalsResponse.data);

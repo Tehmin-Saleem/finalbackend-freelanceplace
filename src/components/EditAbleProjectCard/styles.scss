@@ -8,6 +8,70 @@
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   margin-bottom: 20px; /* Space between cards */
 
+
+
+  .loading-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+
+  .payment-status-info {
+    margin-bottom: 20px;
+    padding: 12px;
+    background: #f6ffed;
+    border: 1px solid #b7eb8f;
+    border-radius: 6px;
+
+    .payment-badge {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+
+      .payment-status {
+        color: #52c41a;
+        font-weight: 600;
+      }
+
+      .payment-amount {
+        background: #52c41a;
+        color: white;
+        padding: 2px 8px;
+        border-radius: 4px;
+      }
+    }
+
+    .payment-details {
+      font-size: 14px;
+      color: #666;
+
+      p {
+        margin: 4px 0;
+      }
+    }
+  }
+
+  // Style for disabled fields when payment is received
+  .payment-received {
+    input, select, textarea {
+      background-color: #f5f5f5;
+      cursor: not-allowed;
+      
+      &:disabled {
+        opacity: 0.7;
+      }
+    }
+  }
+
+
     .project-info, .project-progress, .project-budget {
       margin-bottom: 20px;
   
@@ -174,4 +238,200 @@
       background-color: #1092af;
     }
   }
+
+
+  .milestones {
+    margin: 20px 0;
+  
+    .milestone-item {
+      background: #fff;
+      border: 1px solid #e8e8e8;
+      border-radius: 8px;
+      margin-bottom: 16px;
+      padding: 16px;
+  
+      .milestone-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 12px;
+        
+        h6 {
+          margin: 0;
+          font-size: 16px;
+          color: #262626;
+          margin-right: 10px;
+        }
+  
+        .milestone-deadline {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          font-size: 14px;
+  
+          &.overdue {
+            color: #ff4d4f;
+          }
+  
+          .deadline-label {
+            color: #8c8c8c;
+          }
+  
+          .deadline-date {
+            font-weight: 500;
+          }
+  
+          .overdue-badge {
+            background: #fff1f0;
+            border: 1px solid #ffa39e;
+            color: #ff4d4f;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+          }
+        }
+      }
+  
+      .milestone-content {
+        .milestone-details {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 8px;
+  
+          .amount {
+            font-weight: 500;
+            color: #262626;
+            margin-right: 10px;
+          }
+  
+          select {
+            padding: 4px 8px;
+            border-radius: 4px;
+            border: 1px solid #d9d9d9;
+            
+            &.completed {
+              background: #f6ffed;
+              border-color: #b7eb8f;
+            }
+            
+            &.in-progress {
+              background: #e6f7ff;
+              border-color: #91d5ff;
+            }
+            
+            &.not-started {
+              background: #fff;
+            }
+          }
+        }
+  
+        .milestone-progress {
+          height: 4px;
+          background: #f0f0f0;
+          border-radius: 2px;
+          overflow: hidden;
+  
+          .progress-bar {
+            height: 100%;
+            background: #52c41a;
+            transition: width 0.3s ease;
+          }
+        }
+      }
+    }
+  }
+
+
+  .milestone-deadline {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  
+    .milestone-number {
+      font-weight: bold;
+      color: #666;
+    }
+  
+    &.overdue {
+      color: #dc3545;
+    }
+  
+    .overdue-badge {
+      background-color: #dc3545;
+      color: white;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 12px;
+    }
+  }
+  
+  .milestone-item {
+    position: relative;
+    
+    &::before {
+      content: '';
+      position: absolute;
+      left: -20px;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      background-color: #e0e0e0;
+    }
+  
+    &:not(:last-child)::after {
+      content: '';
+      position: absolute;
+      left: -20px;
+      bottom: -10px;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background-color: #e0e0e0;
+    }
+  }
+
+
+
+  .due-date-notifications {
+    margin: 10px 0;
+    
+    .notification {
+      padding: 8px 12px;
+      margin: 5px 0;
+      border-radius: 4px;
+      font-size: 14px;
+      
+      &.warning {
+        background-color: #fff3cd;
+        color: #856404;
+        border: 1px solid #ffeeba;
+      }
+      
+      &.danger {
+        background-color: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+      }
+      
+      &.info {
+        background-color: #d1ecf1;
+        color: #0c5460;
+        border: 1px solid #bee5eb;
+      }
+    }
+  }
+
+
+
+  
+
+
+  
 }
+
+
+
+
+
+

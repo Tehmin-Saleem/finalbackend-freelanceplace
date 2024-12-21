@@ -5,6 +5,12 @@ import { Chat } from "../../svg/index";
 import axios from "axios";
 import { useParams } from "react-router-dom";
 import ReviewModal from "../../components/ReviewsModal";
+import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js";
+import {
+  ReloadOutlined,
+  CheckCircleOutlined,
+  CloseCircleOutlined,
+} from "@ant-design/icons";
 import { jwtDecode } from "jwt-decode";
 import {
   Card,
@@ -20,10 +26,11 @@ import {
   Modal,
   Button,
   message,
-  
 } from "antd";
-const { Title, Text, Paragraph  } = Typography;
+const { Title, Text, Paragraph } = Typography;
 import Spinner from "../../components/chatcomponents/Spinner";
+
+import { PAYPAL_OPTIONS } from "../../config/paypal.config"; // Update the path
 
 const ManageProjectsByClient = () => {
   const [loading, setLoading] = useState(false);
@@ -31,6 +38,18 @@ const ManageProjectsByClient = () => {
   const [profileData, setProfileData] = useState(null);
   const [projects, setProjects] = useState([]);
   const [selectedProject, setSelectedProject] = useState(null);
+  // Add a new state for storing freelancer payments if needed
+  const [freelancerPayments, setFreelancerPayments] = useState([]);
+
+  const [paymentStatus, setPaymentStatus] = useState({});
+
+  // Add function to update payment status
+  const updatePaymentStatus = (projectId, status, details) => {
+    setPaymentStatus((prev) => ({
+      ...prev,
+      [projectId]: { status, details },
+    }));
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -52,9 +71,45 @@ const ManageProjectsByClient = () => {
         ]);
 
         setProfileData(profileResponse.data.data);
-        setProjects(projectsResponse.data.data);
+        const projectsData = projectsResponse.data.data;
+        setProjects(projectsData);
+        // console.log("Project Data:", projectsResponse.data.data);
 
-        console.log("Project Data:", projectsResponse.data.data);
+        // Fetch payment details for each freelancer
+        const freelancerPaymentDetails = await Promise.all(
+          projectsData.map(async (project) => {
+            const freelancerId =
+              project.freelancer._id ||
+              project.proposalDetails?.Proposal_id?.freelancer ||
+              project.freelancer?.id;
+
+            if (!freelancerId) {
+              console.warn(
+                "No freelancer ID found for project:",
+                project.projectId
+              );
+              return null;
+            }
+
+            const paymentDetails =
+              await fetchFreelancerPaymentDetails(freelancerId);
+
+            return {
+              freelancerId,
+              paymentDetails: paymentDetails || null,
+            };
+          })
+        );
+
+        // Filter out null entries
+        const validPaymentDetails = freelancerPaymentDetails.filter(
+          (detail) => detail && detail.freelancerId && detail.paymentDetails
+        );
+
+        // console.log("Valid Freelancer Payment Details:", validPaymentDetails);
+        setFreelancerPayments(validPaymentDetails);
+
+        // console.log("freelancer id", projectsResponse.data.data);
       } catch (error) {
         console.error("Error fetching data:", error);
         setError(error.message || "An error occurred while fetching data");
@@ -66,6 +121,34 @@ const ManageProjectsByClient = () => {
     fetchData();
   }, []);
 
+  const fetchFreelancerPaymentDetails = async (freelancerId) => {
+    try {
+      const token = localStorage.getItem("token");
+      // console.log("Fetching payment details for freelancer ID:", freelancerId);
+
+      const response = await axios.get(
+        `http://localhost:5000/api/client/payment-method/${freelancerId}`, // Changed to freelancer endpoint
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      // console.log("Payment details response:", response.data); // Log the full response
+
+      if (response.data && response.data.paymentMethod) {
+        return response.data.paymentMethod;
+      }
+      console.error("No payment details found in response");
+      return null;
+    } catch (error) {
+      console.error("Error fetching freelancer payment details:", error);
+      if (error.response) {
+        console.log("Error response:", error.response.data);
+      }
+      return null; // Return null instead of throwing error to handle it gracefully
+    }
+  };
+
   const handleProjectClick = (project) => {
     setSelectedProject(project);
   };
@@ -75,50 +158,69 @@ const ManageProjectsByClient = () => {
 
   return (
     <>
-      <Header />
-      <div className="manage-projects">
-        {/* Header Section */}
-        <header className="header">
-          <div className="header-content">
-            <h1>Manage Ongoing Projects</h1>
-            <p>Track project progress and milestones</p>
-          </div>
-
-          <div className="client-profile">
-            <img
-              src={profileData?.image || "https://via.placeholder.com/150"}
-              alt={profileData?.name || "Client"}
-              className="profile-image"
-            />
-            <div className="profile-info">
-              <span className="name">{profileData?.name || "Loading..."}</span>
-              <span className="email">{profileData?.email}</span>
+      <PayPalScriptProvider options={PAYPAL_OPTIONS}>
+        <Header />
+        <div className="manage-projects">
+          {/* Header Section */}
+          <header className="header">
+            <div className="header-content">
+              <h1>Manage Ongoing Projects</h1>
+              <p>Track project progress and milestones</p>
             </div>
-          </div>
-        </header>
 
-        {/* Projects Section */}
-        <div className="projects-container">
-          {/* Project List */}
-          <div className="project-list">
-            {projects.length === 0 ? (
-              <div className="no-projects">No ongoing projects found</div>
-            ) : (
-              projects.map((project) => (
-                <ProjectCard
-                  key={project.projectId}
-                  project={project}
-                  onClick={() => handleProjectClick(project)}
-                  isSelected={selectedProject?.projectId === project.projectId}
-                />
-              ))
+            <div className="client-profile">
+              <img
+                src={profileData?.image || "https://via.placeholder.com/150"}
+                alt={profileData?.name || "Client"}
+                className="profile-image"
+              />
+              <div className="profile-info">
+                <span className="name">
+                  {profileData?.name || "Loading..."}
+                </span>
+                <span className="email">{profileData?.email}</span>
+              </div>
+            </div>
+          </header>
+
+          {/* Projects Section */}
+          <div className="projects-container">
+            {/* Project List */}
+            <div className="project-list">
+              {projects.length === 0 ? (
+                <div className="no-projects">No ongoing projects found</div>
+              ) : (
+                projects.map((project) => (
+                  <ProjectCard
+                    key={project.projectId}
+                    project={project}
+                    onClick={() => handleProjectClick(project)}
+                    isSelected={
+                      selectedProject?.projectId === project.projectId
+                    }
+                  />
+                ))
+              )}
+            </div>
+
+            {/* Project Details */}
+            {selectedProject && (
+              <ProjectDetails
+                project={selectedProject}
+                freelancerPayments={freelancerPayments}
+                onProjectUpdate={(updatedProject) => {
+                  setProjects((prevProjects) =>
+                    prevProjects.map((p) =>
+                      p._id === updatedProject._id ? updatedProject : p
+                    )
+                  );
+                  setSelectedProject(updatedProject);
+                }}
+              />
             )}
           </div>
-
-          {/* Project Details */}
-          {selectedProject && <ProjectDetails project={selectedProject} />}
         </div>
-      </div>
+      </PayPalScriptProvider>
     </>
   );
 };
@@ -146,7 +248,7 @@ const ProjectCard = ({ project, onClick, isSelected }) => {
     >
       <div className="project-header">
         <h3>{project.projectName}</h3>
-        <span className="budget">{formatBudgetDisplay(project.budget)}</span>
+        {/* <span className="budget">{formatBudgetDisplay(project.budget)}</span> */}
       </div>
 
       <div className="freelancer-info">
@@ -197,7 +299,11 @@ const ProjectCard = ({ project, onClick, isSelected }) => {
   );
 };
 
-const ProjectDetails = ({ project, onProjectStatusChange }) => {
+const ProjectDetails = ({
+  project,
+  onProjectStatusChange,
+  freelancerPayments,
+}) => {
   const [activeTab, setActiveTab] = useState("overview");
 
   const [progressData, setProgressData] = useState(null);
@@ -207,6 +313,50 @@ const ProjectDetails = ({ project, onProjectStatusChange }) => {
   const [showReviewModal, setShowReviewModal] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [ProjectId, setProjectId] = useState(false);
+  // Add these state variables
+  const [paymentStatus, setPaymentStatus] = useState(null);
+  const [paymentDetails, setPaymentDetails] = useState(null);
+  const [currentProject, setCurrentProject] = useState(project);
+  const [isPaymentLoading, setIsPaymentLoading] = useState(false);
+
+  useEffect(() => {
+    if (progressData?.projectDetails) {
+      setPaymentStatus(progressData.projectDetails.paymentStatus);
+      setPaymentDetails(progressData.projectDetails.paymentDetails);
+    }
+  }, [progressData]);
+
+  const handlePaymentSuccess = async (updatedProject) => {
+    setIsPaymentLoading(true);
+    try {
+      setCurrentProject(updatedProject);
+      setPaymentStatus(updatedProject.paymentStatus);
+      setPaymentDetails(updatedProject.paymentDetails);
+      setProgressData((prev) => ({
+        ...prev,
+        projectDetails: {
+          ...prev?.projectDetails,
+          paymentStatus: updatedProject.paymentStatus,
+          paymentDetails: updatedProject.paymentDetails,
+        },
+      }));
+      await fetchProgress();
+      message.success("Payment processed successfully!");
+    } catch (error) {
+      console.error("Error updating payment status:", error);
+      message.error("Error updating payment status");
+    } finally {
+      setIsPaymentLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (progressData?.projectDetails?.paymentStatus === "paid") {
+      // message.success("Payment completed successfully!");
+      // Update UI to show paid status
+      setPaymentStatus("paid");
+    }
+  }, [progressData]);
 
   const handleMarkAsComplete = () => {
     // Instead of making the API call here, just show the modal
@@ -226,21 +376,24 @@ const ProjectDetails = ({ project, onProjectStatusChange }) => {
     try {
       const token = localStorage.getItem("token");
 
-      console.log("client id", userId);
-
-      console.log("Id", project.proposalDetails.Proposal_id._id);
-
       const response = await axios.get(
         `http://localhost:5000/api/client/project-progress/${id}?client_id=${userId}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
-      console.log("Progress :", response.data);
+      // console.log("Progress :", response.data);
       setdescription(response.data.projectDetails.description);
       setProjectId(response.data.projectDetails.projectId);
 
       setProgressData(response.data);
+
+      // Update payment status and details if available
+      if (response.data.projectDetails) {
+        setPaymentStatus(response.data.projectDetails.paymentStatus);
+        setPaymentDetails(response.data.projectDetails.paymentDetails);
+      }
+
       setError(null);
     } catch (err) {
       console.error("Error fetching progress:", err);
@@ -258,20 +411,15 @@ const ProjectDetails = ({ project, onProjectStatusChange }) => {
     }
   }, [activeTab]);
 
- 
+  // const id = ProjectId;
+  // console.log("outside", ProjectId);
 
-
-  const id = ProjectId;
-  console.log("outside", ProjectId)
-
-  const handleReviewSubmit = async ( ProjectId, reviewData, ) => {
+  const handleReviewSubmit = async (ProjectId, reviewData) => {
     try {
       setIsSubmitting(true);
       const token = localStorage.getItem("token");
       const decodedToken = jwtDecode(token);
       const userId = decodedToken.userId;
-
-   
 
       // Make the API call to mark project as completed with review
       const response = await axios.post(
@@ -327,175 +475,506 @@ const ProjectDetails = ({ project, onProjectStatusChange }) => {
     return "Experience level not specified";
   };
 
+  const handlePaymentError = (error) => {
+    message.error(`Payment failed: ${error}`);
+  };
+
   const renderMilestonesContent = () => {
     if (loading) return <Spinner />;
     if (error)
       return (
         <Alert message="Error" description={error} type="error" showIcon />
       );
+
     if (!progressData)
       return <Empty description="No progress data available" />;
 
-    const { progressData: progress, timeMetrics, projectDetails } = progressData;
-    return (
-      <div className="milestone-progress">
-      {/* Overall Progress Card with Progress Bar */}
-      <Card className="overall-progress-card">
-        <Title level={4}>Overall Project Progress</Title>
-        <div className="progress-container">
-          <Progress
-            percent={progress.overallProgress}
-            status="active"
-            strokeColor={{
-              "0%": "#108ee9",
-              "100%": "#87d068",
-            }}
-            strokeWidth={15}
-          />
-        </div>
-      </Card>
+    // Check if progress is milestone-based
+    if (progressData.milestones && progressData.milestones.length > 0) {
+      const { milestones } = progressData;
 
-      {/* Project Statistics */}
-      <Row gutter={[16, 16]} className="stats-cards">
-        <Col span={6}>
-          <Card>
-            <Statistic
-              title="Overall Progress"
-              value={progress.overallProgress}
-              suffix="%"
-              valueStyle={{ color: "#3f8600" }}
-            />
-          </Card>
-        </Col>
-        <Col span={6}>
-          <Card>
-            <Statistic
-              title="Completed Milestones"
-              value={progress.completedMilestones}
-              suffix={`/ ${progress.totalMilestones}`}
-              valueStyle={{ color: "#1890ff" }}
-            />
-          </Card>
-        </Col>
-        <Col span={6}>
-          <Card>
-            <Statistic
-              title="Days Remaining"
-              value={timeMetrics.daysRemaining}
-              suffix="days"
-              valueStyle={{ color: timeMetrics.isOverdue ? "#ff4d4f" : "#722ed1" }}
-            />
-          </Card>
-        </Col>
-        <Col span={6}>
-          <Card>
-            <Statistic
-              title="Days Elapsed"
-              value={timeMetrics.daysElapsed}
-              suffix={`/ ${timeMetrics.totalDays}`}
-              valueStyle={{ color: "#faad14" }}
-            />
-          </Card>
-        </Col>
-      </Row>
-
-      {/* Project Description */}
-      <Card style={{ marginTop: 16, marginBottom: 16 }}>
-        <Title level={5}>Project Details</Title>
-        <Row gutter={[16, 16]}>
-          <Col span={12}>
-            <Text strong>Project Name: </Text>
-            <Text>{projectDetails.projectName}</Text>
-          </Col>
-          <Col span={12}>
-            <Text strong>Last Updated: </Text>
-            <Text>{new Date(progress.lastUpdated).toLocaleString()}</Text>
-          </Col>
-        </Row>
-        <Row style={{ marginTop: 16 }}>
-          <Col span={24}>
-            <Text strong>Description: </Text>
-            <Paragraph ellipsis={{ rows: 3, expandable: true }}>
-              {projectDetails.description}
-            </Paragraph>
-          </Col>
-        </Row>
-      </Card>
-
-      {/* Milestones Timeline */}
-      <Card title="Milestones Timeline" style={{ marginTop: 16 }}>
-        <Timeline mode="left">
-          {progress.milestones.map((milestone, index) => (
-            <Timeline.Item
-              key={index}
-              color={
-                milestone.status === "Completed"
-                  ? "green"
-                  : milestone.status === "In Progress"
-                  ? "blue"
-                  : "gray"
-              }
-              label={new Date(milestone.due_date).toLocaleDateString()}
-            >
-              <Card className="milestone-card" bordered={false}>
-                <Row justify="space-between" align="middle">
-                  <Col span={16}>
-                    <Title level={5}>{milestone.name}</Title>
-                    <Text type="secondary">
-                      Due: {new Date(milestone.due_date).toLocaleDateString()}
-                    </Text>
-                  </Col>
-                  <Col span={8} style={{ textAlign: "right" }}>
-                    <Tag
-                      color={
-                        milestone.status === "Completed"
-                          ? "success"
-                          : milestone.status === "In Progress"
-                          ? "processing"
-                          : "default"
-                      }
-                    >
-                      {milestone.status}
-                    </Tag>
-                    <div style={{ marginTop: 8 }}>
-                      <Text strong>${milestone.amount}</Text>
-                    </div>
-                  </Col>
-                </Row>
-                <Progress
-                  percent={milestone.progress}
-                  status={
+      return (
+        <div className="milestone-progress">
+          <Card title="Milestones Timeline" style={{ marginTop: 16 }}>
+            <Timeline mode="left">
+              {milestones.map((milestone, index) => (
+                <Timeline.Item
+                  key={index}
+                  color={
                     milestone.status === "Completed"
-                      ? "success"
+                      ? "green"
                       : milestone.status === "In Progress"
-                      ? "active"
-                      : "normal"
+                        ? "blue"
+                        : "gray"
                   }
-                  style={{ marginTop: 16 }}
+                  label={new Date(milestone.due_date).toLocaleDateString()}
+                >
+                  <div className="milestone-details">
+                    <h4>{milestone.name}</h4>
+                    <p>
+                      Due Date:
+                      {new Date(milestone.due_date).toLocaleDateString()}
+                    </p>
+                    <p>Status: {milestone.status}</p>
+                    <p>Amount: ${milestone.amount}</p>
+
+                    {milestone.status === "Completed" && !milestone.paid && (
+                      <div className="milestone-payment-section">
+                        {milestone.paid ||
+                        progressData?.projectDetails?.paymentStatus ===
+                          "paid" ? (
+                          <Alert
+                            message={`Milestone ${index + 1} Payment Complete`}
+                            description={
+                              <div>
+                                <p>Amount Paid: ${milestone.amount}</p>
+                                <p>
+                                  Date:{" "}
+                                  {new Date(
+                                    progressData?.projectDetails?.paymentDetails?.paymentDate
+                                  ).toLocaleDateString()}
+                                </p>
+                                <p>
+                                  Method:{" "}
+                                  {
+                                    progressData?.projectDetails?.paymentDetails
+                                      ?.paymentMethod
+                                  }
+                                </p>
+                              </div>
+                            }
+                            type="success"
+                            showIcon
+                          />
+                        ) : (
+                          <div className="payment-button-container">
+                            <PayPalPaymentButton
+                              amount={parseFloat(milestone.amount)}
+                              freelancerPayments={freelancerPayments}
+                              project={project}
+                              milestoneId={milestone._id}
+                              onSuccess={() => handlePaymentSuccess(milestone)}
+                              onError={handlePaymentError}
+                              freelancerId={
+                                currentProject.freelancer_profile_id ||
+                                currentProject.freelancer?._id
+                              }
+                            />
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </Timeline.Item>
+              ))}
+            </Timeline>
+          </Card>
+        </div>
+      );
+    }
+
+    const {
+      progressData: progress,
+      timeMetrics,
+      projectDetails,
+    } = progressData;
+
+    // In the renderMilestonesContent function, update the fixed project condition:
+
+    if (progressData.progressData?.type === "fixed") {
+      const projectBudget = progressData.projectDetails?.budget || 0;
+      const isCompleted = progressData.progressData.overallProgress === 100;
+      const isPendingApproval =
+        progressData.projectDetails.status === "Pending Approval";
+
+      return (
+        <div className="fixed-project-payment">
+          <Card className="overall-progress-card">
+            <Title level={4}>Overall Project Progress</Title>
+            <div className="progress-container">
+              <Progress
+                percent={progressData.progressData.overallProgress}
+                status="active"
+                strokeColor={{
+                  "0%": "#108ee9",
+                  "100%": "#87d068",
+                }}
+                strokeWidth={15}
+              />
+            </div>
+          </Card>
+
+          {/* Project Details */}
+          <Card style={{ marginTop: 16 }}>
+            <Row gutter={[16, 16]}>
+              <Col span={12}>
+                <Statistic
+                  title="Project Budget"
+                  value={projectBudget}
+                  prefix="$"
+                />
+              </Col>
+              <Col span={12}>
+                <Statistic
+                  title="Status"
+                  value={progressData.projectDetails.status}
+                />
+              </Col>
+            </Row>
+          </Card>
+
+          {/* Payment Section */}
+          {isCompleted && isPendingApproval && paymentStatus === "unpaid" && (
+            <Card title="Project Payment" style={{ marginTop: 16 }}>
+              {progressData.projectDetails.paymentStatus === "paid" ? (
+                <Alert
+                  message="Payment Complete"
+                  description={
+                    <div>
+                      <p>Amount Paid: ${projectBudget}</p>
+                      <p>
+                        Date:{" "}
+                        {new Date(
+                          progressData.projectDetails.paymentDetails?.paymentDate
+                        ).toLocaleDateString()}
+                      </p>
+                      <p>
+                        Method:{" "}
+                        {
+                          progressData.projectDetails.paymentDetails
+                            ?.paymentMethod
+                        }
+                      </p>
+                      <p>
+                        Transaction ID:{" "}
+                        {
+                          progressData.projectDetails.paymentDetails
+                            ?.transactionId
+                        }
+                      </p>
+                    </div>
+                  }
+                  type="success"
+                  showIcon
+                />
+              ) : (
+                <>
+                  <Alert
+                    message="Project Ready for Payment"
+                    description="The project has been completed and is pending payment approval."
+                    type="success"
+                    showIcon
+                    style={{ marginBottom: 16 }}
+                  />
+
+                  <Row justify="center">
+                    <Col span={16}>
+                      <div className="payment-amount">
+                        <Statistic
+                          title="Total Amount Due"
+                          value={projectBudget}
+                          prefix="$"
+                          style={{ marginBottom: 16 }}
+                        />
+                      </div>
+
+                      <div className="payment-options">
+                        <PayPalPaymentButton
+                          amount={projectBudget}
+                          freelancerId={project.freelancer?._id}
+                          milestoneId={null}
+                          onSuccess={handlePaymentSuccess}
+                          freelancerPayments={freelancerPayments}
+                          project={project}
+                          onError={handlePaymentError}
+                        />
+                      </div>
+                    </Col>
+                  </Row>
+                </>
+              )}
+            </Card>
+          )}
+
+       
+
+          {/* Project Statistics */}
+          <Row gutter={[16, 16]} style={{ marginTop: 16 }}>
+            <Col span={8}>
+              <Card>
+                <Statistic
+                  title="Days Remaining"
+                  value={progressData.timeMetrics.daysRemaining}
+                  suffix="days"
                 />
               </Card>
-            </Timeline.Item>
-          ))}
-        </Timeline>
-      </Card>
+            </Col>
+            <Col span={8}>
+              <Card>
+                <Statistic
+                  title="Days Elapsed"
+                  value={progressData.timeMetrics.daysElapsed}
+                  suffix={`/ ${progressData.timeMetrics.totalDays}`}
+                />
+              </Card>
+            </Col>
+            <Col span={8}>
+              <Card>
+                <Statistic
+                  title="Last Updated"
+                  value={new Date(
+                    progressData.timeMetrics.lastUpdated
+                  ).toLocaleDateString()}
+                />
+              </Card>
+            </Col>
+          </Row>
 
-      {progress.overallProgress === 100 && (
-        <Button
-          type="primary"
-          className="mark-complete-btn"
-          onClick={handleMarkAsComplete}
-          style={{ marginTop: 16 }}
-        >
-          Mark as Completed
-        </Button>
-      )}
-    </div>
-  );
-};
 
+
+
+             {/* Mark as Complete Button - Show only when progress is 100% */}
+             {progressData.progressData.overallProgress === 100 && (
+            <Button
+              type="primary"
+              className="mark-complete-btn"
+              onClick={handleMarkAsComplete}
+              style={{ marginTop: 16 }}
+            >
+              Mark as Completed
+            </Button>
+          )}
+        </div>
+      );
+    }
+
+    // console.log("for fixed progress data", progressData);
+
+    return (
+      <div className="milestone-progress">
+        {/* Overall Progress Card with Progress Bar */}
+        <Card className="overall-progress-card">
+          <Title level={4}>Overall Project Progress</Title>
+          <div className="progress-container">
+            <Progress
+              percent={progress.overallProgress}
+              status="active"
+              strokeColor={{
+                "0%": "#108ee9",
+                "100%": "#87d068",
+              }}
+              strokeWidth={15}
+            />
+          </div>
+        </Card>
+
+        {/* Project Statistics */}
+        <Row gutter={[16, 16]} className="stats-cards">
+          <Col span={6}>
+            <Card>
+              <Statistic
+                title="Overall Progress"
+                value={progress.overallProgress}
+                suffix="%"
+                valueStyle={{ color: "#3f8600" }}
+              />
+            </Card>
+          </Col>
+          <Col span={6}>
+            <Card>
+              <Statistic
+                title="Completed Milestones"
+                value={progress.completedMilestones}
+                suffix={`/ ${progress.totalMilestones}`}
+                valueStyle={{ color: "#1890ff" }}
+              />
+            </Card>
+          </Col>
+          <Col span={6}>
+            <Card>
+              <Statistic
+                title="Days Remaining"
+                value={timeMetrics.daysRemaining}
+                suffix="days"
+                valueStyle={{
+                  color: timeMetrics.isOverdue ? "#ff4d4f" : "#722ed1",
+                }}
+              />
+            </Card>
+          </Col>
+          <Col span={6}>
+            <Card>
+              <Statistic
+                title="Days Elapsed"
+                value={timeMetrics.daysElapsed}
+                suffix={`/ ${timeMetrics.totalDays}`}
+                valueStyle={{ color: "#faad14" }}
+              />
+            </Card>
+          </Col>
+        </Row>
+        {/* Project Description */}
+        <Card style={{ marginTop: 16, marginBottom: 16 }}>
+          <Title level={5}>Project Details</Title>
+          <Row gutter={[16, 16]}>
+            <Col span={12}>
+              <Text strong>Project Name: </Text>
+              <Text>{projectDetails.projectName}</Text>
+            </Col>
+            <Col span={12}>
+              <Text strong>Last Updated: </Text>
+              <Text>{new Date(progress.lastUpdated).toLocaleString()}</Text>
+            </Col>
+          </Row>
+          <Row style={{ marginTop: 16 }}>
+            <Col span={24}>
+              <Text strong>Description: </Text>
+              <Paragraph ellipsis={{ rows: 3, expandable: true }}>
+                {projectDetails.description}
+              </Paragraph>
+            </Col>
+          </Row>
+        </Card>
+        {/* Milestones Timeline */}
+        <Card title="Milestones Timeline" style={{ marginTop: 16 }}>
+          <Timeline mode="left">
+            {progress.milestones.map((milestone, index) => (
+              <Timeline.Item
+                key={index}
+                color={
+                  milestone.status === "Completed"
+                    ? "green"
+                    : milestone.status === "In Progress"
+                      ? "blue"
+                      : "gray"
+                }
+                label={new Date(milestone.due_date).toLocaleDateString()}
+              >
+                <div className="milestone-details">
+                  <h4>{milestone.name}</h4>
+                  <p>
+                    Due Date:{" "}
+                    {new Date(milestone.due_date).toLocaleDateString()}
+                  </p>
+                  <p>Status: {milestone.status}</p>
+                  {/* <p>Payment Status {}</p> */}
+                  {milestone.status === "Completed" && !milestone.paid && (
+                    <div>
+                      <PayPalPaymentButton
+                        amount={milestone.amount}
+                        onSuccess={() => handlePaymentSuccess(milestone)}
+                        onError={handlePaymentError}
+                        freelancerPayments={freelancerPayments} // Add this prop
+                        project={project} // Pass as project not projects
+                      />
+                    </div>
+                  )}
+                </div>
+                <Card className="milestone-card" bordered={false}>
+                  <Row justify="space-between" align="middle">
+                    <Col span={16}>
+                      <Title level={5}>{milestone.name}</Title>
+                      <Text type="secondary">
+                        Due: {new Date(milestone.due_date).toLocaleDateString()}
+                      </Text>
+                    </Col>
+                    <Col span={8} style={{ textAlign: "right" }}>
+                      <Tag
+                        color={
+                          milestone.status === "Completed"
+                            ? "success"
+                            : milestone.status === "In Progress"
+                              ? "processing"
+                              : "default"
+                        }
+                      >
+                        {milestone.status}
+                      </Tag>
+                      <div style={{ marginTop: 8 }}>
+                        <Text strong>${milestone.amount}</Text>
+                      </div>
+                    </Col>
+                  </Row>
+                  <Progress
+                    percent={milestone.progress}
+                    status={
+                      milestone.status === "Completed"
+                        ? "success"
+                        : milestone.status === "In Progress"
+                          ? "active"
+                          : "normal"
+                    }
+                    style={{ marginTop: 16 }}
+                  />
+                </Card>
+              </Timeline.Item>
+            ))}
+          </Timeline>
+        </Card>
+        {progress.overallProgress === 100 && (
+          <Button
+            type="primary"
+            className="mark-complete-btn"
+            onClick={handleMarkAsComplete}
+            style={{ marginTop: 16 }}
+          >
+            Mark as Completed
+          </Button>
+        )}
+      </div>
+    ); // If no progress data at all
+    // return <Empty description="No progress data available" />;
+  };
+
+  // In ProjectDetails component
+  useEffect(() => {
+    if (currentProject?.paymentStatus === "paid") {
+      setPaymentStatus("paid");
+      setPaymentDetails(currentProject.paymentDetails);
+    }
+  }, [currentProject]);
+
+  useEffect(() => {
+    const refreshPaymentStatus = async () => {
+      if (activeTab === "milestones" && currentProject?.projectId) {
+        await fetchProgress();
+      }
+    };
+
+    refreshPaymentStatus();
+  }, [activeTab, currentProject?.projectId]);
+
+  const refreshPaymentStatus = async () => {
+    setIsPaymentLoading(true);
+    try {
+      await fetchProgress();
+      message.success({
+        content: "Payment status refreshed successfully",
+        icon: <CheckCircleOutlined style={{ color: "#52c41a" }} />,
+      });
+    } catch (error) {
+      message.error({
+        content: "Failed to refresh payment status",
+        icon: <CloseCircleOutlined style={{ color: "#ff4d4f" }} />,
+      });
+    } finally {
+      setIsPaymentLoading(false);
+    }
+  };
 
   return (
     <div className="project-details">
+      {/* Show payment button only if not paid */}
+      {currentProject.progress === 100 &&
+        currentProject.paymentStatus !== "paid" && (
+          <PayPalPaymentButton
+            amount={currentProject.budget}
+            project={currentProject}
+            onSuccess={handlePaymentSuccess}
+            onError={(error) => message.error(error)}
+          />
+        )}
+
       <div className="tabs">
         <button
           className={`tab ${activeTab === "overview" ? "active" : ""}`}
@@ -516,6 +995,49 @@ const ProjectDetails = ({ project, onProjectStatusChange }) => {
           Proposal
         </button>
       </div>
+
+      {paymentStatus === "paid" && paymentDetails && (
+        <div className="payment-status-container">
+          <div className="payment-status-header">
+            <Alert
+              message="Payment Successfully Completed"
+              description={
+                <div className="payment-details">
+                  <p>
+                    <strong>Transaction ID:</strong>{" "}
+                    {paymentDetails.transactionId}
+                  </p>
+                  <p>
+                    <strong>Amount Paid:</strong> $
+                    {paymentDetails.amount.toFixed(2)}
+                  </p>
+                  <p>
+                    <strong>Payment Date:</strong>{" "}
+                    {new Date(paymentDetails.paymentDate).toLocaleDateString()}
+                  </p>
+                  <p>
+                    <strong>Payment Method:</strong>{" "}
+                    {paymentDetails.paymentMethod.charAt(0).toUpperCase() +
+                      paymentDetails.paymentMethod.slice(1)}
+                  </p>
+                </div>
+              }
+              type="success"
+              showIcon
+              className="payment-alert"
+            />
+            <Button
+              type="primary"
+              icon={<ReloadOutlined />}
+              onClick={refreshPaymentStatus}
+              loading={isPaymentLoading}
+              className="refresh-button"
+            >
+              Refresh Status
+            </Button>
+          </div>
+        </div>
+      )}
 
       <div className="tab-content">
         {activeTab === "overview" && (
@@ -659,28 +1181,13 @@ const ProjectDetails = ({ project, onProjectStatusChange }) => {
                     <path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                 </div>
-                <span className="label">Estimated Duration</span>
+                <span className="label">Estimated Duration </span>
                 <span className="value">
                   {project.proposalDetails.estimatedDuration}
                 </span>
               </div>
 
-              <div className="detail-card">
-                <div className="detail-icon">
-                  <svg
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                  >
-                    <path d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                </div>
-                <span className="label">Proposed Rate</span>
-                <span className="value rate">
-                  ${project.proposalDetails.proposedRate}/hr
-                </span>
-              </div>
+         
 
               {project.proposalDetails.attachments && (
                 <div className="proposal-attachments">
@@ -728,20 +1235,232 @@ const ProjectDetails = ({ project, onProjectStatusChange }) => {
         )}
       </div>
 
-
-
-       {/* Add ReviewModal here */}
-       <ReviewModal
+      {/* Add ReviewModal here */}
+      <ReviewModal
         visible={showReviewModal}
         onClose={() => setShowReviewModal(false)}
-        onSubmit={(reviewData) => handleReviewSubmit( ProjectId, reviewData)}
-        freelancerName={project.freelancer?.name || 'Freelancer'}
+        onSubmit={(reviewData) => handleReviewSubmit(ProjectId, reviewData)}
+        freelancerName={project.freelancer?.name || "Freelancer"}
         isSubmitting={isSubmitting}
       />
     </div>
   );
+};
 
+const PayPalPaymentButton = ({
+  amount,
+  freelancerPayments, // Add this prop
+  project,
+  milestoneId,
+  onSuccess,
+  onError,
+}) => {
+  const [loading, setLoading] = useState(false);
 
+  // Add validation with meaningful error messages
+  if (!project) {
+    console.warn("Project prop is required for PayPalPaymentButton");
+    return null;
+  }
+
+  if (!amount || isNaN(amount)) {
+    console.warn("Valid amount is required for PayPalPaymentButton");
+    return null;
+  }
+
+  // // Add debugging logs
+  // useEffect(() => {
+  //   console.log("PayPalPaymentButton Props:", {
+  //     amount,
+  //     project,
+  //     milestoneId,
+  //     freelancerPayments,
+  //   });
+  // }, []);
+
+  // Get freelancer payment details from the project
+  const freelancerId =
+    project?.freelancer?._id ||
+    project?.proposalDetails?.Proposal_id?.freelancer ||
+    project?.freelancer?.id;
+
+  // console.log("pojects", project);
+
+  // Safely check for freelancerPayments before using find
+  const freelancerPaymentInfo = Array.isArray(freelancerPayments)
+    ? freelancerPayments.find(
+        (payment) => payment.freelancerId === freelancerId
+      )
+    : null;
+
+  // console.log("Freelancer Payment Info:", freelancerPaymentInfo);
+
+  const paypalEmail =
+    freelancerPaymentInfo?.paymentDetails?.paypal_details?.email;
+
+  // Add safety checks
+  if (!freelancerPayments || !Array.isArray(freelancerPayments)) {
+    console.error(
+      "freelancerPayments is not properly initialized:",
+      freelancerPayments
+    );
+    return <div>Error: Payment system not properly configured</div>;
+  }
+
+  if (!freelancerId) {
+    console.error("Freelancer ID not found in project:", project);
+    return <div>Error: Freelancer information not found</div>;
+  }
+
+  if (!paypalEmail) {
+    console.error("PayPal email not found for freelancer:", freelancerId);
+    return <div>Error: PayPal details not available</div>;
+  }
+
+  const createOrder = (data, actions) => {
+    if (!paypalEmail) {
+      onError("Freelancer PayPal email not found");
+      return;
+    }
+
+    return actions.order.create({
+      purchase_units: [
+        {
+          amount: {
+            currency_code: "USD",
+            value: amount.toFixed(2),
+          },
+          payee: {
+            email_address: paypalEmail, // Freelancer's PayPal email
+          },
+          description: `Payment for Project: ${project.projectName}`,
+        },
+      ],
+    });
+  };
+
+  const handleApprove = async (data, actions) => {
+    setLoading(true);
+    try {
+      // console.log("Payment approved, capturing order...");
+      const order = await actions.order.capture();
+      // console.log("Order captured:", order);
+      const token = localStorage.getItem("token");
+      const decodedToken = jwtDecode(token);
+      const userId = decodedToken.userId;
+
+      if (!freelancerId) {
+        throw new Error("Freelancer ID not found");
+      }
+
+      // Log the project object to verify the ID
+      // console.log("Project data being sent:", project);
+
+      // Get proposal_id from project
+      const proposal_id = project.proposalDetails?.Proposal_id?._id;
+
+      if (!proposal_id) {
+        throw new Error("Proposal ID not found in project data");
+      }
+
+      // Create payment data
+      const paymentData = {
+        freelancerId,
+        milestoneId,
+        amount,
+        paymentMethod: "paypal",
+        orderId: order.id,
+        projectId: project._id || project.projectId, // Try both _id and projectId
+        projectType: project.budget_type || "fixed",
+        proposal_id: project.proposalDetails.Proposal_id._id, // Add these
+        client_id: userId,
+        paypalEmail: freelancerPayments?.find(
+          (p) => p.freelancerId === freelancerId
+        )?.paymentDetails?.paypal_details?.email,
+        // Add these fields for debugging
+        paymentDetails: {
+          payer: order.payer,
+          status: order.status,
+          orderId: order.id,
+          paymentIntentId: order.id,
+          create_time: order.create_time,
+          update_time: order.update_time,
+          name: project.projectName,
+          type: project.budget_type,
+          transactionId: order.id,
+          paymentDate: new Date().toISOString(),
+          amount: amount,
+          paymentMethod: "paypal",
+
+          // status: project.status
+        },
+      };
+
+      // console.log("Sending payment data to backend:", paymentData);
+
+      if (!paymentData.projectId) {
+        throw new Error("Project ID is missing");
+      }
+
+      // Process payment on the backend
+      const paymentResponse = await axios.post(
+        "http://localhost:5000/api/client/process-payment",
+        paymentData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      // console.log("Backend payment processing:", paymentResponse.data);
+
+      if (paymentResponse.data.success) {
+        onSuccess({
+          ...paymentResponse.data.project,
+          paymentStatus: "paid",
+          paymentDetails: paymentResponse.data.project.paymentDetails,
+        });
+      }
+      // }
+    } catch (error) {
+      console.error("Error processing PayPal payment:", error);
+      onError(error.message || "Payment failed");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Validate required data before rendering PayPal buttons
+  if (!amount || amount <= 0) {
+    console.error("Invalid amount for PayPal payment:", amount);
+    return null;
+  }
+
+  if (!paypalEmail) {
+    return <div>Error: Freelancer PayPal details not found</div>;
+  }
+
+  return (
+    <div className="paypal-button-container">
+      {loading && <div className="payment-loading">Processing payment...</div>}
+      <PayPalButtons
+        style={{
+          layout: "horizontal",
+          color: "gold",
+          shape: "rect",
+          label: "pay",
+        }}
+        createOrder={createOrder}
+        onApprove={handleApprove}
+        onError={(err) => {
+          console.error("PayPal error:", err);
+          onError(err.message || "Payment failed");
+        }}
+        disabled={loading}
+      />
+    </div>
+  );
 };
 
 export default ManageProjectsByClient;

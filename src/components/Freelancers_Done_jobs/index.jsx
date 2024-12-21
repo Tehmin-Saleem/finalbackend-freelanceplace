@@ -30,6 +30,8 @@ const JobsCard = ({
   clientName, // Add these new props
   clientCountry, // Add these new props
   attachment,
+  paymentStatus,
+  paymentDetails,
 }) => {
   const navigate = useNavigate();
 
@@ -161,7 +163,7 @@ const JobsCard = ({
               rate,
               timeline,
               level,
-              description:  description,
+              description: description,
               tags,
               verified,
               rating,
@@ -175,13 +177,14 @@ const JobsCard = ({
               add_requirements: {
                 by_milestones: [
                   {
-                    
                     amount: parseFloat(rate.replace(/[^0-9.-]+/g, "")),
-                    due_date: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
-                    status: "Not Started"
-                  }
-                ]
-              }
+                    due_date: new Date(
+                      Date.now() + 30 * 24 * 60 * 60 * 1000
+                    ).toISOString(),
+                    status: "Not Started",
+                  },
+                ],
+              },
             },
             freelancer_id,
             client_id,
@@ -189,7 +192,7 @@ const JobsCard = ({
         });
         return;
       }
-  
+
       const headers = {
         Authorization: `Bearer ${token}`, // Fixed template literal
         "Content-Type": "application/json",
@@ -243,6 +246,43 @@ const JobsCard = ({
   useEffect(() => {
     console.log("Current job attachment:", attachment);
   }, [attachment]);
+
+  const PaymentStatus = ({ PaymentStatus, details }) => {
+    if (!PaymentStatus || PaymentStatus !== "paid") return null;
+
+    return (
+      <div className="job-card__payment-status">
+        <div className="payment-status-badge">
+          <i className="fas fa-check-circle"></i>
+          <span>Payment Received</span>
+        </div>
+        <div className="payment-details">
+          <div className="payment-detail-item">
+            <span>Amount:</span>
+            <strong>${details.amount}</strong>
+          </div>
+          <div className="payment-detail-item">
+            <span>Date:</span>
+            <strong>
+              {new Date(details.paymentDate).toLocaleDateString("en-US", {
+                year: "numeric",
+                month: "short",
+                day: "numeric",
+              })}
+            </strong>
+          </div>
+          <div className="payment-detail-item">
+            <span>Transaction ID:</span>
+            <strong>{details.transactionId}</strong>
+          </div>
+          <div className="payment-detail-item">
+            <span>Method:</span>
+            <strong>{details.paymentMethod}</strong>
+          </div>
+        </div>
+      </div>
+    );
+  };
 
   return (
     <div className="job-card">
@@ -320,9 +360,7 @@ const JobsCard = ({
             <div className="progress-container">
               {/* Header */}
               <div className="progress-header">
-                <h3 className="project-title">
-                  Progress
-                </h3>
+                <h3 className="project-title">Progress</h3>
                 <span className="project-due-date">
                   Due:{" "}
                   {new Date(
@@ -354,6 +392,14 @@ const JobsCard = ({
                     </span>
                     <span className="label">Days Elapsed</span>
                   </div>
+                  {progressData.projectDetails.paymentStatus === "paid" && (
+                    <div className="metric payment-metric">
+                      <span className="value">
+                        ${progressData.projectDetails.paymentDetails.amount}
+                      </span>
+                      <span className="label">Paid</span>
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -401,7 +447,14 @@ const JobsCard = ({
                             >
                               {milestone.status}
                             </span>
-                            <span className="amount">${milestone.amount}</span>
+                            <span className="amount">
+                              ${milestone.amount}
+                              {milestone.paid && (
+                                <span className="payment-indicator">
+                                  <i className="fas fa-check-circle"></i> Paid
+                                </span>
+                              )}
+                            </span>
                           </div>
                         </div>
                         <div className="milestone-progress-bar">
@@ -433,6 +486,14 @@ const JobsCard = ({
             </span>
           ))}
         </div>
+
+        {progressData &&
+          progressData.projectDetails.paymentStatus === "paid" && (
+            <PaymentStatus
+              PaymentStatus={progressData.projectDetails.paymentStatus}
+              details={progressData.projectDetails.paymentDetails}
+            />
+          )}
         <div className="job-card__extra">
           <JobSucces className="h-3 w-3" />
           {verified && (

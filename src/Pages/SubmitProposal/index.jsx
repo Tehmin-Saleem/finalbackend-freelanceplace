@@ -52,27 +52,27 @@ const SubmitProposal = () => {
     }
 
     // Validate milestones if payment method is milestone
-     // Validate milestones if payment method is milestone
-  if (paymentMethod === "milestone") {
-    const milestoneErrors = [];
-    milestones.forEach((milestone, index) => {
-      const milestoneError = {};
-      if (!milestone.description.trim()) {
-        milestoneError.description = "Description is required";
-        isValid = false;
-      }
-      if (!milestone.dueDate) {
-        milestoneError.dueDate = "Due date is required";
-        isValid = false;
-      }
-      if (!milestone.amount || milestone.amount <= 0) {
-        milestoneError.amount = "Valid amount is required";
-        isValid = false;
-      }
-      milestoneErrors[index] = milestoneError;
-    });
-    newErrors.milestones = milestoneErrors;
-  }
+    // Validate milestones if payment method is milestone
+    if (paymentMethod === "milestone") {
+      const milestoneErrors = [];
+      milestones.forEach((milestone, index) => {
+        const milestoneError = {};
+        if (!milestone.description.trim()) {
+          milestoneError.description = "Description is required";
+          isValid = false;
+        }
+        if (!milestone.dueDate) {
+          milestoneError.dueDate = "Due date is required";
+          isValid = false;
+        }
+        if (!milestone.amount || milestone.amount <= 0) {
+          milestoneError.amount = "Valid amount is required";
+          isValid = false;
+        }
+        milestoneErrors[index] = milestoneError;
+      });
+      newErrors.milestones = milestoneErrors;
+    }
 
     // Validate project fields if payment method is project
     if (paymentMethod === "project") {
@@ -246,6 +246,14 @@ const SubmitProposal = () => {
 
   const navigate = useNavigate();
 
+  // Handle input changes for form data
+  const handleInputvalueChange = (field, value) => {
+    setFormData((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
+  };
+
   const handleInputChange = async (e) => {
     const { name, value } = e.target;
 
@@ -408,6 +416,10 @@ const SubmitProposal = () => {
         // Access the correct nested property
         setGeneratedCoverLetter(response.data.data.generated_cover_letter);
         setFreelancerCoverLetter(response.data.data.generated_cover_letter);
+        setFormData((prev) => ({
+          ...prev,
+          freelancerCoverLetter: response.data.data.generated_cover_letter,
+        }));
         setLoading(false); // Set loading to false once done
       } else {
         console.error(
@@ -423,6 +435,15 @@ const SubmitProposal = () => {
   useEffect(() => {
     console.log("Cover letter updated:", generatedCoverLetter);
   }, [generatedCoverLetter]);
+
+  // Handle direct changes to the cover letter
+  const handleCoverLetterChange = (value) => {
+    setFreelancerCoverLetter(value);
+    setFormData((prev) => ({
+      ...prev,
+      freelancerCoverLetter: value,
+    }));
+  };
 
   // Handle the form submission to save the proposal
   const handleSubmitCoverLetter = async () => {
@@ -576,78 +597,88 @@ const SubmitProposal = () => {
                             </div>
 
                             <div className="milestone-field">
-            <label>Due date:</label>
-            <div className="date-input">
-              <input
-                type="date"
-                value={milestone.dueDate}
-                onChange={(e) =>
-                  handleMilestoneChange(index, "dueDate", e.target.value)
-                }
-              />
-              {errors.milestones[index]?.dueDate && (
-                <div className="error-message">
-                  {errors.milestones[index].dueDate}
-                </div>
-              )}
-            </div>
-          </div>
+                              <label>Due date:</label>
+                              <div className="date-input">
+                                <input
+                                  type="date"
+                                  value={milestone.dueDate}
+                                  onChange={(e) =>
+                                    handleMilestoneChange(
+                                      index,
+                                      "dueDate",
+                                      e.target.value
+                                    )
+                                  }
+                                />
+                                {errors.milestones[index]?.dueDate && (
+                                  <div className="error-message">
+                                    {errors.milestones[index].dueDate}
+                                  </div>
+                                )}
+                              </div>
+                            </div>
 
-          <div className="milestone-field">
-            <label>Amount:</label>
-            <div className="date-input">
-              <input
-                type="number"
-                placeholder="\$12,00 per milestone"
-                value={milestone.amount}
-                onChange={(e) =>
-                  handleMilestoneChange(index, "amount", e.target.value)
-                }
-              />
-              {errors.milestones[index]?.amount && (
-                <div className="error-message">
-                  {errors.milestones[index].amount}
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      </div>
-    ))}
-  </>
-)}
-
-
+                            <div className="milestone-field">
+                              <label>Amount:</label>
+                              <div className="date-input">
+                                <input
+                                  type="number"
+                                  placeholder="\$12,00 per milestone"
+                                  value={milestone.amount}
+                                  onChange={(e) =>
+                                    handleMilestoneChange(
+                                      index,
+                                      "amount",
+                                      e.target.value
+                                    )
+                                  }
+                                />
+                                {errors.milestones[index]?.amount && (
+                                  <div className="error-message">
+                                    {errors.milestones[index].amount}
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </>
+                  )}
 
                   {paymentMethod === "project" && (
                     <>
-                     <div className="milestone-field">
-      <label>Amount:</label>
-      <input
-        type="number"
-        name="projectAmount"
-        value={formData.projectAmount}
-        onChange={handleInputChange}
-        placeholder="\$12,00"
-      />
-      {errors.projectAmount && (
-        <div className="error-message">{errors.projectAmount}</div>
-      )}
-    </div>
-    <div className="milestone-field">
-      <label>Due Date:</label>
-      <input
-        type="date"
-        name="projectDueDate"
-        value={formData.projectDueDate}
-        onChange={handleInputChange}
-      />
-      {errors.projectDueDate && (
-        <div className="error-message">{errors.projectDueDate}</div>
-      )}
-    </div>
-  </>
-)}
+                      <div className="milestone-field">
+                        <label>Amount:</label>
+                        <input
+                          type="number"
+                          name="projectAmount"
+                          value={formData.projectAmount}
+                          onChange={handleInputChange}
+                          placeholder="\$12,00"
+                        />
+                        {errors.projectAmount && (
+                          <div className="error-message">
+                            {errors.projectAmount}
+                          </div>
+                        )}
+                      </div>
+                      <div className="milestone-field">
+                        <label>Due Date:</label>
+                        <input
+                          type="date"
+                          name="projectDueDate"
+                          value={formData.projectDueDate}
+                          onChange={handleInputChange}
+                        />
+                        {errors.projectDueDate && (
+                          <div className="error-message">
+                            {errors.projectDueDate}
+                          </div>
+                        )}
+                      </div>
+                    </>
+                  )}
 
                   {/* <div className="form-field"> */}
                   <label className="Label">
@@ -679,9 +710,7 @@ const SubmitProposal = () => {
                       <CoverLetter
                         formData={formData}
                         // freelancerCoverLetter={formData.freelancerCoverLetter}
-                        setFreelancerCoverLetter={(value) =>
-                          handleInputChange("freelancerCoverLetter", value)
-                        }
+                        setFreelancerCoverLetter={handleCoverLetterChange} // Use the new handler
                         handleClose={() => setShowCoverLetter(false)}
                         generateCoverLetter={generateCoverLetter}
                         handleSubmitCoverLetter={handleSubmitCoverLetter}
@@ -690,7 +719,7 @@ const SubmitProposal = () => {
                         // setFreelancerCoverLetter={setFreelancerCoverLetter}
                         additionalSkills={additionalSkills}
                         handleSkillsChange={handleSkillsChange}
-                        handleInputChange={handleInputChange}
+                        handleInputChange={handleInputvalueChange}
                         loading={loading}
                       />
                     )}
