@@ -22,6 +22,7 @@ const payment_MethodSchema = new Schema({
   paypal_details: {
     email: String,
   },
+  
 });
 
 const Payment_Method = mongoose.model("Payment_Method", payment_MethodSchema);

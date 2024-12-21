@@ -129,6 +129,35 @@ router.delete('/payment-methods/:paymentMethodId', paymentMethodController.delet
 
 
 
+router.post('/create-paypal-order', paymentMethodController.createPayPalOrder);
+router.post('/capture-paypal-payment', paymentMethodController.capturePayPalPayment);
+
+
+// Route to fetch freelancer payment details  
+router.get('/payment-method/:freelancerId', paymentMethodController.getFreelancerPaymentDetails);
+
+
+
+// routes/paymentRoutes.js
+// router.patch('/update-payment-status/:proposal_id', authMiddleware,  paymentMethodController.updatePaymentStatus);
+
+
+
+
+
+// Route to process payment for a freelancer  
+router.post('/process-payment',paymentMethodController.processPaymentForFreelancer);  
+
+router.post('/mark-milestone-paid', paymentMethodController.markMilestoneAsPaid);
+
+
+router.get('/milestone/:milestoneId', paymentMethodController.getMilestoneDetails); 
+
+router.get('/project/:projectId/milestones', paymentMethodController.getProjectMilestones);
+
+
+
+
 
 router.post('/hire/:proposalId', authMiddleware, hireFreelancerController.hireFreelancer);
 router.put('/hire/:hireRequestId', hireFreelancerController.updateHireRequest);
@@ -253,6 +282,11 @@ router.post(
 router.get('/job-status/:jobId',authMiddleware, jobPostController.getJobStatus);
 router.patch('/proposals/:proposalId/status', authMiddleware, jobPostController.updateProposalStatus);
 router.get('/completed-jobs-count/:clientId', authMiddleware, hireFreelancerController.getClientCompletedJobsCount);
+
+
+
+
+router.get('/completed-jobs/:freelancerId', authMiddleware, hireFreelancerController.getFreelancerCompletedJobs);
 
 
 
