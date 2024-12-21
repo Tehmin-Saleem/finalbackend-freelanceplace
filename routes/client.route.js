@@ -48,6 +48,7 @@ router.post('/ChangePass/:id/:token',usercontroller.ChangePass);
 
 router.use(authMiddleware);
 
+router.get('/validate-token', authMiddleware, usercontroller.validateToken);
 
 router.post('/uploads', upload.single('File'), (req, res) => {
   try {
@@ -239,7 +240,7 @@ router.patch('/unban/:id', authMiddleware,usercontroller.ClientUnban);
 // const upload = multer({ dest: 'uploads/' });
 
 router.post('/Constprofile', upload.single('profilePicture'),authMiddleware, consultantProfileController.createProfile);
-router.get('/Constprofile/:id', authMiddleware, consultantProfileController.getProfileByUserId);
+router.get('/Constprofile/:consultantId', authMiddleware, consultantProfileController.getProfileByUserId);
 router.get('/ConsultantsProfiles', authMiddleware,consultantProfileController.getConsultantProfiles);
 // In your routes file
 router.get('/filtered-jobs', authMiddleware, hireFreelancerController.getFilteredJobs);
@@ -248,6 +249,7 @@ router.get('/count-job-posts/:clientId',authMiddleware, jobPostController.countJ
 
 // In your routes file
 router.get('/ongoing-projects', authMiddleware, hireFreelancerController.getClientOngoingProjects);
+router.post('/send-offer-to-consultant/:consultant_id', authMiddleware, consultantProfileController.sendOfferToConsultant);
 
 router.get('/hired-freelancers-count/:clientId', hireFreelancerController.getHiredFreelancersCountByClientId);
 
@@ -287,6 +289,15 @@ router.get('/completed-jobs-count/:clientId', authMiddleware, hireFreelancerCont
 
 
 router.get('/completed-jobs/:freelancerId', authMiddleware, hireFreelancerController.getFreelancerCompletedJobs);
+
+///Consulatnts Routes/////
+router.get('/consultantoffers/:clientId', authMiddleware, consultantProfileController.getOffersByClientId);
+router.get('/offer/:consultantId',authMiddleware, consultantProfileController.getOffersByConsultantId);
+router.put('/offer/:offerId', authMiddleware, consultantProfileController.updateOfferStatus);
+
+router.post('/sendProjectDetails/:consultantId', authMiddleware, consultantProfileController.sendProjectDetailsToConsultant);
+
+router.get('project-details/:offerId',authMiddleware, consultantProfileController.getProjectDetailsByOfferId);
 
 
 

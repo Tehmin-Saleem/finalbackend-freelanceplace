@@ -26,6 +26,7 @@ exports.createProject = async (req, res) => {
       proposal_id,
       client_id,
       freelancer_id,
+      source,
       paymentStatus,
     } = req.body;
 
@@ -59,7 +60,8 @@ exports.createProject = async (req, res) => {
 
     validateId(freelancer_id, 'freelancer ID');
     validateId(client_id, 'client ID');
-    if (proposal_id) validateId(proposal_id, 'proposal ID');
+   // Ensure proposal_id is valid or null
+
 
     // Process milestones and calculate progress
     const processedMilestones = milestones?.map(milestone => ({
@@ -93,12 +95,38 @@ exports.createProject = async (req, res) => {
       paymentStatus,
 
     };
+  
+    if (proposal_id && proposal_id.trim() !== '' && source !== 'offer') {
+      // Validate proposal_id before adding
+      try {
+        validateId(proposal_id, 'proposal ID');
+        projectData.proposal_id = proposal_id;
+      } catch (idError) {
+        console.warn('Invalid proposal_id:', idError.message);
+      }
+    }
+      if (source === 'offer') {
+      const existingProject = await Project.findOne({ projectName, client_id, freelancer_id });
 
+      if (existingProject) {
+        // Update the existing project with the new data
+        Object.assign(existingProject, projectData); // Merge the new data with existing project
+        await existingProject.save();
+
+        return res.status(200).json({
+          success: true,
+          data: existingProject,
+          message: 'Project updated successfully',
+          status: existingProject.status
+        });
+      }
+    }
+
+    // Create a new project if not updated
     const project = new Project(projectData);
     await project.save();
 
-    // Update related proposal if it exists
-    if (proposal_id) {
+    if (proposal_id && proposal_id.trim() !== '' && source !== 'offer') {
       await Proposal.findByIdAndUpdate(proposal_id, {
         projectStatus: project.status
       });
@@ -115,7 +143,7 @@ exports.createProject = async (req, res) => {
 
   } catch (error) {
     console.error('Error in createProject:', error);
-    
+
     if (error.name === 'ValidationError') {
       return res.status(400).json({
         success: false,
