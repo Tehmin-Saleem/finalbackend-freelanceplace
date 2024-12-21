@@ -58,6 +58,9 @@ import ConsultantProfileForm from "./components/ConsultantProfileForm";
 import ConsultantProfileView from "./components/ConsultantProfileView";
 import ConsultantCard from "./components/ConsultantCards";
 import Offers from "./Pages/FetchOffers";
+import ClientOffersPage from "./components/ConsultantOffer";
+import ConsultantOffers from "./components/ConsultantoffersFetch";
+import SendProjectDetails from "./components/ProjectDetailsForm";
 // import PaymentMethod from './components/PaymentMethod';
 
 const freelancers = [
@@ -266,6 +269,11 @@ function App() {
 
               <Route path="/freelancerOffers" element={<Offers/>} />
           {/* <Route path="/profile/:id"  element={<ConsultantProfileView />} /> */}
+          <Route path="/ClientOfferPage" element={<ClientOffersPage/>} />
+
+<Route path="/ConsultantOfferPage" element={<ConsultantOffers/>} />     
+<Route path="/SendProjectDetails" element={<SendProjectDetails/>} />      
+
         </Routes>
       </Router>
     </NotificationProvider>

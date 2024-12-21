@@ -245,6 +245,9 @@ setFreelancerData((prev) => ({
         paymentDetails: freelancerData.paymentDetails,
         // Add timestamp for the update
         lastUpdated: new Date().toISOString(),
+        status: freelancerData.progress === 100 ? 'Pending Approval' : 'Ongoing',
+        source: project.source || 'proposal',
+        proposal_id: project.proposal_id || null 
       };
 
       const token = localStorage.getItem("token");

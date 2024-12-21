@@ -15,7 +15,7 @@ class SocketManager {
       const decodedToken = jwtDecode(token);
       this.userId = decodedToken?.userId;
       this.userRole = decodedToken?.role;
-      
+
       this.socket = io('http://localhost:5000', {
         auth: {
           token,
@@ -23,9 +23,10 @@ class SocketManager {
           role: this.userRole
         }
       });
-      
+
       this.socket.on('connect', () => {
         console.log('Socket connected');
+        
         // Join role-specific and user-specific rooms
         this.socket.emit('join-rooms', {
           userId: this.userId,
@@ -39,18 +40,21 @@ class SocketManager {
 
       // Set up notification listener with role-based filtering
       this.setupNotificationListener();
+
+      return this.socket;
     } catch (error) {
       console.error('Socket connection error:', error);
+      throw error;
     }
   }
 
+  
   setupNotificationListener() {
     if (!this.socket) return;
-    
+
     this.socket.on('notification', (notification) => {
       console.log('Received notification:', notification);
-      
-      // Check if the notification is meant for the current user based on role and type
+
       if (this.shouldReceiveNotification(notification)) {
         this.notifyListeners([notification]);
       }
@@ -58,25 +62,78 @@ class SocketManager {
   }
 
   shouldReceiveNotification(notification) {
+    // Explicitly check if the notification is for the current user
+    // Check 1: Prevent notifications from the sender
+    if (notification.sender_id?.toString() === this.userId?.toString()) {
+      console.warn('Blocked self-notification:', notification);
+      return false;
+    }
+  
+  
+
     // Define notification routing rules
     const routingRules = {
-      'hired': { role: 'freelancer', idField: 'freelancer_id' },
-      'new_proposal': { role: 'client', idField: 'client_id' },
-      'new_offer': { role: 'freelancer', idField: 'freelancer_id' },
-      'milestone_completed': { role: 'client', idField: 'client_id' },
-      'payment_received': { role: 'freelancer', idField: 'freelancer_id' }
+      'hired': {
+        role: 'freelancer',
+        idField: 'freelancer_id'
+      },
+      'new_proposal': {
+        role: 'client',
+        idField: 'client_id'
+      },
+      'new_offer': {
+        roles: ['freelancer', 'consultant'],
+        idFields: ['freelancer_id', 'consultant_id']
+      },
+      'milestone_completed': {
+        role: 'client',
+        idField: 'client_id'
+      },
+      'payment_received': {
+        role: 'freelancer',
+        idField: 'freelancer_id'
+      }
     };
 
     const rule = routingRules[notification.type];
-    if (!rule) return false;
+    if (!rule) {
+      console.warn('No routing rule for notification type:', notification.type);
+      return false;
+    }
 
-    // Check if user role matches and the ID matches
-    return this.userRole === rule.role && 
-           notification[rule.idField]?.toString() === this.userId?.toString();
+    // Handle special case for 'new_offer' with multiple possible roles
+    if (rule.roles) {
+      const isValidRecipient = rule.roles.includes(this.userRole) &&
+        rule.idFields.some(field =>
+          notification[field]?.toString() === this.userId?.toString()
+        );
+      
+      console.log('Notification validation for multi-role type:', {
+        type: notification.type,
+        isValidRecipient,
+        currentRole: this.userRole,
+        currentUserId: this.userId
+      });
+
+      return isValidRecipient;
+    }
+
+    // Standard case for other notification types
+    const isValidRecipient = this.userRole === rule.role &&
+      notification[rule.idField]?.toString() === this.userId?.toString();
+
+    console.log('Notification validation:', {
+      type: notification.type,
+      isValidRecipient,
+      currentRole: this.userRole,
+      currentUserId: this.userId
+    });
+
+    return isValidRecipient;
   }
-
   addNotificationListener(callback) {
     this.notificationListeners.add(callback);
+    return () => this.removeNotificationListener(callback);
   }
 
   removeNotificationListener(callback) {

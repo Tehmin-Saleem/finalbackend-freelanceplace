@@ -260,6 +260,7 @@ import { proxy, useSnapshot } from "valtio";
 import axios from "axios";
 import { useNavigate, Link } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
+
 import { NotificationContext } from "../../../Pages/Notifications/NotificationContext";
 import {
   JobsDropdwon,
@@ -363,7 +364,10 @@ const Header = () => {
       navigate("/jobPosting");
     } else if (option === "Explore Freelancers") {
       navigate("/freelancercard");
-    } else if (option === "All Jobs Post") {
+    } 
+    else if (option === "Your offers") {
+      navigate("/ConsultantOfferPage");
+    }else if (option === "All Jobs Post") {
       navigate("/alljobs");
     } else if (option === "Add Payment") {
       navigate("/payment");
@@ -375,6 +379,9 @@ const Header = () => {
       navigate("/ClientDashboard");
     } else if (snap.user.role === "freelancer") {
       navigate("/FreelanceDashBoard");
+    }
+      else if (snap.user.role === "consultant") {
+        navigate("/ConsultantDash");
     } else {
       navigate("/signin");
     }
@@ -385,49 +392,43 @@ const Header = () => {
   const userId = decodedToken.userId;
 
 
-
   const handleProfileOption = async (option) => {
     setProfileDropdownOpen(false);
-
+  
     if (option === "PROFILE") {
-      if (snap.user.role === "client") {
-        const token = localStorage.getItem("token"); // or wherever the token is stored
-        const config = {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        };
-        try {
+      const token = localStorage.getItem("token");
+      const config = {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      };
+  
+      try {
+        if (snap.user.role === "client") {
           const response = await axios.get(
-            `http://localhost:5000/api/client/client-profile-exists/${userId}`, config
+            `http://localhost:5000/api/client/client-profile-exists/${userId}`,
+            config
           );
-          if (response.data.exists) {
-            navigate(`/ClientProfile`);
-          } else {
-            navigate(`/ClientProfileForm`);
-          }
-        } catch (error) {
-          console.error("Error checking profile existence:", error);
+          navigate(response.data.exists ? "/ClientProfile" : "/ClientProfileForm");
+        } else if (snap.user.role === "freelancer") {
+          const response = await axios.get(
+            `http://localhost:5000/api/freelancer/freelancer-profile-exists/${userId}`,
+            config
+          );
+          navigate(response.data.exists ? `/profile/${userId}` : "/myProfile");
+        } else if (snap.user.role === "consultant") {
+         
+          navigate("/ConsultantProfileView"); 
         }
-      } else if (snap.user.role === "freelancer") {
-        const token = localStorage.getItem("token"); // or wherever the token is stored
-        const config = {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        };
-        const response = await axios.get(
-          `http://localhost:5000/api/freelancer/freelancer-profile-exists/${userId}`,
-          config
-        );
-        navigate(response.data.exists ? `/profile/${userId}` : `/myProfile`);
+      } catch (error) {
+        console.error("Error checking profile existence:", error);
       }
     } else if (option === "LOGOUT") {
       localStorage.clear();
       navigate("/signin");
-      
     }
   };
+  
 
   useEffect(() => {
     const handleClickOutside = () => {
@@ -447,21 +448,34 @@ const Header = () => {
   const initials = getInitials(snap.user.first_name, snap.user.last_name);
 
   const dropdownOptions =
-    snap.user.role === "client"
-      ? [
-          "Post a Job",
-          "Explore Freelancers",
-          "Add Payment",
-          "All Jobs Post",
-          "Privacy Policy",
-        ]
-      : ["Explore Jobs", "Add Payment", "Privacy Policy"];
+  snap.user.role === "client"
+    ? [
+        "Post a Job",
+        "Explore Freelancers",
+        "Add Payment",
+        "All Jobs Post",
+        "Privacy Policy",
+      ]
+    : snap.user.role === "freelancer"
+    ? [
+        "Explore Jobs",
+        "Add Payment",
+        "Privacy Policy",
+      ]
+    : snap.user.role === "consultant"
+    ? [
+        "Your Offers",
+        "Privacy Policy",
+      ]
+    : [];
 
+  
   return (
     <header className="header">
       <div className="header-top">
         <div className="logo">
           <Logo style={{ cursor: 'pointer' }} width="250" height="100" onClick={handleLogoClick} />
+          {/* <Logo style={{ cursor: 'pointer' }} width="100" height="40"  onClick={handleLogoClick} /> */}
         </div>
         <div className="dropdown-container">
           <h2 className="find-work">

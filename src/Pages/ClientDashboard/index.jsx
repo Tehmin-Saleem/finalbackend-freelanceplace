@@ -155,11 +155,11 @@ console.log("Total Jobs Count Response:", jobCountResponse.data)
             <p>Explore profiles of freelancers you’ve worked with.</p>
             <button>View Freelancers</button>
           </div>
-          {/* <div className="card" onClick={() => navigate('/client-ratings')}>
-            <h2>Client Ratings</h2>
-            <p>Check ratings given to freelancers for completed jobs.</p>
-            <button>View Ratings</button>
-          </div> */}
+          <div className="card" onClick={() => navigate('/ClientOfferPage')}>
+            <h2>Consultants Offers</h2>
+            <p>Check the conusltants that you have send the request.</p>
+            <button>View Consultants </button>
+          </div>
         </div>
 
         {/* Contact Button */}

@@ -12,6 +12,7 @@ import {
   CloseCircleOutlined,
 } from "@ant-design/icons";
 import { jwtDecode } from "jwt-decode";
+import { useNavigate } from 'react-router-dom';
 import {
   Card,
   Progress,
@@ -31,6 +32,8 @@ const { Title, Text, Paragraph } = Typography;
 import Spinner from "../../components/chatcomponents/Spinner";
 
 import { PAYPAL_OPTIONS } from "../../config/paypal.config"; // Update the path
+import ConsultantCard from "../../components/ConsultantCards";
+
 
 const ManageProjectsByClient = () => {
   const [loading, setLoading] = useState(false);
@@ -305,7 +308,7 @@ const ProjectDetails = ({
   freelancerPayments,
 }) => {
   const [activeTab, setActiveTab] = useState("overview");
-
+  const [consultantId, setConsultantId] = useState(null);
   const [progressData, setProgressData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -362,6 +365,17 @@ const ProjectDetails = ({
     // Instead of making the API call here, just show the modal
     setShowReviewModal(true);
   };
+  const handleHireConsultant = () => {
+    navigate('/Consultantprofiles', { 
+      state: { 
+        project: project, // Pass the entire project object
+        projectId: project._id,
+        projectName: project.projectName, 
+        projectDescription: project.description 
+      } 
+    });
+  };
+
 
   const fetchProgress = async () => {
     // if (!projectId) return;

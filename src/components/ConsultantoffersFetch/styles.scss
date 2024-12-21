@@ -1,0 +1,196 @@
+$primary-color: #3b82f6;
+$secondary-color: #6b7280;
+$text-color: #374151;
+$background-color: #f7fafb;
+$white: #ffffff;
+$success-color: #10b981;
+$error-color: #ef4444;
+$accent-color: #4bcdeb;
+
+.consultant-offers-page {
+  padding: 20px;
+  background-color: $background-color;
+  min-height: 100vh;
+  font-family: "Poppins", sans-serif;
+
+  h1 {
+    text-align: center;
+    font-size: 2rem;
+    color: $text-color;
+    margin-bottom: 20px;
+  }
+
+  .offers-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .offer-card {
+    background: $white;
+    border-radius: 12px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    transition: transform 0.2s, box-shadow 0.3s;
+
+    &:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+
+      h3 {
+        font-size: 1.2rem;
+        color: $text-color;
+      }
+
+      .status {
+        padding: 5px 10px;
+        border-radius: 4px;
+        font-size: 0.9rem;
+
+        &.pending {
+          background: $secondary-color;
+          color: $white;
+        }
+
+        &.accepted {
+          background: $success-color;
+          color: $white;
+        }
+
+        &.declined {
+          background: $error-color;
+          color: $white;
+        }
+      }
+    }
+
+    p {
+      font-size: 0.95rem;
+      margin: 8px 0;
+    }
+
+    .action-buttons {
+      display: flex;
+      gap: 10px;
+      margin-top: 10px;
+
+      .accept-button {
+        background: $success-color;
+        color: $white;
+        border: none;
+        border-radius: 8px;
+        padding: 8px 12px;
+        cursor: pointer;
+        font-weight: bold;
+
+        &:hover {
+          background: darken($success-color, 10%);
+        }
+      }
+
+      .decline-button {
+        background: $error-color;
+        color: $white;
+        border: none;
+        border-radius: 8px;
+        padding: 8px 12px;
+        cursor: pointer;
+
+        &:hover {
+          background: darken($error-color, 10%);
+        }
+      }
+
+      .status-message {
+        &.success {
+          color: $success-color;
+        }
+
+        &.error {
+          color: $error-color;
+        }
+      }
+    }
+  }
+  
+  .modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 999;
+  }
+  
+  .modal-container {
+    background: #ffffff;
+  border-radius: 8px;
+  width: 90%;
+  max-width: 500px;
+  padding: 20px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  position: relative;
+  
+  h2 {
+    margin-bottom: 20px;
+    color: #374151;
+  }
+  
+  .modal-content {
+    p {
+      margin: 10px 0;
+      color: #374151;
+    }
+    
+    a {
+      color: #4bcdeb;
+      text-decoration: underline;
+    }
+  }
+  
+  .remarks-section {
+    margin-top: 20px;
+    
+    textarea {
+      width: 100%;
+      border: 1px solid #e5e7eb;
+      padding: 10px;
+      border-radius: 4px;
+      margin-top: 10px;
+    }
+
+    .add-remarks-btn {
+      background-color: #4bcdeb;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      margin-top: 10px;
+      cursor: pointer;
+    }
+  }
+
+  .close-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+  }
+}
+
+
+    }

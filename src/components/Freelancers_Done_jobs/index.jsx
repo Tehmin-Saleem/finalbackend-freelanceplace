@@ -9,6 +9,8 @@ import { jwtDecode } from "jwt-decode";
 const JobsCard = ({
   _id,
   job_id,
+estimated_timeline,
+  due_date,
   type,
   title,
   rate,
@@ -161,6 +163,9 @@ const JobsCard = ({
               type,
               title,
               rate,
+              due_date,  // Add due_date
+            timeline: `${estimated_timeline?.duration} ${estimated_timeline?.unit}`,
+              description:  description,
               timeline,
               level,
               description: description,
@@ -169,11 +174,18 @@ const JobsCard = ({
               rating,
               location,
               postedTime,
+              projectType: 'byproject' ,
+              clientName,
+              clientCountry,
             },
             proposalData: {
               _id,
               freelancer_id,
               client_id,
+              clientName, // Add these new props
+              clientCountry,
+              status: 'accepted',
+              projectType: 'byproject',
               add_requirements: {
                 by_milestones: [
                   {
@@ -188,7 +200,8 @@ const JobsCard = ({
             },
             freelancer_id,
             client_id,
-          },
+            isOffer: true // Flag to identify this is an offer
+          }
         });
         return;
       }
@@ -245,6 +258,7 @@ const JobsCard = ({
 
   useEffect(() => {
     console.log("Current job attachment:", attachment);
+    console.log("rate", rate);
   }, [attachment]);
 
   const PaymentStatus = ({ PaymentStatus, details }) => {
@@ -324,9 +338,13 @@ const JobsCard = ({
           <span className="job-card__rated">{rate}</span>
           <span className="job-card__timeline-head">Estimated time:</span>
           <span className="job-card__timeline"> {timeline}</span>
-          <span className="job-card__level-head">Level:</span>
-          <span className="job-card__level"> {level}</span>
-        </div>
+          {source !== 'offer' && (
+          <>
+            <span className="job-card__level-head">Level:</span>
+            <span className="job-card__level">{level}</span>
+          </>
+        )}
+      </div>
 
         <p className="job-card__description">{description}</p>
 
