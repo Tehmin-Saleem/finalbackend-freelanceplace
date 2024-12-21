@@ -5,7 +5,7 @@ const Client_Profile = require('../models/client_profile.model'); // Adjust the 
 const HireFreelancer = require('../models/hire_freelancer.model'); // Adjust the path as needed
 const ConsultantOffer = require('../models/hire_consultant.model'); // Adjust the path as needed
 const Review= require('../models/review.model')
-const ProjectDetails= require('../models/ProjectDetails.model')
+const ProjectDetails= require('../models/SendProjectDetails.model');
 const { createNotification } = require('../controllers/notifications.controller')
 const mongoose = require('mongoose');
 
@@ -563,10 +563,37 @@ exports.sendProjectDetailsToConsultant = async (req, res) => {
   }
 };
 
-  
+exports.getProjectDetailsByOfferId = async (req, res) => {
+  const { offerId } = req.params;
 
-  
+  try {
+    // Step 1: Fetch the ConsultantOffer document with virtual population of project details
+    const offer = await ConsultantOffer.findById(offerId)
+      .populate('projectDetails') // Populate the projectDetails virtual field
+      .lean();
 
+    if (!offer) {
+      return res.status(404).json({ message: 'Offer not found.' });
+    }
 
+    // Step 2: Combine data from offer and populated project details
+    const response = {
+      projectName: offer.offer_details?.project?.name || offer.project_name,
+      description:
+        offer.offer_details?.project?.description || offer.project_description,
+      budget:
+        offer.offer_details?.budget?.type === 'hourly'
+          ? `${offer.offer_details?.budget?.hourlyRateFrom} - ${offer.offer_details?.budget?.hourlyRateTo} per hour`
+          : `$${offer.offer_details?.budget?.fixedPrice} fixed`,
+      githubUrl: offer.projectDetails?.githubUrl || 'N/A',
+      additionalNotes: offer.projectDetails?.additionalNotes || 'N/A',
+      deadline: offer.projectDetails?.deadline || 'N/A',
+    };
 
+    res.status(200).json(response);
+  } catch (error) {
+    console.error('Error fetching project details:', error);
+    res.status(500).json({ message: 'Server error, try again later.' });
+  }
+};
 

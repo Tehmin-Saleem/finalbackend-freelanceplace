@@ -21,6 +21,7 @@ const chatController = require('../controllers/chat.controller'); // Add this
 
 const  aiCoverLetter  = require('../controllers/aiCoverLetter.controller');
 const hireFreelancerController = require('../controllers/hire_freelancer.controller');
+const ClientProfile = require('../controllers/client_profile.controller')
 // const offerController=require("../controllers/offer_form.controller");
 
 
@@ -236,6 +237,8 @@ router.get('/users/:userId', usercontroller.getUserById);
 router.get('/project-progress/:project_id', manageProject.getProjectProgressById);
 
 router.get('/project-progress/:proposal_id', authMiddleware, manageProject.getProjectProgress);
+
+router.get('/profile', authMiddleware, ClientProfile.getProfile);
 
 
 // router.get('/progress/:client_id/:proposal_id',authMiddleware, manageProject.getProgressByIds);

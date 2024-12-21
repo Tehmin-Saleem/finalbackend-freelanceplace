@@ -26,7 +26,8 @@ exports.createProject = async (req, res) => {
       proposal_id,
       client_id,
       freelancer_id,
-      source
+      source,
+      paymentStatus,
     } = req.body;
 
     // Enhanced validation
@@ -91,6 +92,7 @@ exports.createProject = async (req, res) => {
       proposal_id,
       client_id,
       freelancer_id,
+      paymentStatus,
 
     };
   
@@ -473,10 +475,10 @@ exports.getProjectProgress = async (req, res) => {
       },
       {
         $lookup: {
-          from: 'freelancerprofiles',
-          localField: 'freelancer_id', // Make sure this matches your schema
-          foreignField: '_id',
-          as: 'freelancerInfo'
+          from: 'freelancer_profiles', // Collection name for Freelancer_Profile  
+          localField: 'freelancer_profile_id', // Field in the Project collection  
+          foreignField: '_id', // Field in the Freelancer_Profile collection  
+          as: 'freelancerInfo'  
         }
       },
       {
@@ -540,6 +542,7 @@ if (currentProject.projectType === 'milestone') {
     type: 'milestone',
     ...milestoneProgress
   };
+ 
 } else {
   // For fixed projects
   progressData = {
@@ -591,12 +594,15 @@ if (currentProject.projectType === 'milestone') {
         projectId: currentProject._id,
         proposalId: currentProject.proposal_id,
         projectName: currentProject.projectName,
+        paymentStatus: currentProject.paymentStatus,
+        paymentDetails: currentProject.paymentDetails,
         description: currentProject.description,
         startDate: currentProject.createdAt,
         due_date: currentProject.due_date,
         budget: currentProject.budget,
         status: currentProject.status,
         clientApproved: currentProject.clientApproved,
+        paymentStatus:currentProject.paymentStatus,
         projectType: currentProject.projectType,
         lastModified: currentProject.updatedAt,
         latestUpdate: currentProject.latestUpdate[0] || null
@@ -617,6 +623,7 @@ if (currentProject.projectType === 'milestone') {
     });
   }
 };
+
 
 
 

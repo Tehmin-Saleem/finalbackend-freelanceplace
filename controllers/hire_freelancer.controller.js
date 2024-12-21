@@ -7,7 +7,9 @@ const Job= require('../models/post_job.model')
 const mongoose = require('mongoose');
 const User = require('../models/user.model');
 const Freelancer_Profile = require('../models/freelancer_profile.model')
-const Review = require('../models/review.model')
+const Review = require('../models/review.model');
+const consultantprofile = require('../models/consultantprofile');
+const Client_Profile = require ('../models/client_profile.model')
 
 
 // Get hire request status by proposal ID
@@ -588,7 +590,8 @@ exports.getClientOngoingProjects = async (req, res) => {
           estimatedDuration: project.proposalId?.project_duration || '',
           proposedRate: project.proposalId?.add_requirements?.by_project?.bid_amount || 0,
           status: project.status || 'pending'
-        }
+        },
+        
       };
     });
 
@@ -1064,9 +1067,9 @@ exports.getFreelancerReviews = async (req, res) => {
 
     // Find all reviews for the freelancer
     const reviews = await Review.find({ freelancer_id: freelancerId })
-      .populate('client_id', 'name email profile_picture') // Add relevant client fields
+      .populate('client_id', 'first_name last_name email') // Add relevant client fields
       .populate('job_id', 'title description budget status completion_date') // Add relevant job fields
-      .populate('freelancer_id', 'name email')
+      .populate('freelancer_id', 'first_name last_name email')
       .select('client_id freelancer_id job_id message stars status createdAt')
       .sort({ createdAt: -1 }); // Sort by newest first
 
@@ -1084,33 +1087,59 @@ exports.getFreelancerReviews = async (req, res) => {
       });
     }
 
-    // Format the response
-    const formattedReviews = reviews.map(review => ({
-      review_id: review._id,
-      client: {
-        id: review.client_id._id,
-        name: review.client_id.name,
-        email: review.client_id.email,
-        profile_picture: review.client_id.profile_picture
-      },
-      freelancer: {
-        id: review.freelancer_id._id,
-        name: review.freelancer_id.name,
-        email: review.freelancer_id.email
-      },
-      job: {
-        id: review.job_id._id,
-        title: review.job_id.title,
-        description: review.job_id.description,
-        budget: review.job_id.budget,
-        status: review.job_id.status,
-        completion_date: review.job_id.completion_date
-      },
-      rating: review.stars,
-      review_message: review.message,
-      status: review.status,
-      posted_date: review.createdAt
-    }));
+
+
+    // Get all client IDs from reviews
+    const clientIds = reviews.map(review => review.client_id._id);
+
+    // Fetch client profiles for all clients in one query
+    const clientProfiles = await Client_Profile.find({
+      client_id: { $in: clientIds }
+    }).lean();
+
+    // Create a map of client profiles for easy lookup
+    const clientProfileMap = clientProfiles.reduce((acc, profile) => {
+      acc[profile.client_id.toString()] = profile;
+      return acc;
+    }, {});
+
+    // Format the response with client profile information
+    const formattedReviews = reviews.map(review => {
+      const clientProfile = clientProfileMap[review.client_id._id.toString()] || {};
+      
+      return {
+        review_id: review._id,
+        client: {
+          id: review.client_id._id,
+          first_name: clientProfile.first_name || review.client_id.first_name,
+          last_name: clientProfile.last_name || review.client_id.last_name,
+          email: clientProfile.email || review.client_id.email,
+          profile_picture: clientProfile.image || null,
+          about: clientProfile.about || null,
+          country: clientProfile.country || null,
+          languages: clientProfile.languages || []
+        },
+        freelancer: {
+          id: review.freelancer_id._id,
+          first_name: review.freelancer_id.first_name,
+          last_name: review.freelancer_id.last_name,
+          email: review.freelancer_id.email
+        },
+        job: {
+          id: review.job_id._id,
+          title: review.job_id.title,
+          description: review.job_id.description,
+          budget: review.job_id.budget,
+          status: review.job_id.status,
+          completion_date: review.job_id.completion_date
+        },
+        rating: review.stars,
+        review_message: review.message,
+        status: review.status,
+        posted_date: review.createdAt
+      };
+    });
+
 
     // Calculate average rating
     const averageRating = reviews.reduce((acc, review) => acc + review.stars, 0) / reviews.length;
@@ -1284,3 +1313,73 @@ exports.getFreelancerCompletedJobs = async (req, res) => {
 //   }
 // };
 
+exports.getClientCompletedJobsCount = async (req, res) => {
+  try {
+    const { clientId } = req.params;
+    
+    // Validate client ID
+    if (!clientId) {
+      return res.status(400).json({
+        success: false,
+        message: 'Client ID is required'
+      });
+    }
+
+    // Validate if client ID is a valid MongoDB ObjectId
+    if (!mongoose.Types.ObjectId.isValid(clientId)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid client ID format'
+      });
+    }
+
+    // Count completed jobs for the client
+    const completedJobsCount = await HireFreelancer.countDocuments({
+      clientId: clientId,
+      status: 'completed'
+    });
+
+    console.log("complaeted jobs client",completedJobsCount);
+
+    // Get total amount spent on completed jobs (optional)
+    const completedJobs = await HireFreelancer.find({
+      clientId: clientId,
+      status: 'completed'
+    }).populate('jobId', 'budget_type fixed_price hourly_rate');
+
+    // Calculate total spent
+    const totalSpent = completedJobs.reduce((total, job) => {
+      if (job.jobId) {
+        if (job.jobId.budget_type === 'fixed') {
+          return total + (job.jobId.fixed_price || 0);
+        } else if (job.jobId.budget_type === 'hourly') {
+          // For hourly jobs, you might want to calculate based on actual hours worked
+          // This is a simplified calculation using the average of hourly rate range
+          const averageRate = (job.jobId.hourly_rate?.from + job.jobId.hourly_rate?.to) / 2 || 0;
+          return total + averageRate;
+        }
+      }
+      return total;
+    }, 0);
+
+    return res.status(200).json({
+      success: true,
+      data: {
+        clientId: clientId,
+        completedJobsCount: completedJobsCount,
+        totalAmountSpent: parseFloat(totalSpent.toFixed(2)),
+        averageJobCost: completedJobsCount > 0 
+          ? parseFloat((totalSpent / completedJobsCount).toFixed(2)) 
+          : 0
+      }
+    });
+
+  } catch (error) {
+    console.error('Error in getClientCompletedJobsCount:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to fetch completed jobs count',
+      error: error.message
+    });
+  }
+};
