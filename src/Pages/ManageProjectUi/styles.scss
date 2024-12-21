@@ -1329,7 +1329,7 @@ $proposal-shadow: rgba(0, 0, 0, 0.1);
           align-items: center;
           
           strong {
-            color: #1f1f1f;
+            color: #8ac850;
             margin-right: 8px;
           }
         }
@@ -1433,8 +1433,8 @@ $proposal-shadow: rgba(0, 0, 0, 0.1);
     }
     
     strong {
-      color: #262626;
-      font-weight: 600;
+      margin-right: 8px;
+      color: rgba(173, 233, 153, 0.85);
     }
   }
 }
