@@ -9,7 +9,7 @@ import { jwtDecode } from "jwt-decode";
 const JobsCard = ({
   _id,
   job_id,
-estimated_timeline,
+  estimated_timeline,
   due_date,
   type,
   title,
@@ -163,10 +163,10 @@ estimated_timeline,
               type,
               title,
               rate,
-              due_date,  // Add due_date
-            timeline: `${estimated_timeline?.duration} ${estimated_timeline?.unit}`,
-              description:  description,
-              timeline,
+              due_date, // Add due_date
+              timeline: `${estimated_timeline?.duration} ${estimated_timeline?.unit}`,
+
+              // timeline,
               level,
               description: description,
               tags,
@@ -174,7 +174,7 @@ estimated_timeline,
               rating,
               location,
               postedTime,
-              projectType: 'byproject' ,
+              projectType: "byproject",
               clientName,
               clientCountry,
             },
@@ -184,8 +184,8 @@ estimated_timeline,
               client_id,
               clientName, // Add these new props
               clientCountry,
-              status: 'accepted',
-              projectType: 'byproject',
+              status: "accepted",
+              projectType: "byproject",
               add_requirements: {
                 by_milestones: [
                   {
@@ -200,8 +200,8 @@ estimated_timeline,
             },
             freelancer_id,
             client_id,
-            isOffer: true // Flag to identify this is an offer
-          }
+            isOffer: true, // Flag to identify this is an offer
+          },
         });
         return;
       }
@@ -338,13 +338,13 @@ estimated_timeline,
           <span className="job-card__rated">{rate}</span>
           <span className="job-card__timeline-head">Estimated time:</span>
           <span className="job-card__timeline"> {timeline}</span>
-          {source !== 'offer' && (
-          <>
-            <span className="job-card__level-head">Level:</span>
-            <span className="job-card__level">{level}</span>
-          </>
-        )}
-      </div>
+          {source !== "offer" && (
+            <>
+              <span className="job-card__level-head">Level:</span>
+              <span className="job-card__level">{level}</span>
+            </>
+          )}
+        </div>
 
         <p className="job-card__description">{description}</p>
 
