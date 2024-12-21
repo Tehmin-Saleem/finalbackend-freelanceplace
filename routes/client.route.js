@@ -262,6 +262,8 @@ router.put('/offer/:offerId', authMiddleware, consultantProfileController.update
 
 router.post('/sendProjectDetails/:consultantId', authMiddleware, consultantProfileController.sendProjectDetailsToConsultant);
 
+router.get('project-details/:offerId',authMiddleware, consultantProfileController.getProjectDetailsByOfferId);
+
 
 
 module.exports = router;
