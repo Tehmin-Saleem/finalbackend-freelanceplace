@@ -16,11 +16,9 @@ $bg-color: #f7f8fa;
 
 
 
-// .freelancer-card-container {
-//   // background-color: #f0f0f0; /* Light grey background for the container */
-//   // margin: 0 2rem; /* Right and left margins for the container */
-//   // padding: 2rem; /* Padding inside the container */
-// }
+.freelancer-card-container {
+ margin-top: 8rem;
+}
 .selected {
   background-color: #007bff; /* Example selected color */
   color: white;
@@ -45,11 +43,14 @@ $bg-color: #f7f8fa;
 }
 
 .heading {
-  font-size: 24px;
+ 
   margin-bottom: 26px;
   margin-left: 11rem; /* Left margin for the heading */
   font-family: $font-poppins;
   color:$color-dark;
+  color: #4BCBEB;
+  font-size: 30px;
+  font-weight: 500;
   
 }
 

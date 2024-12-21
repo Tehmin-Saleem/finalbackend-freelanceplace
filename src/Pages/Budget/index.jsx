@@ -85,8 +85,10 @@ const Budget = () => {
   };
 
   return (
+    <>
+    <Header />
     <div className="budget-page">
-      <Header />
+     
       <div className="progress-container">
         <ProgressBar steps={steps} currentStep={3} />
       </div>
@@ -179,6 +181,7 @@ const Budget = () => {
         </div>
       </div>
     </div>
+    </>
   );
 };
 

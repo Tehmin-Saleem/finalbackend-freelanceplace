@@ -87,8 +87,10 @@ const SkillManagement = () => {
   ];
 
   return (
+    <>
+    <Header />
     <div className="skill-management">
-      <Header />
+      
 
       <div className="progress-container">
         <ProgressBar steps={steps} currentStep={2} />
@@ -168,6 +170,7 @@ const SkillManagement = () => {
         </div>
       </div>
     </div>
+    </>
   );
 };
 

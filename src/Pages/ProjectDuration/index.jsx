@@ -63,9 +63,11 @@ const ProjectDuration = () => {
     };
 
     return (
+        <>
+        <Header />
         <div className="project-duration-container">
-            <Header />
-            <div className="content">
+            
+            <div className="content ">
                 <ProgressBar steps={steps} currentStep={4} />
                 <div className="content-body">
                     <div className="left-section">
@@ -247,6 +249,7 @@ const ProjectDuration = () => {
                 </div>
             </div>
         </div>
+        </>
     );
 };
 

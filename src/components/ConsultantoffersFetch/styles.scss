@@ -12,9 +12,10 @@ $accent-color: #4bcdeb;
   background-color: $background-color;
   min-height: 100vh;
   font-family: "Poppins", sans-serif;
-
+margin-top: 8rem;
   h1 {
     text-align: center;
+    margin-top: 8rem;
     font-size: 2rem;
     color: $text-color;
     margin-bottom: 20px;
@@ -22,6 +23,7 @@ $accent-color: #4bcdeb;
 
   .offers-container {
     display: grid;
+    margin-top: 8rem;
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     gap: 20px;
     max-width: 1200px;

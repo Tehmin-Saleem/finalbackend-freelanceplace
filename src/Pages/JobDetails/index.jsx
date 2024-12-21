@@ -45,7 +45,8 @@ const JobDetails = () => {
   const [isPopupVisible, setPopupVisible] = useState(false);
   const [fileUrl, setFileUrl] = useState(null);
   const [fileType, setFileType] = useState(null);
-
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
   const handleClosePopup = () => {
     // Close the popup and redirect to homepage
     setPopupVisible(false);
@@ -116,7 +117,7 @@ const JobDetails = () => {
     }
   }, [navigate]);
   const handlePostJob = async () => {
-    setPopupVisible(true);
+    setPopupVisible(false);
     try {
       const token = localStorage.getItem("token");
       let formData = new FormData();
@@ -165,11 +166,19 @@ const JobDetails = () => {
       );
 
       // navigate('/ClientDashboard');
+      if (response.status === 200 || response.status === 201) {
+        setPopupVisible(true);
+      } else {
+        // Handle unexpected success status
+        alert('Something went wrong while posting the job. Please try again.');
+      }
+  
     } catch (error) {
-      console.error(
-        "Error posting job:",
-        error.response ? error.response.data : error.message
-      );
+      setError(error.response?.data?.message || 'Error posting job. Please try again.');
+      alert("Error posting job:", error);
+      setPopupVisible(false);
+    } finally {
+      setIsLoading(false); // End loading regardless of outcome
     }
   };
   const handleViewFile = () => {
@@ -299,8 +308,18 @@ const JobDetails = () => {
             </div>
           </div>
           <div className="actions">
-            <button className="btn back-btn" onClick={() => navigate(-1)}>Back</button>
-            <button className="btn post-job-btn" onClick={handlePostJob}>Post a Job</button>
+          <button 
+              className="btn back-btn" 
+              onClick={() => navigate(-1)}
+              disabled={isLoading}
+            >Back</button>
+            <button 
+              className={`btn post-job-btn ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
+              onClick={handlePostJob}
+              disabled={isLoading}
+            >
+              {isLoading ? 'Posting...' : 'Post a Job'}
+            </button>
           </div>
         </div>
       </div>

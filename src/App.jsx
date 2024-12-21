@@ -167,7 +167,8 @@ function App() {
             path="/freelancercard"
             element={
               <FreeLancerCard
-                heading="UI/UX Designer"
+                heading="All freelancers"
+              
                 freelancers={freelancers}
               />
             }

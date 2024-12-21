@@ -15,12 +15,15 @@ class SocketManager {
       const decodedToken = jwtDecode(token);
       this.userId = decodedToken?.userId;
       this.userRole = decodedToken?.role;
-
+      this.userEmail = decodedToken?.email;
       this.socket = io('http://localhost:5000', {
         auth: {
           token,
           userId: this.userId,
-          role: this.userRole
+          role: this.userRole,
+          email: this.userEmail,
+          isAdmin: this.userRole === 'admin'
+     
         }
       });
 
@@ -30,7 +33,9 @@ class SocketManager {
         // Join role-specific and user-specific rooms
         this.socket.emit('join-rooms', {
           userId: this.userId,
-          role: this.userRole
+          role: this.userRole,
+           email: this.userEmail,
+          isAdmin: this.userRole === 'admin'
         });
       });
 
@@ -62,13 +67,22 @@ class SocketManager {
   }
 
   shouldReceiveNotification(notification) {
-    // Explicitly check if the notification is for the current user
-    // Check 1: Prevent notifications from the sender
+    // First check if user is admin and notification is a query
+    if (this.userRole === 'admin' && notification.type === 'new_query') {
+      const isForThisAdmin = notification.admin_email === this.socket.auth.email;
+      console.log('Admin notification check:', {
+        isForThisAdmin,
+        notificationEmail: notification.admin_email,
+        userEmail: this.socket.auth.email
+      });
+      return isForThisAdmin;
+    }
+
+    // Prevent self-notifications
     if (notification.sender_id?.toString() === this.userId?.toString()) {
       console.warn('Blocked self-notification:', notification);
       return false;
     }
-  
   
 
     // Define notification routing rules

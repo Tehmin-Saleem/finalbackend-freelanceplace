@@ -67,8 +67,10 @@ const PostJob = () => {
   };
 
   return (
+    <>
+    <Header />
     <div className="post-job">
-      <Header />
+      
       <div className="Jobcontainer">
         <div className="job-form">
           <div className="title-container">
@@ -177,6 +179,7 @@ const PostJob = () => {
         </div>
       </div>
     </div>
+    </>
   );
 };
 

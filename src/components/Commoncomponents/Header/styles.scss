@@ -38,12 +38,23 @@ $color-accent: #4BCBEB;
 @mixin text-base {
   font-size: 16px;
 }
-
+body, html {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+}
 // Styles
 .header {
   background-color: $color-white;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   padding: 1rem;
+  padding: 0 20px;
+  position: fixed;
+  width:100%;
+  z-index: 1000;
+  top: 0; // Add this
+  left: 0;
   @include flex-center;
   flex-direction: row;
   @include flex-space-between;
@@ -61,6 +72,7 @@ $color-accent: #4BCBEB;
         height: 50px;
         margin-left: 7rem;
         cursor: pointer;
+        margin-bottom: 10px;
       }
       @media (max-width: 480px) {
         width: 40px;
@@ -125,7 +137,21 @@ $color-accent: #4BCBEB;
         }
       }
     }
-
+    .header-top,
+    .header-bottom {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+    }
+    
+    .header-top {
+      border-bottom: 1px solid #e0e0e0; /* Optional: Add a border for better visual separation */
+    }
+    
+    .header-bottom {
+      border-top: 1px solid #e0e0e0; /* Optional: Add a border for better visual separation */
+    }
     .messages {
       font-size: 20px;
       color: $color-dark;

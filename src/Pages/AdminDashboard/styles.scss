@@ -7,7 +7,96 @@ $card-bg: #f5f5f5;
 $sidebar-width: 250px;
 $sidebar-width-closed: 80px;
 $transition-time: 0.3s;
+.notification-container {
+  position: relative;
+  padding-right: 20px;
+  .notification-icon-wrapper {
+    position: relative;
+    padding: 8px;
+    
+    .icon {
+      font-size: 1.25rem;
+      color: #4B5563;
+    }
+    
+    .notification-badge {
+      position: absolute;
+      top: 0;
+      right: 0;
+      background-color: #005f7c;
+      color: white;
+      border-radius: 9999px;
+      padding: 2px 6px;
+      margin-right: 20px;
+      font-size: 0.75rem;
+      min-width: 10px;
+      height: 20px;
+      display: flex;
+      // align-items: center;
+      justify-content: center;
+      transform: translate(25%, -25%);
+    }
+  }
 
+  .notification-dropdown {
+    position: absolute;
+    right: 0;
+    top: 100%;
+    margin-top: 0.5rem;
+    width: 400px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    z-index: 50;
+    max-height: 80vh;
+    overflow-y: auto;
+
+    .notification-header {
+      padding: 1rem;
+      border-bottom: 1px solid #E5E7EB;
+      
+      h3 {
+        font-weight: 600;
+        margin-bottom: 0.25rem;
+      }
+      
+      .unread-count {
+        color: #6B7280;
+        font-size: 0.875rem;
+      }
+    }
+
+    .notification-list {
+      .notification-wrapper {
+        padding: 0.75rem 1rem;
+        cursor: pointer;
+        transition: background-color 0.2s;
+        
+        &:hover {
+          background-color: #F3F4F6;
+        }
+        
+        &.unread {
+          background-color: #EBF5FF;
+          
+          &:hover {
+            background-color: #DBEAFE;
+          }
+        }
+        
+        &.read {
+          background-color: white;
+        }
+      }
+    }
+
+    .no-notifications {
+      padding: 2rem;
+      text-align: center;
+      color: #6B7280;
+    }
+  }
+}
 .admin-dashboard {
   display: flex;
 
@@ -253,8 +342,37 @@ cursor: pointer;
         }
       }
     }
-
+    .queries-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+  
+      .filter-controls {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+  
+        .filter-icon {
+          color: #666;
+        }
+  
+        .status-filter {
+          padding: 0.5rem;
+          border: 1px solid #ddd;
+          border-radius: 4px;
+          background-color: white;
+          cursor: pointer;
+          
+          &:focus {
+            outline: none;
+            border-color: #0066cc;
+          }
+        }
+      }
+    }
     .queries-section {
+      
       h2 {
         font-size: 22px;
         margin-bottom: 15px;

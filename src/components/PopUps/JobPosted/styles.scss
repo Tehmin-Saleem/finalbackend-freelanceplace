@@ -13,11 +13,12 @@ $bg-color: #f7f8fa;
 
 .popup-overlay {
   position: fixed;
+  margin-top: 8rem;
   top: 0;
   left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5); // Semi-transparent background
+  width: 0%;
+  height: 50%;
+  background-color: rgba(168, 166, 166, 0.5); // Semi-transparent background
   display: flex;
   justify-content: center;
   align-items: center;

@@ -146,9 +146,9 @@ const AllJobsPage = () => {
 
   return (
     <>
-      <div className="jobs-Page">
+      
         <Header />
-
+        <div className="main-content ">
         <h1 className="jobs-Heading">All Job Posts</h1>
 
         <div className="search-Container">
@@ -302,7 +302,7 @@ const AllJobsPage = () => {
             </div>
           </div>
         )}
-      </div>
+     </div>
     </>
   );
 };

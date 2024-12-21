@@ -33,8 +33,10 @@ const DescriptionPage = () => {
   
       const currentStep = 1; 
   return (
+    <>
+    <Header />
     <div className="description-page">
-      <Header />
+   
       <div className="descontainer">
       <ProgressBar steps={steps} currentStep={1} />
         <h3 className="step-title">2/6 Description</h3>
@@ -73,6 +75,7 @@ const DescriptionPage = () => {
         </div>
       </div>
     </div>
+    </>
   );
 };
 

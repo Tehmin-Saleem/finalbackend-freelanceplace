@@ -329,7 +329,7 @@ function SignIn() {
               <span>
                 <a
                   className="text-[#4BCBEB] font-Poppins hover:underline hover:underline-offset-4 text-base font-bold"
-                  href="/signup"
+                  href="/"
                 >
                   Sign Up
                 </a>

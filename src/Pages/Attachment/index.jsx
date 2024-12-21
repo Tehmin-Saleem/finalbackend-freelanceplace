@@ -67,8 +67,10 @@ const Attachment = () => {
     }
   };
   return (
+    <>
+    <Header />
     <div className="attachment-container">
-      <Header />
+      
       <div className="content">
         <ProgressBar steps={steps} currentStep={6} />
         <div className="form-container">
@@ -122,6 +124,7 @@ const Attachment = () => {
         </div>
       </div>
     </div>
+    </>
   );
 };
 

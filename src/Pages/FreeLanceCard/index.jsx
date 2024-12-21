@@ -152,8 +152,10 @@ const FreelancerCard = ({ heading, freelancer }) => {
   if (error) return <div>{error}</div>;
 
   return (
+    <>
+    <Header />
     <div className="freelancer-card-container">
-      <Header />
+      
 
       <h1 className="heading">{heading}</h1>
 
@@ -366,6 +368,7 @@ const FreelancerCard = ({ heading, freelancer }) => {
         ))
       )}
     </div>
+    </>
   );
 };
 
