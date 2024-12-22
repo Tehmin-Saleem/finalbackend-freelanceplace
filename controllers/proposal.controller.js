@@ -60,6 +60,8 @@ exports.createProposal = async (req, res) => {
       client_id: client_id,
       freelancer_id: freelancer_id,
       job_id: job_id,
+      receiver_id:client_id,
+      senderId: freelancer_id,
       message: `You have received a new proposal for your job: ${job.job_title}`,
       type: 'new_proposal'
     };

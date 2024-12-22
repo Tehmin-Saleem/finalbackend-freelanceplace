@@ -47,7 +47,7 @@ const notificationsSchema = new Schema({
   type: {
     type: String,
    
-    enum: ['hired', 'new_proposal', 'new_offer', 'milestone_completed', 'payment_received',  'new_query']
+    enum: ['hired', 'new_proposal', 'new_offer', 'milestone_completed', 'payment_received',  'new_query','offer_accepted']
   }
 });
 

@@ -49,6 +49,7 @@ exports.createQuery = async (req, res) => {
       type: 'new_query',
       message: `${senderProfile.first_name} (${senderRole}) has sent you a query`,
       sender_id: userId,
+      
       admin_email: 'tehmina.saleem31@gmail.com', // Using email for admin instead of receiver_id
       client_id: senderRole === 'client' ? userId : null,
       freelancer_id: senderRole === 'freelancer' ? userId : null,

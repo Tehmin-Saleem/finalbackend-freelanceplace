@@ -126,6 +126,8 @@ exports.createoffer = async (req, res) => {
       freelancer_id: freelancer_id,
       job_id: savedOffer._id, // This is the correct offer ID
       type: 'new_offer',
+      senderId: client_id,
+      receiver_id:freelancer_id,
       message: `You have received a new offer for "${job_title}"`
     };
 
@@ -406,6 +408,8 @@ exports.updateOfferStatus = async (req, res) => {
           client_id: offer.client_id,
           freelancer_id: offer.freelancer_id,
           job_id: offer._id,
+          receiver_id:offer.client_id,
+          senderId: offer.freelancer_id,
           type: `offer_${status}`,
           message: notificationMessage
       };

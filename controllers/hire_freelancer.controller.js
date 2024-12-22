@@ -192,6 +192,8 @@ exports.hireFreelancer = async (req, res) => {
     const notificationData = {
       freelancer_id: proposal.freelancer_id._id,
       client_id: clientId,
+      sender_id:clientId,
+      receiver_id:freelancer_id,
       job_id: proposal.job_id._id,
       message: `Congratulations! You've been hired for "${proposal.job_id.job_title}"`,
       type: 'hired'
