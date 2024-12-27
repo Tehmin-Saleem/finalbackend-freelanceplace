@@ -238,8 +238,7 @@ setFreelancerData((prev) => ({
     try {
       const projectData = {
         ...freelancerData,
-        status:
-          freelancerData.progress === 100 ? "Pending Approval" : "Ongoing",
+        
         // Include previous payment information if it exists
         paymentStatus: freelancerData.paymentStatus,
         paymentDetails: freelancerData.paymentDetails,

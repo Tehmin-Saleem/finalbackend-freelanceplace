@@ -65,7 +65,9 @@ const JobsPage = () => {
         setPaymentMethods(paymentMethodMap);
 
         // Combine job data with payment method status and country name
-        const jobsWithPaymentStatus = jobsResponse.data.jobPosts.map((job) => {
+        const jobsWithPaymentStatus = jobsResponse.data.jobPosts
+        .filter(job => job.jobstatus !== "completed") // Filter out completed jobs
+        .map((job) => {
           const clientId =
             job.client_id && job.client_id._id
               ? job.client_id._id.toString()
