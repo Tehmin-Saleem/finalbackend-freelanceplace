@@ -1,9 +1,3 @@
-
-
-
-
-
-
 const Proposal = require('../models/proposal.model');
 const Freelancer_Profile = require('../models/freelancer_profile.model');
 const Job = require('../models/post_job.model'); // Import the Job model
@@ -60,6 +54,8 @@ exports.createProposal = async (req, res) => {
       client_id: client_id,
       freelancer_id: freelancer_id,
       job_id: job_id,
+      receiver_id:client_id,
+      senderId: freelancer_id,
       message: `You have received a new proposal for your job: ${job.job_title}`,
       type: 'new_proposal'
     };
@@ -510,5 +506,3 @@ exports.hireProposal = async (req, res) => {
     return res.status(500).json({ message: "Server error" });
   }
 };
-
-

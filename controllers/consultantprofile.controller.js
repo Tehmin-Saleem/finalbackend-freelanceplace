@@ -9,6 +9,7 @@ const ProjectDetails= require('../models/SendProjectDetails.model');
 const { createNotification } = require('../controllers/notifications.controller')
 const mongoose = require('mongoose');
 
+
 exports.createProfile = async (req, res) => {
   try {
     console.log('Received profile data:', req.body);
@@ -565,18 +566,22 @@ exports.sendProjectDetailsToConsultant = async (req, res) => {
 
 exports.getProjectDetailsByOfferId = async (req, res) => {
   const { offerId } = req.params;
+  console.log("Offer ID passed in request:", offerId);
+  
 
   try {
-    // Step 1: Fetch the ConsultantOffer document with virtual population of project details
-    const offer = await ConsultantOffer.findById(offerId)
-      .populate('projectDetails') // Populate the projectDetails virtual field
-      .lean();
+    // Step 1: Fetch the ConsultantOffer document
+    const offer = await ConsultantOffer.findById(offerId).lean();
+console.log("Offer fetched:", offer);
 
-    if (!offer) {
-      return res.status(404).json({ message: 'Offer not found.' });
-    }
+    
+      
 
-    // Step 2: Combine data from offer and populated project details
+    // Step 2: Fetch the ProjectDetails document using the offerId
+    const projectDetails = await ProjectDetails.findOne({ offerId }).lean();
+    console.log("Project Details fetched:", projectDetails);
+
+    // Step 3: Combine data from both schemas
     const response = {
       projectName: offer.offer_details?.project?.name || offer.project_name,
       description:
@@ -585,9 +590,9 @@ exports.getProjectDetailsByOfferId = async (req, res) => {
         offer.offer_details?.budget?.type === 'hourly'
           ? `${offer.offer_details?.budget?.hourlyRateFrom} - ${offer.offer_details?.budget?.hourlyRateTo} per hour`
           : `$${offer.offer_details?.budget?.fixedPrice} fixed`,
-      githubUrl: offer.projectDetails?.githubUrl || 'N/A',
-      additionalNotes: offer.projectDetails?.additionalNotes || 'N/A',
-      deadline: offer.projectDetails?.deadline || 'N/A',
+      githubUrl: projectDetails?.githubUrl || 'N/A',
+      additionalNotes: projectDetails?.additionalNotes || 'N/A',
+      deadline: projectDetails?.deadline || 'N/A',
     };
 
     res.status(200).json(response);
@@ -596,4 +601,5 @@ exports.getProjectDetailsByOfferId = async (req, res) => {
     res.status(500).json({ message: 'Server error, try again later.' });
   }
 };
+
 
