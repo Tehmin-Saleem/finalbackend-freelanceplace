@@ -84,15 +84,31 @@ app.use("/api/freelancer", freelancerRoutes);
 // Socket.io Implementation
 io.on("connection", (socket) => {
   socket.on("setup", (userData) => {
+     console.log("userdata in server", userData);
+
+    // Check if userData is valid
+    if (!userData) {
+      console.error("Invalid user data received:", userData);
+      return;
+    }
+    // Check if the user is a freelancer or client based on the presence of freelancer_id or _id
     if (userData.freelancer_id) {
-      socket.join(userData.freelancer_id);
+      socket.join(userData.freelancer_id); // Join room using freelancer_id for freelancers
+      // console.log(`Freelancer joined room: ${userData.freelancer_id}`);
     } else if (userData._id) {
-      socket.join(userData._id);
+      socket.join(userData._id); // Join room using _id for clients
+      // console.log(`Client joined room: ${userData._id}`);
     } else {
-      console.error("Invalid user data for socket setup:", userData);
+      console.error(
+        "Neither _id nor freelancer_id found in user data:",
+        userData
+      );
       return;
     }
     socket.emit("connected");
+
+    
+
   });
 
   socket.on("join chat", (room) => {

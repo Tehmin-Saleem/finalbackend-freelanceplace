@@ -242,6 +242,8 @@ exports.sendOfferToConsultant = async (req, res) => {
       client_id: clientId,
       consultant_id: consultant_id,
       job_id: project._id,
+      sender_id:clientId,
+      receiver_id:consultant_id,
       message: `${clientName} has sent you an offer for project ${projectName}`,
       type: 'new_offer',
       senderId: clientId
