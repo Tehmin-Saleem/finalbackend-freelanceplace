@@ -13,8 +13,8 @@ const ConsultantOffers = () => {
   const [showProjectDetails, setShowProjectDetails] = useState(false);
   const navigate = useNavigate();
 
-  const handleSeeProjectDetails = () => {
-    navigate('/SeeProjectDetails'); // Navigate to ProjectDetails component
+  const handleSeeProjectDetails = (offerId) => {
+    navigate('/SeeProjectDetails', { state: { offerId } }); // Pass offerId as state
   };
 
   // Fetch offers on component mount
@@ -166,12 +166,12 @@ const ConsultantOffers = () => {
                     )}
                     {status === "accepted" && (
         <div>
-          <button
-            className="accept-button"
-            onClick={handleSeeProjectDetails}
-          >
-            View Project Details
-          </button>
+ <button
+  className="accept-button"
+  onClick={() => handleSeeProjectDetails(offer._id)} // Use _id here
+>
+  View Project Details
+</button>
         </div>
                     )}
                     {status === "declined" && (

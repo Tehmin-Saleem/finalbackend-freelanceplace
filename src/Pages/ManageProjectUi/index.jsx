@@ -60,7 +60,7 @@ const ManageProjectsByClient = () => {
 
         console.log("Projects Data:", projectsResponse.data.data);
       } catch (error) {
-        console.error("Error fetching data:", error);
+        console.error("Error fetching data :", error);
         setError(error.message || "An error occurred while fetching data");
       } finally {
         setLoading(false);
