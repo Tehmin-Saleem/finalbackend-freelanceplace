@@ -192,6 +192,8 @@ exports.hireFreelancer = async (req, res) => {
     const notificationData = {
       freelancer_id: proposal.freelancer_id._id,
       client_id: clientId,
+      sender_id:clientId,
+      receiver_id:proposal.freelancer_id._id,
       job_id: proposal.job_id._id,
       message: `Congratulations! You've been hired for "${proposal.job_id.job_title}"`,
       type: 'hired'
@@ -550,21 +552,21 @@ exports.getClientOngoingProjects = async (req, res) => {
     const formattedProjects = ongoingProjects.map(project => {
       const freelancerProfile = freelancerProfileMap[project.freelancerId._id.toString()];
       return {
-        budget_type: project.jobId.budget_type,
+        budget_type: project.budget_type,
         hourly_rate: {
-          from: project.jobId.hourly_rate?.from || 0,
-          to: project.jobId.hourly_rate?.to || 0
+          from: project.hourly_rate?.from || 0,
+          to: project.hourly_rate?.to || 0
         },
-        fixed_price: project.jobId.fixed_price,
+        fixed_price: project.fixed_price,
         project_duration: {
-          duration: project.jobId.project_duration || 'Not specified',
-          experience_level: project.jobId.experience_level || 'Not specified'
+          duration: project.project_duration || 'Not specified',
+          experience_level: project.experience_level || 'Not specified'
         },
         projectId: project._id,
-        projectName: project.jobId.job_title,
-        job_title: project.jobId.job_title,
-        description: project.jobId.description,
-        preferred_skills: project.jobId.preferred_skills || [],
+        projectName: project.job_title,
+        job_title: project.job_title,
+        description: project.description,
+        preferred_skills: project.preferred_skills || [],
         freelancer: {
           id: project.freelancerId._id,
           name: `${project.freelancerId.first_name} ${project.freelancerId.last_name}`,
@@ -574,13 +576,13 @@ exports.getClientOngoingProjects = async (req, res) => {
             country: project.freelancerId.country_name || 'Not specified'
           }
         },
-        budget_type: project.jobId.budget_type,
+        budget_type: project.budget_type,
         budget: formatBudget(project.jobId),
         progress: 0, // Set a default value or calculate based on your logic
         startDate: project.hiredAt || new Date(),
         deadline: project.proposalId?.add_requirements?.by_project?.due_date || null,
         project_duration: {
-          duration_of_work: project.jobId.project_duration || 'Not specified',
+          duration_of_work: project.project_duration || 'Not specified',
           experience_level: 'Not specified'
         },
         milestones: formatMilestones(project.proposalId?.add_requirements?.by_milestones || []),
@@ -591,10 +593,13 @@ exports.getClientOngoingProjects = async (req, res) => {
           proposedRate: project.proposalId?.add_requirements?.by_project?.bid_amount || 0,
           status: project.status || 'pending'
         },
-        
+       
       };
+     
     });
+    console.log('project', formattedProjects
 
+    )
     res.status(200).json({
       success: true,
       count: formattedProjects.length,
