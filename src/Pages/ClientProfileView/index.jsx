@@ -7,6 +7,7 @@ import axios from "axios";
 import { useState, useEffect } from "react";
 import { jwtDecode } from "jwt-decode";
 import { useNavigate } from "react-router-dom";
+import { MdLocationOn, MdEmail, MdEdit } from 'react-icons/md';
 
 const ClientProfile = () => {
   const [profileData, setProfileData] = useState({
@@ -145,14 +146,14 @@ const ClientProfile = () => {
           </div>
           <div className="profile-info">
             <h1>{profileData.name}</h1>
-            <p>{profileData.country}</p>
-            <p>Email: {email}</p>
+            <p><MdLocationOn className="text-primary" />{profileData.country}</p>
+            <p><MdEmail className="text-primary" />{email}</p>
           </div>
 
           <div className="flex items-center justify-between buttons">
             <CommonButton
               onClick={() => navigate(`/ClientProfileForm`)}
-              text="Edit"
+              text={<><MdEdit className="inline mr-2" />Edit</>}
               className="bg-[#4BCBEB] text-[18px] font-Poppins text-[#FFFFFF] rounded-lg font-semibold font-Poppins py-2 px-6 w-full focus:outline-none focus:shadow-outline"
             />
           </div>
