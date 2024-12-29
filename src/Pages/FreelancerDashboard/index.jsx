@@ -146,9 +146,9 @@ const FreelanceDashboardPage = () => {
   return (
     <div className="dashboard-page">
       <Header />
-      <div className="background-section">
+      <div className="background-section mt-8">
         <h1>Welcome, {user.first_name}!</h1>
-        <p>Manage projects, track progress, and explore freelancer profiles, all in one place.</p>
+        <p>Send proposals, Accept offers,Manage projects, and explore jobs matching your skills, all in one place.</p>
       </div>
 
 

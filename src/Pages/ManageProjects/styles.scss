@@ -1,19 +1,23 @@
+
+
 .manage-projects {
   width: 60%;
-  margin: 0 auto;
   padding: 20px;
-  background-color: #333;
+  background-color: #dd0f0f;
+  margin-top: 10rem;
 
-  .header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 30px;
-    
+  // .project-header {
+  //   display: flex;
+  //   justify-content: space-between;
+  //   align-items: center;
+  //   margin-bottom: 30px;
+   
+  //   background-color: #05d1ff;
+
     h1 {
       font-size: 2rem;
-      margin: 0;
-      color:#15829b
+     
+      color: #15829b;
     }
   
   
@@ -27,7 +31,7 @@
           height: 40px;
           margin-right: 10px;
         }
-      }
+      
     }
   
     // .project-list {

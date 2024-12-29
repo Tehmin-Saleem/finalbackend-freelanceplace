@@ -129,7 +129,16 @@ textarea {
     font-size: 0.9rem; /* Adjust font size for consistency */
     margin-bottom: 0.25rem; /* Spacing between label and input */
 }
-
+.button {
+  background: $color-accent;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  cursor: pointer;
+ 
+}
     .job-info {
         display: flex;
         gap: 2rem;

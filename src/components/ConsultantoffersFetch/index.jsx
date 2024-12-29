@@ -27,11 +27,20 @@ const ConsultantOffers = () => {
             },
           }
         );
-        console.log("Offers data:", response.data);
-        setOffers(response.data.offers || []); // Ensure offers is always an array
+
+        if (response.status === 404) {
+          setOffers([]); // Set offers to an empty array
+        } else {
+          setOffers(response.data.offers || []); // Ensure offers is always an array
+        }
       } catch (err) {
-        console.error("Fetch offers error:", err.response || err.message);
-        setError("Failed to fetch offers.");
+        if (err.response && err.response.status === 404) {
+          setOffers([]); // Set offers to an empty array
+          setError(""); // Clear the error state
+        } else {
+          console.error("Fetch offers error:", err.response || err.message);
+          setError("Failed to fetch offers.");
+        }
       } finally {
         setLoading(false);
       }
@@ -92,7 +101,7 @@ const ConsultantOffers = () => {
         <h1>Offers</h1>
         <div className="offers-container">
           {offers.length === 0 ? (
-            <div className="no-offers">No offers received.</div>
+            <div className="no-offers">No offers received yet.</div>
           ) : (
             offers.map((offer) => {
               // Safely extract values with optional chaining
@@ -184,7 +193,6 @@ const ConsultantOffers = () => {
           )}
         </div>
       </div>
-      
     </>
   );
 };

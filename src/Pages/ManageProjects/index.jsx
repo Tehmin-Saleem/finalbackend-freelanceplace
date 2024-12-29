@@ -173,11 +173,12 @@ const ManageProjects = () => {
     <>
       <Header/>
       <div className="manage-projects">
-        <header className="header">
-          <h1>Manage Ongoing Projects</h1>
-        </header>
+        
+          
+          
 
         <div className="project-list">
+        
           {projects.map((project, index) => (
             <EditableProjectCard
               key={index}

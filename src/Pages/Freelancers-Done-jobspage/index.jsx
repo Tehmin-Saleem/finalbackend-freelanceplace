@@ -266,7 +266,7 @@ const FreelancersJobsPage = () => {
   return (
     <div className="jobs-page">
       <Header />
-      <h1 className="jobs-heading">My Hired Jobs</h1>
+      <h1 className="jobs-heading">My All Jobs</h1>
       <div className="filters-container">
         <div className="searchbar-container">
           <div className="search-bar-wrapper">

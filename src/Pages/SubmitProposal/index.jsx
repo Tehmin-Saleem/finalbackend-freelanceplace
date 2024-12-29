@@ -702,7 +702,7 @@ const SubmitProposal = () => {
                   <label className="Label">Cover letter</label>
 
                   <div>
-                    <Button variant="primary" onClick={handleShowModal}>
+                    <Button className="button" variant="primary" onClick={handleShowModal}>
                       Generate Cover Letter
                     </Button>
 

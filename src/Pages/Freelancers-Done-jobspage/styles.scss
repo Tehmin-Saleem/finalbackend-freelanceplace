@@ -7,6 +7,7 @@
   $border-color: #dee2e7;
   $dark-text-color: #0f172a;
   $light-grey-color: #e2e8f0;
+margin-top: 8rem;
 
 
 
@@ -142,11 +143,12 @@
   }
 
   .jobs-heading {
-    font-size: 28px;
-    font-weight: 300;
-    color: $dark-text-color;
+    font-size: 40px;
+    font-weight: 500;
+    color: #4bcbeb;
     margin: 3% 5%;
     padding-left: 5%;
+
   }
 
   .jobs-container {

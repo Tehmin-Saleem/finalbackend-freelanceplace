@@ -412,6 +412,7 @@ const calculateMilestoneDueNotifications = (milestones, projectDueDate) => {
 
   return (
     <div className="editable-project-card">
+      <h1 className="heading text-sky-400">Manage Ongoing Projects</h1>
       {isLoading && <div className="loading-overlay">Loading...</div>}
       {error && <div className="error-message">{error}</div>}
 
