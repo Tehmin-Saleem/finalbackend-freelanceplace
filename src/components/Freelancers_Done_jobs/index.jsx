@@ -110,6 +110,10 @@ const JobsCard = ({
           throw new Error("No token found");
         }
 
+        // Add debug logging
+        console.log("Fetching review for job:", job_id);
+        console.log("Using token:", token.substring(0, 20) + "..."); // Show first 20 chars of token
+
         // console.log("Fetching review for job:", job_id); // Debug log
 
         const response = await axios.get(
@@ -128,12 +132,31 @@ const JobsCard = ({
           setReview(response.data.data);
           setRatings(response.data.data.rating);
           setMessage(response.data.data.review_message);
+          console.log("Review data successfully fetched:", response.data.data);
         }
       } catch (err) {
-        console.error("Error fetching review:", err);
-        // Only set error if it's not a 404 (no review found)
-        if (err.response?.status !== 404) {
-          setError(err.message);
+        // More detailed error handling
+        if (err.response) {
+          // Server responded with error
+          if (err.response.status === 404) {
+            console.log("No review found for this job");
+            // You might want to set some state to show "No review yet" message
+            setReview(null);
+          } else if (err.response.status === 401) {
+            console.log("Authentication error");
+            navigate("/signin"); // Redirect on auth error
+          } else {
+            console.error("Server error:", err.response.data);
+            setError("Failed to fetch review: " + err.response.data.message);
+          }
+        } else if (err.request) {
+          // Request made but no response
+          console.error("No response received:", err.request);
+          setError("Network error - no response from server");
+        } else {
+          // Error in request setup
+          console.error("Error setting up request:", err.message);
+          setError("Error setting up request: " + err.message);
         }
       } finally {
         setLoading(false);
