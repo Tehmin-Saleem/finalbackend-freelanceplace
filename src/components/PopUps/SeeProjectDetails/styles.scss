@@ -21,7 +21,7 @@ $error-color: #dc2626;
 
   .modal-container {
     background-color: $background-color;
-    width: 90%;
+    width: 100%;
     max-width: 500px;
     padding: 20px;
     border-radius: 10px;
@@ -144,8 +144,17 @@ $error-color: #dc2626;
   border-radius: 5px;
   cursor: pointer;
   font-weight: bold;
+  margin-top: 2rem;
 
   &:hover {
     background-color: darken($primary-color, 10%);
   }
 }
+.confidentiality-instruction {
+    background-color: #fff3cd; /* Light yellow background */
+    color: #856404; /* Dark golden-brown text */
+    border: 1px solid #ffeeba; /* Matching border */
+    padding: 10px;
+    border-radius: 5px;
+    font-size: 14px;
+  }
