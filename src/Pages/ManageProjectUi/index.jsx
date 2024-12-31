@@ -36,6 +36,7 @@ import ConsultantCard from "../../components/ConsultantCards";
 
 
 const ManageProjectsByClient = () => {
+  console.log("ManageProjectsByClient rendering");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [profileData, setProfileData] = useState(null);
@@ -159,11 +160,31 @@ const ManageProjectsByClient = () => {
   if (loading) return <Spinner alignCenter />;
   if (error) return <div className="error-message">{error}</div>;
 
+
+  const ErrorBoundary = ({ children }) => {
+    const [hasError, setHasError] = useState(false);
+    const [error, setError] = useState(null);
+  
+    if (hasError) {
+      return <div style={{ padding: '20px', color: 'red' }}>Error: {error?.message}</div>;
+    }
+  
+    try {
+      return children;
+    } catch (err) {
+      setError(err);
+      setHasError(true);
+      return null;
+    }
+  };
+
   return (
     <>
       <PayPalScriptProvider options={PAYPAL_OPTIONS}>
         <Header />
+        <ErrorBoundary>
         <div className="manage-projects">
+        <ErrorBoundary>
           {/* Header Section */}
           <header className="header">
             <div className="header-content">
@@ -185,6 +206,9 @@ const ManageProjectsByClient = () => {
               </div>
             </div>
           </header>
+          </ErrorBoundary>
+
+          <ErrorBoundary>
 
           {/* Projects Section */}
           <div className="projects-container">
@@ -222,13 +246,16 @@ const ManageProjectsByClient = () => {
               />
             )}
           </div>
+          </ErrorBoundary>
         </div>
+        </ErrorBoundary>
       </PayPalScriptProvider>
     </>
   );
 };
 
 const ProjectCard = ({ project, onClick, isSelected }) => {
+  console.log("ProjectCard is being rendering");
   const formatDate = (date) => {
     return new Date(date).toLocaleDateString("en-US", {
       year: "numeric",
@@ -307,6 +334,7 @@ const ProjectDetails = ({
   onProjectStatusChange,
   freelancerPayments,
 }) => {
+  console.log("ProjectDetails is being rendering");
   const [activeTab, setActiveTab] = useState("overview");
   const [consultantId, setConsultantId] = useState(null);
   const [progressData, setProgressData] = useState(null);
@@ -959,6 +987,7 @@ const ProjectDetails = ({
   }, [activeTab, currentProject?.projectId]);
 
   const refreshPaymentStatus = async () => {
+    console.log("Referesh payment status is being rendering");
     setIsPaymentLoading(true);
     try {
       await fetchProgress();
