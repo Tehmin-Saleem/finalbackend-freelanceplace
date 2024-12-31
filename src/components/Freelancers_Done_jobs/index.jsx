@@ -126,13 +126,13 @@ const JobsCard = ({
           }
         );
 
+        console.log("Review data successfully fetched:", response.data.data);
         // console.log("Review response:", response.data.data); // Debug log
 
         if (response.data.success) {
           setReview(response.data.data);
           setRatings(response.data.data.rating);
           setMessage(response.data.data.review_message);
-          console.log("Review data successfully fetched:", response.data.data);
         }
       } catch (err) {
         // More detailed error handling
