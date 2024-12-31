@@ -69,7 +69,7 @@ useEffect(() => {
         email: userData.email || "",
         country: userData.country_name || "",
       }));
-
+console.log('userdata', userData)
       // Then check for existing profile
       const profileResponse = await axios.get(
         "http://localhost:5000/api/client/profile",
@@ -77,7 +77,7 @@ useEffect(() => {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
-
+console.log('profile', profileResponse.data.data)
       if (profileResponse.data.success && profileResponse.data.data) {
         setIsEditMode(true);
         const profile = profileResponse.data.data;
