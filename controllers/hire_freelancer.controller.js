@@ -501,7 +501,6 @@ exports.getFilteredJobs = async (req, res) => {
 
 
 
-
 exports.getClientOngoingProjects = async (req, res) => {
   try {
     const clientId = req.user.userId;
@@ -531,15 +530,13 @@ exports.getClientOngoingProjects = async (req, res) => {
     .populate({
       path: 'proposalId',
       select: 'Proposal_id cover_letter project_duration add_requirements'
-    })
+    });
 
     // Get freelancer profiles for all freelancers
     const freelancerIds = ongoingProjects.map(project => project.freelancerId._id);
     const freelancerProfiles = await Freelancer_Profile.find({
-      freelancer_id: { $in: freelancerIds }  })
-    .lean();
-
-
+      freelancer_id: { $in: freelancerIds }
+    }).lean();
 
     // Create a map of freelancer profiles
     const freelancerProfileMap = freelancerProfiles.reduce((map, profile) => {
@@ -547,42 +544,43 @@ exports.getClientOngoingProjects = async (req, res) => {
       return map;
     }, {});
 
-
     // Transform the data to match frontend requirements
     const formattedProjects = ongoingProjects.map(project => {
       const freelancerProfile = freelancerProfileMap[project.freelancerId._id.toString()];
+      const jobId = project.jobId;
+
       return {
-        budget_type: project.budget_type,
+        budget_type: jobId ? jobId.budget_type : 'unknown',
         hourly_rate: {
-          from: project.hourly_rate?.from || 0,
-          to: project.hourly_rate?.to || 0
+          from: jobId?.hourly_rate?.from || 0,
+          to: jobId?.hourly_rate?.to || 0
         },
-        fixed_price: project.fixed_price,
+        fixed_price: jobId ? jobId.fixed_price : 0,
         project_duration: {
-          duration: project.project_duration || 'Not specified',
-          experience_level: project.experience_level || 'Not specified'
+          duration: jobId ? jobId.project_duration : 'Not specified',
+          experience_level: jobId ? jobId.experience_level : 'Not specified'
         },
         projectId: project._id,
-        projectName: project.job_title,
-        job_title: project.job_title,
-        description: project.description,
-        preferred_skills: project.preferred_skills || [],
+        projectName: jobId ? jobId.job_title : 'Unknown Project',
+        job_title: jobId ? jobId.job_title : 'Unknown Job',
+        description: jobId ? jobId.description : 'No description',
+        preferred_skills: jobId ? jobId.preferred_skills : [],
         freelancer: {
           id: project.freelancerId._id,
           name: `${project.freelancerId.first_name} ${project.freelancerId.last_name}`,
           email: project.freelancerId.email,
-          image: freelancerProfile?.image || null, // Get image from freelancer 
+          image: freelancerProfile?.image || null, // Get image from freelancer
           location: {
             country: project.freelancerId.country_name || 'Not specified'
           }
         },
-        budget_type: project.budget_type,
-        budget: formatBudget(project.jobId),
+        budget_type: jobId ? jobId.budget_type : 'unknown',
+        budget: formatBudget(jobId),
         progress: 0, // Set a default value or calculate based on your logic
         startDate: project.hiredAt || new Date(),
         deadline: project.proposalId?.add_requirements?.by_project?.due_date || null,
         project_duration: {
-          duration_of_work: project.project_duration || 'Not specified',
+          duration_of_work: jobId ? jobId.project_duration : 'Not specified',
           experience_level: 'Not specified'
         },
         milestones: formatMilestones(project.proposalId?.add_requirements?.by_milestones || []),
@@ -593,13 +591,9 @@ exports.getClientOngoingProjects = async (req, res) => {
           proposedRate: project.proposalId?.add_requirements?.by_project?.bid_amount || 0,
           status: project.status || 'pending'
         },
-       
       };
-     
     });
-    console.log('project', formattedProjects
-
-    )
+console.log('formatted projects', formattedProjects)
     res.status(200).json({
       success: true,
       count: formattedProjects.length,
@@ -615,6 +609,7 @@ exports.getClientOngoingProjects = async (req, res) => {
     });
   }
 };
+
 
 // Helper Functions
 function formatBudget(job) {
@@ -1172,7 +1167,7 @@ exports.getFreelancerReviews = async (req, res) => {
 exports.getFreelancerCompletedJobs = async (req, res) => {
   try {
     const { freelancerId } = req.params;
-    
+
     if (!freelancerId) {
       return res.status(400).json({
         success: false,
@@ -1181,7 +1176,7 @@ exports.getFreelancerCompletedJobs = async (req, res) => {
     }
 
     // Find all completed hire requests for the freelancer
-    const completedJobs = await HireFreelancer.find({ 
+    const completedJobs = await HireFreelancer.find({
       freelancerId: freelancerId,
       status: 'completed'
     })
@@ -1200,7 +1195,7 @@ exports.getFreelancerCompletedJobs = async (req, res) => {
     .sort({ completedAt: -1 }); // Sort by completion date
 
     // Get reviews for these jobs
-    const jobIds = completedJobs.map(job => job.jobId._id);
+    const jobIds = completedJobs.map(job => job.jobId?._id);
     const reviews = await Review.find({
       freelancer_id: freelancerId,
       job_id: { $in: jobIds }
@@ -1212,54 +1207,60 @@ exports.getFreelancerCompletedJobs = async (req, res) => {
       return acc;
     }, {});
 
-    const formattedResponse = completedJobs.map(job => ({
-      hireId: job._id,
-      job: job.jobId ? {
-        id: job.jobId._id,
-        title: job.jobId.job_title,
-        description: job.jobId.description,
-        budget: job.jobId.budget,
-        deadline: job.jobId.deadline,
-        category: job.jobId.category,
-        skills: job.jobId.skills,
-        completionDate: job.jobId.completion_date
-      } : null,
-      client: job.clientId ? {
-        id: job.clientId._id,
-        name: job.clientId.name,
-        email: job.clientId.email,
-        company: job.clientId.company,
-        profileImage: job.clientId.profile_image
-      } : null,
-      proposal: job.proposalId ? {
-        id: job.proposalId._id,
-        coverLetter: job.proposalId.cover_letter,
-        projectDuration: job.proposalId.project_duration,
-        portfolioLink: job.proposalId.portfolio_link,
-        attachment: job.proposalId.attachment,
-        milestones: job.proposalId.add_requirements?.by_milestones?.map(milestone => ({
-          amount: milestone.amount,
-          description: milestone.description,
-          dueDate: milestone.due_date
-        })) || [],
-        projectBid: job.proposalId.add_requirements?.by_project ? {
-          bidAmount: job.proposalId.add_requirements.by_project.bid_amount,
-          dueDate: job.proposalId.add_requirements.by_project.due_date
-        } : null
-      } : null,
-      review: reviewsByJob[job.jobId._id.toString()] ? {
-        rating: reviewsByJob[job.jobId._id.toString()].stars,
-        message: reviewsByJob[job.jobId._id.toString()].message,
-        reviewDate: reviewsByJob[job.jobId._id.toString()].createdAt
-      } : null,
-      completedAt: job.completedAt,
-      earnings: job.terms?.rate || 0
-    }));
+    const formattedResponse = completedJobs.map(job => {
+      const jobId = job.jobId?._id;
+      const clientId = job.clientId?._id;
+      const proposalId = job.proposalId?._id;
+
+      return {
+        hireId: job._id,
+        job: jobId ? {
+          id: jobId,
+          title: job.jobId.job_title,
+          description: job.jobId.description,
+          budget: job.jobId.budget,
+          deadline: job.jobId.deadline,
+          category: job.jobId.category,
+          skills: job.jobId.skills,
+          completionDate: job.jobId.completion_date
+        } : null,
+        client: clientId ? {
+          id: clientId,
+          name: job.clientId.name,
+          email: job.clientId.email,
+          company: job.clientId.company,
+          profileImage: job.clientId.profile_image
+        } : null,
+        proposal: proposalId ? {
+          id: proposalId,
+          coverLetter: job.proposalId.cover_letter,
+          projectDuration: job.proposalId.project_duration,
+          portfolioLink: job.proposalId.portfolio_link,
+          attachment: job.proposalId.attachment,
+          milestones: job.proposalId.add_requirements?.by_milestones?.map(milestone => ({
+            amount: milestone.amount,
+            description: milestone.description,
+            dueDate: milestone.due_date
+          })) || [],
+          projectBid: job.proposalId.add_requirements?.by_project ? {
+            bidAmount: job.proposalId.add_requirements.by_project.bid_amount,
+            dueDate: job.proposalId.add_requirements.by_project.due_date
+          } : null
+        } : null,
+        review: reviewsByJob[jobId?.toString()] ? {
+          rating: reviewsByJob[jobId.toString()].stars,
+          message: reviewsByJob[jobId.toString()].message,
+          reviewDate: reviewsByJob[jobId.toString()].createdAt
+        } : null,
+        completedAt: job.completedAt,
+        earnings: job.terms?.rate || 0
+      };
+    }).filter(job => job.job !== null); // Filter out jobs with null jobId
 
     // Calculate statistics
     const totalEarnings = formattedResponse.reduce((sum, job) => sum + job.earnings, 0);
-    const averageRating = reviews.length > 0 
-      ? reviews.reduce((sum, review) => sum + review.stars, 0) / reviews.length 
+    const averageRating = reviews.length > 0
+      ? reviews.reduce((sum, review) => sum + review.stars, 0) / reviews.length
       : 0;
 
     res.status(200).json({
@@ -1280,8 +1281,8 @@ exports.getFreelancerCompletedJobs = async (req, res) => {
       error: error.message
     });
   }
-
 };
+
 
 
 
