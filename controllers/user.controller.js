@@ -525,7 +525,7 @@ const validateToken = async (req, res) => {
       message: 'Token is valid', 
       user: req.user 
     });
-    console.log('user', user)
+    
   } catch (error) {
     console.error('Token validation error:', error);
     res.status(401).json({ message: 'Invalid token' });
