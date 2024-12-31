@@ -16,12 +16,12 @@ $bg-color: #f7f8fa;
 .chat-page {
   display: flex;
   height: 100vh;
-
+margin-top: 3rem;
   .left-section {
     width: 30%;
     background-color: #f8f8f8;
     padding: 20px;
-
+margin-top: 2rem;
     .msg {
       padding-bottom: 1rem;
       padding-inline: 1rem;
@@ -420,8 +420,10 @@ $bg-color: #f7f8fa;
   font-family: "Work Sans", sans-serif;
   display: flex;
   // justify-content: space-between;
-  width: 40%;
+  width: 100%;
   align-items: self-start;
+  padding-top: 1rem;
+  padding-bottom: 1rem;
   border-radius: 0.5rem;
 }
 

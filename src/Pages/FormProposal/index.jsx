@@ -10,6 +10,8 @@ import {
   HourlyRate,
   FixedRate,
 } from "../../svg/index";
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const OfferForm = () => {
   const [selectedSkills, setSelectedSkills] = useState([]);
@@ -23,7 +25,7 @@ const OfferForm = () => {
     "JavaScript",
     "React",
   ]);
-  
+
   const [filteredSkills, setFilteredSkills] = useState(popularSkills);
   const [inputValue, setInputValue] = useState('');
 
@@ -78,16 +80,6 @@ const OfferForm = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
 
-  // const handleSkillAdd = (skill) => {
-  //   setSelectedSkills([...selectedSkills, skill]);
-  //   setPopularSkills(popularSkills.filter((item) => item !== skill));
-  // };
-
-  // const handleSkillRemove = (skill) => {
-  //   setPopularSkills([...popularSkills, skill]);
-  //   setSelectedSkills(selectedSkills.filter((item) => item !== skill));
-  // };
-
   const handleFileAttach = (event) => {
     setAttachedFile(event.target.files[0]);
   };
@@ -129,13 +121,13 @@ const OfferForm = () => {
     e.preventDefault();
     setIsLoading(true);
     setError("");
-  
+
     const token = localStorage.getItem('token');
     if (!token) {
       navigate('/signin');
       return;
     }
-  
+
     if (!validateForm()) {
       setIsLoading(false);
       return;
@@ -161,7 +153,7 @@ const OfferForm = () => {
       console.log('Setting fixed price:', fixedPrice);
       formData.append('fixed_price', fixedPrice);
     }
-  
+
     formData.append('due_date', dueDate);
     formData.append('estimated_timeline_duration', timelineDuration);
     formData.append('estimated_timeline_unit', timelineUnit);
@@ -172,28 +164,39 @@ const OfferForm = () => {
     formData.append('job_title', jobTitle);
     formData.append('preferred_skills', JSON.stringify(selectedSkills));
     formData.append('status', 'pending');
-  
+
     if (attachedFile) {
       formData.append('attachment', attachedFile);
     }
-  
+
     try {
+      console.log('Calling toast.success');
+      toast.success('Offer sent successfully!', {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      });
+
       // Log the FormData entries for debugging
       for (let pair of formData.entries()) {
         console.log(pair[0] + ': ' + pair[1]);
       }
-  
+
       const response = await axios.post('http://localhost:5000/api/client/offerform', formData, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'multipart/form-data'
         },
       });
-      
+
       console.log('Offer created successfully:', response.data);
       const offerId = response.data._id || response.data.offerId;
       console.log('Generated offer ID:', offerId);
-      
+
       navigate('/clientDashboard');
     } catch (error) {
       console.error('Error creating offer:', error);
@@ -207,7 +210,6 @@ const OfferForm = () => {
     <>
       <Header />
       <h2 className="offerTitle">Send an offer</h2>
-
       <div className="outerContainer">
         <div className="container">
           <div className="left">
@@ -239,144 +241,137 @@ const OfferForm = () => {
                 </div>
               </div>
               <div className="field">
-      <label>Due Date:</label>
-      <div className="input-wrapper">
-  <input
-    type="date"
-    className="roundedInput"
-    value={dueDate}
-    onChange={(e) => setDueDate(e.target.value)}
-    required
-  />
+                <label>Due Date:</label>
+                <div className="input-wrapper">
+                  <input
+                    type="date"
+                    className="roundedInput"
+                    value={dueDate}
+                    onChange={(e) => setDueDate(e.target.value)}
+                    required
+                  />
+                </div>
+              </div>
 
-</div>
-    </div>
-
-    <div className="field">
-      <label>Estimated Timeline:</label>
-      <div className="timeline-inputs">
-       
-        <select
-          className="roundedInput timeline-unit"
-          value={timelineUnit}
-          onChange={(e) => setTimelineUnit(e.target.value)}
-          required
-        >
-          <option value="hours">Hours</option>
-          <option value="days">Days</option>
-          <option value="weeks">Weeks</option>
-          <option value="months">Months</option>
-        </select>
-        <input
-          type="number"
-          className="roundedInput timeline-duration"
-          value={timelineDuration}
-          onChange={(e) => setTimelineDuration(e.target.value)}
-          placeholder="Duration"
-          min="1"
-          required
-        />
-      </div>
-    </div>
+              <div className="field">
+                <label>Estimated Timeline:</label>
+                <div className="timeline-inputs">
+                  <select
+                    className="roundedInput timeline-unit"
+                    value={timelineUnit}
+                    onChange={(e) => setTimelineUnit(e.target.value)}
+                    required
+                  >
+                    <option value="hours">Hours</option>
+                    <option value="days">Days</option>
+                    <option value="weeks">Weeks</option>
+                    <option value="months">Months</option>
+                  </select>
+                  <input
+                    type="number"
+                    className="roundedInput timeline-duration"
+                    value={timelineDuration}
+                    onChange={(e) => setTimelineDuration(e.target.value)}
+                    placeholder="Duration"
+                    min="1"
+                    required
+                  />
+                </div>
+              </div>
               {/* Skills section */}
               <div className="field">
-        <label>Search skills or add your own:</label>
-        <div className="inputWrapper">
-          <input
-            type="text"
-            className="inputWithIcon"
-            value={inputValue}
-            onChange={handleSearch}
-            onKeyDown={handleAddCustomSkill}
-            placeholder="Search skill "
-          />
-          {/* <span>
-            <SearchIcon className="searchIcon" />
-          </span> */}
-        </div>
-      </div>
+                <label>Search skills or add your own:</label>
+                <div className="inputWrapper">
+                  <input
+                    type="text"
+                    className="inputWithIcon"
+                    value={inputValue}
+                    onChange={handleSearch}
+                    onKeyDown={handleAddCustomSkill}
+                    placeholder="Search skill "
+                  />
+                </div>
+              </div>
 
-      {/* Selected Skills */}
-      <h3 className="field">Selected skills</h3>
-      <div className="skill">
-        {selectedSkills.map((skill) => (
-          <button
-            key={skill}
-            type="button"
-            className="skillButton"
-            onClick={() => handleSkillRemove(skill)}
-          >
-            {skill}
-            <span>
-              <CrossIcon />
-            </span>
-          </button>
-        ))}
-      </div>
+              {/* Selected Skills */}
+              <h3 className="field">Selected skills</h3>
+              <div className="skill">
+                {selectedSkills.map((skill) => (
+                  <button
+                    key={skill}
+                    type="button"
+                    className="skillButton"
+                    onClick={() => handleSkillRemove(skill)}
+                  >
+                    {skill}
+                    <span>
+                      <CrossIcon />
+                    </span>
+                  </button>
+                ))}
+              </div>
 
-      {/* Filtered or Popular Skills */}
-      <h3 className="field">Popular skills for UI/UX Design</h3>
-      <div className="skills">
-        {filteredSkills.map((skill) => (
-          <button
-            key={skill}
-            type="button"
-            className="skillButton"
-            onClick={() => handleSkillAdd(skill)}
-          >
-            {skill}
-            <span>
-              <PlusIcon />
-            </span>
-          </button>
-        ))}
-      </div>
+              {/* Filtered or Popular Skills */}
+              <h3 className="field">Popular skills for UI/UX Design</h3>
+              <div className="skills">
+                {filteredSkills.map((skill) => (
+                  <button
+                    key={skill}
+                    type="button"
+                    className="skillButton"
+                    onClick={() => handleSkillAdd(skill)}
+                  >
+                    {skill}
+                    <span>
+                      <PlusIcon />
+                    </span>
+                  </button>
+                ))}
+              </div>
 
               {/* Budget section */}
-  <h3 className="field">Budget:</h3>
-<div className="budget-section">
-  <div className="pricing-options">
-    <div
-      className={`option-box ${budgetType === 'hourly' ? 'selected' : ''}`}
-      onClick={() => handleBudgetTypeChange('hourly')}
-    >
-      <div className="box-content">
-        <input
-          type="radio"
-          name="budgetType"
-          value="hourly"
-          checked={budgetType === 'hourly'}
-          onChange={() => handleBudgetTypeChange('hourly')}
-          className="radio-button"
-        />
-        <span className="icon">
-          <HourlyRate />
-        </span>
-        <p>Hourly rate</p>
-      </div>
-    </div>
-    <div
-      className={`option-box ${budgetType === 'fixed' ? 'selected' : ''}`}
-      onClick={() => handleBudgetTypeChange('fixed')}
-    >
-      <div className="box-content">
-        <input
-          type="radio"
-          name="budgetType"
-          value="fixed"
-          checked={budgetType === 'fixed'}
-          onChange={() => handleBudgetTypeChange('fixed')}
-          className="radio-button"
-        />
-        <span className="icon">
-          <FixedRate />
-        </span>
-        <p>Fixed price</p>
-      </div>
-    </div>
-  </div>
-
-
+              <h3 className="field">Budget:</h3>
+              <div className="budget-section">
+                <div className="pricing-options">
+                  <div
+                    className={`option-box ${budgetType === 'hourly' ? 'selected' : ''}`}
+                    onClick={() => handleBudgetTypeChange('hourly')}
+                  >
+                    <div className="box-content">
+                      <input
+                        type="radio"
+                        name="budgetType"
+                        value="hourly"
+                        checked={budgetType === 'hourly'}
+                        onChange={() => handleBudgetTypeChange('hourly')}
+                        className="radio-button"
+                      />
+                      <span className="icon">
+                        <HourlyRate />
+                      </span>
+                      <p>Hourly rate</p>
+                    </div>
+                  </div>
+                  <div
+                    className={`option-box ${budgetType === 'fixed' ? 'selected' : ''}`}
+                    onClick={() => handleBudgetTypeChange('fixed')}
+                  >
+                    <div className="box-content">
+                      <input
+                        type="radio"
+                        name="budgetType"
+                        value="fixed"
+                        checked={budgetType === 'fixed'}
+                        onChange={() => handleBudgetTypeChange('fixed')}
+                        className="radio-button"
+                      />
+                      <span className="icon">
+                        <FixedRate />
+                      </span>
+                      <p>Fixed price</p>
+                    </div>
+                  </div>
+                </div>
 
                 {budgetType === 'hourly' && (
                   <div className="rate-inputs">
@@ -408,7 +403,7 @@ const OfferForm = () => {
                     </div>
                   </div>
                 )}
-                
+
                 {budgetType === 'fixed' && (
                   <div className="rate-inputs">
                     <div className="input-group">
@@ -429,7 +424,7 @@ const OfferForm = () => {
                 <div className="field">
                   <label>Describe what you need:</label>
                   <div>
-                    <textarea 
+                    <textarea
                       className="textArea"
                       value={detailedDescription}
                       onChange={(e) => setDetailedDescription(e.target.value)}
@@ -476,7 +471,7 @@ const OfferForm = () => {
                   <p>{freelancerProfile.country || "No country provided"}</p>
                   <p>{freelancerProfile.experience?.title}</p>
                   <p>${freelancerProfile.rate} /hr</p>
-                  <p>{freelancerProfile.totalJobs} jobs completed</p>
+                  <p>{freelancerProfile.completedJobs} jobs completed</p>
                 </div>
               ) : (
                 <p>No freelancer profile selected</p>
@@ -485,6 +480,7 @@ const OfferForm = () => {
           </div>
         </div>
       </div>
+      <ToastContainer />
     </>
   );
 };

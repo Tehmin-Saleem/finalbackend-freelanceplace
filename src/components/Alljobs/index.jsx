@@ -97,26 +97,31 @@ const Alljobs = ({
   projectDuration,
   proposalCount
 }) => {
-  const isButtonDisabled = () => {
-    return status === "completed";
-  };
+ const isButtonDisabled = () => {
+  return status === "completed" || status === "ongoing";
+};
 
-  const getButtonText = () => {
-    return status === "completed" ? "Job Completed" : "View Proposals";
-  };
+const getButtonText = () => {
+  return status === "completed" 
+    ? "Job Completed" 
+    : status === "ongoing" 
+      ? "Ongoing Job" 
+      : "View Proposals";
+};
 
-  const formatDate = (dateString) => {
-    return format(new Date(dateString), 'MMM dd, yyyy');
-  };
+const formatDate = (dateString) => {
+  return format(new Date(dateString), 'MMM dd, yyyy');
+};
 
-  const getStatusClass = () => {
-    switch (status) {
-      case 'ongoing': return 'status-ongoing';
-      case 'completed': return 'status-completed';
-      case 'pending': return 'status-pending';
-      default: return 'status-active';
-    }
-  };
+const getStatusClass = () => {
+  switch (status) {
+    case 'ongoing': return 'status-ongoing';
+    case 'completed': return 'status-completed';
+    case 'pending': return 'status-pending';
+    default: return 'status-active';
+  }
+};
+
 
   return (
     <div className="job-card">

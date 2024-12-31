@@ -147,7 +147,7 @@ const ClientProfile = () => {
           <div className="profile-info">
             <h1>{profileData.name}</h1>
             <p><MdLocationOn className="text-primary" />{profileData.country}</p>
-            <p><MdEmail className="text-primary" />{email}</p>
+            <p><MdEmail className="text-primary" />{profileData.email}</p>
           </div>
 
           <div className="flex items-center justify-between buttons">

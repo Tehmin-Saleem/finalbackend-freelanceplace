@@ -6,6 +6,7 @@ import axios from "axios";
 import { useParams } from "react-router-dom";
 import ReviewModal from "../../components/ReviewsModal";
 import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js";
+
 import {
   ReloadOutlined,
   CheckCircleOutlined,
@@ -44,7 +45,7 @@ const ManageProjectsByClient = () => {
   const [selectedProject, setSelectedProject] = useState(null);
   // Add a new state for storing freelancer payments if needed
   const [freelancerPayments, setFreelancerPayments] = useState([]);
-
+  
   const [paymentStatus, setPaymentStatus] = useState({});
 
   // Add function to update payment status
@@ -63,7 +64,7 @@ const ManageProjectsByClient = () => {
         if (!token) {
           throw new Error("No authentication token found");
         }
-
+  
         // Fetch client profile and ongoing projects in parallel
         const [profileResponse, projectsResponse] = await Promise.all([
           axios.get("http://localhost:5000/api/client/profile", {
@@ -73,12 +74,15 @@ const ManageProjectsByClient = () => {
             headers: { Authorization: `Bearer ${token}` },
           }),
         ]);
-
+  
+        console.log("Profile Response:", profileResponse.data);
+        console.log("Projects Response:", projectsResponse.data);
+  
         setProfileData(profileResponse.data.data);
         const projectsData = projectsResponse.data.data;
+        console.log('projects', projectsData)
         setProjects(projectsData);
-        // console.log("Project Data:", projectsResponse.data.data);
-
+  
         // Fetch payment details for each freelancer
         const freelancerPaymentDetails = await Promise.all(
           projectsData.map(async (project) => {
@@ -86,7 +90,7 @@ const ManageProjectsByClient = () => {
               project.freelancer._id ||
               project.proposalDetails?.Proposal_id?.freelancer ||
               project.freelancer?.id;
-
+  
             if (!freelancerId) {
               console.warn(
                 "No freelancer ID found for project:",
@@ -94,26 +98,25 @@ const ManageProjectsByClient = () => {
               );
               return null;
             }
-
+  
             const paymentDetails =
               await fetchFreelancerPaymentDetails(freelancerId);
-
+  
             return {
               freelancerId,
               paymentDetails: paymentDetails || null,
             };
           })
         );
-
+  
         // Filter out null entries
         const validPaymentDetails = freelancerPaymentDetails.filter(
           (detail) => detail && detail.freelancerId && detail.paymentDetails
         );
-
-        // console.log("Valid Freelancer Payment Details:", validPaymentDetails);
+  
+        console.log("Valid Freelancer Payment Details:", validPaymentDetails);
         setFreelancerPayments(validPaymentDetails);
-
-        // console.log("freelancer id", projectsResponse.data.data);
+  
       } catch (error) {
         console.error("Error fetching data :", error);
         setError(error.message || "An error occurred while fetching data");
@@ -121,9 +124,17 @@ const ManageProjectsByClient = () => {
         setLoading(false);
       }
     };
-
+  
     fetchData();
   }, []);
+  useEffect(() => {
+    console.log("Projects state updated:", projects);
+  }, [projects]);
+  
+  useEffect(() => {
+    console.log("Selected project state updated:", selectedProject);
+  }, [selectedProject]);
+    
 
   const fetchFreelancerPaymentDetails = async (freelancerId) => {
     try {
@@ -186,7 +197,7 @@ const ManageProjectsByClient = () => {
         <div className="manage-projects">
         <ErrorBoundary>
           {/* Header Section */}
-          <header className="header">
+          <header className="main">
             <div className="header-content">
               <h1>Manage Ongoing Projects</h1>
               <p>Track project progress and milestones</p>
@@ -255,6 +266,8 @@ const ManageProjectsByClient = () => {
 };
 
 const ProjectCard = ({ project, onClick, isSelected }) => {
+  console.log("ProjectCard props:", project);
+
   console.log("ProjectCard is being rendering");
   const formatDate = (date) => {
     return new Date(date).toLocaleDateString("en-US", {
@@ -278,7 +291,7 @@ const ProjectCard = ({ project, onClick, isSelected }) => {
     >
       <div className="project-header">
         <h3>{project.projectName}</h3>
-        {/* <span className="budget">{formatBudgetDisplay(project.budget)}</span> */}
+        <span className="budget">{formatBudgetDisplay(project.budget)}</span>
       </div>
 
       <div className="freelancer-info">
@@ -329,6 +342,7 @@ const ProjectCard = ({ project, onClick, isSelected }) => {
   );
 };
 
+
 const ProjectDetails = ({
   project,
   onProjectStatusChange,
@@ -349,7 +363,7 @@ const ProjectDetails = ({
   const [paymentDetails, setPaymentDetails] = useState(null);
   const [currentProject, setCurrentProject] = useState(project);
   const [isPaymentLoading, setIsPaymentLoading] = useState(false);
-
+  const navigate = useNavigate();
   useEffect(() => {
     if (progressData?.projectDetails) {
       setPaymentStatus(progressData.projectDetails.paymentStatus);
@@ -785,7 +799,16 @@ const ProjectDetails = ({
             >
               Mark as Completed
             </Button>
+            
           )}
+            <Button
+          type="primary"
+          className="hire-consulatnt-btn"
+          onClick={handleHireConsultant}
+          style={{ marginTop: 16 }}
+        >
+          Hire Consultant
+        </Button>
         </div>
       );
     }
@@ -1102,16 +1125,19 @@ const ProjectDetails = ({
               <hr className="divider" />
 
               <div className="job-infor">
-                <span className="job-info-item">
-                  <span className="labeltext">
-                    {project.budget_type === "fixed"
-                      ? "Fixed Price:"
-                      : "Hourly Rate:"}
-                  </span>
-                  <span className="value">
-                    <span className="value">{formatHourlyRate(project)}</span>
-                  </span>
-                </span>
+              <span className="job-info-item">
+  <span className="labeltext">
+    {project.budget_type === "fixed"
+      ? "Fixed Price:"
+      : "Hourly Rate:"}
+  </span>
+  <span className="value">
+    {project.budget_type === "fixed"
+      ? `$${project.budget.amount}`
+      : formatHourlyRate(project)}
+  </span>
+</span>
+
                 <span className="job-info-item">
                   <span className="labeltext">Project Duration:</span>
                   <span className="value">

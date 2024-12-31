@@ -47,9 +47,9 @@ $proposal-shadow: rgba(0, 0, 0, 0.1);
   background-color: $background-color;
   min-height: calc(100vh - 64px); // Adjust based on your header height
   padding: 2rem;
-
+margin-top: 5rem;
   // Header Section
-  .header {
+  .main {
     background: white;
     padding: 2rem;
     border-radius: 12px;

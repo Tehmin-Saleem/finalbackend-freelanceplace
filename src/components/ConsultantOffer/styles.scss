@@ -16,6 +16,12 @@ $bg-color: #f7f8fa;
     background-color: $bg-color;
     font-family: $font-poppins;
   margin-top: 5rem;
+  h1 {
+    font-size: 20px;
+    font-weight: 600;
+    color: $color-accent;
+    margin-bottom: 2rem;
+  }
     .offers-container {
       display: grid;
       grid-template-rows: repeat(auto-fit, minmax(350px, 1fr));
