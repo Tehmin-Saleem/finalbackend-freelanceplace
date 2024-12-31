@@ -17,7 +17,7 @@ const FreelancerCard = ({ heading, freelancer }) => {
   const [selectedCategory, setSelectedCategory] = useState("");
   const [selectedLocation, setSelectedLocation] = useState("");
   const [selectedAvailability, setSelectedAvailability] = useState("");
-
+  const [completedJobsMap, setCompletedJobsMap] = useState({});
   const navigate = useNavigate();
   const [userCountryMap, setUserCountryMap] = useState({});
 
@@ -51,6 +51,22 @@ const FreelancerCard = ({ heading, freelancer }) => {
 
           setFreelancers(freelancers);
           setUserCountryMap(userCountryMap);
+          const completedJobsPromises = freelancers.map(async (freelancer) => {
+            const response = await axios.get(
+              `http://localhost:5000/api/freelancer/completed-jobs/${freelancer.freelancer_id}`,
+              { headers }
+            );
+            return {
+              [freelancer.freelancer_id]: response.data.data.totalCompletedJobs,
+            };
+          });
+
+          const completedJobsResults = await Promise.all(completedJobsPromises);
+          const completedJobsMap = completedJobsResults.reduce((acc, result) => {
+            return { ...acc, ...result };
+          }, {});
+
+          setCompletedJobsMap(completedJobsMap);
 
           setLoading(false);
         } catch (err) {
@@ -77,16 +93,19 @@ const FreelancerCard = ({ heading, freelancer }) => {
 
   const handleInviteClick = (freelancer) => {
     const country = userCountryMap[freelancer.freelancer_id] || "Unknown";
+    const completedJobs = completedJobsMap[freelancer.freelancer_id] || 0;
 
     navigate("/offerform", {
       state: {
         freelancerProfile: {
           ...freelancer,
           country,
+          completedJobs,
         },
       },
     });
   };
+
 
   const handleFilterChange = (filterType, value) => {
     switch (filterType) {
@@ -343,8 +362,9 @@ const FreelancerCard = ({ heading, freelancer }) => {
                   /hr
                 </span>
                 <span className="freelancer-success">
-                  {freelancer.totalJobs} projects completed
-                </span>
+                    {completedJobsMap[freelancer.freelancer_id] || 0} projects
+                    completed
+                  </span>
               </div>
               <div className="freelancer-availability">
                 {freelancer.availability.full_time &&

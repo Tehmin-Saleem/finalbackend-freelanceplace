@@ -122,13 +122,15 @@ const ClientOffersPage = () => {
     <>
       <Header />
       <div className="client-offers-page">
-      <div className="status-filter-container mb-4 flex justify-center space-x-4">
-          <button 
+        <h1>All Offers You Sent</h1>
+        <div className="status-filter-container mb-4 flex justify-center space-x-4">
+        <button 
             className={`px-4 py-2 rounded ${statusFilter === 'all' ? 'bg-sky-400 text-white' : 'bg-gray-200'}`}
             onClick={() => handleStatusFilterChange('all')}
           >
             All Offers
           </button>
+
           <button 
             className={`px-4 py-2 rounded ${statusFilter === 'pending' ? 'bg-yellow-500 text-white' : 'bg-gray-200'}`}
             onClick={() => handleStatusFilterChange('pending')}
@@ -191,37 +193,42 @@ const ClientOffersPage = () => {
                     </p>
                   </div>
                   <div className="experience-education">
-                    <div>
-                      <h4>Experience</h4>
-                      {offer?.offer_details?.consultant?.experience?.length > 0 ? (
-                        <ul>
-                          {offer.offer_details.consultant.experience.map((exp, index) => (
-                            <li key={index}>
-                              <strong>{exp.title || "N/A"}</strong> at {exp.company || "N/A"} (
-                              {exp.years || "N/A"})
-                            </li>
-                          ))}
-                        </ul>
-                      ) : (
-                        <p>No experience provided.</p>
-                      )}
-                    </div>
-                    <div>
-                      <h4>Education</h4>
-                      {offer?.offer_details?.consultant?.education?.length > 0 ? (
-                        <ul>
-                          {offer.offer_details.consultant.education.map((edu, index) => (
-                            <li key={index}>
-                              <strong>{edu.degree || "N/A"}</strong> from {edu.institution || "N/A"} (
-                              {edu.year || "N/A"})
-                            </li>
-                          ))}
-                        </ul>
-                      ) : (
-                        <p>No education details provided.</p>
-                      )}
-                    </div>
-                  </div>
+                  <div>
+    <h4>Experience</h4>
+    {offer?.offer_details?.consultant?.experience?.length > 0 ? (
+      <ul>
+        {offer.offer_details.consultant.experience
+          .filter(exp => exp.title || exp.company || exp.years) // Ensure only valid data is shown
+          .map((exp, index) => (
+            <li key={index}>
+              <strong>{exp.title || "No Title Provided"}</strong> at {exp.company || "No Company Provided"} (
+              {exp.years ? `${exp.years} years` : "No Years Provided"})
+            </li>
+          ))}
+      </ul>
+    ) : (
+      <p>No experience provided.</p>
+    )}
+  </div>
+  <div>
+    <h4>Education</h4>
+    {offer?.offer_details?.consultant?.education?.length > 0 ? (
+      <ul>
+        {offer.offer_details.consultant.education
+          .filter(edu => edu.degree || edu.institution || edu.year) 
+          .map((edu, index) => (
+            <li key={index}>
+              <strong>{edu.degree || "No Degree Provided"}</strong> from {edu.institution || "No Institution Provided"} (
+              {edu.year ? `${edu.year} years` : "No Year Provided"})
+            </li>
+          ))}
+      </ul>
+    ) : (
+      <p>No education details provided.</p>
+    )}
+  </div>
+</div>
+
                 </div>
                 <div className="project-description">
                   <h4>Project Details</h4>
@@ -229,7 +236,7 @@ const ClientOffersPage = () => {
                 </div>
                 {offer?.status === "Accepted" && (
                   <div className="add-project-button">
-                    <button className="btn-primary"onClick={() => handleAddProjectClick(offer.id)}>Add Project Details</button>
+                    <button className="btn-primary"onClick={() => handleAddProjectClick(offer.id)}>Send Project Details</button>
                   
                     {activeOfferId === offer.id && (
                       <>

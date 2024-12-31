@@ -6,7 +6,8 @@ import axios from "axios";
 import { Helmet } from "react-helmet";
 import { useNavigate, useLocation } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
-
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 
 
@@ -206,7 +207,29 @@ useEffect(() => {
       });
 
       setIsLoading(false);
-      alert(`Profile ${isEditMode ? "updated" : "created"} successfully!`);
+      if (isEditMode) {
+        toast.success('Profile updated successfully!', {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+        });
+      } else {
+        toast.success('Profile created successfully!', {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+        });
+      }
+
+      // alert(`Profile ${isEditMode ? "updated" : "created"} successfully!`);
       console.log("Profile response:", response.data);
       navigate("/ClientProfile");
     } catch (err) {
