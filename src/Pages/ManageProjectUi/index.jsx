@@ -11,15 +11,21 @@ import {
   ReloadOutlined,
   CheckCircleOutlined,
   CloseCircleOutlined,
+  ClockCircleOutlined,
+  MessageOutlined,
+  PaperClipOutlined,
+  DownloadOutlined,
 } from "@ant-design/icons";
 import { jwtDecode } from "jwt-decode";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
 import {
   Card,
   Progress,
+  Space,
   Tag,
   Row,
   Col,
+  Divider,
   Timeline,
   Empty,
   Alert,
@@ -29,12 +35,12 @@ import {
   Button,
   message,
 } from "antd";
+
 const { Title, Text, Paragraph } = Typography;
 import Spinner from "../../components/chatcomponents/Spinner";
 
 import { PAYPAL_OPTIONS } from "../../config/paypal.config"; // Update the path
 import ConsultantCard from "../../components/ConsultantCards";
-
 
 const ManageProjectsByClient = () => {
   console.log("ManageProjectsByClient rendering");
@@ -45,7 +51,7 @@ const ManageProjectsByClient = () => {
   const [selectedProject, setSelectedProject] = useState(null);
   // Add a new state for storing freelancer payments if needed
   const [freelancerPayments, setFreelancerPayments] = useState([]);
-  
+
   const [paymentStatus, setPaymentStatus] = useState({});
 
   // Add function to update payment status
@@ -64,25 +70,39 @@ const ManageProjectsByClient = () => {
         if (!token) {
           throw new Error("No authentication token found");
         }
-  
+
         // Fetch client profile and ongoing projects in parallel
-        const [profileResponse, projectsResponse] = await Promise.all([
-          axios.get("http://localhost:5000/api/client/profile", {
-            headers: { Authorization: `Bearer ${token}` },
-          }),
-          axios.get("http://localhost:5000/api/client/ongoing-projects", {
-            headers: { Authorization: `Bearer ${token}` },
-          }),
-        ]);
-  
+        const [profileResponse, projectsResponse, offersResponse] =
+          await Promise.all([
+            axios.get("http://localhost:5000/api/client/profile", {
+              headers: { Authorization: `Bearer ${token}` },
+            }),
+            axios.get("http://localhost:5000/api/client/ongoing-projects", {
+              headers: { Authorization: `Bearer ${token}` },
+            }),
+            axios.get("http://localhost:5000/api/client/accepted-offers", {
+              headers: { Authorization: `Bearer ${token}` },
+            }),
+          ]);
+
         console.log("Profile Response:", profileResponse.data);
         console.log("Projects Response:", projectsResponse.data);
-  
+        console.log("Offers Response:", offersResponse.data);
+
         setProfileData(profileResponse.data.data);
         const projectsData = projectsResponse.data.data;
-        console.log('projects', projectsData)
-        setProjects(projectsData);
-  
+        const offersData = offersResponse.data.data;
+
+        // Combine and sort by date
+        const combinedData = [...projectsData, ...offersData].sort(
+          (a, b) => new Date(b.startDate) - new Date(a.startDate)
+        );
+
+        console.log("Combined projects and offers:", combinedData);
+
+        // console.log("projects", projectsData);
+        setProjects(combinedData);
+
         // Fetch payment details for each freelancer
         const freelancerPaymentDetails = await Promise.all(
           projectsData.map(async (project) => {
@@ -90,7 +110,7 @@ const ManageProjectsByClient = () => {
               project.freelancer._id ||
               project.proposalDetails?.Proposal_id?.freelancer ||
               project.freelancer?.id;
-  
+
             if (!freelancerId) {
               console.warn(
                 "No freelancer ID found for project:",
@@ -98,25 +118,24 @@ const ManageProjectsByClient = () => {
               );
               return null;
             }
-  
+
             const paymentDetails =
               await fetchFreelancerPaymentDetails(freelancerId);
-  
+
             return {
               freelancerId,
               paymentDetails: paymentDetails || null,
             };
           })
         );
-  
+
         // Filter out null entries
         const validPaymentDetails = freelancerPaymentDetails.filter(
           (detail) => detail && detail.freelancerId && detail.paymentDetails
         );
-  
+
         console.log("Valid Freelancer Payment Details:", validPaymentDetails);
         setFreelancerPayments(validPaymentDetails);
-  
       } catch (error) {
         console.error("Error fetching data :", error);
         setError(error.message || "An error occurred while fetching data");
@@ -124,17 +143,16 @@ const ManageProjectsByClient = () => {
         setLoading(false);
       }
     };
-  
+
     fetchData();
   }, []);
   useEffect(() => {
     console.log("Projects state updated:", projects);
   }, [projects]);
-  
+
   useEffect(() => {
     console.log("Selected project state updated:", selectedProject);
   }, [selectedProject]);
-    
 
   const fetchFreelancerPaymentDetails = async (freelancerId) => {
     try {
@@ -171,15 +189,18 @@ const ManageProjectsByClient = () => {
   if (loading) return <Spinner alignCenter />;
   if (error) return <div className="error-message">{error}</div>;
 
-
   const ErrorBoundary = ({ children }) => {
     const [hasError, setHasError] = useState(false);
     const [error, setError] = useState(null);
-  
+
     if (hasError) {
-      return <div style={{ padding: '20px', color: 'red' }}>Error: {error?.message}</div>;
+      return (
+        <div style={{ padding: "20px", color: "red" }}>
+          Error: {error?.message}
+        </div>
+      );
     }
-  
+
     try {
       return children;
     } catch (err) {
@@ -194,71 +215,72 @@ const ManageProjectsByClient = () => {
       <PayPalScriptProvider options={PAYPAL_OPTIONS}>
         <Header />
         <ErrorBoundary>
-        <div className="manage-projects">
-        <ErrorBoundary>
-          {/* Header Section */}
-          <header className="main">
-            <div className="header-content">
-              <h1>Manage Ongoing Projects</h1>
-              <p>Track project progress and milestones</p>
-            </div>
+          <div className="manage-projects">
+            <ErrorBoundary>
+              {/* Header Section */}
+              <header className="main">
+                <div className="header-content">
+                  <h1>Manage Ongoing Projects</h1>
+                  <p>Track project progress and milestones</p>
+                </div>
 
-            <div className="client-profile">
-              <img
-                src={profileData?.image || "https://via.placeholder.com/150"}
-                alt={profileData?.name || "Client"}
-                className="profile-image"
-              />
-              <div className="profile-info">
-                <span className="name">
-                  {profileData?.name || "Loading..."}
-                </span>
-                <span className="email">{profileData?.email}</span>
-              </div>
-            </div>
-          </header>
-          </ErrorBoundary>
-
-          <ErrorBoundary>
-
-          {/* Projects Section */}
-          <div className="projects-container">
-            {/* Project List */}
-            <div className="project-list">
-              {projects.length === 0 ? (
-                <div className="no-projects">No ongoing projects found</div>
-              ) : (
-                projects.map((project) => (
-                  <ProjectCard
-                    key={project.projectId}
-                    project={project}
-                    onClick={() => handleProjectClick(project)}
-                    isSelected={
-                      selectedProject?.projectId === project.projectId
+                <div className="client-profile">
+                  <img
+                    src={
+                      profileData?.image || "https://via.placeholder.com/150"
                     }
+                    alt={profileData?.name || "Client"}
+                    className="profile-image"
                   />
-                ))
-              )}
-            </div>
+                  <div className="profile-info">
+                    <span className="name">
+                      {profileData?.name || "Loading..."}
+                    </span>
+                    <span className="email">{profileData?.email}</span>
+                  </div>
+                </div>
+              </header>
+            </ErrorBoundary>
 
-            {/* Project Details */}
-            {selectedProject && (
-              <ProjectDetails
-                project={selectedProject}
-                freelancerPayments={freelancerPayments}
-                onProjectUpdate={(updatedProject) => {
-                  setProjects((prevProjects) =>
-                    prevProjects.map((p) =>
-                      p._id === updatedProject._id ? updatedProject : p
-                    )
-                  );
-                  setSelectedProject(updatedProject);
-                }}
-              />
-            )}
+            <ErrorBoundary>
+              {/* Projects Section */}
+              <div className="projects-container">
+                {/* Project List */}
+                <div className="project-list">
+                  {projects.length === 0 ? (
+                    <div className="no-projects">No ongoing projects found</div>
+                  ) : (
+                    projects.map((project) => (
+                      <ProjectCard
+                        key={project.projectId}
+                        project={project}
+                        onClick={() => handleProjectClick(project)}
+                        isSelected={
+                          selectedProject?.projectId === project.projectId
+                        }
+                      />
+                    ))
+                  )}
+                </div>
+
+                {/* Project Details */}
+                {selectedProject && (
+                  <ProjectDetails
+                    project={selectedProject}
+                    freelancerPayments={freelancerPayments}
+                    onProjectUpdate={(updatedProject) => {
+                      setProjects((prevProjects) =>
+                        prevProjects.map((p) =>
+                          p._id === updatedProject._id ? updatedProject : p
+                        )
+                      );
+                      setSelectedProject(updatedProject);
+                    }}
+                  />
+                )}
+              </div>
+            </ErrorBoundary>
           </div>
-          </ErrorBoundary>
-        </div>
         </ErrorBoundary>
       </PayPalScriptProvider>
     </>
@@ -266,9 +288,9 @@ const ManageProjectsByClient = () => {
 };
 
 const ProjectCard = ({ project, onClick, isSelected }) => {
-  console.log("ProjectCard props:", project);
+  const isOffer = project.type === "offer";
 
-  console.log("ProjectCard is being rendering");
+  // console.log("ProjectCard is being rendering");
   const formatDate = (date) => {
     return new Date(date).toLocaleDateString("en-US", {
       year: "numeric",
@@ -292,6 +314,7 @@ const ProjectCard = ({ project, onClick, isSelected }) => {
       <div className="project-header">
         <h3>{project.projectName}</h3>
         <span className="budget">{formatBudgetDisplay(project.budget)}</span>
+        {isOffer && <Tag color="blue">Offer</Tag>}
       </div>
 
       <div className="freelancer-info">
@@ -309,7 +332,8 @@ const ProjectCard = ({ project, onClick, isSelected }) => {
             {/* <span className="rating">★ {project.freelancer.rating.toFixed(1)}</span> */}
           </div>
           <span className="status">
-            Hired on {formatDate(project.startDate)}
+            {isOffer ? "Accepted on" : "Hired on"}{" "}
+            {formatDate(project.startDate)}
           </span>
         </div>
       </div>
@@ -333,15 +357,16 @@ const ProjectCard = ({ project, onClick, isSelected }) => {
               : "No deadline set"}
           </span>
         </div>
-        <div className="milestone-count">
-          <Chat />
-          <span>{project.milestones?.length || 0} Milestones</span>
-        </div>
+        {!isOffer && (
+          <div className="milestone-count">
+            <Chat />
+            <span>{project.milestones?.length || 0} Milestones</span>
+          </div>
+        )}
       </div>
     </div>
   );
 };
-
 
 const ProjectDetails = ({
   project,
@@ -408,46 +433,154 @@ const ProjectDetails = ({
     setShowReviewModal(true);
   };
   const handleHireConsultant = () => {
-    navigate('/Consultantprofiles', { 
-      state: { 
+    navigate("/Consultantprofiles", {
+      state: {
         project: project, // Pass the entire project object
         projectId: project._id,
-        projectName: project.projectName, 
-        projectDescription: project.description 
-      } 
+        projectName: project.projectName,
+        projectDescription: project.description,
+      },
     });
   };
 
+  // const fetchProgress = async () => {
+  //   // if (!projectId) return;
+  //   setLoading(true);
+  //   try {
+
+  //   const token = localStorage.getItem("token");
+  //   const decodedToken = jwtDecode(token);
+  //   const userId = decodedToken.userId;
+
+  //   // const id = project.proposalDetails.Proposal_id._id;
+
+  //   let response;
+
+  //   if (project.type === 'offer') {
+  //     // Fetch progress for offers
+  //     response = await axios.get(
+  //       `http://localhost:5000/api/client/offer-progress`,
+  //       {
+  //         params: {
+  //           client_id: userId,
+  //           projectName: project.projectName || project.job_title
+  //         },
+  //         headers: { Authorization: `Bearer ${token}` }
+  //       }
+  //     );
+  //   } else {
+  //     // Existing code for regular projects
+  //     const id = project.proposalDetails.Proposal_id._id;
+  //     response = await axios.get(
+  //       `http://localhost:5000/api/client/project-progress/${id}?client_id=${userId}`,
+  //       {
+  //         headers: { Authorization: `Bearer ${token}` }
+  //       }
+  //     );
+  //   }
+
+  //   // try {
+  //   //   const token = localStorage.getItem("token");
+
+  //   //   const response = await axios.get(
+  //   //     `http://localhost:5000/api/client/project-progress/${id}?client_id=${userId}`,
+  //   //     {
+  //   //       headers: { Authorization: `Bearer ${token}` },
+  //   //     }
+  //   //   );
+  //   //   // console.log("Progress :", response.data);
+  //   //   setdescription(response.data.projectDetails.description);
+  //   //   setProjectId(response.data.projectDetails.projectId);
+
+  //   //   setProgressData(response.data);
+
+  //   //   // Update payment status and details if available
+  //   //   if (response.data.projectDetails) {
+  //   //     setPaymentStatus(response.data.projectDetails.paymentStatus);
+  //   //     setPaymentDetails(response.data.projectDetails.paymentDetails);
+  //   //   }
+
+  //   //   setError(null);
+
+  //   console.log("progress data in case of offers ", response.data.data)
+  //   console.log("progress data in case of projects", response.data)
+
+  //   if (response.data.success) {
+  //     const progressData = response.data.data || response.data ;
+  //     setdescription(response.data.projectDetails.description);
+  //     setProjectId(response.data.projectDetails.projectId);
+  //     setProgressData(progressData);
+
+  //     if (progressData.projectDetails) {
+  //       setPaymentStatus(progressData.projectDetails.paymentStatus);
+  //       setPaymentDetails(progressData.projectDetails.paymentDetails);
+  //     }
+
+  //     setError(null);
+  //   }
+  //   } catch (err) {
+  //     console.error("Error fetching progress:", err);
+  //     setError(
+  //       err.response?.data?.message || "Error fetching project progress"
+  //     );
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
 
   const fetchProgress = async () => {
-    // if (!projectId) return;
-
-    const token = localStorage.getItem("token");
-    const decodedToken = jwtDecode(token);
-    const userId = decodedToken.userId;
-
-    const id = project.proposalDetails.Proposal_id._id;
-
     setLoading(true);
     try {
       const token = localStorage.getItem("token");
+      const decodedToken = jwtDecode(token);
+      const userId = decodedToken.userId;
 
-      const response = await axios.get(
-        `http://localhost:5000/api/client/project-progress/${id}?client_id=${userId}`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
+      let response;
+
+      if (project.type === "offer") {
+        // Fetch progress for offers
+        response = await axios.get(
+          `http://localhost:5000/api/client/offer-progress`,
+          {
+            params: {
+              client_id: userId,
+              projectName: project.projectName || project.job_title,
+            },
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+
+        if (response.data.success) {
+          const progressData = response.data.data;
+          setdescription(progressData.projectDetails.description);
+          setProjectId(progressData.projectDetails.projectId);
+          setProgressData(progressData);
+
+          if (progressData.projectDetails) {
+            setPaymentStatus(progressData.projectDetails.paymentStatus);
+            setPaymentDetails(progressData.projectDetails.paymentDetails);
+          }
         }
-      );
-      // console.log("Progress :", response.data);
-      setdescription(response.data.projectDetails.description);
-      setProjectId(response.data.projectDetails.projectId);
+      } else {
+        // Fetch progress for regular projects
+        const id = project.proposalDetails.Proposal_id._id;
+        response = await axios.get(
+          `http://localhost:5000/api/client/project-progress/${id}?client_id=${userId}`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+        if (response.data.success) {
+          const progressData = response.data;
+          setdescription(response.data.projectDetails.description);
+          setProjectId(response.data.projectDetails.projectId);
+          setProgressData(progressData);
 
-      setProgressData(response.data);
-
-      // Update payment status and details if available
-      if (response.data.projectDetails) {
-        setPaymentStatus(response.data.projectDetails.paymentStatus);
-        setPaymentDetails(response.data.projectDetails.paymentDetails);
+          if (progressData.projectDetails) {
+            setPaymentStatus(progressData.projectDetails.paymentStatus);
+            setPaymentDetails(progressData.projectDetails.paymentDetails);
+          }
+        }
       }
 
       setError(null);
@@ -465,7 +598,7 @@ const ProjectDetails = ({
     if (activeTab === "milestones") {
       fetchProgress();
     }
-  }, [activeTab]);
+  }, [activeTab, project]);
 
   // const id = ProjectId;
   // console.log("outside", ProjectId);
@@ -509,6 +642,7 @@ const ProjectDetails = ({
       setIsSubmitting(false);
     }
   };
+
 
   const formatHourlyRate = (project) => {
     if (project.hourly_rate?.from && project.hourly_rate?.to) {
@@ -752,8 +886,6 @@ const ProjectDetails = ({
             </Card>
           )}
 
-       
-
           {/* Project Statistics */}
           <Row gutter={[16, 16]} style={{ marginTop: 16 }}>
             <Col span={8}>
@@ -786,11 +918,8 @@ const ProjectDetails = ({
             </Col>
           </Row>
 
-
-
-
-             {/* Mark as Complete Button - Show only when progress is 100% */}
-             {progressData.progressData.overallProgress === 100 && (
+          {/* Mark as Complete Button - Show only when progress is 100% */}
+          {progressData.progressData.overallProgress === 100 && (
             <Button
               type="primary"
               className="mark-complete-btn"
@@ -799,16 +928,15 @@ const ProjectDetails = ({
             >
               Mark as Completed
             </Button>
-            
           )}
-            <Button
-          type="primary"
-          className="hire-consulatnt-btn"
-          onClick={handleHireConsultant}
-          style={{ marginTop: 16 }}
-        >
-          Hire Consultant
-        </Button>
+          <Button
+            type="primary"
+            className="hire-consulatnt-btn"
+            onClick={handleHireConsultant}
+            style={{ marginTop: 16 }}
+          >
+            Hire Consultant
+          </Button>
         </div>
       );
     }
@@ -1125,18 +1253,18 @@ const ProjectDetails = ({
               <hr className="divider" />
 
               <div className="job-infor">
-              <span className="job-info-item">
-  <span className="labeltext">
-    {project.budget_type === "fixed"
-      ? "Fixed Price:"
-      : "Hourly Rate:"}
-  </span>
-  <span className="value">
-    {project.budget_type === "fixed"
-      ? `$${project.budget.amount}`
-      : formatHourlyRate(project)}
-  </span>
-</span>
+                <span className="job-info-item">
+                  <span className="labeltext">
+                    {project.budget_type === "fixed"
+                      ? "Fixed Price:"
+                      : "Hourly Rate:"}
+                  </span>
+                  <span className="value">
+                    {project.budget_type === "fixed"
+                      ? `$${project.budget.amount}`
+                      : formatHourlyRate(project)}
+                  </span>
+                </span>
 
                 <span className="job-info-item">
                   <span className="labeltext">Project Duration:</span>
@@ -1215,91 +1343,211 @@ const ProjectDetails = ({
 
         {activeTab === "proposal" && (
           <div className="proposal">
-            <div className="proposal-header">
-              <span className="proposal-status accepted">
-                Proposal Accepted
-              </span>
-            </div>
+            {project.type === "offer" ? (
+              // For offers
+              <div className="offer-details">
+                <Card className="offer-info-card">
+                  <div className="offer-header">
+                    <Tag color="blue" icon={<CheckCircleOutlined />}>
+                      Direct Offer
+                    </Tag>
+                    <span className="offer-status">Accepted</span>
+                  </div>
 
-            <div className="proposal-section">
-              <h3>
-                <svg
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                >
-                  <path d="M7 8h10M7 12h10M7 16h10" />
-                </svg>
-                Cover Letter
-              </h3>
-              <div className="cover-letter">
-                <p>{project.proposalDetails.coverLetter}</p>
+                  <Divider />
+
+                  <div className="offer-content">
+                    <Row gutter={[16, 24]}>
+                      <Col span={24}>
+                        <Title level={5}>Project Overview</Title>
+                        <Paragraph>{project.description}</Paragraph>
+                      </Col>
+
+                      <Col span={12}>
+                        <Statistic
+                          title="Budget Type"
+                          value={
+                            project.budget.type === "fixed"
+                              ? "Fixed Price"
+                              : "Hourly Rate"
+                          }
+                        />
+                      </Col>
+
+                      <Col span={12}>
+                        <Statistic
+                          title="Amount"
+                          value={
+                            project.budget.type === "fixed"
+                              ? `${project.budget.amount}`
+                              : `${project.budget.hourly_rate?.from} - ${project.budget.hourly_rate?.to}/hr`
+                          }
+                          prefix="$"
+                        />
+                      </Col>
+
+                      <Col span={24}>
+                        <Title level={5}>Timeline</Title>
+                        <Row gutter={[16, 16]}>
+                          <Col span={12}>
+                            <Text type="secondary">Start Date</Text>
+                            <br />
+                            <Text strong>
+                              {new Date(project.startDate).toLocaleDateString()}
+                            </Text>
+                          </Col>
+                          <Col span={12}>
+                            <Text type="secondary">Due Date</Text>
+                            <br />
+                            <Text strong>
+                              {new Date(project.deadline).toLocaleDateString()}
+                            </Text>
+                          </Col>
+                        </Row>
+                      </Col>
+
+                      {project.preferred_skills &&
+                        project.preferred_skills.length > 0 && (
+                          <Col span={24}>
+                            <Title level={5}>Required Skills</Title>
+                            <div className="skills-container">
+                              {project.preferred_skills.map((skill, index) => (
+                                <Tag key={index} color="blue">
+                                  {skill}
+                                </Tag>
+                              ))}
+                            </div>
+                          </Col>
+                        )}
+
+                      {project.attachment && (
+                        <Col span={24}>
+                          <Title level={5}>Attachments</Title>
+                          <Card size="small" className="attachment-card">
+                            <Space>
+                              <PaperClipOutlined />
+                              <Text>{project.attachment.fileName}</Text>
+                              <Button
+                                type="link"
+                                icon={<DownloadOutlined />}
+                                onClick={() =>
+                                  window.open(project.attachment.path)
+                                }
+                              >
+                                Download
+                              </Button>
+                            </Space>
+                          </Card>
+                        </Col>
+                      )}
+                    </Row>
+                  </div>
+
+                  <Divider />
+
+                  <div className="offer-actions">
+                    <Button
+                      type="primary"
+                      icon={<MessageOutlined />}
+                      onClick={() => handleMessageFreelancer(project)}
+                    >
+                      Message Freelancer
+                    </Button>
+                  </div>
+                </Card>
               </div>
-            </div>
-
-            <div className="proposal-details">
-              <div className="detail-card">
-                <div className="detail-icon">
-                  <svg
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                  >
-                    <path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
+            ) : (
+              // For regular proposals
+              <>
+                <div className="proposal-header">
+                  <span className="proposal-status accepted">
+                    Proposal Accepted
+                  </span>
                 </div>
-                <span className="label">Estimated Duration </span>
-                <span className="value">
-                  {project.proposalDetails.estimatedDuration}
-                </span>
-              </div>
 
-         
-
-              {project.proposalDetails.attachments && (
-                <div className="proposal-attachments">
-                  <h4>Attachments</h4>
-                  <div className="attachments-list">
-                    {project.proposalDetails.attachments.map(
-                      (attachment, index) => (
-                        <div key={index} className="attachment-item">
-                          <div className="file-icon">
-                            <svg
-                              viewBox="0 0 24 24"
-                              fill="none"
-                              stroke="currentColor"
-                              strokeWidth="2"
-                            >
-                              <path d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-                            </svg>
-                          </div>
-                          <div className="file-info">
-                            <div className="file-name">{attachment.name}</div>
-                            <div className="file-size">{attachment.size}</div>
-                          </div>
-                        </div>
-                      )
-                    )}
+                <div className="proposal-section">
+                  <h3>
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                    >
+                      <path d="M7 8h10M7 12h10M7 16h10" />
+                    </svg>
+                    Cover Letter
+                  </h3>
+                  <div className="cover-letter">
+                    <p>{project.proposalDetails.coverLetter}</p>
                   </div>
                 </div>
-              )}
-            </div>
 
-            <div className="proposal-actions">
-              <button className="message-btn">
-                <svg
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                >
-                  <path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                </svg>
-                Message Freelancer
-              </button>
-            </div>
+                <div className="proposal-details">
+                  <div className="detail-card">
+                    <div className="detail-icon">
+                      <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                      >
+                        <path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                    </div>
+                    <span className="label">Estimated Duration </span>
+                    <span className="value">
+                      {project.proposalDetails.estimatedDuration}
+                    </span>
+                  </div>
+
+                  {project.proposalDetails.attachments && (
+                    <div className="proposal-attachments">
+                      <h4>Attachments</h4>
+                      <div className="attachments-list">
+                        {project.proposalDetails.attachments.map(
+                          (attachment, index) => (
+                            <div key={index} className="attachment-item">
+                              <div className="file-icon">
+                                <svg
+                                  viewBox="0 0 24 24"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  strokeWidth="2"
+                                >
+                                  <path d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                                </svg>
+                              </div>
+                              <div className="file-info">
+                                <div className="file-name">
+                                  {attachment.name}
+                                </div>
+                                <div className="file-size">
+                                  {attachment.size}
+                                </div>
+                              </div>
+                            </div>
+                          )
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                <div className="proposal-actions">
+                  <button className="message-btn">
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                    >
+                      <path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                    </svg>
+                    Message Freelancer
+                  </button>
+                </div>
+              </>
+            )}
           </div>
         )}
       </div>
@@ -1428,9 +1676,9 @@ const PayPalPaymentButton = ({
       // Get proposal_id from project
       const proposal_id = project.proposalDetails?.Proposal_id?._id;
 
-      if (!proposal_id) {
-        throw new Error("Proposal ID not found in project data");
-      }
+      // if (!proposal_id) {
+      //   throw new Error("Proposal ID not found in project data");
+      // }
 
       // Create payment data
       const paymentData = {
@@ -1441,7 +1689,13 @@ const PayPalPaymentButton = ({
         orderId: order.id,
         projectId: project._id || project.projectId, // Try both _id and projectId
         projectType: project.budget_type || "fixed",
-        proposal_id: project.proposalDetails.Proposal_id._id, // Add these
+        // proposal_id: project.proposalDetails.Proposal_id._id, // Add these
+        isOffer: project.type === "offer", // Add this flag
+        projectName: project.projectName, // Add project name for offers
+
+        ...(project.type !== "offer" && {
+          proposal_id: project.proposalDetails?.Proposal_id?._id,
+        }),
         client_id: userId,
         paypalEmail: freelancerPayments?.find(
           (p) => p.freelancerId === freelancerId
