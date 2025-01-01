@@ -257,13 +257,18 @@ exports.updateNotification = async (req, res) => {
   try {
     const userId = req.user.userId;
     const userRole = req.user.role;
-    const notificationId = req.params.notificationId;
+   
     const userEmail = req.user.email;
-    let updateQuery;
+    const notificationId = req.params.notificationId;
+    console.log('Notification ID:', notificationId);
+    
+    // Initialize updateQuery with the notificationId
+    let updateQuery = { _id: notificationId };
+
     switch (userRole) {
       case 'admin':
         updateQuery = {
-          _id: notificationId,
+          ...updateQuery,
           $or: [
             { type: 'new_query', admin_email: userEmail },
             { type: 'new_query' }
@@ -300,6 +305,7 @@ exports.updateNotification = async (req, res) => {
     res.status(500).json({ message: 'Error updating notification', error: error.message });
   }
 };
+
 
 // Middleware to check authentication
 exports.checkAuth = (req, res, next) => {

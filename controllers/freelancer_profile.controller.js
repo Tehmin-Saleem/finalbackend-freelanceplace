@@ -131,51 +131,65 @@ exports.getProfileByUserId = async (req, res) => {
   console.log('Starting getProfileByUserId function');
   try {
     const userId = req.user.userId || req.user;
-    // console.log('Fetching profile for user ID:', userId);
     
     const profile = await Freelancer_Profile.findOne({ freelancer_id: userId })
-      .select('-__v -createdAt -updatedAt');
-
-    // console.log('Found profile:', profile);
+      .select('-__v');
 
     if (!profile) {
       console.log('No profile found for user ID:', userId);
       return res.status(404).json({ success: false, message: 'Profile not found' });
     }
 
-    // Constructing the formatcdted profile
+    // Transform the profile data to match the frontend expectations
     const formattedProfile = {
+      _id: profile._id,
       freelancer_id: profile.freelancer_id,
-      name: `${profile.first_name} ${profile.last_name}`.trim() || 'No Name',
-      jobSuccess: calculateJobSuccess(profile),
-      rate: profile.availability?.hourly_rate || 'Not specified',
+      name: `${profile.first_name} ${profile.last_name}`.trim(),
+      jobSuccess: 100, // You might want to calculate this based on actual data
+      rate: profile.availability?.hourly_rate || 0,
+      image: profile.image && profile.image.startsWith('http') 
+        ? profile.image 
+        : profile.image
+          ? `https://res.cloudinary.com/dwqcs228h/image/upload/v1728108804/uploads/${profile.image}`
+          : null,
       skills: profile.skills || [],
-      totalJobs: profile.experience?.completed_projects || 0,
-      totalHours: profile.total_hours || 0,
-      title: profile.title || '',
       experience: {
-        description: profile.profile_overview || 'No description available',
+        completed_projects: profile.experience?.completed_projects || 0,
         title: profile.title || '',
+        description: profile.profile_overview || ''
       },
-      availability: profile.availability || {},
-      languages: profile.languages || [],
       portfolios: profile.portfolios?.map(portfolio => ({
-        ...portfolio.toObject(),
-        attachment: portfolio.attachment.startsWith('http') 
-          ? portfolio.attachment 
-          : `https://res.cloudinary.com/dwqcs228h/raw/upload/v1728108804/uploads/${portfolio.attachment}`
+        project_title: portfolio.project_title || '',
+        category: portfolio.category || '',
+        description: portfolio.description || '',
+        tool_used: portfolio.tool_used || '',
+        url: portfolio.url || '',
+        attachment: portfolio.attachment && portfolio.attachment.startsWith('http')
+          ? portfolio.attachment
+          : portfolio.attachment
+            ? `https://res.cloudinary.com/dwqcs228h/raw/upload/v1728108804/uploads/${portfolio.attachment}`
+            : null
       })) || [],
-    
-      image: profile.image || null
-    }
+      languages: profile.languages || [],
+      availability: {
+        full_time: profile.availability?.full_time || false,
+        part_time: profile.availability?.part_time || false,
+        hourly_rate: profile.availability?.hourly_rate || 0
+      }
+    };
 
-    console.log('profile image:', formattedProfile.image);
     console.log('Formatted profile data:', formattedProfile);
 
-    res.status(200).json({ success: true, data: formattedProfile });
+    res.status(200).json({ 
+      success: true, 
+      data: formattedProfile 
+    });
   } catch (err) {
     console.error('Error in getProfileByUserId:', err);
-    res.status(500).json({ success: false, error: err.message });
+    res.status(500).json({ 
+      success: false, 
+      error: err.message 
+    });
   }
 };
 
