@@ -4,6 +4,7 @@ const mongoose = require("mongoose");
 const jobpost = require("../models/post_job.model");
 const review = require("../models/review.model");
 const NotificationModel = require("../models/notifications.model");
+const Freelancer_Profile = require('../models/freelancer_profile.model')
 exports.createoffer = async (req, res) => {
   console.log('Offer Controller: createoffer hit');
   console.log('Request body:', req.body);
@@ -559,6 +560,205 @@ exports.getOffersByFreelancerId = async (req, res) => {
     res.status(500).json({ 
       message: 'Error fetching offers for freelancer', 
       error: error.message 
+    });
+  }
+};
+
+
+
+// exports.getClientAcceptedOffers = async (req, res) => {
+//   try {
+//     const clientId = req.user.userId; // Get client ID from authenticated user
+//     console.log('Fetching accepted offers for client:', clientId);
+
+//     // Find all accepted offers for the client with populated freelancer data
+//     const acceptedOffers = await Offer_Form.find({
+//       client_id: clientId,
+//       status: 'accepted'
+//     })
+//     .populate({
+//       path: 'freelancer_id',
+//       select: 'first_name last_name email profile_image country_name'
+//     })
+//     .sort({ createdAt: -1 }); // Sort by newest first
+
+//     console.log(`Found ${acceptedOffers.length} accepted offers`);
+
+//     // Get freelancer profiles and reviews for all freelancers
+//     const freelancerIds = acceptedOffers.map(offer => offer.freelancer_id._id);
+    
+//     // Get all reviews for these freelancers
+//     const freelancerReviews = await review.aggregate([
+//       {
+//         $match: {
+//           freelancer_id: { $in: freelancerIds },
+//           status: "Completed"
+//         }
+//       },
+//       {
+//         $group: {
+//           _id: '$freelancer_id',
+//           averageRating: { $avg: '$stars' },
+//           totalReviews: { $sum: 1 }
+//         }
+//       }
+//     ]);
+
+//     // Create a map of freelancer stats
+//     const freelancerStatsMap = freelancerReviews.reduce((acc, stat) => {
+//       acc[stat._id.toString()] = {
+//         averageRating: parseFloat(stat.averageRating.toFixed(1)),
+//         totalReviews: stat.totalReviews
+//       };
+//       return acc;
+//     }, {});
+
+//     // Format the response
+//     const formattedOffers = acceptedOffers.map(offer => {
+//       const freelancerId = offer.freelancer_id._id.toString();
+//       const freelancerStats = freelancerStatsMap[freelancerId] || {
+//         averageRating: 0,
+//         totalReviews: 0
+//       };
+
+//       // Format budget details
+//       let budget;
+//       if (offer.budget_type === 'hourly') {
+//         budget = {
+//           type: 'hourly',
+//           rate: {
+//             from: offer.hourly_rate.from,
+//             to: offer.hourly_rate.to
+//           }
+//         };
+//       } else {
+//         budget = {
+//           type: 'fixed',
+//           amount: offer.fixed_price
+//         };
+//       }
+
+//       return {
+//         offer_id: offer._id,
+//         job_title: offer.job_title,
+//         status: offer.status,
+//         created_at: offer.createdAt,
+//         due_date: offer.due_date,
+//         budget: budget,
+//         description: offer.description,
+//         detailed_description: offer.detailed_description,
+//         preferred_skills: offer.preferred_skills,
+//         estimated_timeline: {
+//           duration: offer.estimated_timeline.duration,
+//           unit: offer.estimated_timeline.unit
+//         },
+//         freelancer: {
+//           id: offer.freelancer_id._id,
+//           name: `${offer.freelancer_id.first_name} ${offer.freelancer_id.last_name}`,
+//           email: offer.freelancer_id.email,
+//           profile_image: offer.freelancer_id.profile_image,
+//           country: offer.freelancer_id.country_name,
+//           stats: {
+//             rating: freelancerStats.averageRating,
+//             total_reviews: freelancerStats.totalReviews
+//           }
+//         },
+//         attachment: offer.attachment ? {
+//           fileName: offer.attachment.fileName,
+//           path: offer.attachment.path,
+//           description: offer.attachment.description
+//         } : null
+//       };
+//     });
+
+//     res.status(200).json({
+//       success: true,
+//       count: formattedOffers.length,
+//       data: formattedOffers
+//     });
+
+//   } catch (error) {
+//     console.error('Error in getClientAcceptedOffers:', error);
+//     res.status(500).json({
+//       success: false,
+//       message: 'Failed to fetch accepted offers',
+//       error: error.message
+//     });
+//   }
+// };
+
+
+
+exports.getClientAcceptedOffers = async (req, res) => {
+  try {
+    const clientId = req.user.userId;
+    console.log('Fetching accepted offers for client:', clientId);
+
+    // Find all accepted offers for the client
+    const acceptedOffers = await Offer_Form.find({
+      client_id: clientId,
+      status: 'accepted'
+    })
+    .populate({
+      path: 'freelancer_id',
+      select: 'first_name last_name email profile_image country_name'
+    })
+    .sort({ createdAt: -1 });
+
+    // Format the offers to match your project structure
+    const formattedOffers = await Promise.all(acceptedOffers.map(async (offer) => {
+      // Get freelancer profile
+      const freelancerProfile = await Freelancer_Profile.findOne({
+        freelancer_id: offer.freelancer_id._id
+      });
+
+      return {
+        projectId: offer._id,
+        projectName: offer.job_title,
+        job_title: offer.job_title,
+        description: offer.description,
+        detailed_description: offer.detailed_description,
+        preferred_skills: offer.preferred_skills,
+        startDate: offer.createdAt,
+        deadline: offer.due_date,
+        budget: {
+          type: offer.budget_type,
+          amount: offer.budget_type === 'fixed' ? offer.fixed_price : null,
+          hourly_rate: offer.budget_type === 'hourly' ? {
+            from: offer.hourly_rate?.from,
+            to: offer.hourly_rate?.to
+          } : null
+        },
+        freelancer: {
+          id: offer.freelancer_id._id,
+          name: `${offer.freelancer_id.first_name} ${offer.freelancer_id.last_name}`,
+          email: offer.freelancer_id.email,
+          image: freelancerProfile?.image || offer.freelancer_id.profile_image,
+          location: {
+            country: offer.freelancer_id.country_name
+          }
+        },
+        project_duration: {
+          duration_of_work: offer.estimated_timeline?.duration + ' ' + offer.estimated_timeline?.unit
+        },
+        status: 'ongoing',
+        type: 'offer',
+        attachment: offer.attachment
+      };
+    }));
+
+    res.status(200).json({
+      success: true,
+      count: formattedOffers.length,
+      data: formattedOffers
+    });
+
+  } catch (error) {
+    console.error('Error in getClientAcceptedOffers:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to fetch accepted offers',
+      error: error.message
     });
   }
 };

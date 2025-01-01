@@ -247,8 +247,12 @@ router.get('/filtered-jobs', authMiddleware, hireFreelancerController.getFiltere
 router.get('/count-job-posts/:clientId',authMiddleware, jobPostController.countJobPostsByClientId);
 
 
+
+
+
 // In your routes file
 router.get('/ongoing-projects', authMiddleware, hireFreelancerController.getClientOngoingProjects);
+router.get('/accepted-offers', authMiddleware, offerController.getClientAcceptedOffers);
 router.post('/send-offer-to-consultant/:consultant_id', authMiddleware, consultantProfileController.sendOfferToConsultant);
 
 router.get('/hired-freelancers-count/:clientId', hireFreelancerController.getHiredFreelancersCountByClientId);
@@ -273,6 +277,9 @@ router.get(
 
 
 router.get('/project-progress/:proposal_id', authMiddleware, manageProject.getProjectProgress);
+
+
+router.get('/offer-progress', authMiddleware, manageProject.getOfferProgress);
 
 
 router.post(
