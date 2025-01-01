@@ -146,14 +146,20 @@ const OfferCards = () => {
     <div className="min-h-screen bg-gray-50">
       <Header />
 
-      <main className="max-w-4xl mx-auto p-6">
+      <main className="main max-w-4xl mx-auto p-6 mt-30">
+      <h1 className="text-2xl font-bold text-sky-400 text-center mt-4">
+        Offers Received
+      </h1>
         {offers.length === 0 ? (
           <div className="text-center py-8 text-gray-600">
             No offers Recieved.
           </div>
         ) : (
+          
           offers.map((offer) => (
+            
             <div key={offer._id} className="mt-8 bg-white shadow-lg rounded-lg">
+             
               {/* Rest of your existing offer card JSX remains the same */}
               <div className="space-y-4 p-6">
                 <div className="text-sm text-gray-500 mb-4">

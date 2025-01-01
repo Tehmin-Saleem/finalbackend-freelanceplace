@@ -1043,7 +1043,7 @@ const ProjectDetails = ({
 
       <div className="tabs">
         <button
-          className={`tab ${activeTab === "overview" ? "active" : ""}`}
+          className={`tab bg-sky-400 ${activeTab === "overview" ? "active" : ""}`}
           onClick={() => setActiveTab("overview")}
         >
           Overview

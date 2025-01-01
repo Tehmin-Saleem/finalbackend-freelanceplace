@@ -215,7 +215,7 @@ const OfferDetails = () => {
     <div className="min-h-screen bg-gray-50">
       <Header />
 
-      <main className="max-w-4xl mx-auto p-6">
+      <main className="max-w-4xl mx-auto p-6 mt-20">
         <div className="mt-8 bg-white shadow-lg rounded-lg">
           <div className="space-y-4 p-6">
             <div className="flex justify-between items-start">

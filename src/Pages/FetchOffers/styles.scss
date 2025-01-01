@@ -32,8 +32,11 @@ $bg-color: #f7f8fa;
   padding: 4rem 2rem;
   background-color: $bg-color;
   min-height: 100vh;
+  margin-top: 6rem;
 }
-
+.main{
+  margin-top: 4rem;
+}
 .offer-card {
   background-color: $color-white;
   border-radius: 16px;

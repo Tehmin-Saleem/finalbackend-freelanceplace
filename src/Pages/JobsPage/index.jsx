@@ -12,7 +12,31 @@ const JobsPage = () => {
   const [error, setError] = useState("");
   const [userMap, setUserMap] = useState({});
   const navigate = useNavigate();
-
+  const [currentPage, setCurrentPage] = useState(1);
+  const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [goToPage, setGoToPage] = useState("");
+  const formatTimeDifference = (createdAt) => {
+    if (!createdAt || isNaN(new Date(createdAt).getTime())) {
+      return "Invalid time"; // Fallback for missing or invalid date
+    }
+  
+    const createdDate = new Date(createdAt);
+    const now = new Date();
+    const diffInMs = now - createdDate;
+    const diffInMinutes = Math.floor(diffInMs / (1000 * 60));
+    const diffInHours = Math.floor(diffInMinutes / 60);
+    const diffInDays = Math.floor(diffInHours / 24);
+  
+    if (diffInMinutes < 1) return "Just now";
+    if (diffInMinutes < 60) return `${diffInMinutes} minutes ago`;
+    if (diffInHours === 1) return "1 hour ago";
+    if (diffInHours < 24) return `${diffInHours} hours ago`;
+    if (diffInDays === 1) return "Yesterday";
+    return `${diffInDays} days ago`;
+  };
+  
+  
+  
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -40,7 +64,9 @@ const JobsPage = () => {
               headers,
             }),
           ]);
-
+console.log('payment',paymentMethodsResponse.data)
+console.log('users',userResponse.data)
+console.log('jobs',jobsResponse.data)
         // Check if paymentMethodsResponse.data.paymentMethods is an array
         const paymentMethodsArray = Array.isArray(
           paymentMethodsResponse.data.paymentMethods
@@ -61,32 +87,24 @@ const JobsPage = () => {
           }
           return acc;
         }, {});
-
+console.log('paymentmap', paymentMethodMap)
         setPaymentMethods(paymentMethodMap);
 
         // Combine job data with payment method status and country name
-        const jobsWithPaymentStatus = jobsResponse.data.jobPosts
-        .filter(job => job.jobstatus !== "completed") // Filter out completed jobs
-        .map((job) => {
-          const clientId =
-            job.client_id && job.client_id._id
-              ? job.client_id._id.toString()
-              : null;
+        const jobsWithPaymentStatus = jobsResponse.data.jobPosts.map((job) => {
+          const clientId = job.client_id?._id;
           return {
             ...job,
-            paymentMethodStatus:
-              clientId && paymentMethodMap[clientId]
-                ? "Payment Verified"
-                : "No Payment Method Available",
+            paymentMethodStatus: paymentMethodMap[clientId] ? "Payment Verified" : "No Payment Method Available",
             country: clientId
-              ? userCountryMap[clientId] || "Unknown"
-              : "Unknown",
-          };
-        });
-        console.log("Jobs with payment status:", jobsWithPaymentStatus);
+            ? userCountryMap[clientId] || "Unknown"
+            : "Unknown",
+        };
+      });
+
         setJobs(jobsWithPaymentStatus);
       } catch (error) {
-        console.error("Detailed error:", error);
+        console.error("Error fetching data:", error);
         setError("Error fetching data: " + error.message);
       } finally {
         setLoading(false);
@@ -106,7 +124,67 @@ const JobsPage = () => {
       return "Rate not specified";
     }
   };
+  const indexOfLastJob = currentPage * rowsPerPage;
+  const indexOfFirstJob = indexOfLastJob - rowsPerPage;
+  const currentJobs = jobs.slice(indexOfFirstJob, indexOfLastJob);
+  const totalPages = Math.ceil(jobs.length / rowsPerPage);
 
+  // Pagination handlers
+  const handleRowsPerPageChange = (event) => {
+    const newRowsPerPage = parseInt(event.target.value);
+    setRowsPerPage(newRowsPerPage);
+    setCurrentPage(1); // Reset to first page when changing rows per page
+  };
+
+  const handlePageClick = (page) => {
+    if (page >= 1 && page <= totalPages) {
+      setCurrentPage(page);
+    }
+  };
+
+  const handleGoToPage = (event) => {
+    event.preventDefault();
+    const pageNumber = parseInt(goToPage);
+    if (pageNumber >= 1 && pageNumber <= totalPages) {
+      setCurrentPage(pageNumber);
+      setGoToPage("");
+    }
+  };
+
+  // Generate page numbers for pagination
+  const getPageNumbers = () => {
+    const pages = [];
+    const maxVisiblePages = 7;
+
+    if (totalPages <= maxVisiblePages) {
+      for (let i = 1; i <= totalPages; i++) {
+        pages.push(i);
+      }
+    } else {
+      pages.push(1);
+      
+      if (currentPage > 3) {
+        pages.push("ellipsis1");
+      }
+      
+      const start = Math.max(2, currentPage - 1);
+      const end = Math.min(currentPage + 1, totalPages - 1);
+      
+      for (let i = start; i <= end; i++) {
+        pages.push(i);
+      }
+      
+      if (currentPage < totalPages - 2) {
+        pages.push("ellipsis2");
+      }
+      
+      if (totalPages > 1) {
+        pages.push(totalPages);
+      }
+    }
+
+    return pages;
+  };
   if (loading) return <Spinner size={100} alignCenter />;
   if (error) return <div>{error}</div>;
 
@@ -115,7 +193,7 @@ const JobsPage = () => {
       <Header />
       <h1 className="jobs-heading">All Jobs</h1>
       <div className="jobs-container">
-        {jobs.map((job) => (
+        {currentJobs.map((job) => (
           <JobsCard
             key={job._id}
             jobPostId={job._id}
@@ -126,6 +204,7 @@ const JobsPage = () => {
             level={job.project_duration?.experience_level || "Not specified"}
             description={job.description || "No description provided"}
             tags={job.preferred_skills || []}
+            proposalCount={job.proposalCount}
             paymentMethodStatus={job.paymentMethodStatus}
             location={job.country}
             // Add these new props
@@ -134,29 +213,48 @@ const JobsPage = () => {
                 ? `${job.client_id.first_name} ${job.client_id.last_name}`
                 : "Unknown"
             }
+            createdAt={job.createdAt ? formatTimeDifference(job.createdAt) : "Date not available"}
+
+
             clientLocation={job.client_id?.country_name || "Unknown"}
           />
         ))}
       </div>
       <div className="pagination">
         <span>Rows per page</span>
-        <select>
-          <option>5</option>
-          <option>10</option>
-          <option>15</option>
+        <select value={rowsPerPage} onChange={handleRowsPerPageChange}>
+          <option value={5}>5</option>
+          <option value={10}>10</option>
+          <option value={15}>15</option>
         </select>
         <div className="page-controls">
-          <span>1</span>
-          <span>2</span>
-          <span>3</span>
-          <span>...</span>
-          <span>10</span>
-          <span>11</span>
-          <span>12</span>
+          {getPageNumbers().map((page, index) => (
+            page === "ellipsis1" || page === "ellipsis2" ? (
+              <span key={page}>...</span>
+            ) : (
+              <span
+                key={page}
+                onClick={() => handlePageClick(page)}
+                style={{
+                  cursor: 'pointer',
+                  fontWeight: currentPage === page ? 'bold' : 'normal',
+                  margin: '0 5px',
+                  padding: '0 5px'
+                }}
+              >
+                {page}
+              </span>
+            )
+          ))}
         </div>
         <span>Go to page</span>
-        <input type="text" />
-        <button>→</button>
+        <input
+          type="text"
+          value={goToPage}
+          onChange={(e) => setGoToPage(e.target.value)}
+          onKeyPress={(e) => e.key === 'Enter' && handleGoToPage(e)}
+        />
+        <button onClick={handleGoToPage}>→</button>
       </div>
     </div>
   );

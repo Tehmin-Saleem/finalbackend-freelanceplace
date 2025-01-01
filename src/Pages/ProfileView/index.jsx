@@ -27,39 +27,65 @@ function ProfileView() {
 
   const [reviews, setReviews] = useState(null);
 
-  const fetchFreelancerReviews = async () => {
-    try {
-      const token = localStorage.getItem("token");
-      if (!token) {
-        throw new Error("No token found");
-      }
-
-      const decodedToken = jwtDecode(token);
-      const freelancerId = decodedToken.userId;
-
-      console.log("Token:", token);
-
-      console.log("freelancerid", freelancerId);
-      setLoading(true);
-      const response = await axios.get(
-        `http://localhost:5000/api/freelancer/${freelancerId}/reviews`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
-      console.log("response review", response.data.data);
-      setReviews(response.data.data);
-
-      setError(null);
-    } catch (err) {
-      setError(err.response?.data?.message || "Failed to fetch reviews");
-    } finally {
-      setLoading(false);
+ // Inside the fetchFreelancerReviews function
+ const fetchFreelancerReviews = async () => {
+  try {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      throw new Error("No token found");
     }
-  };
+
+    const decodedToken = jwtDecode(token);
+    const freelancerId = decodedToken.userId;
+
+    console.log("Token:", token);
+    console.log("freelancerId", freelancerId);
+
+    setLoading(true);
+    const response = await axios.get(
+      `http://localhost:5000/api/freelancer/${freelancerId}/reviews`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    console.log("response review", response.data.data);
+
+    const reviewsData = response.data.data || {}; 
+    setReviews(reviewsData); 
+    // If reviews data is available, calculate job success percentage
+    if (reviewsData.reviews && Array.isArray(reviewsData.reviews) && reviewsData.reviews.length > 0) {
+      const totalReviews = reviewsData.reviews.length;
+      const totalRating = reviewsData.reviews.reduce((sum, review) => sum + review.rating, 0);
+      const jobSuccessPercentage = ((totalRating / (totalReviews * 5)) * 100).toFixed(2); // Assuming max rating is 5
+
+      // Set the job success percentage in the profile data
+      setProfileData((prevProfileData) => ({
+        ...prevProfileData,
+        jobSuccess: jobSuccessPercentage,
+      }));
+    } else {
+      // If there are no reviews, set job success to 0 or a default value
+      setProfileData((prevProfileData) => ({
+        ...prevProfileData,
+        jobSuccess: '0.00',  // Default value for job success
+      }));
+    }
+
+    setError(null); // Reset error state if reviews were successfully fetched
+
+  } catch (err) {
+    console.error(err); // Logging the error for debugging
+    setError(err.response?.data?.message || err.message || "Failed to fetch reviews");
+  } finally {
+    setLoading(false);
+  }
+};
+
+
 
   useEffect(() => {
     fetchFreelancerReviews();
@@ -96,7 +122,7 @@ function ProfileView() {
         setCountry(userInfo ? userInfo.country_name : "Not specified");
 
         setLoading(false);
-        // console.log('profile:', profileData.image)
+         console.log('profile:', response.data.data)
       } catch (err) {
         console.error("Error fetching profile data:", err);
         setError(err.message || "Failed to fetch profile data");
@@ -112,42 +138,6 @@ function ProfileView() {
   if (error) return <div>{error}</div>;
   if (!profileData) return <div>No profile data found</div>;
 
-  //   console.log('Profile data:', profileData);
-
-  // console.log('Profile image path:', `http://localhost:5000${profileData.image}`);
-  // console.log('Profile data:', profileData.image);
-  // console.log('Portfolio path:', `http://localhost:5000/api/freelancer/profile/portfolios/${profileData.attachment}`);
-
-  // const userReviews = [
-  //   {
-  //     id: 1,
-  //     name: "Usman Shahid",
-  //     location: "Australia",
-  //     description:
-  //       "Lorem ipsum dolor sit amet consectetur. Dictum blandit turpis hac elit nunc vitae quis adipiscing. Eu pellentesque a curabitur facilisi velit est vestibulum laoreet diam.",
-  //     rating: 3,
-  //     locationIcon: <Australia />,
-  //   },
-  //   {
-  //     id: 2,
-  //     name: "Aqib Ali",
-  //     location: "United States",
-  //     description:
-  //       "Lorem ipsum dolor sit amet consectetur. Dictum blandit turpis hac elit nunc vitae quis adipiscing. Eu pellentesque a curabitur facilisi velit est vestibulum laoreet diam.",
-  //     rating: 5,
-  //     locationIcon: <UStates />,
-  //   },
-  //   {
-  //     id: 3,
-  //     name: "Shehroz Mubarik",
-  //     location: "Saudi Arabia",
-  //     description:
-  //       "Lorem ipsum dolor sit amet consectetur. Dictum blandit turpis hac elit nunc vitae quis adipiscing. Eu pellentesque a curabitur facilisi velit est vestibulum laoreet diam.",
-  //     rating: 4,
-  //     locationIcon: <SArabia />,
-  //   },
-  //   // Add more user reviews as needed
-  // ];
   return (
     <div>
       <Header />
@@ -175,7 +165,7 @@ function ProfileView() {
                   <div className="flex items-center">
                     <JobSucces className="h-3 w-3" />
                     <div className="text-[#2C3E50] text-[14px] font-Poppins ml-4 w-32">
-                      {profileData.jobSuccess}% Job Success
+                    {profileData.jobSuccess}% Job Success
                     </div>
                   </div>
                   <div className="flex items-center">
@@ -187,7 +177,7 @@ function ProfileView() {
                 </div>
               </div>
 
-              <div className="flex items-center justify-between buttons ml-[50%] pr-5">
+              <div className="flex items-center justify-between buttons ml-[40%] pr-5">
                 <CommonButton
                   onClick={handleClick}
                   text={<Chat />}
@@ -217,44 +207,60 @@ function ProfileView() {
                 Skills:
               </h2>
               <div className="flex flex-wrap mb-6">
-                {profileData.skills.map((skill, index) => (
-                  <div
-                    key={index}
-                    className="border border-[#94A3B8] rounded-2xl p-2 mr-2 mb-2 text-[14px] text-[#94A3B8] font-Poppins"
-                  >
-                    {skill}
-                  </div>
-                ))}
+              {profileData.skills && Array.isArray(profileData.skills) && profileData.skills.length > 0 ? (
+  profileData.skills.map((skill, index) => (
+    <div
+      key={index}
+      className="border border-[#94A3B8] rounded-2xl p-2 mr-2 mb-2 text-[14px] text-[#94A3B8] font-Poppins"
+    >
+      {skill}
+    </div>
+  ))
+) : (
+  <p>No skills available</p>
+)}
+
               </div>
 
               <div>
                 <h2 className="text-[#2C3E50] text-[20px] font-Poppins font-medium mb-6">
-                  Experience:
+                  Completed Jobs:
                 </h2>
                 <div className="mb-2 flex flex-row  text-center">
                   <div className="mr-6 flex flex-col">
                     <span className="text-[24px] text-[#2C3E50] font-Poppins">
-                      {profileData.totalJobs}
+                      {profileData.experience.completed_projects}
                     </span>
                     <span className="font-Poppins text-[#94A3B8] text-[16px]">
-                      years
+                      projects
                     </span>
                   </div>
-                  <div className="flex flex-col">
-                    {/* <span className="text-[24px] text-[#2C3E50] font-Poppins">
-                      {profileData.totalHours}
-                    </span> */}
-                    {/* <span className="font-Poppins text-[#94A3B8] text-[16px]">
-                      Total Hours
-                    </span> */}
-                  </div>
+                 
+
+
                 </div>
               </div>
+              <div className="flex flex-col">
+              <h2 className="text-[#2C3E50] text-[20px] font-Poppins font-medium mb-6">
+                  Languages:
+                </h2>
+  <ul className="list-disc pl-6">
+    {profileData.languages && Array.isArray(profileData.languages) && profileData.languages.length > 0 ? (
+      profileData.languages.map((lang, index) => (
+        <li key={index} className="text-[16px] text-[#2C3E50] font-Poppins">
+          {lang.language} - {lang.proficiency_level}
+        </li>
+      ))
+    ) : (
+      <li className="text-[16px] text-[#94A3B8] font-Poppins">No languages available</li>
+    )}
+  </ul>
+</div>
             </div>
 
             <div className="RightSide Outer">
               <div className="top">
-                <h2 className="ProfileTitle">{profileData.experience.title}</h2>
+              <h2 className="ProfileTitle">{profileData.experience.title}</h2>
                 <div>
                   <p className="Profiledescription">
                     {profileData.experience.description}
@@ -298,6 +304,24 @@ function ProfileView() {
               </div>
               <div className="review">
                 <h2 className="reviewtitle">Reviews</h2>
+                <div className="review-summary mb-6 bg-white rounded-lg p-6 shadow-sm">
+                          <div className="flex items-center justify-between">
+                            <div className="flex flex-col">
+                              <div className="flex items-center gap-2 mb-2">
+                                <h2 className="reviewtitle">Average Ratings</h2>
+                                <span className="text-3xl font-bold text-[#2C3E50]">
+                                  {reviews.average_rating.toFixed(1)}
+                                </span>
+                              </div>
+                              <span className="text-gray-600 text-sm">
+                                {reviews.total_reviews}{" "}
+                                {reviews.total_reviews === 1
+                                  ? "review"
+                                  : "reviews"}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
                 {loading ? (
                   <div className="text-center py-4">Loading reviews...</div>
                 ) : error ? (
@@ -334,24 +358,7 @@ function ProfileView() {
                          />
                         ))}
 
-                        <div className="review-summary mb-6 bg-white rounded-lg p-6 shadow-sm">
-                          <div className="flex items-center justify-between">
-                            <div className="flex flex-col">
-                              <div className="flex items-center gap-2 mb-2">
-                                <h2 className="reviewtitle">Average Ratings</h2>
-                                <span className="text-3xl font-bold text-[#2C3E50]">
-                                  {reviews.average_rating.toFixed(1)}
-                                </span>
-                              </div>
-                              <span className="text-gray-600 text-sm">
-                                {reviews.total_reviews}{" "}
-                                {reviews.total_reviews === 1
-                                  ? "review"
-                                  : "reviews"}
-                              </span>
-                            </div>
-                          </div>
-                        </div>
+                      
                       </>
                     ) : (
                       <div className="text-center py-4 text-gray-500 bg-gray-50 rounded-lg">

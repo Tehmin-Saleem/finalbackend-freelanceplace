@@ -861,14 +861,14 @@ margin-top: 5rem;
             .job-Title {
               font-size: 24px;
               font-weight: 600;
-              color: #1a1a1a;
+              color: #ffffff;
               margin-bottom: 8px;
               line-height: 1.3;
             }
       
             .job-Location {
               font-size: 14px;
-              color: #666;
+              color: #ffffff;
               display: flex;
               align-items: center;
               gap: 6px;
@@ -886,14 +886,14 @@ margin-top: 5rem;
       
             .job-posted-Time {
               font-size: 14px;
-              color: #666;
+              color: #ffffff;
               
               .posted-text {
-                color: #888;
+                color: #ffffff;
               }
               
               .time-text {
-                color: #444;
+                color: #ffffff;
                 font-weight: 500;
               }
             }
@@ -902,7 +902,7 @@ margin-top: 5rem;
           .divider {
             border: none;
             height: 1px;
-            background: #e0e0e0;
+            background: #ffffff;
             margin: 20px 0;
           }
       
@@ -922,13 +922,13 @@ margin-top: 5rem;
       
               .labeltext {
                 font-size: 13px;
-                color: #666;
+                color: #ffffff;
                 font-weight: 500;
               }
       
               .value {
                 font-size: 15px;
-                color: #2c3e50;
+                color: #ffffff;
                 font-weight: 600;
               }
             }
@@ -937,16 +937,16 @@ margin-top: 5rem;
           .section-title {
             font-size: 18px;
             font-weight: 600;
-            color: #2c3e50;
+            color: #ffffff;
             margin: 24px 0 16px;
             padding-bottom: 8px;
-            border-bottom: 2px solid #eef2f7;
+            border-bottom: 2px solid #ffffff;
           }
       
           .job-description {
             font-size: 15px;
             line-height: 1.6;
-            color: #4a5568;
+            color: #ffffff;
             margin-bottom: 24px;
             white-space: pre-line;
           }
@@ -974,7 +974,7 @@ margin-top: 5rem;
       
                 .file-name {
                   font-size: 14px;
-                  color: #2c3e50;
+                  color: #ffffff;
                   font-weight: 500;
                 }
               }
@@ -1013,7 +1013,7 @@ margin-top: 5rem;
       
             .skill {
               padding: 6px 12px;
-              background: #e8f7ff;
+              background: #ffffff;
               color: #0086c9;
               border-radius: 20px;
               font-size: 13px;
@@ -1035,13 +1035,13 @@ margin-top: 5rem;
           &-image {
             max-width: 100%;
             border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 2px 8px rgba(255, 255, 255, 0.1);
           }
       
           &-pdf {
             width: 100%;
             height: 500px;
-            border: 1px solid #e0e0e0;
+            border: 1px solid #ffffff;
             border-radius: 8px;
           }
         }
@@ -1070,7 +1070,7 @@ margin-top: 5rem;
       // Dark Mode Support (optional)
       @media (prefers-color-scheme: dark) {
         .overview {
-          background: #1a1a1a;
+          background: #19a4bd;
       
           .job-Card {
             .header-job {
@@ -1080,35 +1080,35 @@ margin-top: 5rem;
       
               .job-Location,
               .job-posted-Time {
-                color: #a0a0a0;
+                color: #ffffff;
               }
             }
       
             .divider {
-              background: #333;
+              background: #ffffff;
             }
       
             .job-infor {
-              background: #2d2d2d;
+              background: #ffffff;
       
               .job-info-item {
                 .labeltext {
-                  color: #a0a0a0;
+                  color: #000000;
                 }
       
                 .value {
-                  color: #ffffff;
+                  color: #000000;
                 }
               }
             }
       
             .section-title {
               color: #ffffff;
-              border-bottom-color: #333;
+              border-bottom-color: #ffffff;
             }
       
             .job-description {
-              color: #d0d0d0;
+              color: #ffffff;
             }
       
             .attachments {
@@ -1124,11 +1124,12 @@ margin-top: 5rem;
       
             .skills {
               .skill {
-                background: #2d2d2d;
-                color: #4BCBEB;
+                background: #ffffff;
+                color: #0682a1;
       
                 &:hover {
-                  background: #333;
+                  background: #088ca3;
+                  color: white;
                 }
               }
             }

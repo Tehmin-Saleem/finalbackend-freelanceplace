@@ -89,13 +89,14 @@ export const NotificationProvider = ({ children }) => {
             await axios.put(`http://localhost:5000/api/freelancer/notifications/${notificationId}/read`, {}, {
                 headers: { Authorization: `Bearer ${token}` }
             });
-        
+           
             setNotifications(prevNotifications =>
                 prevNotifications.map(notif =>
                 notif._id === notificationId ? { ...notif, is_read: true } : notif
                 )
             );
-        
+            console.log("Notification ID being sent:", notificationId);
+
             setUnreadCount(prevCount => Math.max(0, prevCount - 1));
         } catch (error) {
             console.error('Error marking notification as read:', error);
