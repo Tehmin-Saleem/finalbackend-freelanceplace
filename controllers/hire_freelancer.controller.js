@@ -1216,7 +1216,9 @@ exports.getFreelancerReviews = async (req, res) => {
     }
 
     // Get all client IDs from reviews
-    const clientIds = reviews.map((review) => review.client_id._id);
+    const clientIds = reviews
+    .filter(review => review.client_id) // Filter out null client_ids
+    .map((review) => review.client_id._id);
 
     // Fetch client profiles for all clients in one query
     const clientProfiles = await Client_Profile.find({
@@ -1230,7 +1232,9 @@ exports.getFreelancerReviews = async (req, res) => {
     }, {});
 
     // Format the response with client profile information
-    const formattedReviews = reviews.map((review) => {
+    const formattedReviews = reviews
+    .filter(review => review.client_id && review.freelancer_id && review.job_id) // Filter out reviews with null references
+    .map((review) => {
       const clientProfile =
         clientProfileMap[review.client_id._id.toString()] || {};
 
@@ -1238,9 +1242,9 @@ exports.getFreelancerReviews = async (req, res) => {
         review_id: review._id,
         client: {
           id: review.client_id._id,
-          first_name: clientProfile.first_name || review.client_id.first_name,
-          last_name: clientProfile.last_name || review.client_id.last_name,
-          email: clientProfile.email || review.client_id.email,
+          first_name: clientProfile.first_name || review.client_id.first_name || 'Unknown',
+          last_name: clientProfile.last_name || review.client_id.last_name || 'User',
+          email: clientProfile.email || review.client_id.email || '',
           profile_picture: clientProfile.image || null,
           about: clientProfile.about || null,
           country: clientProfile.country || null,
@@ -1248,33 +1252,35 @@ exports.getFreelancerReviews = async (req, res) => {
         },
         freelancer: {
           id: review.freelancer_id._id,
-          first_name: review.freelancer_id.first_name,
-          last_name: review.freelancer_id.last_name,
-          email: review.freelancer_id.email,
+          first_name: review.freelancer_id.first_name|| 'Unknown',
+          last_name: review.freelancer_id.last_name || 'Freelancer',
+          email: review.freelancer_id.email || '',
         },
         job: {
           id: review.job_id._id,
-          title: review.job_id.title,
-          description: review.job_id.description,
-          budget: review.job_id.budget,
-          status: review.job_id.status,
-          completion_date: review.job_id.completion_date,
+          title: review.job_id.title || 'Untitled Job',
+          description: review.job_id.description|| '',
+          budget: review.job_id.budget || 0,
+          status: review.job_id.status || 'unknown',
+          completion_date: review.job_id.completion_date || null,
         },
-        rating: review.stars,
-        review_message: review.message,
-        status: review.status,
+        rating: review.stars || 0,
+        review_message: review.message || '',
+        status: review.status || 'pending',
         posted_date: review.createdAt,
       };
     });
 
     // Calculate average rating
+    const validReviews = formattedReviews.filter(review => review.rating > 0);
     const averageRating =
-      reviews.reduce((acc, review) => acc + review.stars, 0) / reviews.length;
-
+    validReviews.length > 0
+    ? validReviews.reduce((acc, review) => acc + review.rating, 0) / validReviews.length
+    : 0;
     res.status(200).json({
       success: true,
       data: {
-        total_reviews: reviews.length,
+        total_reviews: formattedReviews.length,
         average_rating: parseFloat(averageRating.toFixed(1)),
         reviews: formattedReviews,
       },
