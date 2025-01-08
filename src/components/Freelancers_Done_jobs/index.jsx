@@ -86,51 +86,51 @@ const JobsCard = ({
 
   const [error, setError] = useState(null);
 
-
   // In your JobsCard component, modify the fetchProgress function:
 
-const fetchProgress = async () => {
-  try {
-    setLoadingProgress(true);
-    const token = localStorage.getItem("token");
-    if (!token) throw new Error("No authentication token found");
+  const fetchProgress = async () => {
+    try {
+      setLoadingProgress(true);
+      const token = localStorage.getItem("token");
+      if (!token) throw new Error("No authentication token found");
 
-    let url;
-    if (source === "offer") {
-      // For offers, use projectName
-      url = `http://localhost:5000/api/client/project-progress/null?client_id=${client_id}&projectName=${encodeURIComponent(title)}`;
-    } else {
-      // For normal jobs
-      url = `http://localhost:5000/api/client/project-progress/${proposal_id}?client_id=${client_id}`;
+      let url;
+      if (source === "offer") {
+        // For offers, use projectName
+        url = `http://localhost:5000/api/client/project-progress/null?client_id=${client_id}&projectName=${encodeURIComponent(title)}`;
+      } else {
+        // For normal jobs
+        url = `http://localhost:5000/api/client/project-progress/${proposal_id}?client_id=${client_id}`;
+      }
+
+      const response = await axios.get(url, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      // console.log("fetch progress response", response.data);
+
+      if (response.data.success) {
+        setProgressData(response.data);
+      }
+    } catch (error) {
+      console.error("Error fetching project progress:", error);
+    } finally {
+      setLoadingProgress(false);
     }
+  };
 
-    const response = await axios.get(url, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-    });
-
-    // console.log("fetch progress response", response.data);
-
-    if (response.data.success) {
-      setProgressData(response.data);
+  // Modify the useEffect dependency array to include necessary variables
+  useEffect(() => {
+    if (
+      (client_id && proposal_id) ||
+      (client_id && source === "offer" && title)
+    ) {
+      fetchProgress();
     }
-  } catch (error) {
-    console.error("Error fetching project progress:", error);
-  } finally {
-    setLoadingProgress(false);
-  }
-};
-
-// Modify the useEffect dependency array to include necessary variables
-useEffect(() => {
-  if ((client_id && proposal_id) || (client_id && source === "offer" && title)) {
-    fetchProgress();
-  }
-}, [client_id, proposal_id, source, title]);
-
-
+  }, [client_id, proposal_id, source, title]);
 
   const handleAttachmentClick = (path) => {
     if (path) {
@@ -157,13 +157,12 @@ useEffect(() => {
         }
 
         // Add debug logging
-        console.log("Fetching review for job:", job_id);
-        // console.log("Using token:", token.substring(0, 20) + "..."); // Show first 20 chars of token
+        // console.log("Fetching review for job:", job_id);
 
-        // console.log("Fetching review for job:", job_id); // Debug log
+
 
         const response = await axios.get(
-          `http://localhost:5000/api/freelancer/job-review/${job_id}?source=${source === 'offer' ? 'offer' : 'normal'}`,
+          `http://localhost:5000/api/freelancer/job-review/${job_id}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -172,7 +171,7 @@ useEffect(() => {
           }
         );
 
-        console.log("Review data successfully fetched:", response.data.data);
+        // console.log("Review data successfully fetched:", response.data.data);
         // console.log("Review response:", response.data.data); // Debug log
 
         if (response.data.success) {

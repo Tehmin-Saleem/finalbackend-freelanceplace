@@ -1,8 +1,4 @@
 
-
-
-
-
 // styles.scss
 
 // Variables
@@ -861,14 +857,14 @@ margin-top: 5rem;
             .job-Title {
               font-size: 24px;
               font-weight: 600;
-              color: #ffffff;
+              color: #4BCBEB;
               margin-bottom: 8px;
               line-height: 1.3;
             }
       
             .job-Location {
               font-size: 14px;
-              color: #ffffff;
+              color: #7F8C8D;
               display: flex;
               align-items: center;
               gap: 6px;
@@ -886,14 +882,15 @@ margin-top: 5rem;
       
             .job-posted-Time {
               font-size: 14px;
-              color: #ffffff;
+              color: #4BCBEB;
               
               .posted-text {
-                color: #ffffff;
+                color: #7F8C8D;
               }
+
               
               .time-text {
-                color: #ffffff;
+                color: #7F8C8D;
                 font-weight: 500;
               }
             }
@@ -902,7 +899,7 @@ margin-top: 5rem;
           .divider {
             border: none;
             height: 1px;
-            background: #ffffff;
+            background: #4BCBEB;
             margin: 20px 0;
           }
       
@@ -911,7 +908,7 @@ margin-top: 5rem;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 20px;
             padding: 16px;
-            background: #f8f9fa;
+            background: #4BCBEB;
             border-radius: 8px;
             margin-bottom: 24px;
       
@@ -937,16 +934,16 @@ margin-top: 5rem;
           .section-title {
             font-size: 18px;
             font-weight: 600;
-            color: #ffffff;
+            color: #4BCBEB;
             margin: 24px 0 16px;
             padding-bottom: 8px;
-            border-bottom: 2px solid #ffffff;
+            border-bottom: 2px solid #4BCBEB;
           }
       
           .job-description {
             font-size: 15px;
             line-height: 1.6;
-            color: #ffffff;
+            color: #7F8C8D;
             margin-bottom: 24px;
             white-space: pre-line;
           }
@@ -959,7 +956,7 @@ margin-top: 5rem;
               align-items: center;
               justify-content: space-between;
               padding: 12px;
-              background: #f8f9fa;
+              background: #4BCBEB;
               border-radius: 8px;
               border: 1px solid #e0e0e0;
       
@@ -974,7 +971,7 @@ margin-top: 5rem;
       
                 .file-name {
                   font-size: 14px;
-                  color: #ffffff;
+                  color: #4BCBEB;
                   font-weight: 500;
                 }
               }
@@ -1013,8 +1010,8 @@ margin-top: 5rem;
       
             .skill {
               padding: 6px 12px;
-              background: #ffffff;
-              color: #0086c9;
+              background: #4BCBEB;
+              color: #FFFFFF;
               border-radius: 20px;
               font-size: 13px;
               font-weight: 500;
@@ -1041,7 +1038,7 @@ margin-top: 5rem;
           &-pdf {
             width: 100%;
             height: 500px;
-            border: 1px solid #ffffff;
+            border: 1px solid #4BCBEB;
             border-radius: 8px;
           }
         }
