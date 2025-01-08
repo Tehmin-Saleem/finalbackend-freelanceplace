@@ -156,13 +156,20 @@ const JobsCard = ({
           throw new Error("No token found");
         }
 
-        // Add debug logging
-        // console.log("Fetching review for job:", job_id);
+        // For offers, use the offer ID but include source=offer
 
+        // Determine which ID to use based on source
+        const reviewId = source === "offer" ? job_id : _id;
 
+        console.log("Fetching review with:", {
+          source,
+          reviewId,
+          job_id,
+          _id,
+        });
 
         const response = await axios.get(
-          `http://localhost:5000/api/freelancer/job-review/${job_id}`,
+          `http://localhost:5000/api/freelancer/job-review/${reviewId}${source === 'offer' ? '?source=offer' : ''}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -171,7 +178,7 @@ const JobsCard = ({
           }
         );
 
-        // console.log("Review data successfully fetched:", response.data.data);
+        console.log("Review data successfully fetched:", response.data.data);
         // console.log("Review response:", response.data.data); // Debug log
 
         if (response.data.success) {
@@ -180,28 +187,15 @@ const JobsCard = ({
           setMessage(response.data.data.review_message);
         }
       } catch (err) {
-        // More detailed error handling
-        if (err.response) {
-          // Server responded with error
-          if (err.response.status === 404) {
-            console.log("No review found for this job");
-            // You might want to set some state to show "No review yet" message
-            setReview(null);
-          } else if (err.response.status === 401) {
-            console.log("Authentication error");
-            navigate("/signin"); // Redirect on auth error
-          } else {
-            console.error("Server error:", err.response.data);
-            setError("Failed to fetch review: " + err.response.data.message);
-          }
-        } else if (err.request) {
-          // Request made but no response
-          console.error("No response received:", err.request);
-          setError("Network error - no response from server");
+        // Don't set error for 404 (no review yet) case
+        if (err.response && err.response.status === 404) {
+          setReview(null);
+          setRatings(null);
+          setMessage(null);
         } else {
-          // Error in request setup
-          console.error("Error setting up request:", err.message);
-          setError("Error setting up request: " + err.message);
+          console.error("Error fetching review:", err);
+          // Only set error for non-404 errors if you want to show them
+          setError("Failed to load review");
         }
       } finally {
         setLoading(false);
@@ -209,10 +203,13 @@ const JobsCard = ({
     };
 
     fetchReview();
-  }, [job_id]); // Include status and jobStatus in dependencies
+  }, [_id, job_id, source]); // Include status and jobStatus in dependencies
 
   // Function to check if job is completed
   const isJobCompleted = () => {
+    if (source === 'offer') {
+      return status === "completed";
+    }
     return status === "completed" || jobStatus === "completed";
   };
 
@@ -597,11 +594,23 @@ const JobsCard = ({
             <div className="job-card__review-container">
               <div className="job-card__review-header">
                 <h4>Client Review</h4>
-                <StarRating rating={ratings} showRatingValue={true} />
+                {ratings ? (
+                  <StarRating rating={ratings} showRatingValue={true} />
+                ) : (
+                  <span className="pending-review">Pending</span>
+                )}
               </div>
-              {message && (
+              {message ? (
                 <div className="job-card__review-content">
                   <p className="job-card__review-message">"{message}"</p>
+                </div>
+              ) : (
+                <div className="job-card__review-pending">
+                  <i className="fas fa-hourglass-half"></i>
+                  <p>Awaiting client review</p>
+                  <span>
+                    The client hasn't provided a review for this job yet.
+                  </span>
                 </div>
               )}
             </div>

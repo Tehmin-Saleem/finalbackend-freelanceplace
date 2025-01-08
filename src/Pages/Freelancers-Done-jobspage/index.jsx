@@ -55,7 +55,7 @@ const FreelancersJobsPage = () => {
 
       // Process hired jobs
       console.log("offers", offersResponse.data);
-      console.log("hire response", hireResponse.data.data);
+      // console.log("hire response", hireResponse.data.data);
 
       // Map offers with detailed logging
 
@@ -98,7 +98,7 @@ const FreelancersJobsPage = () => {
         }
       );
 
-      console.log("job response", jobsResponse.data);
+      // console.log("job response", jobsResponse.data);
 
       // Process hired jobs
       const hiredJobs = (jobsResponse.data?.jobPosts || [])
@@ -141,7 +141,7 @@ const FreelancersJobsPage = () => {
       const acceptedOffers = (offersResponse.data?.offers || []).map(
         (offer) => ({
           // No need to filter by freelancer_id as backend already handles this
-          job_id: offer._id,
+          job_id: offer.job_id,
           type: offer.type, // Backend already formats this
           title: offer.title, // Backend provides formatted title
           client_id: offer.client_id,
@@ -193,13 +193,13 @@ const FreelancersJobsPage = () => {
   // Rest of your existing code remains the same...
   const getFilteredJobs = () => {
     return jobs.filter((job) => {
-      console.log("Filtering job:", {
-        title: job.title,
-        status: job.status,
-        jobStatus: job.jobStatus,
-        searchTerm: searchTerm,
-        statusFilter: statusFilter,
-      });
+      // console.log("Filtering job:", {
+      //   title: job.title,
+      //   status: job.status,
+      //   jobStatus: job.jobStatus,
+      //   searchTerm: searchTerm,
+      //   statusFilter: statusFilter,
+      // });
 
       const matchesSearch = job.title
         .toLowerCase()
@@ -328,6 +328,7 @@ const FreelancersJobsPage = () => {
             paginatedJobs.map((job) => (
               <FreelancersJobsCard
                 key={job.title}
+                _id={job.source === 'offer' ? job._id : job.job_id} // Add this line
                 job_id={job.job_id}
                 client_id={job.client_id}
                 title={job.title} // Make sure this is explicitly passed
