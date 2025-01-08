@@ -323,6 +323,7 @@ exports.getOffers = async (req, res) => {
     // Format the offers to match frontend expectations
     const formattedOffers = offers.map(offer => ({
       _id: offer._id,
+      job_id: offer.job_id,
       type: offer.budget_type === "fixed" ? "Fixed" : 
             offer.budget_type === "hourly" ? "Hourly" : "Unknown",
       title: offer.job_title || "Untitled Job",

@@ -1548,15 +1548,19 @@ exports.getJobReview = async (req, res) => {
       });
     }
 
-    console.log("Fetching review for job:", jobId); // Debug log
+    console.log("Fetching review for:", { jobId, source }); // Debug log
 
     let review;
+    let jobDetails;
 
 
     if (source === 'offer') {
       // First find the offer to get its job_id
-      const offer = await Offer_Form.findById(jobId);
+      const offer = await Offer_Form.findOne({ job_id: jobId }).lean();
       
+      console.log("Searching for offer with job_id:", jobId);
+      console.log("Found offer:", offer);
+
       if (!offer) {
         return res.status(404).json({
           success: false,
@@ -1565,7 +1569,7 @@ exports.getJobReview = async (req, res) => {
       }
       // Find review using the job_id from the offer
       review = await Review.findOne({
-        job_id: offer.job_id,
+        job_id: jobId, // Use jobId directly since it's the job_id we're looking for
         client_id: offer.client_id,
         freelancer_id: offer.freelancer_id
       }).populate([
@@ -1578,6 +1582,13 @@ exports.getJobReview = async (req, res) => {
           select: "name email profile_image"
         }
       ]);
+
+      // Set job details from offer
+      jobDetails = {
+        _id: offer.job_id,
+        job_title: offer.job_title || offer.title,
+        description: offer.description
+      };
 
      
     } else {
@@ -1613,28 +1624,11 @@ exports.getJobReview = async (req, res) => {
         select: "job_title description",
       },
     ]);
+    jobDetails = review?.job_id;
 
     }
 
-    // // Find the review
-    // const review = await Review.findOne({
-    //   job_id: jobId,
-    //   freelancer_id: freelancerId._id,
-    //   client_id: clientId._id,
-    // }).populate([
-    //   {
-    //     path: "client_id",
-    //     select: "name email profile_image",
-    //   },
-    //   {
-    //     path: "freelancer_id",
-    //     select: "name email profile_image",
-    //   },
-    //   {
-    //     path: "job_id",
-    //     select: "job_title description",
-    //   },
-    // ]);
+ 
 
     if (!review) {
       return res.status(404).json({
@@ -1651,7 +1645,7 @@ exports.getJobReview = async (req, res) => {
     // Format the response
     const formattedResponse = {
       review_id: review._id,
-      job_id: review.job_id._id,
+      job_id: source === 'offer' ? jobDetails._id : review.job_id._id,
       offer_id: source === 'offer' ? jobId : null,
       job_title: review.job_id.job_title,
       rating: review.stars,
