@@ -47,44 +47,90 @@ const JobsCard = ({
   const [progressData, setProgressData] = useState(null);
   const [loadingProgress, setLoadingProgress] = useState(false);
 
-  console.log("clientid", client_id);
-  console.log("proposalid", proposal_id);
+  // console.log("clientid", client_id);
+  // console.log("proposalid", proposal_id);
 
-  useEffect(() => {
-    const fetchProgress = async () => {
-      try {
-        setLoadingProgress(true);
-        const token = localStorage.getItem("token");
-        if (!token) throw new Error("No authentication token found");
+  // useEffect(() => {
+  //   const fetchProgress = async () => {
+  //     try {
+  //       setLoadingProgress(true);
+  //       const token = localStorage.getItem("token");
+  //       if (!token) throw new Error("No authentication token found");
 
-        const response = await axios.get(
-          `http://localhost:5000/api/client/project-progress/${proposal_id}?client_id=${client_id}`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-              "Content-Type": "application/json",
-            },
-          }
-        );
+  //       const response = await axios.get(
+  //         `http://localhost:5000/api/client/project-progress/${proposal_id}?client_id=${client_id}`,
+  //         {
+  //           headers: {
+  //             Authorization: `Bearer ${token}`,
+  //             "Content-Type": "application/json",
+  //           },
+  //         }
+  //       );
 
-        console.log("fetch progress response", response.data);
+  //       console.log("fetch progress response", response.data);
 
-        if (response.data.success) {
-          setProgressData(response.data);
-        }
-      } catch (error) {
-        console.error("Error fetching project progress:", error);
-      } finally {
-        setLoadingProgress(false);
-      }
-    };
+  //       if (response.data.success) {
+  //         setProgressData(response.data);
+  //       }
+  //     } catch (error) {
+  //       console.error("Error fetching project progress:", error);
+  //     } finally {
+  //       setLoadingProgress(false);
+  //     }
+  //   };
 
-    if (client_id && proposal_id) {
-      fetchProgress();
+  //   if (client_id && proposal_id) {
+  //     fetchProgress();
+  //   }
+  // }, [client_id, proposal_id]); // Remove the parameters from useEffect and add them as dependencies
+
+  const [error, setError] = useState(null);
+
+
+  // In your JobsCard component, modify the fetchProgress function:
+
+const fetchProgress = async () => {
+  try {
+    setLoadingProgress(true);
+    const token = localStorage.getItem("token");
+    if (!token) throw new Error("No authentication token found");
+
+    let url;
+    if (source === "offer") {
+      // For offers, use projectName
+      url = `http://localhost:5000/api/client/project-progress/null?client_id=${client_id}&projectName=${encodeURIComponent(title)}`;
+    } else {
+      // For normal jobs
+      url = `http://localhost:5000/api/client/project-progress/${proposal_id}?client_id=${client_id}`;
     }
-  }, [client_id, proposal_id]); // Remove the parameters from useEffect and add them as dependencies
 
-  // const [error, setError] = useState(null);
+    const response = await axios.get(url, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+
+    // console.log("fetch progress response", response.data);
+
+    if (response.data.success) {
+      setProgressData(response.data);
+    }
+  } catch (error) {
+    console.error("Error fetching project progress:", error);
+  } finally {
+    setLoadingProgress(false);
+  }
+};
+
+// Modify the useEffect dependency array to include necessary variables
+useEffect(() => {
+  if ((client_id && proposal_id) || (client_id && source === "offer" && title)) {
+    fetchProgress();
+  }
+}, [client_id, proposal_id, source, title]);
+
+
 
   const handleAttachmentClick = (path) => {
     if (path) {
@@ -112,12 +158,12 @@ const JobsCard = ({
 
         // Add debug logging
         console.log("Fetching review for job:", job_id);
-        console.log("Using token:", token.substring(0, 20) + "..."); // Show first 20 chars of token
+        // console.log("Using token:", token.substring(0, 20) + "..."); // Show first 20 chars of token
 
         // console.log("Fetching review for job:", job_id); // Debug log
 
         const response = await axios.get(
-          `http://localhost:5000/api/freelancer/job-review/${job_id}`,
+          `http://localhost:5000/api/freelancer/job-review/${job_id}?source=${source === 'offer' ? 'offer' : 'normal'}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -239,13 +285,13 @@ const JobsCard = ({
         `http://localhost:5000/api/freelancer/getproposals?jobId=${job_id}`, // Fixed template literal
         { headers }
       );
-      console.log("Fetched job_id:", job_id); // Debug log
+      // console.log("Fetched job_id:", job_id); // Debug log
       // Find the specific proposal for this job
       const specificProposal = response.data.proposals.find(
         (proposal) => proposal._id === proposalId
       );
 
-      console.log("proposals", response.data);
+      // console.log("proposals", response.data);
 
       if (!specificProposal) {
         throw new Error("No proposal found for this job");
@@ -280,8 +326,8 @@ const JobsCard = ({
   };
 
   useEffect(() => {
-    console.log("Current job attachment:", attachment);
-    console.log("rate", rate);
+    // console.log("Current job attachment:", attachment);
+    // console.log("rate", rate);
   }, [attachment]);
 
   const PaymentStatus = ({ PaymentStatus, details }) => {

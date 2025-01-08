@@ -603,6 +603,46 @@ const ProjectDetails = ({
   // const id = ProjectId;
   // console.log("outside", ProjectId);
 
+  // const handleReviewSubmit = async (ProjectId, reviewData) => {
+  //   try {
+  //     setIsSubmitting(true);
+  //     const token = localStorage.getItem("token");
+  //     const decodedToken = jwtDecode(token);
+  //     const userId = decodedToken.userId;
+
+  //     // Make the API call to mark project as completed with review
+  //     const response = await axios.post(
+  //       `http://localhost:5000/api/client/complete-project/${ProjectId}`,
+  //       {
+  //         stars: reviewData.rating,
+  //         message: reviewData.review,
+  //       },
+  //       {
+  //         headers: {
+  //           Authorization: `Bearer ${token}`,
+  //         },
+  //       }
+  //     );
+
+  //     if (response.data.success) {
+  //       message.success(
+  //         "Project marked as completed and review submitted successfully"
+  //       );
+  //       setShowReviewModal(false);
+
+  //       // Notify parent component about status change
+  //       if (onProjectStatusChange) {
+  //         onProjectStatusChange(project._id, "completed");
+  //       }
+  //     }
+  //   } catch (error) {
+  //     console.error("Error submitting review:", error);
+  //     message.error(error.response?.data?.message || "Failed to submit review");
+  //   } finally {
+  //     setIsSubmitting(false);
+  //   }
+  // };
+
   const handleReviewSubmit = async (ProjectId, reviewData) => {
     try {
       setIsSubmitting(true);
@@ -610,19 +650,38 @@ const ProjectDetails = ({
       const decodedToken = jwtDecode(token);
       const userId = decodedToken.userId;
 
-      // Make the API call to mark project as completed with review
-      const response = await axios.post(
-        `http://localhost:5000/api/client/complete-project/${ProjectId}`,
-        {
-          stars: reviewData.rating,
-          message: reviewData.review,
+      // Use the correct project ID from the project object
+      const actualProjectId = project.projectId; // This is where the ID is stored
+
+      console.log("Submitting review with:", {
+        actualProjectId,
+        reviewData,
+        projectType: project.type,
+      });
+
+      // Validate project ID
+      if (!actualProjectId) {
+        throw new Error("No valid project ID found");
+      }
+
+
+      // Only send the required fields
+      const requestData = {
+        stars: reviewData.rating,
+        message: reviewData.review,
+      };
+
+      // Choose the appropriate endpoint based on project type
+      const endpoint =
+        project.type === "offer"
+          ? `http://localhost:5000/api/client/complete-offer/${actualProjectId}`
+          : `http://localhost:5000/api/client/complete-project/${ProjectId}`;
+
+      const response = await axios.post(endpoint, requestData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
         },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      });
 
       if (response.data.success) {
         message.success(
@@ -642,7 +701,6 @@ const ProjectDetails = ({
       setIsSubmitting(false);
     }
   };
-
 
   const formatHourlyRate = (project) => {
     if (project.hourly_rate?.from && project.hourly_rate?.to) {
@@ -1556,9 +1614,10 @@ const ProjectDetails = ({
       <ReviewModal
         visible={showReviewModal}
         onClose={() => setShowReviewModal(false)}
-        onSubmit={(reviewData) => handleReviewSubmit(ProjectId, reviewData)}
+        onSubmit={(reviewData) => handleReviewSubmit(ProjectId || actualProjectId , reviewData)}
         freelancerName={project.freelancer?.name || "Freelancer"}
         isSubmitting={isSubmitting}
+        project={project}
       />
     </div>
   );
