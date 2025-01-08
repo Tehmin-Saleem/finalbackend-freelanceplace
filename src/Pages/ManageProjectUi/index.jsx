@@ -218,7 +218,7 @@ const ManageProjectsByClient = () => {
           <div className="manage-projects">
             <ErrorBoundary>
               {/* Header Section */}
-              <header className="main">
+              <div className="upperhead">
                 <div className="header-content">
                   <h1>Manage Ongoing Projects</h1>
                   <p>Track project progress and milestones</p>
@@ -239,7 +239,7 @@ const ManageProjectsByClient = () => {
                     <span className="email">{profileData?.email}</span>
                   </div>
                 </div>
-              </header>
+              </div>
             </ErrorBoundary>
 
             <ErrorBoundary>

@@ -1,25 +1,23 @@
-
 // styles.scss
 
 // Variables
-$primary-color: #4BCBEB;
-$secondary-color: #2C3E50;
-$background-color: #F8F9FA;
-$border-color: #E1E8ED;
-$success-color: #2ECC71;
-$warning-color: #F1C40F;
-$danger-color: #E74C3C;
-$text-primary: #2C3E50;
-$text-secondary: #7F8C8D;
+$primary-color: #4bcbeb;
+$secondary-color: #2c3e50;
+$background-color: #f8f9fa;
+$border-color: #e1e8ed;
+$success-color: #2ecc71;
+$warning-color: #f1c40f;
+$danger-color: #e74c3c;
+$text-primary: #2c3e50;
+$text-secondary: #7f8c8d;
 $shadow-color: rgba(0, 0, 0, 0.1);
 // Add these new variables at the top of your styles.scss
-$proposal-bg: #FFFFFF;
-$proposal-border: #E1E8ED;
-$proposal-text: #2C3E50;
-$proposal-secondary: #7F8C8D;
-$proposal-highlight: #4BCBEB;
+$proposal-bg: #ffffff;
+$proposal-border: #e1e8ed;
+$proposal-text: #2c3e50;
+$proposal-secondary: #7f8c8d;
+$proposal-highlight: #4bcbeb;
 $proposal-shadow: rgba(0, 0, 0, 0.1);
-
 
 // Mixins
 @mixin card-shadow {
@@ -41,11 +39,12 @@ $proposal-shadow: rgba(0, 0, 0, 0.1);
 // Main Container
 .manage-projects {
   background-color: $background-color;
-  min-height: calc(100vh - 64px); // Adjust based on your header height
+  // min-height: calc(100vh - 64px); // Adjust based on your header height
+  
   padding: 2rem;
-margin-top: 5rem;
+  margin-top: 3rem;
   // Header Section
-  .main {
+  .upperhead {
     background: white;
     padding: 2rem;
     border-radius: 12px;
@@ -97,14 +96,12 @@ margin-top: 5rem;
     }
   }
 
-  
-
   // Projects Container
   .projects-container {
     display: grid;
     grid-template-columns: 1fr 1.5fr;
     gap: 2rem;
-    
+
     // Project List
     .project-list {
       display: flex;
@@ -135,15 +132,16 @@ margin-top: 5rem;
       padding: 1.5rem;
       @include card-shadow;
       cursor: pointer;
-      transition: transform 0.2s, box-shadow 0.2s;
+      transition:
+        transform 0.2s,
+        box-shadow 0.2s;
 
-      
       .skills {
         display: flex;
         flex-wrap: wrap;
         gap: 8px;
         margin-top: 12px;
-  
+
         .skill {
           padding: 6px 12px;
           background: #e8f7ff;
@@ -152,7 +150,7 @@ margin-top: 5rem;
           font-size: 13px;
           font-weight: 500;
           transition: all 0.2s ease;
-  
+
           &:hover {
             background: #d1efff;
             transform: translateY(-1px);
@@ -247,7 +245,8 @@ margin-top: 5rem;
         padding-top: 1rem;
         border-top: 1px solid $border-color;
 
-        .deadline, .milestone-count {
+        .deadline,
+        .milestone-count {
           @include flex-center;
           gap: 0.5rem;
           color: $text-secondary;
@@ -262,461 +261,49 @@ margin-top: 5rem;
       }
     }
 
-
-
-// Add this to your existing styles.scss
-.proposal {
-  background: $proposal-bg;
-  border-radius: 12px;
-  padding: 2rem;
-
-  .proposal-header {
-    margin-bottom: 2rem;
-    padding-bottom: 1rem;
-    border-bottom: 1px solid $proposal-border;
-
-    .proposal-status {
-      display: inline-block;
-      padding: 0.5rem 1.5rem;
-      border-radius: 20px;
-      font-size: 0.9rem;
-      font-weight: 500;
-      margin-bottom: 1rem;
-
-      &.accepted {
-        background: rgba($success-color, 0.1);
-        color: $success-color;
-      }
-
-      &.pending {
-        background: rgba($warning-color, 0.1);
-        color: $warning-color;
-      }
-    }
-  }
-
-  .proposal-section {
-    margin-bottom: 2rem;
-
-    h3 {
-      font-size: 1.2rem;
-      color: $proposal-text;
-      font-weight: 600;
-      margin-bottom: 1rem;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-
-      svg {
-        width: 20px;
-        height: 20px;
-        color: $proposal-highlight;
-      }
-    }
-
-    .cover-letter {
-      background: lighten($proposal-highlight, 38%);
+    // Add this to your existing styles.scss
+    .proposal {
+      background: $proposal-bg;
       border-radius: 12px;
-      padding: 1.5rem;
-      margin-bottom: 2rem;
-      position: relative;
+      padding: 2rem;
 
-      &::before {
-        content: '"';
-        position: absolute;
-        top: -10px;
-        left: 20px;
-        font-size: 4rem;
-        color: $proposal-highlight;
-        opacity: 0.2;
-      }
+      .proposal-header {
+        margin-bottom: 2rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid $proposal-border;
 
-      p {
-        color: $proposal-text;
-        line-height: 1.8;
-        font-size: 1rem;
-        position: relative;
-        z-index: 1;
-      }
-    }
-  }
-
-  .milestones {
-    .milestone-stats {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 2rem;
-      padding: 1rem;
-      background: #f8f9fa;
-      border-radius: 8px;
-  
-      .stat-item {
-        text-align: center;
-  
-        .label {
-          display: block;
-          color: #6c757d;
+        .proposal-status {
+          display: inline-block;
+          padding: 0.5rem 1.5rem;
+          border-radius: 20px;
           font-size: 0.9rem;
-        }
-  
-        .value {
-          font-size: 1.5rem;
-          font-weight: bold;
-          color: #2c3e50;
-        }
-      }
-    }
-  
-    .milestone-progress-bar {
-      height: 8px;
-      background: #e9ecef;
-      border-radius: 4px;
-      margin-bottom: 2rem;
-      position: relative;
-  
-      .progress {
-        height: 100%;
-        background: #4BCBEB;
-        border-radius: 4px;
-        transition: width 0.3s ease;
-      }
-  
-      .progress-text {
-        position: absolute;
-        right: 0;
-        top: -25px;
-        font-size: 0.9rem;
-        color: #6c757d;
-      }
-    }
-  
-    .milestone-list {
-      .milestone-item {
-        background: white;
-        border: 1px solid #dee2e6;
-        border-radius: 8px;
-        padding: 1rem;
-        margin-bottom: 1rem;
-  
-        .milestone-header {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
+          font-weight: 500;
           margin-bottom: 1rem;
-  
-          h4 {
-            margin: 0;
-            font-size: 1.1rem;
+
+          &.accepted {
+            background: rgba($success-color, 0.1);
+            color: $success-color;
           }
-  
-          .status {
-            padding: 0.25rem 0.75rem;
-            border-radius: 20px;
-            font-size: 0.9rem;
-  
-            &.completed {
-              background: #d4edda;
-              color: #155724;
-            }
-  
-            &.in-progress {
-              background: #fff3cd;
-              color: #856404;
-            }
-  
-            &.not-started {
-              background: #f8f9fa;
-              color: #6c757d;
-            }
+
+          &.pending {
+            background: rgba($warning-color, 0.1);
+            color: $warning-color;
           }
         }
-  
-        .milestone-details {
+      }
+
+      .proposal-section {
+        margin-bottom: 2rem;
+
+        h3 {
+          font-size: 1.2rem;
+          color: $proposal-text;
+          font-weight: 600;
           margin-bottom: 1rem;
-  
-          .milestone-progress {
-            height: 6px;
-            background: #e9ecef;
-            border-radius: 3px;
-            margin-bottom: 0.5rem;
-  
-            .progress {
-              height: 100%;
-              background: #4BCBEB;
-              border-radius: 3px;
-            }
-          }
-        }
-  
-        .milestone-footer {
           display: flex;
-          justify-content: space-between;
-          font-size: 0.9rem;
-          color: #6c757d;
-  
-          .label {
-            margin-right: 0.5rem;
-          }
-        }
-      }
-    }
-  
-    .overdue-warning {
-      background: #fff3cd;
-      color: #856404;
-      padding: 1rem;
-      border-radius: 8px;
-      margin-top: 1rem;
-      text-align: center;
-    }
-  }
-
-
-
-  .overall-progress {
-    margin-bottom: 2rem;
-    padding: 1.5rem;
-    background: #f8f9fa;
-    border-radius: 8px;
-  
-    .progress-description {
-      margin-top: 1rem;
-      padding-top: 1rem;
-      border-top: 1px solid #dee2e6;
-      
-      p {
-        color: #495057;
-        margin-bottom: 0.5rem;
-      }
-  
-      small {
-        color: #6c757d;
-      }
-    }
-  }
-  
-  .no-milestones {
-    text-align: center;
-    padding: 2rem;
-    background: #f8f9fa;
-    border-radius: 8px;
-    margin-top: 1rem;
-  
-    p {
-      margin-bottom: 1rem;
-      color: #495057;
-  
-      &.progress-note {
-        font-style: italic;
-        color: #6c757d;
-        padding: 1rem;
-        background: #fff;
-        border-radius: 4px;
-        margin-top: 1rem;
-      }
-    }
-  }
-
-  .proposal-details {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 1.5rem;
-    margin-bottom: 2rem;
-
-    .detail-card {
-      background: white;
-      border: 1px solid $proposal-border;
-      border-radius: 12px;
-      padding: 1.5rem;
-      transition: transform 0.2s ease;
-
-      &:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px $proposal-shadow;
-      }
-
-      .detail-icon {
-        width: 40px;
-        height: 40px;
-        background: lighten($proposal-highlight, 35%);
-        border-radius: 8px;
-        @include flex-center;
-        margin-bottom: 1rem;
-
-        svg {
-          width: 20px;
-          height: 20px;
-          color: $proposal-highlight;
-        }
-      }
-
-      .label {
-        color: $proposal-secondary;
-        font-size: 0.9rem;
-        margin-bottom: 0.5rem;
-      }
-
-      .value {
-        color: $proposal-text;
-        font-size: 1.2rem;
-        font-weight: 600;
-
-        &.rate {
-          color: $proposal-highlight;
-        }
-      }
-    }
-
-    .milestone-progress-container {
-      padding: 20px;
-    
-      .progress-card {
-        .progress-header {
-          display: flex;
-          justify-content: space-between;
           align-items: center;
-          margin-bottom: 24px;
-        }
-    
-        .progress-section {
-          margin: 20px 0;
-          
-          h4 {
-            margin-bottom: 16px;
-          }
-        }
-    
-        .project-details {
-          margin-top: 24px;
-        }
-    
-        .description-section {
-          margin-top: 24px;
-          padding-top: 24px;
-          border-top: 1px solid #f0f0f0;
-        }
-      }
-    
-      .milestones-card {
-        .ant-timeline {
-          margin-top: 20px;
-        }
-      }
-    }
-  }
+          gap: 0.5rem;
 
-
-
-  .milestone-progress {
-    .progress-stats {
-      margin-bottom: 24px;
-      background: white;
-      padding: 20px;
-      border-radius: 8px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    }
-  
-    .milestones-list {
-      .milestone-card {
-        margin-bottom: 16px;
-        
-        .amount {
-          font-size: 18px;
-          font-weight: bold;
-          color: #1890ff;
-          margin-top: 8px;
-        }
-  
-        .ant-progress {
-          margin-top: 16px;
-        }
-      }
-    }
-  }
-  
-  .progress-section {
-    .ant-progress {
-      margin-bottom: 8px;
-    }
-  }
-
-
-  .milestone-progress {
-    padding: 20px;
-  
-    .stats-cards {
-      margin-top: 20px;
-    }
-  
-    .milestone-card {
-      background-color: #fafafa;
-      border-radius: 8px;
-      margin-bottom: 16px;
-      
-      .ant-card-body {
-        padding: 16px;
-      }
-    }
-  
-    .overall-progress-card {
-      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-      
-      .progress-container {
-        margin-top: 16px;
-      }
-    }
-  
-    .ant-timeline {
-      margin-top: 24px;
-      
-      .ant-timeline-item-content {
-        width: 100%;
-        margin-left: 32px;
-      }
-    }
-  
-   
-  }
-
-  .proposal-attachments {
-    margin-top: 2rem;
-    padding-top: 2rem;
-    border-top: 1px solid $proposal-border;
-
-    h4 {
-      font-size: 1.1rem;
-      color: $proposal-text;
-      margin-bottom: 1rem;
-    }
-
-    .attachments-list {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-      gap: 1rem;
-
-      .attachment-item {
-        background: #f8f9fa;
-        border: 1px solid $proposal-border;
-        border-radius: 8px;
-        padding: 1rem;
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-        cursor: pointer;
-        transition: all 0.2s ease;
-
-        &:hover {
-          background: white;
-          box-shadow: 0 2px 8px $proposal-shadow;
-        }
-
-        .file-icon {
-          width: 40px;
-          height: 40px;
-          @include flex-center;
-          background: white;
-          border-radius: 8px;
-          
           svg {
             width: 20px;
             height: 20px;
@@ -724,83 +311,480 @@ margin-top: 5rem;
           }
         }
 
-        .file-info {
-          flex: 1;
-          
-          .file-name {
-            font-size: 0.9rem;
+        .cover-letter {
+          background: lighten($proposal-highlight, 38%);
+          border-radius: 12px;
+          padding: 1.5rem;
+          margin-bottom: 2rem;
+          position: relative;
+
+          &::before {
+            content: '"';
+            position: absolute;
+            top: -10px;
+            left: 20px;
+            font-size: 4rem;
+            color: $proposal-highlight;
+            opacity: 0.2;
+          }
+
+          p {
             color: $proposal-text;
-            margin-bottom: 0.2rem;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
+            line-height: 1.8;
+            font-size: 1rem;
+            position: relative;
+            z-index: 1;
+          }
+        }
+      }
+
+      .milestones {
+        .milestone-stats {
+          display: flex;
+          justify-content: space-between;
+          margin-bottom: 2rem;
+          padding: 1rem;
+          background: #f8f9fa;
+          border-radius: 8px;
+
+          .stat-item {
+            text-align: center;
+
+            .label {
+              display: block;
+              color: #6c757d;
+              font-size: 0.9rem;
+            }
+
+            .value {
+              font-size: 1.5rem;
+              font-weight: bold;
+              color: #2c3e50;
+            }
+          }
+        }
+
+        .milestone-progress-bar {
+          height: 8px;
+          background: #e9ecef;
+          border-radius: 4px;
+          margin-bottom: 2rem;
+          position: relative;
+
+          .progress {
+            height: 100%;
+            background: #4bcbeb;
+            border-radius: 4px;
+            transition: width 0.3s ease;
           }
 
-          .file-size {
-            font-size: 0.8rem;
+          .progress-text {
+            position: absolute;
+            right: 0;
+            top: -25px;
+            font-size: 0.9rem;
+            color: #6c757d;
+          }
+        }
+
+        .milestone-list {
+          .milestone-item {
+            background: white;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+
+            .milestone-header {
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              margin-bottom: 1rem;
+
+              h4 {
+                margin: 0;
+                font-size: 1.1rem;
+              }
+
+              .status {
+                padding: 0.25rem 0.75rem;
+                border-radius: 20px;
+                font-size: 0.9rem;
+
+                &.completed {
+                  background: #d4edda;
+                  color: #155724;
+                }
+
+                &.in-progress {
+                  background: #fff3cd;
+                  color: #856404;
+                }
+
+                &.not-started {
+                  background: #f8f9fa;
+                  color: #6c757d;
+                }
+              }
+            }
+
+            .milestone-details {
+              margin-bottom: 1rem;
+
+              .milestone-progress {
+                height: 6px;
+                background: #e9ecef;
+                border-radius: 3px;
+                margin-bottom: 0.5rem;
+
+                .progress {
+                  height: 100%;
+                  background: #4bcbeb;
+                  border-radius: 3px;
+                }
+              }
+            }
+
+            .milestone-footer {
+              display: flex;
+              justify-content: space-between;
+              font-size: 0.9rem;
+              color: #6c757d;
+
+              .label {
+                margin-right: 0.5rem;
+              }
+            }
+          }
+        }
+
+        .overdue-warning {
+          background: #fff3cd;
+          color: #856404;
+          padding: 1rem;
+          border-radius: 8px;
+          margin-top: 1rem;
+          text-align: center;
+        }
+      }
+
+      .overall-progress {
+        margin-bottom: 2rem;
+        padding: 1.5rem;
+        background: #f8f9fa;
+        border-radius: 8px;
+
+        .progress-description {
+          margin-top: 1rem;
+          padding-top: 1rem;
+          border-top: 1px solid #dee2e6;
+
+          p {
+            color: #495057;
+            margin-bottom: 0.5rem;
+          }
+
+          small {
+            color: #6c757d;
+          }
+        }
+      }
+
+      .no-milestones {
+        text-align: center;
+        padding: 2rem;
+        background: #f8f9fa;
+        border-radius: 8px;
+        margin-top: 1rem;
+
+        p {
+          margin-bottom: 1rem;
+          color: #495057;
+
+          &.progress-note {
+            font-style: italic;
+            color: #6c757d;
+            padding: 1rem;
+            background: #fff;
+            border-radius: 4px;
+            margin-top: 1rem;
+          }
+        }
+      }
+
+      .proposal-details {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+
+        .detail-card {
+          background: white;
+          border: 1px solid $proposal-border;
+          border-radius: 12px;
+          padding: 1.5rem;
+          transition: transform 0.2s ease;
+
+          &:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px $proposal-shadow;
+          }
+
+          .detail-icon {
+            width: 40px;
+            height: 40px;
+            background: lighten($proposal-highlight, 35%);
+            border-radius: 8px;
+            @include flex-center;
+            margin-bottom: 1rem;
+
+            svg {
+              width: 20px;
+              height: 20px;
+              color: $proposal-highlight;
+            }
+          }
+
+          .label {
             color: $proposal-secondary;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+          }
+
+          .value {
+            color: $proposal-text;
+            font-size: 1.2rem;
+            font-weight: 600;
+
+            &.rate {
+              color: $proposal-highlight;
+            }
+          }
+        }
+
+        .milestone-progress-container {
+          padding: 20px;
+
+          .progress-card {
+            .progress-header {
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              margin-bottom: 24px;
+            }
+
+            .progress-section {
+              margin: 20px 0;
+
+              h4 {
+                margin-bottom: 16px;
+              }
+            }
+
+            .project-details {
+              margin-top: 24px;
+            }
+
+            .description-section {
+              margin-top: 24px;
+              padding-top: 24px;
+              border-top: 1px solid #f0f0f0;
+            }
+          }
+
+          .milestones-card {
+            .ant-timeline {
+              margin-top: 20px;
+            }
+          }
+        }
+      }
+
+      .milestone-progress {
+        .progress-stats {
+          margin-bottom: 24px;
+          background: white;
+          padding: 20px;
+          border-radius: 8px;
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .milestones-list {
+          .milestone-card {
+            margin-bottom: 16px;
+
+            .amount {
+              font-size: 18px;
+              font-weight: bold;
+              color: #1890ff;
+              margin-top: 8px;
+            }
+
+            .ant-progress {
+              margin-top: 16px;
+            }
+          }
+        }
+      }
+
+      .progress-section {
+        .ant-progress {
+          margin-bottom: 8px;
+        }
+      }
+
+      .milestone-progress {
+        padding: 20px;
+
+        .stats-cards {
+          margin-top: 20px;
+        }
+
+        .milestone-card {
+          background-color: #fafafa;
+          border-radius: 8px;
+          margin-bottom: 16px;
+
+          .ant-card-body {
+            padding: 16px;
+          }
+        }
+
+        .overall-progress-card {
+          background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+
+          .progress-container {
+            margin-top: 16px;
+          }
+        }
+
+        .ant-timeline {
+          margin-top: 24px;
+
+          .ant-timeline-item-content {
+            width: 100%;
+            margin-left: 32px;
+          }
+        }
+      }
+
+      .proposal-attachments {
+        margin-top: 2rem;
+        padding-top: 2rem;
+        border-top: 1px solid $proposal-border;
+
+        h4 {
+          font-size: 1.1rem;
+          color: $proposal-text;
+          margin-bottom: 1rem;
+        }
+
+        .attachments-list {
+          display: grid;
+          grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+          gap: 1rem;
+
+          .attachment-item {
+            background: #f8f9fa;
+            border: 1px solid $proposal-border;
+            border-radius: 8px;
+            padding: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+
+            &:hover {
+              background: white;
+              box-shadow: 0 2px 8px $proposal-shadow;
+            }
+
+            .file-icon {
+              width: 40px;
+              height: 40px;
+              @include flex-center;
+              background: white;
+              border-radius: 8px;
+
+              svg {
+                width: 20px;
+                height: 20px;
+                color: $proposal-highlight;
+              }
+            }
+
+            .file-info {
+              flex: 1;
+
+              .file-name {
+                font-size: 0.9rem;
+                color: $proposal-text;
+                margin-bottom: 0.2rem;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+              }
+
+              .file-size {
+                font-size: 0.8rem;
+                color: $proposal-secondary;
+              }
+            }
+          }
+        }
+      }
+
+      // .mark-complete-btn {
+      //   width: 100%;
+      //   height: 40px;
+      //   margin-top: 24px;
+      //   color: #4BCBEB ;
+      // }
+
+      .proposal-actions {
+        margin-top: 2rem;
+        padding-top: 2rem;
+        border-top: 1px solid $proposal-border;
+        display: flex;
+        gap: 1rem;
+
+        button {
+          flex: 1;
+          padding: 1rem 2rem;
+          border-radius: 8px;
+          font-weight: 500;
+          transition: all 0.2s ease;
+          @include flex-center;
+          gap: 0.5rem;
+
+          &.accept-btn {
+            background: $success-color;
+            color: white;
+            border: none;
+
+            &:hover {
+              background: darken($success-color, 5%);
+            }
+          }
+
+          &.message-btn {
+            background: white;
+            color: $proposal-highlight;
+            border: 1px solid $proposal-highlight;
+
+            &:hover {
+              background: lighten($proposal-highlight, 35%);
+            }
+          }
+
+          svg {
+            width: 18px;
+            height: 18px;
           }
         }
       }
     }
-  }
-
-
-  // .mark-complete-btn {
-  //   width: 100%;
-  //   height: 40px;
-  //   margin-top: 24px;
-  //   color: #4BCBEB ;
-  // }
-
-  
-
-  .proposal-actions {
-    margin-top: 2rem;
-    padding-top: 2rem;
-    border-top: 1px solid $proposal-border;
-    display: flex;
-    gap: 1rem;
-
-    button {
-      flex: 1;
-      padding: 1rem 2rem;
-      border-radius: 8px;
-      font-weight: 500;
-      transition: all 0.2s ease;
-      @include flex-center;
-      gap: 0.5rem;
-
-      &.accept-btn {
-        background: $success-color;
-        color: white;
-        border: none;
-
-        &:hover {
-          background: darken($success-color, 5%);
-        }
-      }
-
-      &.message-btn {
-        background: white;
-        color: $proposal-highlight;
-        border: 1px solid $proposal-highlight;
-
-        &:hover {
-          background: lighten($proposal-highlight, 35%);
-        }
-      }
-
-      svg {
-        width: 18px;
-        height: 18px;
-      }
-    }
-  }
-}
-
-
-    
 
     // Project Details
     .project-details {
@@ -828,7 +812,7 @@ margin-top: 5rem;
             color: $primary-color;
 
             &:after {
-              content: '';
+              content: "";
               position: absolute;
               bottom: -1px;
               left: 0;
@@ -840,38 +824,34 @@ margin-top: 5rem;
         }
       }
 
-
-
-
-
       .overview {
         padding: 24px;
         background: #ffffff;
         border-radius: 12px;
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-      
+
         .job-Card {
           .header-job {
             margin-bottom: 24px;
-      
+
             .job-Title {
               font-size: 24px;
               font-weight: 600;
-              color: #4BCBEB;
+              color: #4bcbeb;
               margin-bottom: 8px;
               line-height: 1.3;
             }
-      
+
             .job-Location {
               font-size: 14px;
-              color: #7F8C8D;
+              color: #7f8c8d;
               display: flex;
               align-items: center;
               gap: 6px;
               margin-bottom: 4px;
-      
+
               &:before {
-                content: '';
+                content: "";
                 display: inline-block;
                 width: 16px;
                 height: 16px;
@@ -879,50 +859,49 @@ margin-top: 5rem;
                 background-size: contain;
               }
             }
-      
+
             .job-posted-Time {
               font-size: 14px;
-              color: #4BCBEB;
-              
+              color: #4bcbeb;
+
               .posted-text {
-                color: #7F8C8D;
+                color: #7f8c8d;
               }
 
-              
               .time-text {
-                color: #7F8C8D;
+                color: #7f8c8d;
                 font-weight: 500;
               }
             }
           }
-      
+
           .divider {
             border: none;
             height: 1px;
-            background: #4BCBEB;
+            background: #4bcbeb;
             margin: 20px 0;
           }
-      
+
           .job-infor {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 20px;
             padding: 16px;
-            background: #4BCBEB;
+            background: #4bcbeb;
             border-radius: 8px;
             margin-bottom: 24px;
-      
+
             .job-info-item {
               display: flex;
               flex-direction: column;
               gap: 4px;
-      
+
               .labeltext {
                 font-size: 13px;
                 color: #ffffff;
                 font-weight: 500;
               }
-      
+
               .value {
                 font-size: 15px;
                 color: #ffffff;
@@ -930,70 +909,70 @@ margin-top: 5rem;
               }
             }
           }
-      
+
           .section-title {
             font-size: 18px;
             font-weight: 600;
-            color: #4BCBEB;
+            color: #4bcbeb;
             margin: 24px 0 16px;
             padding-bottom: 8px;
-            border-bottom: 2px solid #4BCBEB;
+            border-bottom: 2px solid #4bcbeb;
           }
-      
+
           .job-description {
             font-size: 15px;
             line-height: 1.6;
-            color: #7F8C8D;
+            color: #7f8c8d;
             margin-bottom: 24px;
             white-space: pre-line;
           }
-      
+
           .attachments {
             margin-bottom: 24px;
-      
+
             .attachment-item {
               display: flex;
               align-items: center;
               justify-content: space-between;
               padding: 12px;
-              background: #4BCBEB;
+              background: #4bcbeb;
               border-radius: 8px;
               border: 1px solid #e0e0e0;
-      
+
               .attachment-file {
                 display: flex;
                 align-items: center;
                 gap: 12px;
-      
+
                 .file-icon {
                   font-size: 24px;
                 }
-      
+
                 .file-name {
                   font-size: 14px;
-                  color: #4BCBEB;
+                  color: #4bcbeb;
                   font-weight: 500;
                 }
               }
-      
+
               .view-btn {
                 display: flex;
                 align-items: center;
                 gap: 6px;
                 padding: 8px 16px;
                 border: none;
-                background: #4BCBEB;
+                background: #4bcbeb;
                 color: white;
                 border-radius: 6px;
                 font-size: 14px;
                 font-weight: 500;
                 cursor: pointer;
                 transition: background 0.2s ease;
-      
+
                 &:hover {
-                  background: darken(#4BCBEB, 10%);
+                  background: darken(#4bcbeb, 10%);
                 }
-      
+
                 svg {
                   width: 16px;
                   height: 16px;
@@ -1001,22 +980,22 @@ margin-top: 5rem;
               }
             }
           }
-      
+
           .skills {
             display: flex;
             flex-wrap: wrap;
             gap: 8px;
             margin-top: 12px;
-      
+
             .skill {
               padding: 6px 12px;
-              background: #4BCBEB;
-              color: #FFFFFF;
+              background: #4bcbeb;
+              color: #ffffff;
               border-radius: 20px;
               font-size: 13px;
               font-weight: 500;
               transition: all 0.2s ease;
-      
+
               &:hover {
                 background: #d1efff;
                 transform: translateY(-1px);
@@ -1024,38 +1003,38 @@ margin-top: 5rem;
             }
           }
         }
-      
+
         // File Preview Styles
         .file-preview {
           margin-top: 16px;
-          
+
           &-image {
             max-width: 100%;
             border-radius: 8px;
             box-shadow: 0 2px 8px rgba(255, 255, 255, 0.1);
           }
-      
+
           &-pdf {
             width: 100%;
             height: 500px;
-            border: 1px solid #4BCBEB;
+            border: 1px solid #4bcbeb;
             border-radius: 8px;
           }
         }
       }
-      
+
       // Responsive Design
       @media (max-width: 768px) {
         .overview {
           padding: 16px;
-      
+
           .job-Card {
             .header-job {
               .job-Title {
                 font-size: 20px;
               }
             }
-      
+
             .job-infor {
               grid-template-columns: 1fr;
               gap: 12px;
@@ -1063,67 +1042,67 @@ margin-top: 5rem;
           }
         }
       }
-      
+
       // Dark Mode Support (optional)
       @media (prefers-color-scheme: dark) {
         .overview {
           background: #19a4bd;
-      
+
           .job-Card {
             .header-job {
               .job-Title {
                 color: #ffffff;
               }
-      
+
               .job-Location,
               .job-posted-Time {
                 color: #ffffff;
               }
             }
-      
+
             .divider {
               background: #ffffff;
             }
-      
+
             .job-infor {
               background: #ffffff;
-      
+
               .job-info-item {
                 .labeltext {
                   color: #000000;
                 }
-      
+
                 .value {
                   color: #000000;
                 }
               }
             }
-      
+
             .section-title {
               color: #ffffff;
               border-bottom-color: #ffffff;
             }
-      
+
             .job-description {
               color: #ffffff;
             }
-      
+
             .attachments {
               .attachment-item {
                 background: #2d2d2d;
                 border-color: #333;
-      
+
                 .file-name {
                   color: #ffffff;
                 }
               }
             }
-      
+
             .skills {
               .skill {
                 background: #ffffff;
                 color: #0682a1;
-      
+
                 &:hover {
                   background: #088ca3;
                   color: white;
@@ -1133,7 +1112,7 @@ margin-top: 5rem;
           }
         }
       }
-      
+
       // Animation Effects
       @keyframes fadeIn {
         from {
@@ -1145,7 +1124,7 @@ margin-top: 5rem;
           transform: translateY(0);
         }
       }
-      
+
       .overview {
         animation: fadeIn 0.3s ease-out;
       }
@@ -1228,7 +1207,6 @@ margin-top: 5rem;
         }
       }
 
-
       .action-buttons {
         display: flex;
         gap: 1rem;
@@ -1290,15 +1268,14 @@ margin-top: 5rem;
     }
   }
 }
-.mark-complete-btn{
+.mark-complete-btn {
   background-color: $primary-color;
 }
-.hire-consulatnt-btn{
+.hire-consulatnt-btn {
   background-color: $primary-color;
   margin-left: 20rem;
   // margin-right: 0;
 }
-
 
 .payment-status-container {
   margin: 20px 0;
@@ -1316,16 +1293,16 @@ margin-top: 5rem;
     .payment-alert {
       flex: 1;
       margin-bottom: 0;
-      
+
       .payment-details {
         margin-top: 12px;
-        
+
         p {
           margin: 8px 0;
           display: flex;
           justify-content: space-between;
           align-items: center;
-          
+
           strong {
             color: #8ac850;
             margin-right: 8px;
@@ -1342,16 +1319,16 @@ margin-top: 5rem;
       justify-content: center;
       gap: 8px;
       transition: all 0.3s ease;
-      
+
       &:hover {
         transform: translateY(-1px);
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
       }
-      
+
       .anticon {
         font-size: 16px;
       }
-      
+
       &.ant-btn-loading {
         .anticon {
           margin-right: 8px;
@@ -1364,12 +1341,12 @@ margin-top: 5rem;
   @media (max-width: 768px) {
     .payment-status-header {
       flex-direction: column;
-      
+
       .payment-alert {
         width: 100%;
         margin-bottom: 16px;
       }
-      
+
       .refresh-button {
         width: 100%;
       }
@@ -1408,7 +1385,7 @@ margin-top: 5rem;
 // Additional hover effects for the alert
 .payment-alert.ant-alert {
   transition: all 0.3s ease;
-  
+
   &:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
@@ -1425,18 +1402,17 @@ margin-top: 5rem;
   p {
     padding: 8px;
     border-bottom: 1px solid #f0f0f0;
-    
+
     &:last-child {
       border-bottom: none;
     }
-    
+
     strong {
       margin-right: 8px;
       color: rgba(173, 233, 153, 0.85);
     }
   }
 }
-
 
 .offer-details {
   padding: 20px;
