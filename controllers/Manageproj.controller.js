@@ -449,17 +449,29 @@ exports.getProjectProgress = async (req, res) => {
     }
 
     const { proposal_id } = req.params;
-    const { client_id } = req.query;
+    const { client_id, projectName } = req.query;
 
-    console.log("proposal_id", proposal_id);
-
-    // Validate IDs
-    if (!mongoose.Types.ObjectId.isValid(proposal_id) || !mongoose.Types.ObjectId.isValid(client_id)) {
-      return res.status(400).json({
-        success: false,
-        message: 'Invalid proposal or client ID format'
-      });
-    }
+// Build match condition based on available parameters
+let matchCondition;
+if (proposal_id !== 'null' && proposal_id) {
+  // For normal jobs with proposal_id
+  matchCondition = {
+    proposal_id: new mongoose.Types.ObjectId(proposal_id),
+    client_id: new mongoose.Types.ObjectId(client_id)
+  };
+} else if (projectName) {
+  // For offered jobs without proposal_id
+  matchCondition = {
+    projectName: projectName,
+    client_id: new mongoose.Types.ObjectId(client_id),
+    proposal_id: null // Specifically for offers
+  };
+} else {
+  return res.status(400).json({
+    success: false,
+    message: 'Invalid request parameters'
+  });
+}
 
 
 
@@ -468,10 +480,7 @@ exports.getProjectProgress = async (req, res) => {
   // Modified aggregation pipeline
     const project = await Project.aggregate([
       {
-        $match: {
-          proposal_id: new mongoose.Types.ObjectId(proposal_id),
-          client_id: new mongoose.Types.ObjectId(client_id)
-        }
+        $match: matchCondition
       },
       {
         $lookup: {
@@ -623,11 +632,6 @@ if (currentProject.projectType === 'milestone') {
     });
   }
 };
-
-
-
-
-
 
 
 exports.getProjectProgressById = async (req, res) => {

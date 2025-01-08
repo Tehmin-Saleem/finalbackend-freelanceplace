@@ -279,6 +279,7 @@ router.get(
 router.get('/project-progress/:proposal_id', authMiddleware, manageProject.getProjectProgress);
 
 
+
 router.get('/offer-progress', authMiddleware, manageProject.getOfferProgress);
 
 
@@ -287,6 +288,11 @@ router.post(
   authMiddleware,
   hireFreelancerController.markProjectAsCompleted
 );
+
+
+// routes/clientRoutes.js
+
+router.post('/complete-offer/:projectId',authMiddleware, hireFreelancerController.markOfferAsCompleted);
 
 router.get('/job-status/:jobId',authMiddleware, jobPostController.getJobStatus);
 router.patch('/proposals/:proposalId/status', authMiddleware, jobPostController.updateProposalStatus);

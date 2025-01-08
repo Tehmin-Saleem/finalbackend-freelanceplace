@@ -10,6 +10,7 @@ const Review = require("../models/review.model");
 const consultantprofile = require("../models/consultantprofile");
 const Client_Profile = require("../models/client_profile.model");
 const Project = require("../models/manageProject.model");
+const Offer_Form = require("../models/offer_form.model");
 
 // Get hire request status by proposal ID
 exports.getHireRequestById = async (req, res) => {
@@ -1064,7 +1065,116 @@ exports.markProjectAsCompleted = async (req, res) => {
 
 
 
+exports.markOfferAsCompleted = async (req, res) => {
+  try {
+    const { projectId } = req.params;
+    const clientId = req.user.userId;
+    const { stars, message } = req.body; // Only require these fields from request body
 
+    console.log("Offer completion request:", {
+      projectId,
+      clientId,
+      stars,
+      message
+    });
+
+    // Validate required fields - match the same validation as normal jobs
+    if (!stars || !message) {
+      return res.status(400).json({
+        success: false,
+        message: 'Rating (stars) and review message are required'
+      });
+    }
+
+    // Validate stars range
+    if (stars < 1 || stars > 5) {
+      return res.status(400).json({
+        success: false,
+        message: 'Rating must be between 1 and 5 stars'
+      });
+    }
+
+    const session = await mongoose.startSession();
+    session.startTransaction();
+
+    try {
+      // Find the offer and populate necessary fields
+      const offer = await Offer_Form.findOne({
+        _id: projectId,
+        client_id: clientId,
+        status: { $in: ['accepted', 'ongoing'] }
+      }).session(session);
+
+      if (!offer) {
+        throw new Error('Offer not found or unauthorized');
+      }
+
+      // Create review document using the offer data
+      const reviewData = new Review({
+        client_id: clientId,
+        freelancer_id: offer.freelancer_id, // Use freelancer_id from offer
+        job_id: offer.job_id, // Use job_id from offer
+        message: message,
+        stars: stars,
+        status: 'Completed',
+        createdAt: new Date(),
+        updated_at: new Date()
+      });
+
+      await reviewData.save({ session });
+
+      // Update offer status
+      offer.status = 'completed';
+      offer.completedAt = new Date();
+      await offer.save({ session });
+
+      // Update freelancer profile
+      await Freelancer_Profile.findOneAndUpdate(
+        { freelancer_id: offer.freelancer_id },
+        {
+          $inc: {
+            completed_jobs: 1,
+            total_reviews: 1,
+            total_ratings: stars
+          }
+        },
+        { session }
+      );
+
+      await session.commitTransaction();
+
+      res.status(200).json({
+        success: true,
+        message: 'Offer marked as completed and review submitted successfully',
+        data: {
+          projectId: projectId,
+          status: 'completed',
+          completedAt: offer.completedAt,
+          review: {
+            stars: stars,
+            message: message,
+            status: 'Completed'
+          }
+        }
+      });
+
+    } catch (error) {
+      console.error('Transaction error:', error);
+      await session.abortTransaction();
+      throw error;
+    } finally {
+      session.endSession();
+    }
+
+  } catch (error) {
+    console.error('Error in markOfferAsCompleted:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to mark offer as completed',
+      error: error.message
+    });
+  }
+};
 
 
 // reviewController.js
@@ -1428,6 +1538,7 @@ exports.getClientCompletedJobsCount = async (req, res) => {
 exports.getJobReview = async (req, res) => {
   try {
     const { jobId } = req.params;
+    const { source } = req.query; // Add source parameter to distinguish offers
 
     // Validate jobId
     if (!mongoose.Types.ObjectId.isValid(jobId)) {
@@ -1438,6 +1549,38 @@ exports.getJobReview = async (req, res) => {
     }
 
     console.log("Fetching review for job:", jobId); // Debug log
+
+    let review;
+
+
+    if (source === 'offer') {
+      // First find the offer to get its job_id
+      const offer = await Offer_Form.findById(jobId);
+      
+      if (!offer) {
+        return res.status(404).json({
+          success: false,
+          message: "Offer not found"
+        });
+      }
+      // Find review using the job_id from the offer
+      review = await Review.findOne({
+        job_id: offer.job_id,
+        client_id: offer.client_id,
+        freelancer_id: offer.freelancer_id
+      }).populate([
+        {
+          path: "client_id",
+          select: "name email profile_image"
+        },
+        {
+          path: "freelancer_id",
+          select: "name email profile_image"
+        }
+      ]);
+
+     
+    } else {
 
     // Find the hire request for this job
     const hireRequest = await HireFreelancer.findOne({
@@ -1451,8 +1594,8 @@ exports.getJobReview = async (req, res) => {
       });
     }
 
-    // Find the review
-    const review = await Review.findOne({
+
+    review = await Review.findOne({
       job_id: jobId,
       freelancer_id: hireRequest.freelancerId._id,
       client_id: hireRequest.clientId._id,
@@ -1471,6 +1614,28 @@ exports.getJobReview = async (req, res) => {
       },
     ]);
 
+    }
+
+    // // Find the review
+    // const review = await Review.findOne({
+    //   job_id: jobId,
+    //   freelancer_id: freelancerId._id,
+    //   client_id: clientId._id,
+    // }).populate([
+    //   {
+    //     path: "client_id",
+    //     select: "name email profile_image",
+    //   },
+    //   {
+    //     path: "freelancer_id",
+    //     select: "name email profile_image",
+    //   },
+    //   {
+    //     path: "job_id",
+    //     select: "job_title description",
+    //   },
+    // ]);
+
     if (!review) {
       return res.status(404).json({
         success: false,
@@ -1487,6 +1652,7 @@ exports.getJobReview = async (req, res) => {
     const formattedResponse = {
       review_id: review._id,
       job_id: review.job_id._id,
+      offer_id: source === 'offer' ? jobId : null,
       job_title: review.job_id.job_title,
       rating: review.stars,
       review_message: review.message,
