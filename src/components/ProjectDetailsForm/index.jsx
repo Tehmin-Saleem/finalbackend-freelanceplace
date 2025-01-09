@@ -54,6 +54,7 @@ const SendProjectDetails = ({ consultantId, onProjectSent, onClose, clientId }) 
       );
 
       console.log("Project details sent successfully:", response.data);
+      onProjectSent();
       alert("Project details sent successfully!");
 
       setIsSent(true);
@@ -67,8 +68,9 @@ const SendProjectDetails = ({ consultantId, onProjectSent, onClose, clientId }) 
 
       // Close the modal
       setIsModalOpen(false);
+      // if (onProjectSent) onProjectSent(); 
 
-      if (onProjectSent) onProjectSent();
+      
     } catch (error) {
       console.error("Full error details:", {
         message: error.message,

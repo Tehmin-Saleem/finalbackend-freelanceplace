@@ -3,118 +3,170 @@ $secondary-color: #6b7280;
 $background-color: #f9fafb;
 $text-color: #374151;
 $white: #ffffff;
-$accent-color: #4bcdeb;
-$gray: #e5e7eb;
 
 .consultant-dashboard {
+  height: 110vh;
   background-color: $background-color;
-  padding: 20px;
-  min-height: 100vh;
-margin-top: 6rem;
-  .dashboard-header {
-    background: linear-gradient(135deg, $primary-color, $accent-color);
-    color: $white;
-    padding: 30px 20px;
-    border-radius: 12px;
+
+  .hero-section {
+    background-image: url('../../images/consultant.webp');
+    background-size: cover;
+    background-position: center;
+    height: 50%;
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
 
-    .header-content {
+    .hero-overlay {
+      background-color: rgba(0, 0, 0, 0.6);
+      padding: 30px;
+      border-radius: 10px;
+      text-align: center;
+      color: $white;
+
       h1 {
-        font-size: 2rem;
+        font-size: 42px;
         font-weight: bold;
+        color: #f9fafb;
       }
 
       p {
-        font-size: 1rem;
-        margin-top: 8px;
-        opacity: 0.9;
+        font-size: 18px;
+        margin-top: 10px;
       }
     }
+  }
 
-    .action-buttons {
+  .offers-card {
+    max-width: 600px;
+    margin: -80px auto 20px;
+    background-color: $white;
+    border-radius: 10px;
+    padding: 20px;
+    text-align: center;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+
+    &:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    .card-icon {
+      font-size: 50px;
+      color: $primary-color;
+    }
+
+    h2 {
+      font-size: 28px;
+      margin-top: 10px;
+    }
+
+    p {
+      font-size: 16px;
+      margin-top: 5px;
+      color: $secondary-color;
+    }
+
+    .stats {
       display: flex;
-      gap: 10px;
+      justify-content: space-around;
+      margin-top: 20px;
 
-      .icon-button {
-        background: $white;
-        border: none;
-        border-radius: 8px;
-        padding: 10px 15px;
-        display: flex;
-        align-items: center;
-        gap: 5px;
-        color: $primary-color;
-        font-weight: bold;
-        cursor: pointer;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        transition: transform 0.2s ease;
+      .stat {
+        text-align: center;
 
-        &:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        h3 {
+          font-size: 24px;
+          color: $primary-color;
         }
 
-        span {
-          font-size: 0.9rem;
+        p {
+          font-size: 14px;
+          color: $text-color;
         }
       }
     }
   }
 
-  .dashboard-sections {
-    margin-top: 30px;
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 20px;
+  .content-section {
+    display: flex;
+    justify-content: space-around;
+    margin: 20px 10px;
 
-    .dashboard-card {
-      background: $white;
-      border-radius: 12px;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    .content-card {
+      background-color: $white;
+      border-radius: 10px;
       padding: 20px;
       text-align: center;
-      position: relative;
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
 
       &:hover {
         transform: translateY(-5px);
-        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+      }
+      .chart-container {
+        width: 100%;
+        max-width: 600px;
+        margin-top: 20px;
       }
 
-      h2 {
-        font-size: 1.2rem;
-        color: $text-color;
-        margin-bottom: 10px;
-      }
-
-      p {
-        font-size: 0.95rem;
-        color: $secondary-color;
-      }
-
-      ul {
-        list-style: none;
-        padding: 0;
-        margin: 0;
-
-        li {
-          margin: 10px 0;
-          color: $text-color;
-          font-size: 0.9rem;
-
-          strong {
-            color: $primary-color;
-          }
-        }
-      }
-
-      .card-icon {
-        font-size: 2.5rem;
+      .content-icon {
+        font-size: 40px;
         color: $primary-color;
-        margin-bottom: 10px;
+      }
+
+      h3 {
+        font-size: 22px;
+        margin-top: 10px;
+      }
+      .h3haeding{
+        margin-top: 2rem;
+
+      }
+
+      .pheading {
+        font-size: 16px;
+        margin-top: 30px;
+        color: $secondary-color;
       }
     }
   }
 }
+.rating-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 10px;
+
+  .stars {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 5px;
+  }
+
+  p {
+    font-size: 14px;
+    color: #555;
+  }
+}
+
+.star {
+  font-size: 24px;
+  color: gold;
+  margin: 0 2px;
+
+  &.empty {
+    color: #ccc;
+  }
+
+  &.half {
+    color: gold;
+    background: linear-gradient(to right, gold 50%, #ccc 50%);
+    // -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+}
+

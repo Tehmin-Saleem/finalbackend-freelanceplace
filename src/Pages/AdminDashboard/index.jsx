@@ -6,6 +6,7 @@ import { jwtDecode } from 'jwt-decode';
 import axios from 'axios';
 import { NotificationContext } from '../Notifications/NotificationContext';
 import NotificationItem from "../../components/NotificationItem/index";
+import { Header } from '../../components';
 
 const AdminDashboard = () => {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -266,6 +267,8 @@ const AdminDashboard = () => {
     };
 
     return (
+      <>
+      <Header/>
       <div className="admin-dashboard">
         <aside className={isSidebarOpen ? 'sidebar open' : 'sidebar closed'}>
           <div className="logo">Admin Panel</div>
@@ -441,6 +444,8 @@ const AdminDashboard = () => {
           )}
         </div>
       </div>
+      </>
+
     );
 };
 

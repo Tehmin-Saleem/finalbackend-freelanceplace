@@ -7,6 +7,78 @@ $white: #ffffff;
 $border-color: #e5e7eb;
 $error-color: #dc2626;
 
+.project-details-page {
+  font-family: Arial, sans-serif;
+  text-align: center;
+  padding: 20px;
+
+  .hero-section {
+    position: relative;
+    text-align: center;
+    color: white;
+
+    .hero-image {
+      width: 100%;
+      height: 300px;
+      object-fit: cover;
+      filter: brightness(0.7);
+    }
+
+    h1 {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 2.5rem;
+      text-shadow: 2px 2px 5px rgba(75, 205, 235, 0.5);
+
+    }
+
+    .hero-text {
+      margin-top: 20px;
+      font-size: 1.2rem;
+      color: #333;
+    }
+  }
+
+  .instructions {
+    margin: 30px 0;
+
+    h2 {
+      font-size: 1.8rem;
+      color: $primary-color;
+    }
+
+    ul {
+      margin-top: 15px;
+      list-style: disc;
+      padding-left: 20px;
+      text-align: left;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    li {
+      font-size: 1rem;
+      margin-bottom: 10px;
+    }
+  }
+
+  .see-details-btn {
+    padding: 10px 20px;
+    font-size: 1.2rem;
+    background-color: $primary-color;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+
+    &:hover {
+      background-color:$primary-color;
+    }
+  }
+}
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -21,12 +93,18 @@ $error-color: #dc2626;
 
   .modal-container {
     background-color: $background-color;
-    width: 100%;
-    max-width: 500px;
+    width: 90%; /* Increased width */
+    max-width: 600px; /* Maximum width */
+    max-height: 80%; /* Reduced height */
+    overflow-y: auto; /* Scrollable if content exceeds height */
     padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    border-radius: 15px; /* Rounded edges */
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
     position: relative;
+
+    display: flex;
+    flex-direction: column; /* Stack elements vertically */
+    align-items: center;
 
     .close-btn {
       position: absolute;
@@ -44,9 +122,10 @@ $error-color: #dc2626;
     }
 
     .modal-title {
-      font-size: 1.5rem;
+      font-size: 1.8rem;
       margin-bottom: 15px;
       color: $text-color;
+      text-align: center;
     }
 
     .modal-content {
@@ -67,47 +146,96 @@ $error-color: #dc2626;
     }
 
     .remarks-section {
-      margin-top: 15px;
-
-      label {
-        display: block;
-        margin-bottom: 5px;
-        font-weight: bold;
-        color: $text-color;
-      }
-
-      textarea {
-        width: 100%;
-        padding: 8px;
-        border: 1px solid $border-color;
-        border-radius: 5px;
-        resize: none;
-        outline: none;
-      }
-
-      .add-remarks-btn {
-        margin-top: 10px;
-        padding: 8px 12px;
-        background-color: $primary-color;
-        color: $white;
-        border: none;
-        cursor: pointer;
-        border-radius: 5px;
-
-        &:hover {
-          background-color: darken($primary-color, 10%);
-        }
-      }
+      padding: 20px;
+      background-color: #f9f9f9;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      max-width: 600px;
+      margin: 20px auto;
     }
+    
+    label {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 10px;
+      display: block;
+      color: #333;
+    }
+    
+    textarea {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 1rem;
+      color: #333;
+      resize: vertical;
+      margin-bottom: 15px;
+      transition: border-color 0.3s;
+    }
+    
+    textarea:focus {
+      border-color: $primary-color;
+      outline: none;
+    }
+    
+    .add-remarks-btn {
+      background-color: $primary-color;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      font-size: 1rem;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    
+    .add-remarks-btn:hover {
+      background-color: $primary-color;
+    }
+    
+    .existing-remarks {
+      margin-top: 20px;
+    }
+    
+    .remark {
+      background-color: #ffffff;
+      border-left: 5px solid $primary-color;
+      padding: 10px;
+      margin-bottom: 10px;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .remark-text {
+      font-size: 1rem;
+      color: #333;
+    }
+    
+    .remark-date {
+      font-size: 0.85rem;
+      color: #777;
+      margin-top: 5px;
+    }
+    
+    .remark-text,
+    .remark-date {
+      word-wrap: break-word;
+    }
+    
 
     .guidelines {
       margin-top: 20px;
+      width: 100%;
+      text-align: left;
 
       ul {
         padding-left: 20px;
 
         li {
-          margin-bottom: 5px;
+          margin-bottom: 8px;
 
           a {
             color: $primary-color;
@@ -139,7 +267,7 @@ $error-color: #dc2626;
 .see-details-btn {
   background-color: $primary-color;
   color: $white;
-  padding: 10px 15px;
+  padding: 12px 18px;
   border: none;
   border-radius: 5px;
   cursor: pointer;
@@ -150,11 +278,12 @@ $error-color: #dc2626;
     background-color: darken($primary-color, 10%);
   }
 }
+
 .confidentiality-instruction {
-    background-color: #fff3cd; /* Light yellow background */
-    color: #856404; /* Dark golden-brown text */
-    border: 1px solid #ffeeba; /* Matching border */
-    padding: 10px;
-    border-radius: 5px;
-    font-size: 14px;
-  }
+  background-color: #fff3cd; /* Light yellow background */
+  color: #856404; /* Dark golden-brown text */
+  border: 1px solid #ffeeba; /* Matching border */
+  padding: 10px;
+  border-radius: 5px;
+  font-size: 14px;
+}

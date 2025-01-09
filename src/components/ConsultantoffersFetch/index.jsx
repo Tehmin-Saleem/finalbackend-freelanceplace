@@ -12,10 +12,18 @@ const ConsultantOffers = () => {
   const [error, setError] = useState("");
   const [showProjectDetails, setShowProjectDetails] = useState(false);
   const navigate = useNavigate();
+  
 
-  const handleSeeProjectDetails = (offerId) => {
-    navigate('/SeeProjectDetails', { state: { offerId } }); // Pass offerId as state
+  const handleSeeProjectDetails = (offerId, consultantId) => {
+    console.log("Navigating with offerId:", offerId, "and consultantId:", consultantId);
+    navigate('/SeeProjectDetails',
+       { state:
+         { offerId,
+          consultantId,   } 
+        }); // Pass offerId as state
   };
+
+ 
 
   // Fetch offers on component mount
   useEffect(() => {
@@ -23,6 +31,8 @@ const ConsultantOffers = () => {
       try {
         const token = localStorage.getItem("token");
         const consultantId = JSON.parse(atob(token.split(".")[1])).userId;
+        console.log("split conusltnatid",consultantId);
+        
 
         const response = await axios.get(
           `http://localhost:5000/api/client/offer/${consultantId}`,
@@ -99,6 +109,69 @@ const ConsultantOffers = () => {
         <p>{error}</p>
       </div>
     );
+
+    const fetchAndViewProjectDetails = async (offerId, consultantId) => {
+      try {
+        console.log("Fetching project details for offerId:", offerId);
+    
+        const token = localStorage.getItem("token");
+        if (!token) {
+          alert("You are not authorized. Please log in first.");
+          return;
+        }
+    
+        // Fetch project details from the backend
+        const response = await axios.get(
+          `http://localhost:5000/api/client/project-details/${offerId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+          }
+        );
+        console.log("Response of additional project details:", response);
+    
+        // Destructure the response data
+        const { githubUrl, additionalNotes, deadline } = response.data;
+    
+        // Validation
+        const isValidUrl = (url) => {
+          try {
+            return !!new URL(url); // Throws error for invalid URLs
+          } catch {
+            return false;
+          }
+        };
+    
+        const isValidDate = (date) => {
+          const parsedDate = new Date(date);
+          return !isNaN(parsedDate) && parsedDate > new Date(); // Ensure it's a valid future date
+        };
+    
+        if (
+          !isValidUrl(githubUrl) || 
+          !additionalNotes?.trim() || 
+          !isValidDate(deadline)
+        ) {
+          alert("Thank you for your patience. The client is in the process of providing the project details. Please check back soon.");
+
+          return;
+        }
+    
+        // If validation passes, navigate to the project details page
+        console.log("Navigating to project details page with data:", response.data);
+        navigate("/SeeProjectDetails", {
+          state: { offerId, consultantId, projectDetails: response.data },
+        });
+      } catch (err) {
+        console.error("Failed to fetch project details:", err.response || err);
+        alert("Failed to fetch project details. Please try again later.");
+      }
+    };
+    
+    
+    
 
   return (
     <>
@@ -177,10 +250,13 @@ const ConsultantOffers = () => {
         <div>
  <button
   className="accept-button"
-  onClick={() => handleSeeProjectDetails(offer._id)} // Use _id here
+  onClick={() => fetchAndViewProjectDetails(offer._id, offer.consultantId)}
 >
   View Project Details
 </button>
+
+
+
         </div>
                     )}
                     {status === "declined" && (

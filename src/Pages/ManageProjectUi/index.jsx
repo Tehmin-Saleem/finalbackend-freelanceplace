@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import "./styles.scss";
+import { jwtDecode } from "jwt-decode";
 import Header from "../../components/Commoncomponents/Header";
 import { Chat } from "../../svg/index";
 import axios from "axios";
@@ -12,8 +13,8 @@ import {
   CheckCircleOutlined,
   CloseCircleOutlined,
 } from "@ant-design/icons";
-import { jwtDecode } from "jwt-decode";
-import { useNavigate } from 'react-router-dom';
+
+import { useNavigate } from "react-router-dom";
 import {
   Card,
   Progress,
@@ -35,7 +36,6 @@ import Spinner from "../../components/chatcomponents/Spinner";
 import { PAYPAL_OPTIONS } from "../../config/paypal.config"; // Update the path
 import ConsultantCard from "../../components/ConsultantCards";
 
-
 const ManageProjectsByClient = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -44,7 +44,7 @@ const ManageProjectsByClient = () => {
   const [selectedProject, setSelectedProject] = useState(null);
   // Add a new state for storing freelancer payments if needed
   const [freelancerPayments, setFreelancerPayments] = useState([]);
-  
+
   const [paymentStatus, setPaymentStatus] = useState({});
 
   // Add function to update payment status
@@ -63,7 +63,7 @@ const ManageProjectsByClient = () => {
         if (!token) {
           throw new Error("No authentication token found");
         }
-  
+
         // Fetch client profile and ongoing projects in parallel
         const [profileResponse, projectsResponse] = await Promise.all([
           axios.get("http://localhost:5000/api/client/profile", {
@@ -73,15 +73,15 @@ const ManageProjectsByClient = () => {
             headers: { Authorization: `Bearer ${token}` },
           }),
         ]);
-  
+
         console.log("Profile Response:", profileResponse.data);
         console.log("Projects Response:", projectsResponse.data);
-  
+
         setProfileData(profileResponse.data.data);
         const projectsData = projectsResponse.data.data;
-        console.log('projects', projectsData)
+        console.log("projects", projectsData);
         setProjects(projectsData);
-  
+
         // Fetch payment details for each freelancer
         const freelancerPaymentDetails = await Promise.all(
           projectsData.map(async (project) => {
@@ -89,7 +89,7 @@ const ManageProjectsByClient = () => {
               project.freelancer._id ||
               project.proposalDetails?.Proposal_id?.freelancer ||
               project.freelancer?.id;
-  
+
             if (!freelancerId) {
               console.warn(
                 "No freelancer ID found for project:",
@@ -97,25 +97,24 @@ const ManageProjectsByClient = () => {
               );
               return null;
             }
-  
+
             const paymentDetails =
               await fetchFreelancerPaymentDetails(freelancerId);
-  
+
             return {
               freelancerId,
               paymentDetails: paymentDetails || null,
             };
           })
         );
-  
+
         // Filter out null entries
         const validPaymentDetails = freelancerPaymentDetails.filter(
           (detail) => detail && detail.freelancerId && detail.paymentDetails
         );
-  
+
         console.log("Valid Freelancer Payment Details:", validPaymentDetails);
         setFreelancerPayments(validPaymentDetails);
-  
       } catch (error) {
         console.error("Error fetching data :", error);
         setError(error.message || "An error occurred while fetching data");
@@ -123,17 +122,16 @@ const ManageProjectsByClient = () => {
         setLoading(false);
       }
     };
-  
+
     fetchData();
   }, []);
   useEffect(() => {
     console.log("Projects state updated:", projects);
   }, [projects]);
-  
+
   useEffect(() => {
     console.log("Selected project state updated:", selectedProject);
   }, [selectedProject]);
-    
 
   const fetchFreelancerPaymentDetails = async (freelancerId) => {
     try {
@@ -315,7 +313,6 @@ const ProjectCard = ({ project, onClick, isSelected }) => {
   );
 };
 
-
 const ProjectDetails = ({
   project,
   onProjectStatusChange,
@@ -380,16 +377,15 @@ const ProjectDetails = ({
     setShowReviewModal(true);
   };
   const handleHireConsultant = () => {
-    navigate('/Consultantprofiles', { 
-      state: { 
+    navigate("/Consultantprofiles", {
+      state: {
         project: project, // Pass the entire project object
         projectId: project._id,
-        projectName: project.projectName, 
-        projectDescription: project.description 
-      } 
+        projectName: project.projectName,
+        projectDescription: project.description,
+      },
     });
   };
-
 
   const fetchProgress = async () => {
     // if (!projectId) return;
@@ -431,6 +427,7 @@ const ProjectDetails = ({
     } finally {
       setLoading(false);
     }
+    return <div>{decodedToken?.clientId}</div>;
   };
 
   useEffect(() => {
@@ -480,6 +477,7 @@ const ProjectDetails = ({
     } finally {
       setIsSubmitting(false);
     }
+    return <div>{decodedToken?.clientId}</div>;
   };
 
   const formatHourlyRate = (project) => {
@@ -724,8 +722,6 @@ const ProjectDetails = ({
             </Card>
           )}
 
-       
-
           {/* Project Statistics */}
           <Row gutter={[16, 16]} style={{ marginTop: 16 }}>
             <Col span={8}>
@@ -758,11 +754,8 @@ const ProjectDetails = ({
             </Col>
           </Row>
 
-
-
-
-             {/* Mark as Complete Button - Show only when progress is 100% */}
-             {progressData.progressData.overallProgress === 100 && (
+          {/* Mark as Complete Button - Show only when progress is 100% */}
+          {progressData.progressData.overallProgress === 100 && (
             <Button
               type="primary"
               className="mark-complete-btn"
@@ -771,16 +764,15 @@ const ProjectDetails = ({
             >
               Mark as Completed
             </Button>
-            
           )}
-            <Button
-          type="primary"
-          className="hire-consulatnt-btn"
-          onClick={handleHireConsultant}
-          style={{ marginTop: 16 }}
-        >
-          Hire Consultant
-        </Button>
+          <Button
+            type="primary"
+            className="hire-consulatnt-btn"
+            onClick={handleHireConsultant}
+            style={{ marginTop: 16 }}
+          >
+            Hire Consultant
+          </Button>
         </div>
       );
     }
@@ -999,6 +991,65 @@ const ProjectDetails = ({
     }
   };
 
+  const [remarks, setRemarks] = useState([]);
+
+  const handleRemarksTabClick = async () => {
+    setActiveTab("Remarks"); // Set the active tab
+
+    try {
+      // Get the token from localStorage
+      const token = localStorage.getItem("token");
+
+      if (!token) {
+        console.error("No token found in localStorage");
+        return;
+      }
+
+      // Get the userInfo object from localStorage
+      const userInfo = localStorage.getItem("userInfo");
+
+      if (!userInfo) {
+        console.error("No userInfo found in localStorage");
+        return;
+      }
+
+      // Parse userInfo to extract clientId
+      const parsedUserInfo = JSON.parse(userInfo);
+      const clientId = parsedUserInfo?.user?.clientId;
+
+      if (!clientId) {
+        console.error("Client ID not found in userInfo");
+        return;
+      }
+
+      console.log("Client ID for fetching the remarks:", clientId);
+
+      // Send the job_title (project name) and clientId as query parameters in the URL
+      const response = await fetch(
+        `http://localhost:5000/api/client/getRemarksByProjectAndClient/${project.job_title}/${clientId}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`, // Include token in Authorization header
+          },
+        }
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log("data fetched of remarks", data);
+
+        setRemarks(data);
+        console.log("setreamrks", setRemarks); // Update the remarks state with the fetched data
+      } else {
+        console.error("Failed to fetch remarks");
+      }
+    } catch (error) {
+      console.error("Error fetching remarks:", error);
+    }
+  };
+
   return (
     <div className="project-details">
       {/* Show payment button only if not paid */}
@@ -1031,6 +1082,35 @@ const ProjectDetails = ({
         >
           Proposal
         </button>
+        <button
+          className={`tab ${activeTab === "Remarks" ? "active" : ""}`}
+          onClick={handleRemarksTabClick}
+        >
+          Remarks
+        </button>
+
+        {/* {activeTab === "Remarks" && (
+          <div className="remarks-section">
+            <h2>Remarks for {project.job_title}</h2>
+            {remarks.length > 0 ? (
+              <ul>
+                {remarks.map((remark, index) => (
+                  <li key={index}>
+                    <p>
+                      <strong>Remark {index + 1}:</strong> {remark.remark}
+                    </p>
+                    <p>
+                      <em>Created At:</em>{" "}
+                      {new Date(remark.createdAt).toLocaleString()}
+                    </p>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p>No remarks available for this job title.</p>
+            )}
+          </div>
+        )} */}
       </div>
 
       {paymentStatus === "paid" && paymentDetails && (
@@ -1096,18 +1176,18 @@ const ProjectDetails = ({
               <hr className="divider" />
 
               <div className="job-infor">
-              <span className="job-info-item">
-  <span className="labeltext">
-    {project.budget_type === "fixed"
-      ? "Fixed Price:"
-      : "Hourly Rate:"}
-  </span>
-  <span className="value">
-    {project.budget_type === "fixed"
-      ? `$${project.budget.amount}`
-      : formatHourlyRate(project)}
-  </span>
-</span>
+                <span className="job-info-item">
+                  <span className="labeltext">
+                    {project.budget_type === "fixed"
+                      ? "Fixed Price:"
+                      : "Hourly Rate:"}
+                  </span>
+                  <span className="value">
+                    {project.budget_type === "fixed"
+                      ? `$${project.budget.amount}`
+                      : formatHourlyRate(project)}
+                  </span>
+                </span>
 
                 <span className="job-info-item">
                   <span className="labeltext">Project Duration:</span>
@@ -1227,8 +1307,6 @@ const ProjectDetails = ({
                 </span>
               </div>
 
-         
-
               {project.proposalDetails.attachments && (
                 <div className="proposal-attachments">
                   <h4>Attachments</h4>
@@ -1271,6 +1349,29 @@ const ProjectDetails = ({
                 Message Freelancer
               </button>
             </div>
+          </div>
+        )}
+
+        {activeTab === "Remarks" && (
+          <div className="remarks-section">
+            <h2>Remarks for {project.job_title}</h2>
+            {remarks.length > 0 ? (
+              <ul>
+                {remarks.map((remark, index) => (
+                  <li key={index}>
+                    <p>
+                      <strong>Remark {index + 1}:</strong> {remark.remark}
+                    </p>
+                    <p>
+                      <em>Created At:</em>{" "}
+                      {new Date(remark.createdAt).toLocaleString()}
+                    </p>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p>No remarks available for this job title.</p>
+            )}
           </div>
         )}
       </div>
