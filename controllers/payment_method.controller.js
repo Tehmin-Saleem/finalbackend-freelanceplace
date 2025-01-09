@@ -493,6 +493,8 @@ exports.processPaymentForFreelancer = async (req, res) => {
       projectId,
       client_id,
       proposal_id,
+      isOffer, // Add this flag to identify offer payments
+      projectName, // Add this for offer identification
       paymentDetails, // Add this to receive payment details
     } = req.body;
 
@@ -500,11 +502,13 @@ exports.processPaymentForFreelancer = async (req, res) => {
       freelancerId,
       projectId,
       proposal_id,
+      isOffer,
+      projectName,
       paymentDetails,
     });
 
     // Validate required fields
-    if (!freelancerId || !proposal_id || !client_id) {
+    if (!freelancerId || (!proposal_id && !isOffer) || !client_id) {
       return res.status(400).json({
         success: false,
         message: "Missing required fields",
@@ -512,10 +516,19 @@ exports.processPaymentForFreelancer = async (req, res) => {
     }
 
    // Get the latest project data
-   const project = await Project.findOne({
-    proposal_id: proposal_id,
-    client_id: client_id
-  }).sort({ createdAt: -1 });
+   let project;
+   if (isOffer) {
+     project = await Project.findOne({
+       projectName: projectName,
+       client_id: client_id,
+       proposal_id: null // For offers, proposal_id should be null
+     }).sort({ createdAt: -1 });
+   } else {
+     project = await Project.findOne({
+       proposal_id: proposal_id,
+       client_id: client_id
+     }).sort({ createdAt: -1 });
+   }
 
     if (!project) {
       return res.status(404).json({
@@ -569,22 +582,32 @@ exports.processPaymentForFreelancer = async (req, res) => {
     };
 
     // Handle milestone updates
-    if (project.projectType === "milestone" && milestoneId) {
-      try {
-        // Update the specific milestone in the project
-        await Project.updateOne(
-          {
+  // Handle milestone updates
+  if (project.projectType === "milestone" && milestoneId) {
+    try {
+      // Create the query based on whether it's an offer or regular project
+      const milestoneQuery = isOffer 
+        ? {
+            projectName: projectName,
+            client_id: client_id,
+            "milestones._id": milestoneId
+          }
+        : {
             proposal_id: proposal_id,
             client_id: client_id,
             "milestones._id": milestoneId
-          },
-          {
-            $set: {
-              "milestones.$.status": "Completed",
-              "milestones.$.paid": true
-            }
+          };
+
+      // Update the specific milestone
+      await Project.updateOne(
+        milestoneQuery,
+        {
+          $set: {
+            "milestones.$.status": "Completed",
+            "milestones.$.paid": true
           }
-        );
+        }
+      );
 
 
      // Get the updated project to calculate new progress
@@ -601,6 +624,17 @@ exports.processPaymentForFreelancer = async (req, res) => {
           throw new Error('Failed to fetch updated project data');
         }
 
+
+        // Calculate progress
+        const totalMilestones = updatedProjectData.milestones.length;
+        const completedMilestones = updatedProjectData.milestones.filter(
+          m => m.status === "Completed"
+        ).length;
+        const newProgress = Math.round((completedMilestones / totalMilestones) * 100);
+
+        // Update progress in updateData
+        updateData.progress = newProgress;
+
        
         console.log('Milestone update successful:', {
           totalMilestones,
@@ -613,6 +647,18 @@ exports.processPaymentForFreelancer = async (req, res) => {
         throw new Error(`Failed to update milestone: ${milestoneError.message}`);
       }
     }
+
+    // Update the project with all changes
+    const finalUpdateQuery = isOffer
+      ? {
+          projectName: projectName,
+          client_id: client_id,
+          proposal_id: null
+        }
+      : {
+          proposal_id: proposal_id,
+          client_id: client_id
+        };
 
     // Update the project with all changes
     const finalUpdatedProject = await Project.findOneAndUpdate(

@@ -209,7 +209,7 @@ router.get('/proposals/count/:userId',authMiddleware, proposalController.getTota
 router.get('/hired-jobs/:freelancerId', hireFreelancerController.getFreelancerHiredJobs);
 
 // Get specific job review
-// router.get('/job-review/:jobId',authMiddleware, hireFreelancerController.getJobReview);
+router.get('/job-review/:jobId',authMiddleware, hireFreelancerController.getJobReview);
 
 // Get all reviews for a freelancer
 router.get('/freelancer-reviews/:freelancerId',authMiddleware, hireFreelancerController.getFreelancerReviews);

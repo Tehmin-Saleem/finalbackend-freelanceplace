@@ -449,17 +449,29 @@ exports.getProjectProgress = async (req, res) => {
     }
 
     const { proposal_id } = req.params;
-    const { client_id } = req.query;
+    const { client_id, projectName } = req.query;
 
-    console.log("proposal_id", proposal_id);
-
-    // Validate IDs
-    if (!mongoose.Types.ObjectId.isValid(proposal_id) || !mongoose.Types.ObjectId.isValid(client_id)) {
-      return res.status(400).json({
-        success: false,
-        message: 'Invalid proposal or client ID format'
-      });
-    }
+// Build match condition based on available parameters
+let matchCondition;
+if (proposal_id !== 'null' && proposal_id) {
+  // For normal jobs with proposal_id
+  matchCondition = {
+    proposal_id: new mongoose.Types.ObjectId(proposal_id),
+    client_id: new mongoose.Types.ObjectId(client_id)
+  };
+} else if (projectName) {
+  // For offered jobs without proposal_id
+  matchCondition = {
+    projectName: projectName,
+    client_id: new mongoose.Types.ObjectId(client_id),
+    proposal_id: null // Specifically for offers
+  };
+} else {
+  return res.status(400).json({
+    success: false,
+    message: 'Invalid request parameters'
+  });
+}
 
 
 
@@ -468,10 +480,7 @@ exports.getProjectProgress = async (req, res) => {
   // Modified aggregation pipeline
     const project = await Project.aggregate([
       {
-        $match: {
-          proposal_id: new mongoose.Types.ObjectId(proposal_id),
-          client_id: new mongoose.Types.ObjectId(client_id)
-        }
+        $match: matchCondition
       },
       {
         $lookup: {
@@ -623,11 +632,6 @@ if (currentProject.projectType === 'milestone') {
     });
   }
 };
-
-
-
-
-
 
 
 exports.getProjectProgressById = async (req, res) => {
@@ -1138,3 +1142,108 @@ exports.getProjectProgressById = async (req, res) => {
 //     });
 //   }
 // };
+
+
+
+exports.getOfferProgress = async (req, res) => {
+  try {
+    const { client_id, projectName } = req.query;
+    console.log('Fetching offer progress for:', { client_id, projectName });
+
+    if (!client_id || !projectName) {
+      return res.status(400).json({
+        success: false,
+        message: 'Client ID and project name are required'
+      });
+    }
+
+    // Find the latest progress entry for the given client and project name
+    const projectData = await Project.findOne({
+      client_id: client_id,
+      projectName: projectName,
+      proposal_id: null // To ensure it's an offer progress
+    })
+    .populate('freelancer_profile_id', 'first_name last_name profile_image country_name')
+    .sort({ createdAt: -1 });
+
+    if (!projectData) {
+      return res.status(404).json({
+        success: false,
+        message: 'No progress data found for this offer'
+      });
+    }
+
+    // Calculate time metrics
+    const now = new Date();
+    const startDate = projectData.createdAt;
+    const dueDate = projectData.due_date;
+    
+    const totalDays = Math.ceil((dueDate - startDate) / (1000 * 60 * 60 * 24));
+    const daysElapsed = Math.ceil((now - startDate) / (1000 * 60 * 60 * 24));
+    const daysRemaining = Math.ceil((dueDate - now) / (1000 * 60 * 60 * 24));
+    const isOverdue = now > dueDate;
+
+    // Format milestones data
+    const formattedMilestones = projectData.milestones.map(milestone => ({
+      name: milestone.name,
+      status: milestone.status,
+      amount: milestone.amount,
+      due_date: milestone.due_date,
+      progress: milestone.status === "Completed" ? 100 : 
+               milestone.status === "In Progress" ? 50 : 0
+    }));
+
+    // Calculate overall progress based on milestones
+    const overallProgress = projectData.progress;
+
+    // Format the response to match your existing structure
+    const response = {
+      success: true,
+      data: {
+        projectDetails: {
+          projectId: projectData._id,
+          projectName: projectData.projectName,
+          description: projectData.description,
+          status: projectData.status,
+          budget: projectData.budget,
+          paymentStatus: projectData.paymentStatus,
+          clientApproved: projectData.clientApproved,
+          paymentDetails: projectData.paymentDetails,
+          freelancer: projectData.freelancer_profile_id ? {
+            name: `${projectData.freelancer_profile_id.first_name} ${projectData.freelancer_profile_id.last_name}`,
+            image: projectData.freelancer_profile_id.profile_image,
+            country: projectData.freelancer_profile_id.country_name
+          } : null
+        },
+        progressData: {
+          type: projectData.projectType,
+          overallProgress: overallProgress,
+          lastUpdated: projectData.updatedAt,
+          milestones: formattedMilestones,
+          completedMilestones: formattedMilestones.filter(m => m.status === "Completed").length,
+          totalMilestones: formattedMilestones.length
+        },
+        timeMetrics: {
+          startDate,
+          dueDate,
+          totalDays,
+          daysElapsed,
+          daysRemaining,
+          isOverdue,
+          lastUpdated: projectData.updatedAt
+        }
+      }
+    };
+
+    console.log('Sending offer progress response:', response);
+    res.status(200).json(response);
+
+  } catch (error) {
+    console.error('Error in getOfferProgress:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error fetching offer progress',
+      error: error.message
+    });
+  }
+};

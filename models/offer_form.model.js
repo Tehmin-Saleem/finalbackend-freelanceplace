@@ -13,7 +13,7 @@ const Offer_FormSchema = new Schema({
   },
   status: {
     type: String,
-    enum: ['pending', 'accepted', 'declined'],
+    enum: ['pending', 'accepted', 'declined', 'ongoing', 'completed'],
     default: 'pending'
   },
   budget_type: { 
