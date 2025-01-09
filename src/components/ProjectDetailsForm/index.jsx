@@ -13,6 +13,8 @@ const SendProjectDetails = ({ consultantId, onProjectSent, onClose, clientId }) 
   const [isModalOpen, setIsModalOpen] = useState(true);
   const [isSent, setIsSent] = useState(false); // Track if the project details were sent
 
+  console.log("consultant id outside",  consultantId)
+
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     setFormData({
