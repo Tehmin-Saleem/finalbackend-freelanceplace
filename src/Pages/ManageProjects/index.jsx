@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import EditableProjectCard from "../../components/EditAbleProjectCard";
@@ -11,6 +10,7 @@ const ManageProjects = () => {
   const [projects, setProjects] = useState([]);
   const { freelancer_id, client_id } = location.state || {};
   const navigate = useNavigate();
+
   const extractMilestones = (data) => {
     // Try all possible paths where milestones might be stored
     const possiblePaths = [
@@ -24,14 +24,13 @@ const ManageProjects = () => {
 
     // Find the first path that contains a valid milestone array
     const milestones = possiblePaths.find(path => Array.isArray(path) && path.length > 0);
-    
+
     return milestones || [];
   };
+
   useEffect(() => {
     if (proposalData) {
-  
       const milestones = extractMilestones(proposalData);
-    
 
       const transformedProject = {
         projectName: jobData?.job_title || jobData?.title || 'Untitled Project',
@@ -46,20 +45,20 @@ const ManageProjects = () => {
         due_date: proposalData?.due_date || new Date().toISOString(),
         progress: 0,
         milestones: formatMilestones(milestones),
-        budget: formatBudget(milestones) || 
-        (jobData?.rate ? 
-          `Fixed Price: $${parseFloat(jobData.rate.replace(/[^0-9.-]+/g, ''))}` : 
+        budget: formatBudget(milestones) ||
+        (jobData?.rate ?
+          `Fixed Price: $${parseFloat(jobData.rate.replace(/[^0-9.-]+/g, ''))}` :
           'Not specified'),
         description: jobData?.description || '',
         proposal_id: proposalData?._id || proposalData?.id,
         client_id: client_id || proposalData?.clientInfo?._id || jobData?.client_id,
         freelancer_id: freelancer_id || proposalData?.freelancerProfile?._id || proposalData?.freelancer_id,
-        projectType: milestones.length > 0 ? 'milestone' : 'fixed',
+        projectType: proposalData.source === 'offer' || !proposalData?._id ? 'fixed' : (milestones.length > 0 ? 'milestone' : 'fixed'),
         status: 'Ongoing',
-      
-        clientApproved: false
+        clientApproved: false,
+        source: proposalData?._id ? proposalData.source : 'offer'
       };
-      
+
       console.log('6. Final Transformed Project:', transformedProject);
       setProjects([transformedProject]);
     }
@@ -74,12 +73,11 @@ const ManageProjects = () => {
   };
 
   const formatClientName = (clientInfo, proposalData, jobData) => {
-    console.log('Formatting Client Name - Inputs:', { 
-      clientInfo, 
-     
-      jobData 
+    console.log('Formatting Client Name - Inputs:', {
+      clientInfo,
+      jobData
     });
-  
+
     const nameOptions = [
       // More aggressive extraction
       clientInfo?.name,
@@ -87,28 +85,26 @@ const ManageProjects = () => {
       clientInfo?.firstName,
       clientInfo?.lastName,
       `${clientInfo?.firstName} ${clientInfo?.lastName}`.trim(),
-      
       proposalData?.clientName,
       proposalData?.clientInfo?.name,
       `${proposalData?.clientInfo?.firstName} ${proposalData?.clientInfo?.lastName}`.trim(),
-      
       jobData?.clientName,
       jobData?.client?.name,
       `${jobData?.client?.firstName} ${jobData?.client?.lastName}`.trim(),
       `${jobData?.client_first_name} ${jobData?.client_last_name}`.trim()
     ];
-  
-    const clientName = nameOptions.find(name => 
-      name && 
-      typeof name === 'string' && 
-      name.trim() !== '' && 
+
+    const clientName = nameOptions.find(name =>
+      name &&
+      typeof name === 'string' &&
+      name.trim() !== '' &&
       name.toLowerCase() !== 'not specified'
     );
-  
+
     console.log('Extracted Client Name:', jobData.clientName);
     return clientName || 'Not specified';
   };
-  
+
   const formatMilestones = (milestones) => {
     if (!Array.isArray(milestones) || milestones.length === 0) {
       return [];
@@ -117,7 +113,7 @@ const ManageProjects = () => {
     return milestones.map((milestone, index) => {
       // Log each milestone's structure
       console.log(`Formatting milestone ${index}:`, milestone);
-      
+
       return {
         name: milestone.description || milestone.name || milestone.milestone_name || `Milestone ${index + 1}`,
         status: milestone.status || 'Not Started',
@@ -130,27 +126,26 @@ const ManageProjects = () => {
   const formatBudget = (milestones) => {
     // If milestones exist and have a total amount, use milestone-based budget
     if (Array.isArray(milestones) && milestones.length > 0) {
-      const totalAmount = milestones.reduce((sum, milestone) => 
+      const totalAmount = milestones.reduce((sum, milestone) =>
         sum + (parseFloat(milestone.amount) || 0), 0);
       return `By Milestone: $${totalAmount.toFixed(2)}`;
     }
-    
+
     // If no milestones, try to use the rate from the project data
     const rate = jobData?.rate || proposalData?.add_requirements?.byproject?.amount;
-    
+
     if (rate) {
-      const formattedRate = typeof rate === 'string' 
-        ? parseFloat(rate.replace(/[^0-9.-]+/g, '')) 
+      const formattedRate = typeof rate === 'string'
+        ? parseFloat(rate.replace(/[^0-9.-]+/g, ''))
         : parseFloat(rate);
-      
-      return formattedRate > 0 
-        ? `Fixed Price: $${formattedRate.toFixed(2)}` 
+
+      return formattedRate > 0
+        ? `Fixed Price: $${formattedRate.toFixed(2)}`
         : 'Not specified';
     }
-    
+
     return 'Not specified';
   };
-  
 
   const handleSave = async (index, updatedProject) => {
     console.log('Saving project with updates:', updatedProject);
@@ -158,7 +153,6 @@ const ManageProjects = () => {
       const updatedProjects = [...projects];
       updatedProjects[index] = {
         ...updatedProject,
-        
         proposal_id: updatedProject.source === 'offer' ? undefined : updatedProject.proposal_id,
         clientInfo: projects[index].clientInfo
       };
@@ -173,18 +167,13 @@ const ManageProjects = () => {
     <>
       <Header/>
       <div className="manage-projects">
-        
-          
-          
-
         <div className="project-list">
-        
           {projects.map((project, index) => (
             <EditableProjectCard
               key={index}
               project={project}
               onSave={(updatedProject) => handleSave(index, updatedProject)}
-              onComplete={(updatedProject) => handleSave(index, updatedProject)} 
+              onComplete={(updatedProject) => handleSave(index, updatedProject)}
             />
           ))}
         </div>

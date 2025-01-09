@@ -21,6 +21,7 @@ import ProjectDuration from "./ProjectDuration";
 import SignUpSection from "./SignUpSection";
 import SkillManagement from "./SkilSection";
 import AllJobsPage from "./AllJobs";
+import { Carousel } from "../components";
 
 
 // Export all the imported modules
@@ -48,5 +49,7 @@ export {default as ProjectDuration} from "./ProjectDuration"
 export {default as SignUpSection} from "./SignUpSection"
 export {default as SkillManagement} from "./SkilSection"
 export {default as AllJobsPage } from "./AllJobs"
+export {default as Carousel} from "../components/ProfileView/Carousel"
+
 
 

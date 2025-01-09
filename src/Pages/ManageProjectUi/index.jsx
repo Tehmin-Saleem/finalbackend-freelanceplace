@@ -12,15 +12,21 @@ import {
   ReloadOutlined,
   CheckCircleOutlined,
   CloseCircleOutlined,
+  ClockCircleOutlined,
+  MessageOutlined,
+  PaperClipOutlined,
+  DownloadOutlined,
 } from "@ant-design/icons";
-
+import { jwtDecode } from "jwt-decode";
 import { useNavigate } from "react-router-dom";
 import {
   Card,
   Progress,
+  Space,
   Tag,
   Row,
   Col,
+  Divider,
   Timeline,
   Empty,
   Alert,
@@ -30,6 +36,7 @@ import {
   Button,
   message,
 } from "antd";
+
 const { Title, Text, Paragraph } = Typography;
 import Spinner from "../../components/chatcomponents/Spinner";
 
@@ -37,6 +44,7 @@ import { PAYPAL_OPTIONS } from "../../config/paypal.config"; // Update the path
 import ConsultantCard from "../../components/ConsultantCards";
 
 const ManageProjectsByClient = () => {
+  console.log("ManageProjectsByClient rendering");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [profileData, setProfileData] = useState(null);
@@ -65,22 +73,36 @@ const ManageProjectsByClient = () => {
         }
 
         // Fetch client profile and ongoing projects in parallel
-        const [profileResponse, projectsResponse] = await Promise.all([
-          axios.get("http://localhost:5000/api/client/profile", {
-            headers: { Authorization: `Bearer ${token}` },
-          }),
-          axios.get("http://localhost:5000/api/client/ongoing-projects", {
-            headers: { Authorization: `Bearer ${token}` },
-          }),
-        ]);
+        const [profileResponse, projectsResponse, offersResponse] =
+          await Promise.all([
+            axios.get("http://localhost:5000/api/client/profile", {
+              headers: { Authorization: `Bearer ${token}` },
+            }),
+            axios.get("http://localhost:5000/api/client/ongoing-projects", {
+              headers: { Authorization: `Bearer ${token}` },
+            }),
+            axios.get("http://localhost:5000/api/client/accepted-offers", {
+              headers: { Authorization: `Bearer ${token}` },
+            }),
+          ]);
 
         console.log("Profile Response:", profileResponse.data);
         console.log("Projects Response:", projectsResponse.data);
+        console.log("Offers Response:", offersResponse.data);
 
         setProfileData(profileResponse.data.data);
         const projectsData = projectsResponse.data.data;
-        console.log("projects", projectsData);
-        setProjects(projectsData);
+        const offersData = offersResponse.data.data;
+
+        // Combine and sort by date
+        const combinedData = [...projectsData, ...offersData].sort(
+          (a, b) => new Date(b.startDate) - new Date(a.startDate)
+        );
+
+        console.log("Combined projects and offers:", combinedData);
+
+        // console.log("projects", projectsData);
+        setProjects(combinedData);
 
         // Fetch payment details for each freelancer
         const freelancerPaymentDetails = await Promise.all(
@@ -168,78 +190,108 @@ const ManageProjectsByClient = () => {
   if (loading) return <Spinner alignCenter />;
   if (error) return <div className="error-message">{error}</div>;
 
+  const ErrorBoundary = ({ children }) => {
+    const [hasError, setHasError] = useState(false);
+    const [error, setError] = useState(null);
+
+    if (hasError) {
+      return (
+        <div style={{ padding: "20px", color: "red" }}>
+          Error: {error?.message}
+        </div>
+      );
+    }
+
+    try {
+      return children;
+    } catch (err) {
+      setError(err);
+      setHasError(true);
+      return null;
+    }
+  };
+
   return (
     <>
       <PayPalScriptProvider options={PAYPAL_OPTIONS}>
         <Header />
-        <div className="manage-projects">
-          {/* Header Section */}
-          <header className="main">
-            <div className="header-content">
-              <h1>Manage Ongoing Projects</h1>
-              <p>Track project progress and milestones</p>
-            </div>
+        <ErrorBoundary>
+          <div className="manage-projects">
+            <ErrorBoundary>
+              {/* Header Section */}
+              <div className="upperhead">
+                <div className="header-content">
+                  <h1>Manage Ongoing Projects</h1>
+                  <p>Track project progress and milestones</p>
+                </div>
 
-            <div className="client-profile">
-              <img
-                src={profileData?.image || "https://via.placeholder.com/150"}
-                alt={profileData?.name || "Client"}
-                className="profile-image"
-              />
-              <div className="profile-info">
-                <span className="name">
-                  {profileData?.name || "Loading..."}
-                </span>
-                <span className="email">{profileData?.email}</span>
-              </div>
-            </div>
-          </header>
-
-          {/* Projects Section */}
-          <div className="projects-container">
-            {/* Project List */}
-            <div className="project-list">
-              {projects.length === 0 ? (
-                <div className="no-projects">No ongoing projects found</div>
-              ) : (
-                projects.map((project) => (
-                  <ProjectCard
-                    key={project.projectId}
-                    project={project}
-                    onClick={() => handleProjectClick(project)}
-                    isSelected={
-                      selectedProject?.projectId === project.projectId
+                <div className="client-profile">
+                  <img
+                    src={
+                      profileData?.image || "https://via.placeholder.com/150"
                     }
+                    alt={profileData?.name || "Client"}
+                    className="profile-image"
                   />
-                ))
-              )}
-            </div>
+                  <div className="profile-info">
+                    <span className="name">
+                      {profileData?.name || "Loading..."}
+                    </span>
+                    <span className="email">{profileData?.email}</span>
+                  </div>
+                </div>
+              </div>
+            </ErrorBoundary>
 
-            {/* Project Details */}
-            {selectedProject && (
-              <ProjectDetails
-                project={selectedProject}
-                freelancerPayments={freelancerPayments}
-                onProjectUpdate={(updatedProject) => {
-                  setProjects((prevProjects) =>
-                    prevProjects.map((p) =>
-                      p._id === updatedProject._id ? updatedProject : p
-                    )
-                  );
-                  setSelectedProject(updatedProject);
-                }}
-              />
-            )}
+            <ErrorBoundary>
+              {/* Projects Section */}
+              <div className="projects-container">
+                {/* Project List */}
+                <div className="project-list">
+                  {projects.length === 0 ? (
+                    <div className="no-projects">No ongoing projects found</div>
+                  ) : (
+                    projects.map((project) => (
+                      <ProjectCard
+                        key={project.projectId}
+                        project={project}
+                        onClick={() => handleProjectClick(project)}
+                        isSelected={
+                          selectedProject?.projectId === project.projectId
+                        }
+                      />
+                    ))
+                  )}
+                </div>
+
+                {/* Project Details */}
+                {selectedProject && (
+                  <ProjectDetails
+                    project={selectedProject}
+                    freelancerPayments={freelancerPayments}
+                    onProjectUpdate={(updatedProject) => {
+                      setProjects((prevProjects) =>
+                        prevProjects.map((p) =>
+                          p._id === updatedProject._id ? updatedProject : p
+                        )
+                      );
+                      setSelectedProject(updatedProject);
+                    }}
+                  />
+                )}
+              </div>
+            </ErrorBoundary>
           </div>
-        </div>
+        </ErrorBoundary>
       </PayPalScriptProvider>
     </>
   );
 };
 
 const ProjectCard = ({ project, onClick, isSelected }) => {
-  console.log("ProjectCard props:", project);
+  const isOffer = project.type === "offer";
 
+  // console.log("ProjectCard is being rendering");
   const formatDate = (date) => {
     return new Date(date).toLocaleDateString("en-US", {
       year: "numeric",
@@ -263,6 +315,7 @@ const ProjectCard = ({ project, onClick, isSelected }) => {
       <div className="project-header">
         <h3>{project.projectName}</h3>
         <span className="budget">{formatBudgetDisplay(project.budget)}</span>
+        {isOffer && <Tag color="blue">Offer</Tag>}
       </div>
 
       <div className="freelancer-info">
@@ -280,7 +333,8 @@ const ProjectCard = ({ project, onClick, isSelected }) => {
             {/* <span className="rating">★ {project.freelancer.rating.toFixed(1)}</span> */}
           </div>
           <span className="status">
-            Hired on {formatDate(project.startDate)}
+            {isOffer ? "Accepted on" : "Hired on"}{" "}
+            {formatDate(project.startDate)}
           </span>
         </div>
       </div>
@@ -296,7 +350,7 @@ const ProjectCard = ({ project, onClick, isSelected }) => {
 
       <div className="project-footer">
         <div className="deadline">
-          <Chat />
+        <ClockCircleOutlined />
           <span>
             Due:{" "}
             {project.deadline
@@ -304,10 +358,12 @@ const ProjectCard = ({ project, onClick, isSelected }) => {
               : "No deadline set"}
           </span>
         </div>
-        <div className="milestone-count">
-          <Chat />
-          <span>{project.milestones?.length || 0} Milestones</span>
-        </div>
+        {!isOffer && (
+          <div className="milestone-count">
+            <CheckCircleOutlined />
+            <span>{project.milestones?.length || 0} Milestones</span>
+          </div>
+        )}
       </div>
     </div>
   );
@@ -318,6 +374,7 @@ const ProjectDetails = ({
   onProjectStatusChange,
   freelancerPayments,
 }) => {
+  console.log("ProjectDetails is being rendering");
   const [activeTab, setActiveTab] = useState("overview");
   const [consultantId, setConsultantId] = useState(null);
   const [progressData, setProgressData] = useState(null);
@@ -387,43 +444,188 @@ const ProjectDetails = ({
     });
   };
 
+  // const fetchProgress = async () => {
+  //   // if (!projectId) return;
+  //   setLoading(true);
+  //   try {
+
+  //   const token = localStorage.getItem("token");
+  //   const decodedToken = jwtDecode(token);
+  //   const userId = decodedToken.userId;
+
+  //   // const id = project.proposalDetails.Proposal_id._id;
+
+  //   let response;
+
+  //   if (project.type === 'offer') {
+  //     // Fetch progress for offers
+  //     response = await axios.get(
+  //       `http://localhost:5000/api/client/offer-progress`,
+  //       {
+  //         params: {
+  //           client_id: userId,
+  //           projectName: project.projectName || project.job_title
+  //         },
+  //         headers: { Authorization: `Bearer ${token}` }
+  //       }
+  //     );
+  //   } else {
+  //     // Existing code for regular projects
+  //     const id = project.proposalDetails.Proposal_id._id;
+  //     response = await axios.get(
+  //       `http://localhost:5000/api/client/project-progress/${id}?client_id=${userId}`,
+  //       {
+  //         headers: { Authorization: `Bearer ${token}` }
+  //       }
+  //     );
+  //   }
+
+  //   // try {
+  //   //   const token = localStorage.getItem("token");
+
+  //   //   const response = await axios.get(
+  //   //     `http://localhost:5000/api/client/project-progress/${id}?client_id=${userId}`,
+  //   //     {
+  //   //       headers: { Authorization: `Bearer ${token}` },
+  //   //     }
+  //   //   );
+  //   //   // console.log("Progress :", response.data);
+  //   //   setdescription(response.data.projectDetails.description);
+  //   //   setProjectId(response.data.projectDetails.projectId);
+
+  //   //   setProgressData(response.data);
+
+  //   //   // Update payment status and details if available
+  //   //   if (response.data.projectDetails) {
+  //   //     setPaymentStatus(response.data.projectDetails.paymentStatus);
+  //   //     setPaymentDetails(response.data.projectDetails.paymentDetails);
+  //   //   }
+
+  //   //   setError(null);
+
+  //   console.log("progress data in case of offers ", response.data.data)
+  //   console.log("progress data in case of projects", response.data)
+
+  //   if (response.data.success) {
+  //     const progressData = response.data.data || response.data ;
+  //     setdescription(response.data.projectDetails.description);
+  //     setProjectId(response.data.projectDetails.projectId);
+  //     setProgressData(progressData);
+
+  //     if (progressData.projectDetails) {
+  //       setPaymentStatus(progressData.projectDetails.paymentStatus);
+  //       setPaymentDetails(progressData.projectDetails.paymentDetails);
+  //     }
+
+  //     setError(null);
+  //   }
+  //   } catch (err) {
+  //     console.error("Error fetching progress:", err);
+  //     setError(
+  //       err.response?.data?.message || "Error fetching project progress"
+  //     );
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
+
   const fetchProgress = async () => {
-    // if (!projectId) return;
-
-    const token = localStorage.getItem("token");
-    const decodedToken = jwtDecode(token);
-    const userId = decodedToken.userId;
-
-    const id = project.proposalDetails.Proposal_id._id;
-
     setLoading(true);
     try {
       const token = localStorage.getItem("token");
+      const decodedToken = jwtDecode(token);
+      const userId = decodedToken.userId;
 
-      const response = await axios.get(
-        `http://localhost:5000/api/client/project-progress/${id}?client_id=${userId}`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
+      let response;
+
+      if (project.type === "offer") {
+        // Fetch progress for offers
+        response = await axios.get(
+          `http://localhost:5000/api/client/offer-progress`,
+          {
+            params: {
+              client_id: userId,
+              projectName: project.projectName || project.job_title,
+            },
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+
+        if (response.data.success) {
+          const progressData = response.data.data;
+          // Check if there's any progress data
+          if (progressData && Object.keys(progressData).length > 0) {
+            setdescription(progressData.projectDetails?.description || "");
+            setProjectId(progressData.projectDetails?.projectId || "");
+            setProgressData({
+              ...progressData,
+              overallProgress: progressData?.overallProgress || 0,
+              milestones: progressData?.milestones || [],
+            });
+
+            if (progressData.projectDetails) {
+              setPaymentStatus(progressData.projectDetails.paymentStatus);
+              setPaymentDetails(progressData.projectDetails.paymentDetails);
+            }
+          } else {
+            // Handle no progress case
+            setProgressData({ noProgress: true });
+            setdescription("");
+            setProjectId("");
+            setPaymentStatus("");
+            setPaymentDetails(null);
+          }
         }
-      );
-      // console.log("Progress :", response.data);
-      setdescription(response.data.projectDetails.description);
-      setProjectId(response.data.projectDetails.projectId);
+      } else {
+        // Fetch progress for regular projects
+        const id = project.proposalDetails.Proposal_id._id;
+        response = await axios.get(
+          `http://localhost:5000/api/client/project-progress/${id}?client_id=${userId}`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+        if (response.data.success) {
+          const progressData = response.data;
 
-      setProgressData(response.data);
+          if (progressData && Object.keys(progressData).length > 0) {
+            setdescription(progressData.projectDetails?.description || "");
+            setProjectId(progressData.projectDetails?.projectId || "");
+            setProgressData({
+              ...progressData,
+              overallProgress: progressData?.overallProgress || 0,
+              milestones: progressData?.milestones || [],
+            });
 
-      // Update payment status and details if available
-      if (response.data.projectDetails) {
-        setPaymentStatus(response.data.projectDetails.paymentStatus);
-        setPaymentDetails(response.data.projectDetails.paymentDetails);
+            if (progressData.projectDetails) {
+              setPaymentStatus(progressData.projectDetails.paymentStatus);
+              setPaymentDetails(progressData.projectDetails.paymentDetails);
+            }
+          } else {
+            // Handle no progress case
+            // Set default values when no progress is found
+            setProgressData({
+              overallProgress: 0,
+              milestones: [],
+              noProgress: true,
+            });
+            setdescription("");
+            setProjectId("");
+            setPaymentStatus("");
+            setPaymentDetails(null);
+          }
+        }
       }
 
       setError(null);
     } catch (err) {
       console.error("Error fetching progress:", err);
-      setError(
-        err.response?.data?.message || "Error fetching project progress"
-      );
+      // Instead of setting error, set no progress state
+      setProgressData({ noProgress: true });
+      setdescription("");
+      setProjectId("");
+      setPaymentStatus("");
+      setPaymentDetails(null);
     } finally {
       setLoading(false);
     }
@@ -434,10 +636,50 @@ const ProjectDetails = ({
     if (activeTab === "milestones") {
       fetchProgress();
     }
-  }, [activeTab]);
+  }, [activeTab, project]);
 
   // const id = ProjectId;
   // console.log("outside", ProjectId);
+
+  // const handleReviewSubmit = async (ProjectId, reviewData) => {
+  //   try {
+  //     setIsSubmitting(true);
+  //     const token = localStorage.getItem("token");
+  //     const decodedToken = jwtDecode(token);
+  //     const userId = decodedToken.userId;
+
+  //     // Make the API call to mark project as completed with review
+  //     const response = await axios.post(
+  //       `http://localhost:5000/api/client/complete-project/${ProjectId}`,
+  //       {
+  //         stars: reviewData.rating,
+  //         message: reviewData.review,
+  //       },
+  //       {
+  //         headers: {
+  //           Authorization: `Bearer ${token}`,
+  //         },
+  //       }
+  //     );
+
+  //     if (response.data.success) {
+  //       message.success(
+  //         "Project marked as completed and review submitted successfully"
+  //       );
+  //       setShowReviewModal(false);
+
+  //       // Notify parent component about status change
+  //       if (onProjectStatusChange) {
+  //         onProjectStatusChange(project._id, "completed");
+  //       }
+  //     }
+  //   } catch (error) {
+  //     console.error("Error submitting review:", error);
+  //     message.error(error.response?.data?.message || "Failed to submit review");
+  //   } finally {
+  //     setIsSubmitting(false);
+  //   }
+  // };
 
   const handleReviewSubmit = async (ProjectId, reviewData) => {
     try {
@@ -446,19 +688,37 @@ const ProjectDetails = ({
       const decodedToken = jwtDecode(token);
       const userId = decodedToken.userId;
 
-      // Make the API call to mark project as completed with review
-      const response = await axios.post(
-        `http://localhost:5000/api/client/complete-project/${ProjectId}`,
-        {
-          stars: reviewData.rating,
-          message: reviewData.review,
+      // Use the correct project ID from the project object
+      const actualProjectId = project.projectId; // This is where the ID is stored
+
+      console.log("Submitting review with:", {
+        actualProjectId,
+        reviewData,
+        projectType: project.type,
+      });
+
+      // Validate project ID
+      if (!actualProjectId) {
+        throw new Error("No valid project ID found");
+      }
+
+      // Only send the required fields
+      const requestData = {
+        stars: reviewData.rating,
+        message: reviewData.review,
+      };
+
+      // Choose the appropriate endpoint based on project type
+      const endpoint =
+        project.type === "offer"
+          ? `http://localhost:5000/api/client/complete-offer/${actualProjectId}`
+          : `http://localhost:5000/api/client/complete-project/${ProjectId}`;
+
+      const response = await axios.post(endpoint, requestData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
         },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      });
 
       if (response.data.success) {
         message.success(
@@ -481,24 +741,53 @@ const ProjectDetails = ({
   };
 
   const formatHourlyRate = (project) => {
-    if (project.hourly_rate?.from && project.hourly_rate?.to) {
-      return `${project.hourly_rate.from} - ${project.hourly_rate.to}/hr`;
+    if (project.type === "offer") {
+      // Handle offer type projects
+      if (
+        project.budget?.hourly_rate?.from &&
+        project.budget?.hourly_rate?.to
+      ) {
+        return `${project.budget.hourly_rate.from} - ${project.budget.hourly_rate.to}/hr`;
+      } else if (project.budget?.amount) {
+        return `${project.budget.amount}`; // For fixed price offers
+      }
+    } else {
+      // Handle normal job type projects
+      if (project.hourly_rate?.from && project.hourly_rate?.to) {
+        return `${project.hourly_rate.from} - ${project.hourly_rate.to}/hr`;
+      }
     }
     return "Rate not specified";
   };
 
   const formatProjectDuration = (project) => {
-    if (project.project_duration?.duration_of_work?.duration_of_work) {
-      return project.project_duration.duration_of_work.duration_of_work;
+    if (project.type === "offer") {
+      return null; // Return null for offers as we don't want to display it
     }
-    return "Duration not specified";
+    try {
+      if (project.project_duration?.duration_of_work?.duration_of_work) {
+        return project.project_duration.duration_of_work.duration_of_work;
+      }
+      return "Duration not specified";
+    } catch (error) {
+      console.error("Error formatting project duration:", error);
+      return "Duration not specified";
+    }
   };
 
   const formatExperienceLevel = (project) => {
-    if (project.project_duration?.duration_of_work?.experience_level) {
-      return project.project_duration.duration_of_work.experience_level;
+    if (project.type === "offer") {
+      return null; // Return null for offers as we don't want to display it
     }
-    return "Experience level not specified";
+    try {
+      if (project.project_duration?.duration_of_work?.experience_level) {
+        return project.project_duration.duration_of_work.experience_level;
+      }
+      return "Experience level not specified";
+    } catch (error) {
+      console.error("Error formatting project duration:", error);
+      return "Duration not specified";
+    }
   };
 
   const handlePaymentError = (error) => {
@@ -512,8 +801,15 @@ const ProjectDetails = ({
         <Alert message="Error" description={error} type="error" showIcon />
       );
 
-    if (!progressData)
-      return <Empty description="No progress data available" />;
+    if (!progressData || progressData.noProgress) {
+      return (
+        <div className="no-progress-container">
+          <div className="no-progress-message">
+            No progress has been reported by the freelancer yet.
+          </div>
+        </div>
+      );
+    }
 
     // Check if progress is milestone-based
     if (progressData.milestones && progressData.milestones.length > 0) {
@@ -619,7 +915,7 @@ const ProjectDetails = ({
             <Title level={4}>Overall Project Progress</Title>
             <div className="progress-container">
               <Progress
-                percent={progressData.progressData.overallProgress}
+                percent={progressData.progressData.overallProgress || 0}
                 status="active"
                 strokeColor={{
                   "0%": "#108ee9",
@@ -974,6 +1270,7 @@ const ProjectDetails = ({
   }, [activeTab, currentProject?.projectId]);
 
   const refreshPaymentStatus = async () => {
+    console.log("Referesh payment status is being rendering");
     setIsPaymentLoading(true);
     try {
       await fetchProgress();
@@ -1050,6 +1347,18 @@ const ProjectDetails = ({
     }
   };
 
+
+  
+
+
+
+
+  
+
+  const handleMessageClick = () => {
+    navigate('/chat');
+  };
+
   return (
     <div className="project-details">
       {/* Show payment button only if not paid */}
@@ -1065,7 +1374,7 @@ const ProjectDetails = ({
 
       <div className="tabs">
         <button
-          className={`tab ${activeTab === "overview" ? "active" : ""}`}
+          className={`tab bg-sky-400 ${activeTab === "overview" ? "active" : ""}`}
           onClick={() => setActiveTab("overview")}
         >
           Overview
@@ -1189,18 +1498,22 @@ const ProjectDetails = ({
                   </span>
                 </span>
 
-                <span className="job-info-item">
-                  <span className="labeltext">Project Duration:</span>
-                  <span className="value">
-                    {formatProjectDuration(project)}
-                  </span>
-                </span>
-                <span className="job-info-item">
-                  <span className="labeltext">Experience Level:</span>
-                  <span className="value">
-                    {formatExperienceLevel(project)}
-                  </span>
-                </span>
+                {!project.type && ( // Changed condition here
+                  <>
+                    <span className="job-info-item">
+                      <span className="labeltext">Project Duration:</span>
+                      <span className="value">
+                        {formatProjectDuration(project)}
+                      </span>
+                    </span>
+                    <span className="job-info-item">
+                      <span className="labeltext">Experience Level:</span>
+                      <span className="value">
+                        {formatExperienceLevel(project)}
+                      </span>
+                    </span>
+                  </>
+                )}
               </div>
 
               <h4 className="section-title">Project Overview:</h4>
@@ -1266,89 +1579,240 @@ const ProjectDetails = ({
 
         {activeTab === "proposal" && (
           <div className="proposal">
-            <div className="proposal-header">
-              <span className="proposal-status accepted">
-                Proposal Accepted
-              </span>
-            </div>
+            {project.type === "offer" ? (
+              // For offers
+              <div className="offer-details">
+                <Card className="offer-info-card">
+                  <div className="offer-header">
+                    <Tag color="blue" icon={<CheckCircleOutlined />}>
+                      Direct Offer
+                    </Tag>
+                    <span className="offer-status">Accepted</span>
+                  </div>
 
-            <div className="proposal-section">
-              <h3>
-                <svg
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                >
-                  <path d="M7 8h10M7 12h10M7 16h10" />
-                </svg>
-                Cover Letter
-              </h3>
-              <div className="cover-letter">
-                <p>{project.proposalDetails.coverLetter}</p>
-              </div>
-            </div>
+                  <Divider />
 
-            <div className="proposal-details">
-              <div className="detail-card">
-                <div className="detail-icon">
-                  <svg
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                  >
-                    <path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
+                  <div className="offer-content">
+                    <Row gutter={[16, 24]}>
+                      <Col span={24}>
+                        <Title level={5}>Project Overview</Title>
+                        <Paragraph>{project.description}</Paragraph>
+                      </Col>
+
+                      <Col span={12}>
+                        <Statistic
+                          title="Budget Type"
+                          value={
+                            project.budget.type === "fixed"
+                              ? "Fixed Price"
+                              : "Hourly Rate"
+                          }
+                        />
+                      </Col>
+
+                      <Col span={12}>
+                        <Statistic
+                          title="Amount"
+                          value={
+                            project.budget.type === "fixed"
+                              ? `${project.budget.amount}`
+                              : `${project.budget.hourly_rate?.from} - ${project.budget.hourly_rate?.to}/hr`
+                          }
+                          prefix="$"
+                        />
+                      </Col>
+
+                      <Col span={24}>
+                        <Title level={5}>Timeline</Title>
+                        <Row gutter={[16, 16]}>
+                          <Col span={12}>
+                            <Text type="secondary">Start Date</Text>
+                            <br />
+                            <Text strong>
+                              {new Date(project.startDate).toLocaleDateString()}
+                            </Text>
+                          </Col>
+                          <Col span={12}>
+                            <Text type="secondary">Due Date</Text>
+                            <br />
+                            <Text strong>
+                              {new Date(project.deadline).toLocaleDateString()}
+                            </Text>
+                          </Col>
+                        </Row>
+                      </Col>
+
+                      {project.preferred_skills &&
+                        project.preferred_skills.length > 0 && (
+                          <Col span={24}>
+                            <Title level={5}>Required Skills</Title>
+                            <div className="skills-container">
+                              {project.preferred_skills.map((skill, index) => (
+                                <Tag key={index} color="blue">
+                                  {skill}
+                                </Tag>
+                              ))}
+                            </div>
+                          </Col>
+                        )}
+
+                      {project.attachment && (
+                        <Col span={24}>
+                          <Title level={5}>Attachments</Title>
+                          <Card size="small" className="attachment-card">
+                            <Space>
+                              <PaperClipOutlined />
+                              <Text>{project.attachment.fileName}</Text>
+                              <Button
+                                type="link"
+                                icon={<DownloadOutlined />}
+                                onClick={() =>
+                                  window.open(project.attachment.path)
+                                }
+                              >
+                                Download
+                              </Button>
+                            </Space>
+                          </Card>
+                        </Col>
+                      )}
+                    </Row>
+                  </div>
+
+                  <Divider />
+
+                  <div className="proposal-actions">
+                  <button className="message-btn" onClick={handleMessageClick}>
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                    >
+                      <path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                    </svg>
+                    Message Freelancer
+                  </button>
                 </div>
-                <span className="label">Estimated Duration </span>
-                <span className="value">
-                  {project.proposalDetails.estimatedDuration}
-                </span>
-              </div>
 
-              {project.proposalDetails.attachments && (
-                <div className="proposal-attachments">
-                  <h4>Attachments</h4>
-                  <div className="attachments-list">
-                    {project.proposalDetails.attachments.map(
-                      (attachment, index) => (
-                        <div key={index} className="attachment-item">
-                          <div className="file-icon">
-                            <svg
-                              viewBox="0 0 24 24"
-                              fill="none"
-                              stroke="currentColor"
-                              strokeWidth="2"
-                            >
-                              <path d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-                            </svg>
-                          </div>
-                          <div className="file-info">
-                            <div className="file-name">{attachment.name}</div>
-                            <div className="file-size">{attachment.size}</div>
-                          </div>
-                        </div>
-                      )
-                    )}
+                  
+                </Card>
+              </div>
+            ) : (
+              // For regular proposals
+              <>
+                <div className="proposal-header">
+                  <span className="proposal-status accepted">
+                    Proposal Accepted
+                  </span>
+                </div>
+
+                <div className="proposal-section">
+                  <h3>
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                    >
+                      <path d="M7 8h10M7 12h10M7 16h10" />
+                    </svg>
+                    Cover Letter
+                  </h3>
+                  <div className="cover-letter">
+                    <p>{project.proposalDetails.coverLetter}</p>
                   </div>
                 </div>
-              )}
-            </div>
 
-            <div className="proposal-actions">
-              <button className="message-btn">
-                <svg
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                >
-                  <path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                </svg>
-                Message Freelancer
-              </button>
-            </div>
+                <div className="proposal-details">
+                  <div className="detail-card">
+                    <div className="detail-icon">
+                      <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                      >
+                        <path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                    </div>
+                    <span className="label">Estimated Duration </span>
+                    <span className="value">
+                      {project.proposalDetails.estimatedDuration}
+                    </span>
+                  </div>
+
+                  {project.proposalDetails.attachments && (
+                    <div className="proposal-attachments">
+                      <h4>Attachments</h4>
+                      <div className="attachments-list">
+                        {project.proposalDetails.attachments.map(
+                          (attachment, index) => (
+                            <div key={index} className="attachment-item">
+                              <div className="file-icon">
+                                <svg
+                                  viewBox="0 0 24 24"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  strokeWidth="2"
+                                >
+                                  <path d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                                </svg>
+                              </div>
+                              <div className="file-info">
+                                <div className="file-name">
+                                  {attachment.name}
+                                </div>
+                                <div className="file-size">
+                                  {attachment.size}
+                                </div>
+                              </div>
+                            </div>
+                          )
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                <div className="proposal-actions">
+                  <button className="message-btn" onClick={handleMessageClick}>
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                    >
+                      <path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                    </svg>
+                    Message Freelancer
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
+        )}
+
+        {activeTab === "Remarks" && (
+          <div className="remarks-section">
+            <h2>Remarks for {project.job_title}</h2>
+            {remarks.length > 0 ? (
+              <ul>
+                {remarks.map((remark, index) => (
+                  <li key={index}>
+                    <p>
+                      <strong>Remark {index + 1}:</strong> {remark.remark}
+                    </p>
+                    <p>
+                      <em>Created At:</em>{" "}
+                      {new Date(remark.createdAt).toLocaleString()}
+                    </p>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p>No remarks available for this job title.</p>
+            )}
           </div>
         )}
 
@@ -1380,9 +1844,12 @@ const ProjectDetails = ({
       <ReviewModal
         visible={showReviewModal}
         onClose={() => setShowReviewModal(false)}
-        onSubmit={(reviewData) => handleReviewSubmit(ProjectId, reviewData)}
+        onSubmit={(reviewData) =>
+          handleReviewSubmit(ProjectId || actualProjectId, reviewData)
+        }
         freelancerName={project.freelancer?.name || "Freelancer"}
         isSubmitting={isSubmitting}
+        project={project}
       />
     </div>
   );
@@ -1500,9 +1967,9 @@ const PayPalPaymentButton = ({
       // Get proposal_id from project
       const proposal_id = project.proposalDetails?.Proposal_id?._id;
 
-      if (!proposal_id) {
-        throw new Error("Proposal ID not found in project data");
-      }
+      // if (!proposal_id) {
+      //   throw new Error("Proposal ID not found in project data");
+      // }
 
       // Create payment data
       const paymentData = {
@@ -1513,7 +1980,13 @@ const PayPalPaymentButton = ({
         orderId: order.id,
         projectId: project._id || project.projectId, // Try both _id and projectId
         projectType: project.budget_type || "fixed",
-        proposal_id: project.proposalDetails.Proposal_id._id, // Add these
+        // proposal_id: project.proposalDetails.Proposal_id._id, // Add these
+        isOffer: project.type === "offer", // Add this flag
+        projectName: project.projectName, // Add project name for offers
+
+        ...(project.type !== "offer" && {
+          proposal_id: project.proposalDetails?.Proposal_id?._id,
+        }),
         client_id: userId,
         paypalEmail: freelancerPayments?.find(
           (p) => p.freelancerId === freelancerId

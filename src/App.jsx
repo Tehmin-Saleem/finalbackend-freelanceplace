@@ -147,7 +147,6 @@ function App() {
           <Route path="/" element={<SignUpSection />} />
           <Route path="/notifications" element={<Notification />} />
 
-         
           <Route path="/alljobs" element={<AllJobsPage />} />
           <Route path="/matchingjobs" element={<JobsPage />} />
           <Route
@@ -169,7 +168,6 @@ function App() {
             element={
               <FreeLancerCard
                 heading="All freelancers"
-              
                 freelancers={freelancers}
               />
             }
@@ -213,19 +211,26 @@ function App() {
               </JobStatusProvider>
             }
           />
-        <Route path="/ReviewPopUp" element={<ReviewPopup/>} />
-        <Route path="/Alljobspage" element={<AllJobsPage/>} /> 
-        <Route path="/JobPopUp" element={<JobPostedPopup/>} /> 
-        <Route path="/ForgotPass" element={<ForgotPassword/>} /> 
-        <Route path="/ChangePass/:id/:token" element={<ChangePassword/>} /> 
-        <Route path="/OfferDetails/:id" element={<OfferDetails/>} /> 
-        <Route path="/OfferDetails/:notificationId" element={<OfferDetails/>} /> 
-        <Route path="/ClientDash" element={<Clientdash/>} /> 
+          <Route path="/ReviewPopUp" element={<ReviewPopup />} />
+          <Route path="/Alljobspage" element={<AllJobsPage />} />
+          <Route path="/JobPopUp" element={<JobPostedPopup />} />
+          <Route path="/ForgotPass" element={<ForgotPassword />} />
+          <Route path="/ChangePass/:id/:token" element={<ChangePassword />} />
+          {/* <Route path="/OfferDetails/:id" element={<OfferDetails/>} />  */}
+          <Route
+            path="/OfferDetails/:notificationId"
+            element={<OfferDetails />}
+          />
+          <Route path="/ClientDash" element={<Clientdash />} />
 
-          <Route path="/proposals/:jobId" element={<JobStatusProvider>
-            <Proposal />
-            </JobStatusProvider>
-            } />   
+          <Route
+            path="/proposals/:jobId"
+            element={
+              <JobStatusProvider>
+                <Proposal />
+              </JobStatusProvider>
+            }
+          />
 
           {/* Fallback Route */}
           <Route path="*" element={<ErrorPage />} />
@@ -240,12 +245,13 @@ function App() {
           <Route path="/ChangePass/:id/:token" element={<ChangePassword />} />
           <Route path="/OfferDetails" element={<OfferDetails />} />
           {/* <Route path="/ClientDash" element={<Clientdash />} /> */}
-           
-          
-          
+
           <Route path="/ManageProj" element={<ManageProjects />} />
-          
-          <Route path="/ManageProjectbyclient" element={< ManageProjectbycient />} />
+
+          <Route
+            path="/ManageProjectbyclient"
+            element={<ManageProjectbycient />}
+          />
 
           {/* //View your profile page// */}
           <Route path="/ClientProfile" element={<ClientProfile />} />
@@ -266,18 +272,15 @@ function App() {
             path="/ConsultantProfileView"
             element={<ConsultantProfileView />}
           />
-              <Route path="/Consultantprofiles" element={<ConsultantCard/>} />
+          <Route path="/Consultantprofiles" element={<ConsultantCard />} />
 
-
-              <Route path="/freelancerOffers" element={<Offers/>} />
+          <Route path="/freelancerOffers" element={<Offers />} />
           {/* <Route path="/profile/:id"  element={<ConsultantProfileView />} /> */}
-          <Route path="/ClientOfferPage" element={<ClientOffersPage/>} />
+          <Route path="/ClientOfferPage" element={<ClientOffersPage />} />
 
-<Route path="/ConsultantOfferPage" element={<ConsultantOffers/>} />     
-<Route path="/SendProjectDetails" element={<SendProjectDetails/>} /> 
-<Route path="/SeeProjectDetails" element={<ProjectDetailsModal/>} /> 
-
-
+          <Route path="/ConsultantOfferPage" element={<ConsultantOffers />} />
+          <Route path="/SendProjectDetails" element={<SendProjectDetails />} />
+          <Route path="/SeeProjectDetails" element={<ProjectDetailsModal />} />
         </Routes>
       </Router>
     </NotificationProvider>

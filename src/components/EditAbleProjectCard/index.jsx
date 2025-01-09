@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import "./styles.scss";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { jwtDecode } from "jwt-decode";
+
 const EditableProjectCard = ({ project, onSave, onComplete }) => {
   const [freelancerData, setFreelancerData] = useState({
     projectName: "",
@@ -38,7 +40,9 @@ const EditableProjectCard = ({ project, onSave, onComplete }) => {
       }
     }
     // If no next incomplete milestone found, return the last milestone's due date
-    return milestones[milestones.length - 1]?.due_date || freelancerData.due_date;
+    return (
+      milestones[milestones.length - 1]?.due_date || freelancerData.due_date
+    );
   };
 
   // Function to update milestone deadlines
@@ -75,6 +79,8 @@ const EditableProjectCard = ({ project, onSave, onComplete }) => {
     });
   };
 
+  console.log("values in project", project);
+
   useEffect(() => {
     const fetchPreviousProgress = async () => {
       setIsFetchingProgress(true);
@@ -82,20 +88,66 @@ const EditableProjectCard = ({ project, onSave, onComplete }) => {
         const token = localStorage.getItem("token");
         if (!token) throw new Error("No authentication token found");
 
-        console.log("proposal id in new function", project.proposal_id);
-        console.log("client id in new function", project.client_id);
+        // const decodedToken = jwtDecode(token);
+        const userId = project.client_id;
 
-        const response = await axios.get(
-          `http://localhost:5000/api/client/project-progress/${project.proposal_id}?client_id=${project.client_id}`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-              "Content-Type": "application/json",
-            },
-          }
-        );
 
+        console.log("userid id", userId)
+
+
+        const isOffer = !project.proposal_id;
+
+
+        let url;
+        if (isOffer) {
+          // For offers, use projectName
+          url = `http://localhost:5000/api/client/project-progress/null?client_id=${userId}&projectName=${encodeURIComponent(project.projectName)}`;
+        } else {
+          // For normal jobs
+          url =  `http://localhost:5000/api/client/project-progress/${project.proposal_id}?client_id=${project.client_id}`;
+        }
+    
+        const response = await axios.get(url, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        });
+        
+
+  
+
+        // if (project.source === 'offer') {
+        //   // Fetch progress for offers
+        //   response = await axios.get(
+        //     `http://localhost:5000/api/client/offer-progress`,
+        //     {
+        //       params: {
+        //         client_id: userId,
+        //         projectName: project.projectName || project.job_title,
+        //       },
+        //       headers: {
+        //         Authorization: `Bearer ${token}`,
+        //         "Content-Type": "application/json",
+        //       },
+        //     }
+        //   );
+        // } else {
+        //   // Fetch progress for normal projects
+        //   response = await axios.get(
+        //     `http://localhost:5000/api/client/project-progress/${project.proposal_id}?client_id=${project.client_id}`,
+        //     {
+        //       headers: {
+        //         Authorization: `Bearer ${token}`,
+        //         "Content-Type": "application/json",
+        //       },
+        //     }
+        //   );
+        // }
+    
         console.log("Previous progress data:", response.data);
+
+      
 
         if (response.data.success) {
           const progressData = response.data.progressData;
@@ -111,8 +163,9 @@ const EditableProjectCard = ({ project, onSave, onComplete }) => {
             status: projectDetails.status || prev.status,
             clientApproved: projectDetails.clientApproved || false,
             due_date: projectDetails.due_date || prev.due_date,
-            milestones:
-              progressData.milestones?.map((milestone) => ({
+            milestones: project.source === 'offer' 
+            ? [] // For offers, initialize empty milestones
+              :progressData.milestones?.map((milestone) => ({
                 name: milestone.name,
                 status: milestone.status,
                 amount: parseFloat(milestone.amount) || 0,
@@ -123,7 +176,7 @@ const EditableProjectCard = ({ project, onSave, onComplete }) => {
             proposal_id: project.proposal_id,
             client_id: project.client_id,
             freelancer_id: project.freelancer_id,
-            projectType: project.projectType,
+            projectType: project.source === 'offer' ? 'fixed' : project.projectType,
           }));
 
           // If there's payment information, store it
@@ -143,10 +196,10 @@ const EditableProjectCard = ({ project, onSave, onComplete }) => {
       }
     };
 
-    if (project.proposal_id && project.client_id) {
+    if ((project.proposal_id && project.client_id) || project.source === 'offer') {
       fetchPreviousProgress();
     }
-  }, [project.proposal_id, project.client_id]);
+  }, [project.proposal_id, project.client_id, project.source]);
 
   useEffect(() => {
     setFreelancerData({
@@ -154,18 +207,22 @@ const EditableProjectCard = ({ project, onSave, onComplete }) => {
       progress: project.progress || 0,
       due_date: project.due_date || new Date().toISOString(),
       milestones:
-        project.milestones?.map((milestone) => ({
-          name: milestone.name || "",
-          status: milestone.status || "Not Started",
-          amount: parseFloat(milestone.amount) || 0,
-          due_date: milestone.due_date || project.due_date,
-        })) || [],
+        project.source === "offer"
+          ? []
+          : project.milestones?.map((milestone) => ({
+              name: milestone.name || "",
+              status: milestone.status || "Not Started",
+              amount: parseFloat(milestone.amount) || 0,
+              due_date: milestone.due_date || project.due_date,
+            })) || [],
       budget:
         typeof project.budget === "string"
           ? parseFloat(project.budget.replace(/[^0-9.-]+/g, ""))
           : project.budget || 0,
-
-      projectType: project.projectType || "milestone",
+      projectType:
+        project.source === "offer"
+          ? "fixed"
+          : project.projectType || "milestone",
       status: project.status || "Ongoing",
       clientApproved: project.clientApproved || false,
       proposal_id: project.proposal_id || "",
@@ -197,35 +254,37 @@ const EditableProjectCard = ({ project, onSave, onComplete }) => {
     setFreelancerData((prev) => ({ ...prev, [name]: processedValue }));
   };
 
-// Update the handleMilestoneChange function
-const handleMilestoneChange = (index, status) => {
-  const updatedMilestones = freelancerData.milestones.map((milestone, i) =>
-    i === index ? { ...milestone, status } : milestone
-  );
+  // Update the handleMilestoneChange function
+  const handleMilestoneChange = (index, status) => {
+    const updatedMilestones = freelancerData.milestones.map((milestone, i) =>
+      i === index ? { ...milestone, status } : milestone
+    );
 
-   // Update deadlines when a milestone is completed
-  const finalMilestones = status === "Completed" 
-  ? updateMilestoneDeadlines(updatedMilestones)
-  : updatedMilestones;
+    // Update deadlines when a milestone is completed
+    const finalMilestones =
+      status === "Completed"
+        ? updateMilestoneDeadlines(updatedMilestones)
+        : updatedMilestones;
 
-const completedMilestones = finalMilestones.filter(
-  (m) => m.status === "Completed"
-).length;
-const totalMilestones = finalMilestones.length;
-const progress = totalMilestones > 0
-  ? Math.round((completedMilestones / totalMilestones) * 100)
-  : 0;
+    const completedMilestones = finalMilestones.filter(
+      (m) => m.status === "Completed"
+    ).length;
+    const totalMilestones = finalMilestones.length;
+    const progress =
+      totalMilestones > 0
+        ? Math.round((completedMilestones / totalMilestones) * 100)
+        : 0;
 
-// Find the next active milestone's deadline
-const nextDeadline = calculateNextDeadline(index, finalMilestones);
+    // Find the next active milestone's deadline
+    const nextDeadline = calculateNextDeadline(index, finalMilestones);
 
-setFreelancerData((prev) => ({
-  ...prev,
-  milestones: finalMilestones,
-  progress,
-  due_date: nextDeadline,
-}));
-};
+    setFreelancerData((prev) => ({
+      ...prev,
+      milestones: finalMilestones,
+      progress,
+      due_date: nextDeadline,
+    }));
+  };
 
   const shouldShowPendingApproval = () => {
     return freelancerData.progress === 100;
@@ -238,15 +297,16 @@ setFreelancerData((prev) => ({
     try {
       const projectData = {
         ...freelancerData,
-        
+
         // Include previous payment information if it exists
         paymentStatus: freelancerData.paymentStatus,
         paymentDetails: freelancerData.paymentDetails,
         // Add timestamp for the update
         lastUpdated: new Date().toISOString(),
-        status: freelancerData.progress === 100 ? 'Pending Approval' : 'Ongoing',
-        source: project.source || 'proposal',
-        proposal_id: project.proposal_id || null 
+        status:
+          freelancerData.progress === 100 ? "Pending Approval" : "Ongoing",
+        source: project.source || "proposal",
+        proposal_id: project.proposal_id || null,
       };
 
       const token = localStorage.getItem("token");
@@ -322,75 +382,85 @@ setFreelancerData((prev) => ({
     );
   };
 
- // Update the calculateMilestoneDueNotifications function
-const calculateMilestoneDueNotifications = (milestones, projectDueDate) => {
-  const today = new Date();
-  const notifications = [];
+  // Update the calculateMilestoneDueNotifications function
+  const calculateMilestoneDueNotifications = (milestones, projectDueDate) => {
+    const today = new Date();
+    const notifications = [];
 
-  // Sort milestones by due date
-  const sortedMilestones = [...milestones].sort((a, b) => 
-    new Date(a.due_date) - new Date(b.due_date)
-  );
+    // Sort milestones by due date
+    const sortedMilestones = [...milestones].sort(
+      (a, b) => new Date(a.due_date) - new Date(b.due_date)
+    );
 
-  // Find current active milestone
-  const incompleteMilestones = sortedMilestones.filter(
-    m => m.status !== "Completed"
-  );
+    // Find current active milestone
+    const incompleteMilestones = sortedMilestones.filter(
+      (m) => m.status !== "Completed"
+    );
 
-  if (incompleteMilestones.length > 0) {
-    // Current active milestone
-    const currentMilestone = incompleteMilestones[0];
-    const currentDueDate = new Date(currentMilestone.due_date);
-    const daysLeft = Math.ceil((currentDueDate - today) / (1000 * 60 * 60 * 24));
+    if (incompleteMilestones.length > 0) {
+      // Current active milestone
+      const currentMilestone = incompleteMilestones[0];
+      const currentDueDate = new Date(currentMilestone.due_date);
+      const daysLeft = Math.ceil(
+        (currentDueDate - today) / (1000 * 60 * 60 * 24)
+      );
 
-    // Notification for current milestone
-    if (daysLeft <= 5 && daysLeft > 0) {
-      notifications.push({
-        type: 'warning',
-        message: `Current milestone "${currentMilestone.name}" is due in ${daysLeft} days.`
-      });
-    } else if (daysLeft <= 0) {
-      notifications.push({
-        type: 'danger',
-        message: `Current milestone "${currentMilestone.name}" is overdue by ${Math.abs(daysLeft)} days!`
-      });
+      // Notification for current milestone
+      if (daysLeft <= 5 && daysLeft > 0) {
+        notifications.push({
+          type: "warning",
+          message: `Current milestone "${currentMilestone.name}" is due in ${daysLeft} days.`,
+        });
+      } else if (daysLeft <= 0) {
+        notifications.push({
+          type: "danger",
+          message: `Current milestone "${currentMilestone.name}" is overdue by ${Math.abs(daysLeft)} days!`,
+        });
+      }
+
+      // Next milestone preview (if exists)
+      if (incompleteMilestones.length > 1) {
+        const nextMilestone = incompleteMilestones[1];
+        const nextDueDate = new Date(nextMilestone.due_date);
+        const nextDaysLeft = Math.ceil(
+          (nextDueDate - today) / (1000 * 60 * 60 * 24)
+        );
+
+        notifications.push({
+          type: "info",
+          message: `Next milestone "${nextMilestone.name}" will be due in ${nextDaysLeft} days.`,
+        });
+      }
     }
 
-    // Next milestone preview (if exists)
-    if (incompleteMilestones.length > 1) {
-      const nextMilestone = incompleteMilestones[1];
-      const nextDueDate = new Date(nextMilestone.due_date);
-      const nextDaysLeft = Math.ceil((nextDueDate - today) / (1000 * 60 * 60 * 24));
+    // Only show project deadline if it's different from the last milestone
+    const lastMilestoneDueDate =
+      sortedMilestones[sortedMilestones.length - 1]?.due_date;
+    const projectDue = new Date(projectDueDate);
 
-      notifications.push({
-        type: 'info',
-        message: `Next milestone "${nextMilestone.name}" will be due in ${nextDaysLeft} days.`
-      });
+    if (
+      lastMilestoneDueDate &&
+      new Date(lastMilestoneDueDate).getTime() !== projectDue.getTime()
+    ) {
+      const projectDaysLeft = Math.ceil(
+        (projectDue - today) / (1000 * 60 * 60 * 24)
+      );
+
+      if (projectDaysLeft <= 5 && projectDaysLeft > 0) {
+        notifications.push({
+          type: "warning",
+          message: `Overall project deadline in ${projectDaysLeft} days!`,
+        });
+      } else if (projectDaysLeft <= 0) {
+        notifications.push({
+          type: "danger",
+          message: `Project is overdue by ${Math.abs(projectDaysLeft)} days!`,
+        });
+      }
     }
-  }
 
-  // Only show project deadline if it's different from the last milestone
-  const lastMilestoneDueDate = sortedMilestones[sortedMilestones.length - 1]?.due_date;
-  const projectDue = new Date(projectDueDate);
-  
-  if (lastMilestoneDueDate && new Date(lastMilestoneDueDate).getTime() !== projectDue.getTime()) {
-    const projectDaysLeft = Math.ceil((projectDue - today) / (1000 * 60 * 60 * 24));
-    
-    if (projectDaysLeft <= 5 && projectDaysLeft > 0) {
-      notifications.push({
-        type: 'warning',
-        message: `Overall project deadline in ${projectDaysLeft} days!`
-      });
-    } else if (projectDaysLeft <= 0) {
-      notifications.push({
-        type: 'danger',
-        message: `Project is overdue by ${Math.abs(projectDaysLeft)} days!`
-      });
-    }
-  }
-
-  return notifications;
-};
+    return notifications;
+  };
 
   // Replace your existing due date notification section with this:
   const renderDueDateNotifications = () => {

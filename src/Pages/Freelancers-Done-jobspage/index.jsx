@@ -19,7 +19,6 @@ const FreelancersJobsPage = () => {
   const [pageSize, setPageSize] = useState(5);
   const [currentPage, setCurrentPage] = useState(1);
   const [statusFilter, setStatusFilter] = useState("all"); // all, ongoing, pending, completed
-  
 
   const fetchOffersAndJobs = async () => {
     try {
@@ -56,8 +55,9 @@ const FreelancersJobsPage = () => {
 
       // Process hired jobs
       console.log("offers", offersResponse.data);
-      console.log("hire response", hireResponse.data.data);
+      // console.log("hire response", hireResponse.data.data);
 
+      // Map offers with detailed logging
 
       const hireStatusMap = (hireResponse.data.data || []).reduce(
         (map, hire) => {
@@ -65,7 +65,7 @@ const FreelancersJobsPage = () => {
             map[hire.jobId.id] = {
               status: hire.status,
               freelancerId: hire.freelancerId?.id,
-              proposalId: hire.proposalId // Add this line to include proposalId
+              proposalId: hire.proposalId, // Add this line to include proposalId
             };
           }
           return map;
@@ -98,7 +98,7 @@ const FreelancersJobsPage = () => {
         }
       );
 
-      console.log("job response", jobsResponse.data);
+      // console.log("job response", jobsResponse.data);
 
       // Process hired jobs
       const hiredJobs = (jobsResponse.data?.jobPosts || [])
@@ -127,50 +127,55 @@ const FreelancersJobsPage = () => {
           postedTime: new Date(job.createdAt).toLocaleDateString(),
           status: hireStatusMap[job._id].status || "pending",
           jobStatus: job.jobstatus || "pending",
-          
+
           source: "hired",
-          attachment: job.attachment ? {
-            fileName: job.attachment.fileName || job.attachment.originalname,
-            path: job.attachment.path
-          } : null,
+          attachment: job.attachment
+            ? {
+                fileName:
+                  job.attachment.fileName || job.attachment.originalname,
+                path: job.attachment.path,
+              }
+            : null,
         }));
 
-     
-  const acceptedOffers = (offersResponse.data?.offers || []).map(offer => ({
-    // No need to filter by freelancer_id as backend already handles this
-    type: offer.type, // Backend already formats this
-    title: offer.title, // Backend provides formatted title
-    client_id: offer.client_id,
-    freelancer_id: offer.freelancer_id,
-    rate: offer.rate, // Backend already formats the rate string
-    description: offer.description,
-    detailed_description: offer.detailed_description,
-    tags: offer.tags,
-    location: offer.location,
-    postedTime: offer.postedTime, // Backend already formats the date
-    status: offer.status,
-    // New fields available from backend
-    clientName: offer.clientName,
-    
-    clientCountry: offer.clientCountry,
-    attachment: offer.attachment,
-    // Fields that need to be added to backend response
-    due_date: offer.due_date, // Date comes formatted from backend
-    timeline: offer.estimated_timeline 
-      ? `${offer.estimated_timeline.duration} ${offer.estimated_timeline.unit}` 
-      : "Not specified",
-    
-    verified: false, // Add to backend if needed
-    jobStatus: "ongoing", // Add to backend if needed
-    source: 'offer' // Add if needed for frontend differentiation
-  }));
-    
+      const acceptedOffers = (offersResponse.data?.offers || []).map(
+        (offer) => ({
+          // No need to filter by freelancer_id as backend already handles this
+          job_id: offer.job_id,
+          type: offer.type, // Backend already formats this
+          title: offer.title, // Backend provides formatted title
+          client_id: offer.client_id,
+          freelancer_id: offer.freelancer_id,
+          rate: offer.rate, // Backend already formats the rate string
+          description: offer.description,
+          detailed_description: offer.detailed_description,
+          tags: offer.tags,
+          location: offer.location,
+          postedTime: offer.postedTime, // Backend already formats the date
+          status: offer.status,
+          // New fields available from backend
+          clientName: offer.clientName,
+
+          clientCountry: offer.clientCountry,
+          attachment: offer.attachment,
+          // Fields that need to be added to backend response
+          due_date: offer.due_date, // Date comes formatted from backend
+          timeline: offer.estimated_timeline
+            ? `${offer.estimated_timeline.duration} ${offer.estimated_timeline.unit}`
+            : "Not specified",
+
+          verified: false, // Add to backend if needed
+          jobStatus: offer.status, // Match the status
+          source: "offer", // Add if needed for frontend differentiation
+        })
+      );
+
       // Combine and deduplicate jobs and offers
       const combinedJobs = [...hiredJobs, ...acceptedOffers];
       const uniqueJobs = Array.from(
         new Map(combinedJobs.map((item) => [item.job_id, item])).values()
       );
-      console.log('Backend Response:', offersResponse.data);
+      console.log("offers fetched:", offersResponse.data);
 
       setJobs(uniqueJobs);
     } catch (error) {
@@ -188,10 +193,21 @@ const FreelancersJobsPage = () => {
   // Rest of your existing code remains the same...
   const getFilteredJobs = () => {
     return jobs.filter((job) => {
+      // console.log("Filtering job:", {
+      //   title: job.title,
+      //   status: job.status,
+      //   jobStatus: job.jobStatus,
+      //   searchTerm: searchTerm,
+      //   statusFilter: statusFilter,
+      // });
+
       const matchesSearch = job.title
         .toLowerCase()
         .includes(searchTerm.toLowerCase());
-      if (!matchesSearch) return false;
+      if (!matchesSearch) {
+        console.log(`Job "${job.title}" filtered out by search`);
+        return false;
+      }
 
       switch (statusFilter) {
         case "all":
@@ -199,12 +215,15 @@ const FreelancersJobsPage = () => {
         case "ongoing":
           return (
             (job.status === "hired" && job.jobStatus === "pending") ||
-            job.jobStatus === "ongoing"
+            job.jobStatus === "ongoing"||
+            (job.source === 'offer' && job.status === 'accepted')
           );
         case "pending":
-          return job.status === "pending" || job.status === "accepted" ;
+          return job.status === "pending" || job.status === "accepted"||
+          (job.source === 'offer' && job.status === 'pending');
         case "completed":
-          return job.status === "completed" || job.jobStatus === "completed";
+          return job.status === "completed" || job.jobStatus === "completed"||
+          (job.source === 'offer' && job.status === 'completed');
         default:
           return true;
       }
@@ -309,18 +328,23 @@ const FreelancersJobsPage = () => {
             paginatedJobs.map((job) => (
               <FreelancersJobsCard
                 key={job.title}
+                _id={job.source === 'offer' ? job._id : job.job_id} // Add this line
                 job_id={job.job_id}
                 client_id={job.client_id}
+                title={job.title} // Make sure this is explicitly passed
                 clientName={job.clientName}
                 clientEmail={job.clientEmail}
                 clientCountry={job.clientCountry}
                 freelancer_id={job.freelancer_id}
-                attachment={job.attachment}  // Add this prop
+                attachment={job.attachment} // Add this prop
                 proposal_id={job.proposal_id} // Add this line
                 source={job.source}
                 {...job}
                 statusBadge={
-                  <StatusBadge status={job.status} jobStatus={job.jobStatus} />
+                  <StatusBadge 
+                  status={job.source === 'offer' ? job.status : job.status} 
+                  jobStatus={job.source === 'offer' ? job.status : job.jobStatus}
+                  />
                 }
               />
             ))
@@ -333,7 +357,6 @@ const FreelancersJobsPage = () => {
           )}
         </div>
       )}
-      
       {filteredJobs.length > 0 && (
         <div className="pagination">
           <div className="rows-per-page">

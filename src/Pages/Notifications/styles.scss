@@ -9,7 +9,7 @@ $font-poppins: 'Poppins', sans-serif;
 $color-gray: #64748b;
 $color-dark: #2c3e50;
 $color-white: #ffffff;
-$color-accent: #4bcdeb;
+$color-accent: #2fc3e4;
 $bg-color: #f7f8fa;
 
 
@@ -17,12 +17,12 @@ $bg-color: #f7f8fa;
     padding: 20px;
     margin: 0 8rem;
     font-family:$font-poppins;
-  
+  margin-top: 6rem;
     h1 {
       font-size: 24px;
       margin-bottom: 10px;
       font-family:$font-poppins;
-      color:$color-dark;
+      color:$color-accent;
       font-size: 2rem;
       font-weight: 600;
     }

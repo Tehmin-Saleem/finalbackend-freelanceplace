@@ -550,7 +550,7 @@ const MyProfile = () => {
           </div>
 
           <div className="field-group">
-            <label>Experience (in Years)</label>
+            <label>Experience</label>
             <input
               type="number"
               value={profile.experience.completed_projects}

@@ -47,44 +47,90 @@ const JobsCard = ({
   const [progressData, setProgressData] = useState(null);
   const [loadingProgress, setLoadingProgress] = useState(false);
 
-  console.log("clientid", client_id);
-  console.log("proposalid", proposal_id);
+  // console.log("clientid", client_id);
+  // console.log("proposalid", proposal_id);
 
-  useEffect(() => {
-    const fetchProgress = async () => {
-      try {
-        setLoadingProgress(true);
-        const token = localStorage.getItem("token");
-        if (!token) throw new Error("No authentication token found");
+  // useEffect(() => {
+  //   const fetchProgress = async () => {
+  //     try {
+  //       setLoadingProgress(true);
+  //       const token = localStorage.getItem("token");
+  //       if (!token) throw new Error("No authentication token found");
 
-        const response = await axios.get(
-          `http://localhost:5000/api/client/project-progress/${proposal_id}?client_id=${client_id}`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-              "Content-Type": "application/json",
-            },
-          }
-        );
+  //       const response = await axios.get(
+  //         `http://localhost:5000/api/client/project-progress/${proposal_id}?client_id=${client_id}`,
+  //         {
+  //           headers: {
+  //             Authorization: `Bearer ${token}`,
+  //             "Content-Type": "application/json",
+  //           },
+  //         }
+  //       );
 
-        console.log("fetch progress response", response.data);
+  //       console.log("fetch progress response", response.data);
 
-        if (response.data.success) {
-          setProgressData(response.data);
-        }
-      } catch (error) {
-        console.error("Error fetching project progress:", error);
-      } finally {
-        setLoadingProgress(false);
+  //       if (response.data.success) {
+  //         setProgressData(response.data);
+  //       }
+  //     } catch (error) {
+  //       console.error("Error fetching project progress:", error);
+  //     } finally {
+  //       setLoadingProgress(false);
+  //     }
+  //   };
+
+  //   if (client_id && proposal_id) {
+  //     fetchProgress();
+  //   }
+  // }, [client_id, proposal_id]); // Remove the parameters from useEffect and add them as dependencies
+
+  const [error, setError] = useState(null);
+
+  // In your JobsCard component, modify the fetchProgress function:
+
+  const fetchProgress = async () => {
+    try {
+      setLoadingProgress(true);
+      const token = localStorage.getItem("token");
+      if (!token) throw new Error("No authentication token found");
+
+      let url;
+      if (source === "offer") {
+        // For offers, use projectName
+        url = `http://localhost:5000/api/client/project-progress/null?client_id=${client_id}&projectName=${encodeURIComponent(title)}`;
+      } else {
+        // For normal jobs
+        url = `http://localhost:5000/api/client/project-progress/${proposal_id}?client_id=${client_id}`;
       }
-    };
 
-    if (client_id && proposal_id) {
+      const response = await axios.get(url, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      // console.log("fetch progress response", response.data);
+
+      if (response.data.success) {
+        setProgressData(response.data);
+      }
+    } catch (error) {
+      console.error("Error fetching project progress:", error);
+    } finally {
+      setLoadingProgress(false);
+    }
+  };
+
+  // Modify the useEffect dependency array to include necessary variables
+  useEffect(() => {
+    if (
+      (client_id && proposal_id) ||
+      (client_id && source === "offer" && title)
+    ) {
       fetchProgress();
     }
-  }, [client_id, proposal_id]); // Remove the parameters from useEffect and add them as dependencies
-
-  // const [error, setError] = useState(null);
+  }, [client_id, proposal_id, source, title]);
 
   const handleAttachmentClick = (path) => {
     if (path) {
@@ -110,14 +156,20 @@ const JobsCard = ({
           throw new Error("No token found");
         }
 
-        // Add debug logging
-        console.log("Fetching review for job:", job_id);
-        console.log("Using token:", token.substring(0, 20) + "..."); // Show first 20 chars of token
+        // For offers, use the offer ID but include source=offer
 
-        // console.log("Fetching review for job:", job_id); // Debug log
+        // Determine which ID to use based on source
+        const reviewId = source === "offer" ? job_id : _id;
+
+        console.log("Fetching review with:", {
+          source,
+          reviewId,
+          job_id,
+          _id,
+        });
 
         const response = await axios.get(
-          `http://localhost:5000/api/freelancer/job-review/${job_id}`,
+          `http://localhost:5000/api/freelancer/job-review/${reviewId}${source === 'offer' ? '?source=offer' : ''}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -126,37 +178,24 @@ const JobsCard = ({
           }
         );
 
+        console.log("Review data successfully fetched:", response.data.data);
         // console.log("Review response:", response.data.data); // Debug log
 
         if (response.data.success) {
           setReview(response.data.data);
           setRatings(response.data.data.rating);
           setMessage(response.data.data.review_message);
-          console.log("Review data successfully fetched:", response.data.data);
         }
       } catch (err) {
-        // More detailed error handling
-        if (err.response) {
-          // Server responded with error
-          if (err.response.status === 404) {
-            console.log("No review found for this job");
-            // You might want to set some state to show "No review yet" message
-            setReview(null);
-          } else if (err.response.status === 401) {
-            console.log("Authentication error");
-            navigate("/signin"); // Redirect on auth error
-          } else {
-            console.error("Server error:", err.response.data);
-            setError("Failed to fetch review: " + err.response.data.message);
-          }
-        } else if (err.request) {
-          // Request made but no response
-          console.error("No response received:", err.request);
-          setError("Network error - no response from server");
+        // Don't set error for 404 (no review yet) case
+        if (err.response && err.response.status === 404) {
+          setReview(null);
+          setRatings(null);
+          setMessage(null);
         } else {
-          // Error in request setup
-          console.error("Error setting up request:", err.message);
-          setError("Error setting up request: " + err.message);
+          console.error("Error fetching review:", err);
+          // Only set error for non-404 errors if you want to show them
+          setError("Failed to load review");
         }
       } finally {
         setLoading(false);
@@ -164,10 +203,13 @@ const JobsCard = ({
     };
 
     fetchReview();
-  }, [job_id]); // Include status and jobStatus in dependencies
+  }, [_id, job_id, source]); // Include status and jobStatus in dependencies
 
   // Function to check if job is completed
   const isJobCompleted = () => {
+    if (source === 'offer') {
+      return status === "completed";
+    }
     return status === "completed" || jobStatus === "completed";
   };
 
@@ -239,13 +281,13 @@ const JobsCard = ({
         `http://localhost:5000/api/freelancer/getproposals?jobId=${job_id}`, // Fixed template literal
         { headers }
       );
-      console.log("Fetched job_id:", job_id); // Debug log
+      // console.log("Fetched job_id:", job_id); // Debug log
       // Find the specific proposal for this job
       const specificProposal = response.data.proposals.find(
         (proposal) => proposal._id === proposalId
       );
 
-      console.log("proposals", response.data);
+      // console.log("proposals", response.data);
 
       if (!specificProposal) {
         throw new Error("No proposal found for this job");
@@ -280,8 +322,8 @@ const JobsCard = ({
   };
 
   useEffect(() => {
-    console.log("Current job attachment:", attachment);
-    console.log("rate", rate);
+    // console.log("Current job attachment:", attachment);
+    // console.log("rate", rate);
   }, [attachment]);
 
   const PaymentStatus = ({ PaymentStatus, details }) => {
@@ -552,11 +594,23 @@ const JobsCard = ({
             <div className="job-card__review-container">
               <div className="job-card__review-header">
                 <h4>Client Review</h4>
-                <StarRating rating={ratings} showRatingValue={true} />
+                {ratings ? (
+                  <StarRating rating={ratings} showRatingValue={true} />
+                ) : (
+                  <span className="pending-review">Pending</span>
+                )}
               </div>
-              {message && (
+              {message ? (
                 <div className="job-card__review-content">
                   <p className="job-card__review-message">"{message}"</p>
+                </div>
+              ) : (
+                <div className="job-card__review-pending">
+                  <i className="fas fa-hourglass-half"></i>
+                  <p>Awaiting client review</p>
+                  <span>
+                    The client hasn't provided a review for this job yet.
+                  </span>
                 </div>
               )}
             </div>
