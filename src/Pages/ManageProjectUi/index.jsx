@@ -17,7 +17,6 @@ import {
   PaperClipOutlined,
   DownloadOutlined,
 } from "@ant-design/icons";
-import { jwtDecode } from "jwt-decode";
 import { useNavigate } from "react-router-dom";
 import {
   Card,
