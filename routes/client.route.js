@@ -14,6 +14,7 @@ const ClientProfile= require('../controllers/client_profile.controller')
 const Notification= require ('../controllers/notifications.controller')
 const consultantProfileController=require ('../controllers/consultantprofile.controller')
 const manageProject = require('../controllers/Manageproj.controller')
+const { addRemark, getRemarks, getRemarksByProjectAndClient } = require('../controllers/Remark.controller');
 
 
 
@@ -297,9 +298,14 @@ router.put('/offer/:offerId', authMiddleware, consultantProfileController.update
 
 router.post('/sendProjectDetails/:consultantId', authMiddleware, consultantProfileController.sendProjectDetailsToConsultant);
 
-router.get('project-details/:offerId',authMiddleware, consultantProfileController.getProjectDetailsByOfferId);
+router.get('/project-details/:offerId',authMiddleware, consultantProfileController.getProjectDetailsByOfferId);
 
+router.post('/add',authMiddleware, addRemark);
 
+// GET: Fetch all remarks for a specific offer and consultant
+router.get('/:offerId/:consultantId', authMiddleware, getRemarks);
+router.get('/offers/count/:consultantId',consultantProfileController.getOfferCountsByConsultantId);
+router.get('/getRemarksByProjectAndClient/:job_title/:clientId', getRemarksByProjectAndClient);
 
 module.exports = router;
 
