@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import "./styles.scss";
-import { jwtDecode } from "jwt-decode";
+// import { jwtDecode } from "jwt-decode";
 import Header from "../../components/Commoncomponents/Header";
 import { Chat } from "../../svg/index";
 import axios from "axios";
@@ -1052,23 +1052,32 @@ const ProjectDetails = ({
 
           {/* Mark as Complete Button - Show only when progress is 100% */}
           {progressData.progressData.overallProgress === 100 && (
-            <Button
-              type="primary"
-              className="mark-complete-btn"
-              onClick={handleMarkAsComplete}
-              style={{ marginTop: 16 }}
-            >
-              Mark as Completed
-            </Button>
-          )}
-          <Button
+  <div style={{ marginTop: 16 }}>
+    <Button
+      type="primary"
+      className="mark-complete-btn"
+      onClick={handleMarkAsComplete}
+      style={{ marginRight: 8 }} // Add spacing between buttons
+    >
+      Mark as Completed
+    </Button>
+    <Button
+      type="primary"
+      className="mark-complete-btn"
+      onClick={handleHireConsultant}
+    >
+      Hire Consultant
+    </Button>
+  </div>
+)}
+          {/* <Button
             type="primary"
             className="hire-consulatnt-btn"
             onClick={handleHireConsultant}
             style={{ marginTop: 16 }}
           >
             Hire Consultant
-          </Button>
+          </Button> */}
         </div>
       );
     }
@@ -1816,7 +1825,7 @@ const ProjectDetails = ({
           </div>
         )}
 
-        {activeTab === "Remarks" && (
+        {/* {activeTab === "Remarks" && (
           <div className="remarks-section">
             <h2>Remarks for {project.job_title}</h2>
             {remarks.length > 0 ? (
@@ -1837,7 +1846,7 @@ const ProjectDetails = ({
               <p>No remarks available for this job title.</p>
             )}
           </div>
-        )}
+        )} */}
       </div>
 
       {/* Add ReviewModal here */}

@@ -251,11 +251,15 @@ const ClientOffersPage = () => {
               {offer?.status === "Accepted" && (
                 <div className="add-project-button">
                   <button
-                    className={`btn-primary ${projectSent[offer.id] ? 'bg-green-500 text-white' : ''}`} // Change color to green once the project is sent
-                    onClick={() => setActiveOfferId(offer.id)}
-                  >
-                    {projectSent[offer.id] ? 'Project Details Sent' : 'Send Project Details'}
-                  </button>
+  className={`btn-primary ${projectSent[offer.id] ? 'bg-green-500 text-white' : ''}`}
+  onClick={() => {
+    setActiveOfferId(offer.id);
+    setSelectedConsultantId(offer.offer_details.consultant.id); // Assuming consultant ID is here
+    setSelectedClientId(getClientIdFromToken()); // Fetch client ID from token
+  }}
+>
+  {projectSent[offer.id] ? 'Project Details Sent' : 'Send Project Details'}
+</button>
 
                   {/* This success message will always appear after sending the project details */}
                   {projectSent[offer.id] && (
