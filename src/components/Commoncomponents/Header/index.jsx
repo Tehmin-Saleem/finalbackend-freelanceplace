@@ -417,8 +417,21 @@ const Header = () => {
           );
           navigate(response.data.exists ? `/profile/${userId}` : "/myProfile");
         } else if (snap.user.role === "consultant") {
-         
-          navigate("/ConsultantProfileView"); 
+          try {
+            const response = await axios.get(
+              `http://localhost:5000/api/client/Constprofile/${userId}`, // Correct route
+              config
+            );
+            console.log("Response data for consultant profile:", response.data);
+            navigate(response.data.exists ? `/ConsultantProfileView/${userId}` : "/ConsultantProfileForm");
+          } catch (error) {
+            if (error.response && error.response.status === 404) {
+              console.log("Consultant profile not found, navigating to form.");
+              navigate("/ConsultantProfileForm");
+            } else {
+              console.error("Error checking profile existence:", error);
+            }
+          }
         }
       } catch (error) {
         console.error("Error checking profile existence:", error);
@@ -428,6 +441,7 @@ const Header = () => {
       navigate("/signin");
     }
   };
+  
   
 
   useEffect(() => {

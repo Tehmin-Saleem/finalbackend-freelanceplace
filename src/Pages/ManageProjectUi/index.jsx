@@ -7,7 +7,7 @@ import axios from "axios";
 import { useParams } from "react-router-dom";
 import ReviewModal from "../../components/ReviewsModal";
 import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js";
-
+import { jwtDecode } from "jwt-decode";
 import {
   ReloadOutlined,
   CheckCircleOutlined,
@@ -628,7 +628,7 @@ const ProjectDetails = ({
     } finally {
       setLoading(false);
     }
-    return <div>{decodedToken?.clientId}</div>;
+   
   };
 
   useEffect(() => {

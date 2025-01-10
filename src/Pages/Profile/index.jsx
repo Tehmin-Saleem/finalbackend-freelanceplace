@@ -15,6 +15,17 @@ const MyProfile = () => {
   const navigate = useNavigate();
   const [portfolioThumbnails, setPortfolioThumbnails] = useState({});
   const [isLoading, setIsLoading] = useState(true);
+  const [filteredPopularSkills, setFilteredPopularSkills] = useState([]);
+  
+
+  const popularSkills = [
+    "React",
+    "UI/UX Design",
+    "JavaScript",
+    "CSS",
+    "HTML",
+    "Figma",
+  ];
 
   const [profile, setProfile] = useState({
     profileId: "",
@@ -62,44 +73,7 @@ const MyProfile = () => {
   });
   const [imageFile, setImageFile] = useState(null);
 
-  // ===========================================
-  // useEffect(() => {
-  //   const token = localStorage.getItem("token");
-  //   const userId = localStorage.getItem("userId");
-
-  //   if (!token) {
-  //     navigate("/signin");
-  //     return;
-  //   }
-
-  //   // Fetch the profile data if it exists
-  //   const fetchProfileData = async () => {
-  //     try {
-  //       const response = await axios.get(
-  //         `http://localhost:5000/api/freelancer/profile/${userId}`,
-  //         {
-  //           headers: { Authorization: `Bearer ${token}` },
-  //         }
-  //       );
-
-  //       if (response.data.data) {
-  //         setProfile((prevProfile) => ({
-  //           ...prevProfile,
-  //           ...response.data.data,
-  //         }));
-  //       }
-  //     } catch (error) {
-  //       console.error("Error fetching profile data:", error);
-  //       setError("Failed to load profile data.");
-  //     } finally {
-  //       setIsLoading(false);
-  //     }
-  //   };
-
-  //   fetchProfileData();
-  // }, [navigate]);
-
-  // Fetch the profile data if it exists
+  
   const fetchProfileDataIfNeeded = async () => {
     try {
       const token = localStorage.getItem("token");
@@ -162,35 +136,7 @@ const MyProfile = () => {
     }
   };
 
-  //     // Check if the profile exists
-  //     const existenceResponse = await axios.get(
-  //       `http://localhost:5000/api/freelancer/freelancer-profile-exists/${userId}`,
-  //       config
-  //     );
-
-  //     // If profile exists, fetch the data
-  //     if (existenceResponse.data.exists) {
-  //       const response = await axios.get(
-  //         `http://localhost:5000/api/freelancer/profile/${userId}`,
-  //         config
-  //       );
-
-  //       if (response.data.data) {
-  //         setProfile((prevProfile) => ({
-  //           ...prevProfile,
-  //           ...response.data.data,
-  //         }));
-  //       }
-  //     } else {
-  //       navigate("/myProfile"); // Redirect to profile creation page if it doesn't exist
-  //     }
-  //   } catch (error) {
-  //     console.error("Error fetching profile data:", error);
-  //     setError("Failed to load profile data.");
-  //   } finally {
-  //     setIsLoading(false);
-  //   }
-  // };
+ 
 
   // Call the function inside useEffect
   useEffect(() => {
@@ -219,16 +165,16 @@ const MyProfile = () => {
   };
 
   const handleAvailabilityChange = (e) => {
-    const { name, value, type, checked } = e.target;
+    const { name } = e.target;
     setProfile((prevProfile) => ({
       ...prevProfile,
       availability: {
-        ...prevProfile.availability,
-        [name]: type === "checkbox" ? checked : parseFloat(value),
+        full_time: name === "full_time",
+        part_time: name === "part_time",
       },
     }));
   };
-
+  
   const handleLanguageChange = (index, field, value) => {
     const updatedLanguages = [...profile.languages];
     updatedLanguages[index] = { ...updatedLanguages[index], [field]: value };
@@ -263,6 +209,8 @@ const MyProfile = () => {
       }));
     }
   };
+  
+
 
   const handleRemoveSkill = (skill) => {
     setProfile((prevProfile) => ({
@@ -270,6 +218,25 @@ const MyProfile = () => {
       skills: prevProfile.skills.filter((s) => s !== skill),
     }));
   };
+  
+  // Handle Enter key press to add custom skill
+  const handleKeyPress = (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault(); // Prevent form submission
+      if (skillInput.trim() !== "") {
+        handleAddSkill(skillInput.trim()); // Add the skill
+        setSkillInput(""); // Clear the input
+      }
+    }
+  };
+  useEffect(() => {
+    setFilteredPopularSkills(
+      popularSkills.filter((skill) =>
+        skill.toLowerCase().includes(skillInput.toLowerCase())
+      )
+    );
+  }, [skillInput, popularSkills]);
+  
 
   // Add this new useEffect after your existing useEffects
   useEffect(() => {
@@ -476,15 +443,8 @@ const MyProfile = () => {
   if (isLoading) {
     return <Spinner alignCenter />;
   }
-
-  const popularSkills = [
-    "React",
-    "UI/UX Design",
-    "JavaScript",
-    "CSS",
-    "HTML",
-    "Figma",
-  ];
+ 
+ 
 
   return (
     <div className="my-profile">
@@ -615,28 +575,29 @@ const MyProfile = () => {
           </div>
 
           <div className="form-group availability-group">
-            <label>Availability</label>
-            <div className="checkbox-group">
-              <label>
-                <input
-                  type="checkbox"
-                  name="full_time"
-                  checked={profile.availability.full_time}
-                  onChange={handleAvailabilityChange}
-                />
-                Full Time
-              </label>
-              <label>
-                <input
-                  type="checkbox"
-                  name="part_time"
-                  checked={profile.availability.part_time}
-                  onChange={handleAvailabilityChange}
-                />
-                Part Time
-              </label>
-            </div>
-          </div>
+  <label>Availability</label>
+  <div className="checkbox-group">
+    <label>
+      <input
+        type="checkbox"
+        name="full_time"
+        checked={profile.availability.full_time}
+        onChange={handleAvailabilityChange}
+      />
+      Full Time
+    </label>
+    <label>
+      <input
+        type="checkbox"
+        name="part_time"
+        checked={profile.availability.part_time}
+        onChange={handleAvailabilityChange}
+      />
+      Part Time
+    </label>
+  </div>
+</div>
+
 
           <div className="form-group">
             <label>Profile Overview</label>
@@ -649,49 +610,54 @@ const MyProfile = () => {
           </div>
 
           <div className="form-group">
-            <label>Search Skills or add your own:</label>
-            <div className="search-bar">
-              <IconSearchBar alt="Search" />
-              <input
-                type="text"
-                value={skillInput}
-                onChange={(e) => setSkillInput(e.target.value)}
-                placeholder="Search skills..."
-              />
-            </div>
-          </div>
+  <label>Search Skills or add your own:</label>
+  <div className="search-bar">
+    <IconSearchBar alt="Search" />
+    <input
+      type="text"
+      value={skillInput}
+      onChange={(e) => setSkillInput(e.target.value)}
+      onKeyPress={handleKeyPress} // Prevent form submission and add skill
+      placeholder="Search skills..."
+    />
+  </div>
+</div>
 
-          <div className="form-group">
-            <label>Selected Skills</label>
-            <div className="selected-skills">
-              {profile.skills.map((skill) => (
-                <div className="skill-badge" key={skill}>
-                  {skill}
-                  <Cross
-                    alt="Remove"
-                    className="remove-skill"
-                    onClick={() => handleRemoveSkill(skill)}
-                  />
-                </div>
-              ))}
-            </div>
-          </div>
+<div className="form-group">
+  <label>Selected Skills</label>
+  <div className="selected-skills">
+    {profile.skills.map((skill) => (
+      <div className="skill-badge" key={skill}>
+        {skill}
+        <Cross
+          alt="Remove"
+          className="remove-skill"
+          onClick={() => handleRemoveSkill(skill)} // Remove skill
+        />
+      </div>
+    ))}
+  </div>
+</div>
 
-          <div className="form-group">
-            <label>Popular Skills for UI/UX Design</label>
-            <div className="popular-skills">
-              {popularSkills.map((skill) => (
-                <div
-                  className="skill-badge"
-                  key={skill}
-                  onClick={() => handleAddSkill(skill)}
-                >
-                  {skill}
-                  <PlusIcon alt="Add" className="add-skill" />
-                </div>
-              ))}
-            </div>
-          </div>
+<div className="form-group">
+  <label>Popular Skills</label>
+  <div className="popular-skills">
+    {filteredPopularSkills.length > 0 ? (
+      filteredPopularSkills.map((skill) => (
+        <div
+          className="skill-badge"
+          key={skill}
+          onClick={() => handleAddSkill(skill)} // Add skill
+        >
+          {skill}
+          <PlusIcon alt="Add" className="add-skill" />
+        </div>
+      ))
+    ) : (
+      <p>No matching skills found</p>
+    )}
+  </div>
+</div>
 
           <div className="form-group">
             <label>Add Your Portfolio</label>
