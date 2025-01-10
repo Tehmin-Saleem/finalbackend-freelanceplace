@@ -219,15 +219,20 @@ const MyProfile = () => {
   };
 
   const handleAvailabilityChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    setProfile((prevProfile) => ({
-      ...prevProfile,
-      availability: {
-        ...prevProfile.availability,
-        [name]: type === "checkbox" ? checked : parseFloat(value),
-      },
-    }));
+    const { value } = e.target;
+    setProfile((prevProfile) => {
+      const newAvailability = {
+        full_time: value === "full_time",
+        part_time: value === "part_time",
+        hourly_rate: prevProfile.availability.hourly_rate,
+      };
+      return {
+        ...prevProfile,
+        availability: newAvailability,
+      };
+    });
   };
+  
 
   const handleLanguageChange = (index, field, value) => {
     const updatedLanguages = [...profile.languages];
@@ -485,7 +490,13 @@ const MyProfile = () => {
     "HTML",
     "Figma",
   ];
-
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      handleAddSkill(skillInput);
+      setSkillInput("");
+    }
+  };
   return (
     <div className="my-profile">
       <Header />
@@ -615,28 +626,31 @@ const MyProfile = () => {
           </div>
 
           <div className="form-group availability-group">
-            <label>Availability</label>
-            <div className="checkbox-group">
-              <label>
-                <input
-                  type="checkbox"
-                  name="full_time"
-                  checked={profile.availability.full_time}
-                  onChange={handleAvailabilityChange}
-                />
-                Full Time
-              </label>
-              <label>
-                <input
-                  type="checkbox"
-                  name="part_time"
-                  checked={profile.availability.part_time}
-                  onChange={handleAvailabilityChange}
-                />
-                Part Time
-              </label>
-            </div>
-          </div>
+  <label>Availability</label>
+  <div className="checkbox-group">
+    <label>
+      <input
+       type="checkbox"
+        name="availability_type"
+        value="full_time"
+        checked={profile.availability.full_time}
+        onChange={handleAvailabilityChange}
+      />
+      Full Time
+    </label>
+    <label>
+      <input
+       type="checkbox"
+        name="availability_type"
+        value="part_time"
+        checked={profile.availability.part_time}
+        onChange={handleAvailabilityChange}
+      />
+      Part Time
+    </label>
+  </div>
+</div>
+
 
           <div className="form-group">
             <label>Profile Overview</label>
@@ -656,6 +670,7 @@ const MyProfile = () => {
                 type="text"
                 value={skillInput}
                 onChange={(e) => setSkillInput(e.target.value)}
+                onKeyDown={handleKeyDown}
                 placeholder="Search skills..."
               />
             </div>
