@@ -308,7 +308,7 @@ exports.getOffers = async (req, res) => {
     // Find all offers for the logged-in freelancer
     const offers = await Offer_Form.find({
       freelancer_id: loggedInUserId,
-      status: 'accepted'  // Only get accepted offers
+      status: { $in: ['accepted', 'completed'] }  // Get both accepted and completed offers
     }).populate('client_id', 'first_name last_name country_name');
 
     console.log('Raw offers data:', offers);
@@ -323,6 +323,7 @@ exports.getOffers = async (req, res) => {
     // Format the offers to match frontend expectations
     const formattedOffers = offers.map(offer => ({
       _id: offer._id,
+      job_id: offer.job_id,
       type: offer.budget_type === "fixed" ? "Fixed" : 
             offer.budget_type === "hourly" ? "Hourly" : "Unknown",
       title: offer.job_title || "Untitled Job",
@@ -338,7 +339,8 @@ exports.getOffers = async (req, res) => {
       tags: offer.preferred_skills || [],
       location: offer.location || "Not specified",
       postedTime: new Date(offer.createdAt).toLocaleDateString(),
-      status: 'accepted',
+      status: offer.status, // Use the actual status from the offer
+      jobStatus: offer.status, // Match the status for consistency
       due_date: offer.due_date ? new Date(offer.due_date).toLocaleDateString() : "Not specified",
       estimated_timeline: offer.estimated_timeline ? {
         duration: offer.estimated_timeline.duration,
@@ -351,6 +353,7 @@ exports.getOffers = async (req, res) => {
         ? `${offer.client_id.first_name} ${offer.client_id.last_name}`
         : "Unknown Client",
       clientCountry: offer.client_id?.country_name || "Not specified",
+      source: 'offer', // Add this to identify offer type
       attachment: offer.attachment ? {
         fileName: offer.attachment.fileName,
         path: offer.attachment.path,

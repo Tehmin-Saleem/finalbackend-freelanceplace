@@ -567,18 +567,22 @@ exports.sendProjectDetailsToConsultant = async (req, res) => {
 
 exports.getProjectDetailsByOfferId = async (req, res) => {
   const { offerId } = req.params;
+  console.log("Offer ID passed in request:", offerId);
+  
 
   try {
-    // Step 1: Fetch the ConsultantOffer document with virtual population of project details
-    const offer = await ConsultantOffer.findById(offerId)
-      .populate('projectDetails') // Populate the projectDetails virtual field
-      .lean();
+    // Step 1: Fetch the ConsultantOffer document
+    const offer = await ConsultantOffer.findById(offerId).lean();
+console.log("Offer fetched:", offer);
 
-    if (!offer) {
-      return res.status(404).json({ message: 'Offer not found.' });
-    }
+    
+      
 
-    // Step 2: Combine data from offer and populated project details
+    // Step 2: Fetch the ProjectDetails document using the offerId
+    const projectDetails = await ProjectDetails.findOne({ offerId }).lean();
+    console.log("Project Details fetched:", projectDetails);
+
+    // Step 3: Combine data from both schemas
     const response = {
       projectName: offer.offer_details?.project?.name || offer.project_name,
       description:
@@ -587,15 +591,53 @@ exports.getProjectDetailsByOfferId = async (req, res) => {
         offer.offer_details?.budget?.type === 'hourly'
           ? `${offer.offer_details?.budget?.hourlyRateFrom} - ${offer.offer_details?.budget?.hourlyRateTo} per hour`
           : `$${offer.offer_details?.budget?.fixedPrice} fixed`,
-      githubUrl: offer.projectDetails?.githubUrl || 'N/A',
-      additionalNotes: offer.projectDetails?.additionalNotes || 'N/A',
-      deadline: offer.projectDetails?.deadline || 'N/A',
+      githubUrl: projectDetails?.githubUrl || 'N/A',
+      additionalNotes: projectDetails?.additionalNotes || 'N/A',
+      deadline: projectDetails?.deadline || 'N/A',
     };
 
     res.status(200).json(response);
   } catch (error) {
     console.error('Error fetching project details:', error);
     res.status(500).json({ message: 'Server error, try again later.' });
+  }
+};
+
+exports.getOfferCountsByConsultantId = async (req, res) => {
+  try {
+    const consultantId = req.params.consultantId;
+
+    // Validate consultant ID
+    if (!consultantId) {
+      return res.status(400).json({ message: "Consultant ID is required" });
+    }
+
+    // Fetch counts for total, accepted, and pending offers
+    const totalOffers = await ConsultantOffer.countDocuments({ consultant_id: consultantId });
+    const acceptedOffers = await ConsultantOffer.countDocuments({
+      consultant_id: consultantId,
+      status: "Accepted",
+    });
+    const pendingOffers = await ConsultantOffer.countDocuments({
+      consultant_id: consultantId,
+      status: "pending",
+    });
+
+    res.status(200).json({
+      success: true,
+      data: {
+        totalOffers,
+        acceptedOffers,
+        pendingOffers,
+      },
+    });
+  } catch (error) {
+    console.error("Error fetching offer counts by consultant ID:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch offer counts",
+      error: error.message,
+    });
   }
 };
 

@@ -14,6 +14,7 @@ const ClientProfile= require('../controllers/client_profile.controller')
 const Notification= require ('../controllers/notifications.controller')
 const consultantProfileController=require ('../controllers/consultantprofile.controller')
 const manageProject = require('../controllers/Manageproj.controller')
+const { addRemark, getRemarks, getRemarksByProjectAndClient } = require('../controllers/Remark.controller');
 
 
 
@@ -279,6 +280,7 @@ router.get(
 router.get('/project-progress/:proposal_id', authMiddleware, manageProject.getProjectProgress);
 
 
+
 router.get('/offer-progress', authMiddleware, manageProject.getOfferProgress);
 
 
@@ -287,6 +289,11 @@ router.post(
   authMiddleware,
   hireFreelancerController.markProjectAsCompleted
 );
+
+
+// routes/clientRoutes.js
+
+router.post('/complete-offer/:projectId',authMiddleware, hireFreelancerController.markOfferAsCompleted);
 
 router.get('/job-status/:jobId',authMiddleware, jobPostController.getJobStatus);
 router.patch('/proposals/:proposalId/status', authMiddleware, jobPostController.updateProposalStatus);
@@ -304,9 +311,14 @@ router.put('/offer/:offerId', authMiddleware, consultantProfileController.update
 
 router.post('/sendProjectDetails/:consultantId', authMiddleware, consultantProfileController.sendProjectDetailsToConsultant);
 
-router.get('project-details/:offerId',authMiddleware, consultantProfileController.getProjectDetailsByOfferId);
+router.get('/project-details/:offerId',authMiddleware, consultantProfileController.getProjectDetailsByOfferId);
 
+router.post('/add',authMiddleware, addRemark);
 
+// GET: Fetch all remarks for a specific offer and consultant
+router.get('/:offerId/:consultantId', authMiddleware, getRemarks);
+router.get('/offers/count/:consultantId',consultantProfileController.getOfferCountsByConsultantId);
+router.get('/getRemarksByProjectAndClient/:job_title/:clientId', getRemarksByProjectAndClient);
 
 module.exports = router;
 

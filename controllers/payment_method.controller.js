@@ -649,6 +649,18 @@ exports.processPaymentForFreelancer = async (req, res) => {
     }
 
     // Update the project with all changes
+    const finalUpdateQuery = isOffer
+      ? {
+          projectName: projectName,
+          client_id: client_id,
+          proposal_id: null
+        }
+      : {
+          proposal_id: proposal_id,
+          client_id: client_id
+        };
+
+    // Update the project with all changes
     const finalUpdatedProject = await Project.findOneAndUpdate(
       {
         proposal_id: proposal_id,
