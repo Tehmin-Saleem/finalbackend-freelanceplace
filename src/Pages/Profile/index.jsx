@@ -3,8 +3,15 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import "./styles.scss";
 import { jwtDecode } from "jwt-decode";
-import { Cross, IconSearchBar, UploadIcon, PlusIcon } from "../../svg/index";
+import { Cross, IconSearchBar, UploadIcon, PlusIcon ,ImageIcon} from "../../svg/index";
 import { Header, Spinner } from "../../components/index";
+
+import * as pdfjsLib from "pdfjs-dist";
+import pdfjsWorker from "pdfjs-dist/build/pdf.worker.entry";
+
+pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorker;
+
+
 // import { GlobalWorkerOptions } from 'pdfjs-dist';
 // import 'pdfjs-dist/build/pdf.worker.entry';
 
@@ -298,59 +305,98 @@ const MyProfile = () => {
   };
 
   const generateThumbnail = async (file) => {
-    if (file.type !== "application/pdf") {
-      throw new Error("Unsupported file type");
-    }
-
-    const fileReader = new FileReader();
-    return new Promise((resolve, reject) => {
-      fileReader.onload = async (event) => {
-        try {
-          const typedArray = new Uint8Array(event.target.result);
-          const pdf = await pdfjsLib.getDocument(typedArray).promise;
-          const page = await pdf.getPage(1);
-          const scale = 1.5;
-          const viewport = page.getViewport({ scale });
-          const canvas = document.createElement("canvas");
-          const context = canvas.getContext("2d");
-          canvas.height = viewport.height;
-          canvas.width = viewport.width;
-          const renderContext = {
-            canvasContext: context,
-            viewport: viewport,
+    try {
+      // For images (jpg, jpeg, png, gif)
+      if (file.type.startsWith("image/")) {
+        return new Promise((resolve) => {
+          const reader = new FileReader();
+          reader.onloadend = () => {
+            resolve(reader.result);
           };
-          await page.render(renderContext).promise;
-          resolve(canvas.toDataURL());
-        } catch (error) {
-          reject(error);
-        }
-      };
+          reader.readAsDataURL(file);
+        });
+      }
 
-      fileReader.onerror = reject;
-      fileReader.readAsArrayBuffer(file);
-    });
+      // For PDFs
+      else if (file.type === "application/pdf") {
+        const fileReader = new FileReader();
+        return new Promise((resolve, reject) => {
+          fileReader.onload = async (event) => {
+            try {
+              const typedArray = new Uint8Array(event.target.result);
+              const pdf = await pdfjsLib.getDocument(typedArray).promise;
+              const page = await pdf.getPage(1);
+              const scale = 1.5;
+              const viewport = page.getViewport({ scale });
+              const canvas = document.createElement("canvas");
+              const context = canvas.getContext("2d");
+              canvas.height = viewport.height;
+              canvas.width = viewport.width;
+              const renderContext = {
+                canvasContext: context,
+                viewport: viewport,
+              };
+              await page.render(renderContext).promise;
+              resolve(canvas.toDataURL());
+            } catch (error) {
+              reject(error);
+            }
+          };
+          fileReader.onerror = reject;
+          fileReader.readAsArrayBuffer(file);
+        });
+      }
+
+      // For other file types
+      else {
+        // Return a default thumbnail or icon based on file type
+        return "/path/to/default/file/icon.png"; // Replace with your default icon path
+      }
+    } catch (error) {
+      console.error("Error generating thumbnail:", error);
+      throw error;
+    }
+  };
+
+  const DefaultThumbnail = ({ fileType }) => {
+    // Return appropriate icon based on file type
+    return (
+      <div className="default-thumbnail">
+        {fileType === "application/pdf" && <ImageIcon />}
+        {fileType.startsWith("image/") && <ImageIcon />}
+        {/* Add more file type icons as needed */}
+      </div>
+    );
   };
 
   const handlePortfolioChange = async (e) => {
     const { name, value, type } = e.target;
     if (type === "file") {
       const file = e.target.files[0];
-      if (file.size > 10 * 1024 * 1024) {
-        alert("File size exceeds 10MB limit.");
-        return;
-      }
-      setCurrentPortfolio((prev) => ({
-        ...prev,
-        attachment: file,
-      }));
-      try {
-        const thumbnail = await generateThumbnail(file);
-        setPortfolioThumbnails((prev) => ({
+      if (file) {
+        if (file.size > 10 * 1024 * 1024) {
+          alert("File size exceeds 10MB limit.");
+          return;
+        }
+        setCurrentPortfolio((prev) => ({
           ...prev,
-          [currentPortfolio.project_title]: thumbnail,
+          attachment: file,
         }));
-      } catch (error) {
-        console.error("Error generating thumbnail:", error);
+
+        try {
+          const thumbnail = await generateThumbnail(file);
+          setPortfolioThumbnails((prev) => ({
+            ...prev,
+            [currentPortfolio.project_title]: thumbnail,
+          }));
+        } catch (error) {
+          console.error("Error generating thumbnail:", error);
+          // Set a default thumbnail or handle the error appropriately
+          setPortfolioThumbnails((prev) => ({
+            ...prev,
+            [currentPortfolio.project_title]: "/path/to/default/thumbnail.png", // Replace with your default thumbnail
+          }));
+        }
       }
     } else {
       setCurrentPortfolio((prev) => ({
@@ -361,9 +407,18 @@ const MyProfile = () => {
   };
 
   const handleSavePortfolio = () => {
+    const newPortfolio = {
+      project_title: currentPortfolio.project_title,
+      category: currentPortfolio.category,
+      description: currentPortfolio.description,
+      tool_used: currentPortfolio.tool_used,
+      url: currentPortfolio.url,
+      attachment: currentPortfolio.attachment, // Keep the file object for later upload
+      // Don't include the attachment here as it needs special handling
+    };
     setProfile((prevProfile) => ({
       ...prevProfile,
-      portfolios: [...prevProfile.portfolios, currentPortfolio],
+      portfolios: [...prevProfile.portfolios, newPortfolio],
     }));
     setPortfolioModalOpen(false);
     setCurrentPortfolio({
@@ -402,19 +457,39 @@ const MyProfile = () => {
         formData.append("image", imageFile);
       }
 
-      // Append portfolios as a single JSON string
-      formData.append("portfolios", JSON.stringify(profile.portfolios));
 
-      // Append portfolio attachments
-      profile.portfolios.forEach((portfolio, index) => {
+
+      // Handle portfolios and their attachments
+      const portfoliosForUpload = profile.portfolios.map((portfolio, index) => {
+        // Create a copy without the file object
+        const portfolioData = {
+          project_title: portfolio.project_title,
+          category: portfolio.category,
+          description: portfolio.description,
+          tool_used: portfolio.tool_used,
+          url: portfolio.url,
+        };
+
+        // If there's an attachment, append it to formData
         if (portfolio.attachment instanceof File) {
           formData.append(
-            `portfolios`,
+            `portfolio_attachments`,
             portfolio.attachment,
             `portfolio_${index}_${portfolio.attachment.name}`
           );
         }
+
+        return portfolioData;
       });
+
+      // Append the portfolio data without the file objects
+      formData.append("portfolios", JSON.stringify(portfoliosForUpload));
+
+
+      console.log("Portfolios being sent:", portfoliosForUpload);
+    for (let pair of formData.entries()) {
+      console.log(pair[0], pair[1]);
+    }
 
       const token = localStorage.getItem("token");
       console.log("Retrieved token:", token);
@@ -665,12 +740,16 @@ const MyProfile = () => {
               {profile.portfolios.map((portfolio, index) => (
                 <div key={index} className="portfolio-box">
                   <div className="thumbnail-preview">
-                    {portfolioThumbnails[currentPortfolio.project_title] && (
+                    {portfolioThumbnails[currentPortfolio.project_title] ? (
                       <img
                         src={
                           portfolioThumbnails[currentPortfolio.project_title]
                         }
                         alt="Portfolio Thumbnail"
+                      />
+                    ) : (
+                      <DefaultThumbnail
+                        fileType={portfolio.attachment?.type || "unknown"}
                       />
                     )}
                   </div>
@@ -768,6 +847,7 @@ const MyProfile = () => {
               <input
                 type="file"
                 name="attachment"
+                accept=".pdf,.jpg,.jpeg,.png,.gif"
                 onChange={handlePortfolioChange}
               />
             </div>

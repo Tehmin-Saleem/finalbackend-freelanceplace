@@ -3,12 +3,17 @@ import axios from "axios";
 import "./styles.scss";
 import { Header } from "../../components";
 import { Spinner } from "../../components/index";
-import { MapPin, Briefcase, Clock, DollarSign, Paperclip } from "lucide-react";
+import { MapPin, Briefcase, Clock, DollarSign, Paperclip, InboxIcon } from "lucide-react";
+
+
+
+
 const OfferCards = () => {
   const [offers, setOffers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [submitLoading, setSubmitLoading] = useState(false);
+
   // Function to get freelancer ID from the JWT token stored in localStorage
   const getFreelancerIdFromToken = () => {
     const token = localStorage.getItem("token");
@@ -56,7 +61,7 @@ const OfferCards = () => {
 
         setOffers(sortedOffers);
       } catch (err) {
-        setError("Failed to fetch offers.");
+        setOffers([]);
       } finally {
         setLoading(false); // Stop loading after fetching data
       }
@@ -146,13 +151,29 @@ const OfferCards = () => {
     <div className="min-h-screen bg-gray-50">
       <Header />
 
-      <main className="main max-w-4xl mx-auto p-6 mt-30">
+      <main className="main max-w-4xl mx-auto p-6 mt-32">
       <h1 className="text-2xl font-bold text-sky-400 text-center mt-4">
         Offers Received
       </h1>
-        {offers.length === 0 ? (
-          <div className="text-center py-8 text-gray-600">
-            No offers Recieved.
+      {offers.length === 0 ? (
+          <div className="mt-8 flex flex-col items-center justify-center p-12 bg-white rounded-lg shadow-lg">
+            <div className="w-16 h-16 bg-sky-100 rounded-full flex items-center justify-center mb-4">
+              <InboxIcon className="w-8 h-8 text-sky-500" />
+            </div>
+            <h3 className="text-xl font-medium text-gray-900 mb-2">
+              No Offers Yet
+            </h3>
+            <p className="text-gray-500 text-center max-w-md">
+              You haven't received any offers from clients yet. When clients send you offers, they will appear here.
+            </p>
+            <div className="mt-6">
+              <button 
+                onClick={() => window.location.reload()} 
+                className="px-6 py-2 text-sm font-medium text-white bg-sky-500 rounded-md hover:bg-sky-600 transition-colors duration-200"
+              >
+                Refresh Page
+              </button>
+            </div>
           </div>
         ) : (
           

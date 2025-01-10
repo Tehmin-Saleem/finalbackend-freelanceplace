@@ -25,6 +25,7 @@ import SArabia from "./ProfileView/SArabia"
 import Star from "./ProfileView/Star"
 import UStates from "./ProfileView/UStates"
 import Filter from "./FreelanceDoneJobs/Filter"
+import ImageIcon from "./Myprofile/ImageIcon"
 
 
 import BackgroundLining from "./Sammar's-SVG-Components/BackgroundLining";
@@ -53,6 +54,7 @@ import Notifications from "./Sammar's-SVG-Components/Notifications";
 import BigCross from "./ChatPage/BigCross"
 import Attachment from "./ChatPage/Attachment"
 import ConsultantFrame from "./Sammar's-SVG-Components/ConsultantFrame"
+
 
 
 export { default as BackgroundLining } from "./Sammar's-SVG-Components/BackgroundLining";
@@ -108,3 +110,6 @@ export {default as Notifications} from "./Sammar's-SVG-Components/Notifications"
 export {default as BigCross} from "./ChatPage/BigCross"
 export {default as Attachment} from "./ChatPage/Attachment"
 export {default as ConsultantFrame} from "./Sammar's-SVG-Components/ConsultantFrame"
+export {default as ImageIcon} from "./Myprofile/ImageIcon"
+
+
