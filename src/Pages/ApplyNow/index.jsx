@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { Header } from "../../components/index";
+import { Header, Modal } from "../../components/index";
 import "./styles.scss";
 
 const ApplyJob = () => {
@@ -11,25 +11,75 @@ const ApplyJob = () => {
   const navigate = useNavigate();
   const [fileUrl, setFileUrl] = useState(null);
   const [fileType, setFileType] = useState(null);
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [hasPaymentMethod, setHasPaymentMethod] = useState(false);
+
+  const checkPaymentMethod = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await fetch(
+        "http://localhost:5000/api/freelancer/checkPaymentMethod",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      const data = await response.json();
+
+      if (!data.success) {
+        throw new Error(data.message);
+      }
+
+      return {
+        hasPaymentMethod: data.hasPaymentMethod,
+        paymentDetails: data.paymentDetails,
+      };
+    } catch (error) {
+      console.error("Error checking payment method:", error);
+      return {
+        hasPaymentMethod: false,
+        paymentDetails: null,
+      };
+    }
+  };
+
+// Move handleApplyNow outside useEffect
+const handleApplyNow = async () => {
+  const paymentStatus = await checkPaymentMethod();
+  setHasPaymentMethod(paymentStatus.hasPaymentMethod);
+  
+  if (!paymentStatus.hasPaymentMethod) {
+    setShowPaymentModal(true);
+  } else {
+    navigate(`/submitProposal/${jobPostId}`);
+  }
+};
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem("token");
     if (!token) {
-      navigate('/signin');
+      navigate("/signin");
       return;
     }
 
     const fetchJobPost = async () => {
       try {
-        const response = await fetch(`http://localhost:5000/api/client/job-posts/${jobPostId}`, {
-          headers: {
-            'Authorization': `Bearer ${token}`
+        const response = await fetch(
+          `http://localhost:5000/api/client/job-posts/${jobPostId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
           }
-        });
+        );
 
         if (!response.ok) {
           const errorData = await response.json();
-          throw new Error(`Failed to fetch job post: ${response.statusText} - ${errorData.message}`);
+          throw new Error(
+            `Failed to fetch job post: ${response.statusText} - ${errorData.message}`
+          );
         }
 
         const data = await response.json();
@@ -37,13 +87,13 @@ const ApplyJob = () => {
 
         // If there's an attachment, handle file type and URL generation
         if (data.jobPost.attachment) {
-          setFileUrl(data.jobPost.attachment.path);  // Using the Cloudinary URL directly
-          setFileType(data.jobPost.attachment.mimeType || 'application/pdf');
+          setFileUrl(data.jobPost.attachment.path); // Using the Cloudinary URL directly
+          setFileType(data.jobPost.attachment.mimeType || "application/pdf");
         }
 
         setLoading(false);
       } catch (error) {
-        setError(error.message || 'An unexpected error occurred');
+        setError(error.message || "An unexpected error occurred");
         setLoading(false);
       }
     };
@@ -75,28 +125,30 @@ const ApplyJob = () => {
     const postedDate = new Date(dateString);
     const diffInSeconds = Math.floor((now - postedDate) / 1000);
 
-    if (diffInSeconds < 60) return 'Just now';
-    if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)} minutes ago`;
-    if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)} hours ago`;
+    if (diffInSeconds < 60) return "Just now";
+    if (diffInSeconds < 3600)
+      return `${Math.floor(diffInSeconds / 60)} minutes ago`;
+    if (diffInSeconds < 86400)
+      return `${Math.floor(diffInSeconds / 3600)} hours ago`;
     return `${Math.floor(diffInSeconds / 86400)} days ago`;
   };
 
   const handleViewFile = () => {
     if (fileType && fileUrl) {
-      if (fileType.startsWith('image/')) {
+      if (fileType.startsWith("image/")) {
         // For images, check if it's a URL or a Blob and handle accordingly
-        if (fileUrl.startsWith('http')) {
+        if (fileUrl.startsWith("http")) {
           // If the fileUrl is a URL (like Cloudinary)
-          window.open(fileUrl, '_blank');
+          window.open(fileUrl, "_blank");
         } else {
           // Otherwise, open the Blob URL
-          window.open(fileUrl, '_blank');
+          window.open(fileUrl, "_blank");
         }
-      } else if (fileType === 'application/pdf') {
+      } else if (fileType === "application/pdf") {
         // For PDF, open in a new tab
-        window.open(fileUrl, '_blank');
+        window.open(fileUrl, "_blank");
       } else {
-        alert('Unsupported file type.');
+        alert("Unsupported file type.");
       }
     } else {
       alert("No file available to view.");
@@ -106,9 +158,15 @@ const ApplyJob = () => {
   // File Preview
   const renderFilePreview = () => {
     if (fileType && fileUrl) {
-      if (fileType.startsWith('image/')) {
-        return <img src={fileUrl} alt="Attachment Preview" className="file-preview-image" />;
-      } else if (fileType === 'application/pdf') {
+      if (fileType.startsWith("image/")) {
+        return (
+          <img
+            src={fileUrl}
+            alt="Attachment Preview"
+            className="file-preview-image"
+          />
+        );
+      } else if (fileType === "application/pdf") {
         return (
           <embed
             src={fileUrl}
@@ -127,9 +185,9 @@ const ApplyJob = () => {
   if (error) return <div>Error: {error}</div>;
   if (!jobPost) return <div>No job post found</div>;
 
-  const handleApplyNow = () => {
-    navigate(`/submitProposal/${jobPostId}`);
-  };
+  // const handleApplyNow = () => {
+  //   navigate(`/submitProposal/${jobPostId}`);
+  // };
 
   return (
     <>
@@ -143,11 +201,16 @@ const ApplyJob = () => {
               <h3 className="job-Title">{jobPost.job_title}</h3>
               <p className="job-Location">Lahore</p>
               <p className="job-posted-Time">
-                <span className="posted-text">Posted:</span> 
-                <span className="time-text"> {formatTimeAgo(jobPost.createdAt)}</span>
+                <span className="posted-text">Posted:</span>
+                <span className="time-text">
+                  {" "}
+                  {formatTimeAgo(jobPost.createdAt)}
+                </span>
               </p>
             </div>
-            <button className="apply-now-bton" onClick={handleApplyNow}>Apply now</button>
+            <button className="apply-now-bton" onClick={handleApplyNow}>
+              Apply now
+            </button>
           </div>
 
           <hr className="divider" />
@@ -155,26 +218,34 @@ const ApplyJob = () => {
           <div className="job-infor">
             <span className="job-info-item">
               <span className="labeltext">
-                {jobPost.budget_type === 'fixed' ? 'Fixed Price:' : 'Hourly Rate:'}
-              </span> 
+                {jobPost.budget_type === "fixed"
+                  ? "Fixed Price:"
+                  : "Hourly Rate:"}
+              </span>
               <span className="value">
-                {jobPost.budget_type === 'fixed'
+                {jobPost.budget_type === "fixed"
                   ? `$${jobPost.fixed_price}`
                   : `$${jobPost.hourly_rate?.from} - $${jobPost.hourly_rate?.to} /hr`}
               </span>
             </span>
             <span className="job-info-item">
-              <span className="labeltext">Estimated Time:</span> 
-              <span className="value">{jobPost.project_duration?.duration_of_work}</span>
+              <span className="labeltext">Estimated Time:</span>
+              <span className="value">
+                {jobPost.project_duration?.duration_of_work}
+              </span>
             </span>
             <span className="job-info-item">
-              <span className="labeltext">Level:</span> 
-              <span className="value">{jobPost.project_duration?.experience_level}</span>
+              <span className="labeltext">Level:</span>
+              <span className="value">
+                {jobPost.project_duration?.experience_level}
+              </span>
             </span>
           </div>
 
           <h4 className="section-title">Project Overview:</h4>
-          <p className="job-description">{jobPost.description || "No description provided."}</p>
+          <p className="job-description">
+            {jobPost.description || "No description provided."}
+          </p>
 
           {jobPost.attachment && (
             <>
@@ -183,7 +254,9 @@ const ApplyJob = () => {
                 <div className="attachment-item">
                   <div className="attachment-file">
                     <span className="file-icon">📄</span>
-                    <span className="file-name">{jobPost.attachment.fileName}</span>
+                    <span className="file-name">
+                      {jobPost.attachment.fileName}
+                    </span>
                   </div>
                   <button className="view-btn" onClick={handleViewFile}>
                     <EyeIcon />
@@ -191,9 +264,7 @@ const ApplyJob = () => {
                   </button>
                 </div>
                 {/* Displaying the file preview */}
-                <div className="file-preview">
-                  {renderFilePreview()}
-                </div>
+                <div className="file-preview">{renderFilePreview()}</div>
               </div>
             </>
           )}
@@ -201,11 +272,43 @@ const ApplyJob = () => {
           <h4 className="section-title">Skills and Expertise:</h4>
           <div className="skills">
             {jobPost.preferred_skills.map((skill) => (
-              <span key={skill} className="skill">{skill}</span>
+              <span key={skill} className="skill">
+                {skill}
+              </span>
             ))}
           </div>
         </div>
       </div>
+      {/* Add the Payment Modal */}
+      <Modal
+        isOpen={showPaymentModal}
+        onClose={() => setShowPaymentModal(false)}
+      >
+        <div className="payment-modal-content">
+          <h2>Payment Method Required</h2>
+          <p>
+            Please set up your payment method before applying for jobs. This
+            ensures smooth transactions once you start working.
+          </p>
+          <div className="modal-buttons">
+            <button
+              className="setup-payment-btn"
+              onClick={() => {
+                setShowPaymentModal(false);
+                navigate("/payment");
+              }}
+            >
+              Set Up Payment Method
+            </button>
+            <button
+              className="modal-close"
+              onClick={() => setShowPaymentModal(false)}
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      </Modal>
     </>
   );
 };
