@@ -74,17 +74,18 @@ exports.createOrUpdateProfile = async (req, res) => {
           };
 
           // Check if there's a corresponding attachment
-        if (req.files && req.files.portfolio_attachments) {
-          const attachmentFile = req.files.portfolio_attachments.find(
-            file => file.originalname.startsWith(`portfolio_${i}_`)
-          );
-
-          if (attachmentFile) {
-            const result = await cloudinary.uploader.upload(attachmentFile.path, {
-              resource_type: "auto",
-              folder: "portfolio_attachments"
-            });
+        if (req.files && req.files.portfolio_attachments && req.files.portfolio_attachments[i]) {
+          try {
+            const result = await cloudinary.uploader.upload(
+              req.files.portfolio_attachments[i].path,
+              {
+                resource_type: "auto",
+                folder: "portfolio_attachments"
+              }
+            );
             portfolio.attachment = result.secure_url;
+          } catch (error) {
+            console.error(`Error uploading portfolio attachment ${i}:`, error);
           }
         }
 
