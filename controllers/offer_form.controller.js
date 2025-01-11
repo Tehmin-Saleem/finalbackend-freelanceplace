@@ -680,7 +680,7 @@ exports.getClientAllJobAndOffersCounts = async (req, res) => {
 
     // Combine counts
     const totalCompletedJobs = completedJobsCount + completedOffersCount;
-    const totalOngoingJobs = ongoingJobsCount + acceptedOffers;
+    const totalOngoingJobs = ongoingJobsCount + acceptedOffers.length;
 
     // Response with all counts
     res.status(200).json({
