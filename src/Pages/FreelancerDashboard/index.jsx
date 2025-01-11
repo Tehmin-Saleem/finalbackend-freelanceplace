@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState, useCallback } from "react";
 import { Header, ZoomedImage, Modal } from "../../components";
 
@@ -21,6 +22,7 @@ const FreelanceDashboardPage = () => {
   });
   const [uniqueJobCount, setUniqueJobCount] = useState(0);
   const navigate = useNavigate();
+
   const [reviews, setReviews] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -128,7 +130,6 @@ const FreelanceDashboardPage = () => {
     // Log quickStats after it updates
     console.log("Updated quickStats:", quickStats);
   }, [quickStats]);
-
   // Check if profile exists
   const checkProfileExists = async (userId, token) => {
     try {
@@ -222,53 +223,53 @@ const FreelanceDashboardPage = () => {
         );
         setUser(response.data);
 
-        const statsResponse = await axios.get(
-          `http://localhost:5000/api/freelancer/proposals/count/${userId}`,
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        );
-        setQuickStats((prevStats) => ({
-          ...prevStats,
-          totalJobsApplied: statsResponse.data.totalProposals,
-        }));
-        const responses = await axios.get(
-          `http://localhost:5000/api/freelancer/hired-jobs/${userId}`,
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        );
-        setQuickStats((prevStats) => ({
-          ...prevStats,
-          ongoingJobs: responses.data.count,
-        }));
+        // const statsResponse = await axios.get(
+        //   `http://localhost:5000/api/freelancer/proposals/count/${userId}`,
+        //   {
+        //     headers: { Authorization: `Bearer ${token}` },
+        //   }
+        // );
+        // setQuickStats((prevStats) => ({
+        //   ...prevStats,
+        //   totalJobsApplied: statsResponse.data.totalProposals,
+        // }));
+        // const responses = await axios.get(
+        //   `http://localhost:5000/api/freelancer/hired-jobs/${userId}`,
+        //   {
+        //     headers: { Authorization: `Bearer ${token}` },
+        //   }
+        // );
+        // setQuickStats((prevStats) => ({
+        //   ...prevStats,
+        //   ongoingJobs: responses.data.count,
+        // }));
 
-        const completedresponses = await axios.get(
-          `http://localhost:5000/api/freelancer/completed-jobs/${userId}`,
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        );
-        console.log(
-          "completed ",
-          completedresponses.data.data.totalCompletedJobs
-        );
-        setQuickStats((prevStats) => ({
-          ...prevStats,
-          completedJobs: completedresponses.data.data.totalCompletedJobs,
-        }));
+        // const completedresponses = await axios.get(
+        //   `http://localhost:5000/api/freelancer/completed-jobs/${userId}`,
+        //   {
+        //     headers: { Authorization: `Bearer ${token}` },
+        //   }
+        // );
+        // console.log(
+        //   "completed ",
+        //   completedresponses.data.data.totalCompletedJobs
+        // );
+        // setQuickStats((prevStats) => ({
+        //   ...prevStats,
+        //   completedJobs: completedresponses.data.data.totalCompletedJobs,
+        // }));
 
-        const ongoingJobsResponse = await axios.get(
-          `http://localhost:5000/api/freelancer/hired-jobs/${userId}`,
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        );
-        console.log("dattaatattatatata", ongoingJobsResponse.data.count);
-        setQuickStats((prevStats) => ({
-          ...prevStats,
-          ongoingJobs: ongoingJobsResponse.data.count,
-        }));
+        // const ongoingJobsResponse = await axios.get(
+        //   `http://localhost:5000/api/freelancer/hired-jobs/${userId}`,
+        //   {
+        //     headers: { Authorization: `Bearer ${token}` },
+        //   }
+        // );
+        // console.log("dattaatattatatata", ongoingJobsResponse.data.count);
+        // setQuickStats((prevStats) => ({
+        //   ...prevStats,
+        //   ongoingJobs: ongoingJobsResponse.data.count,
+        // }));
 
         // // Fetch stats
         // const statsResponse = await axios.get(`http://localhost:5000/api/freelancer/proposals/count/${userId}`, {
@@ -478,17 +479,7 @@ const FreelanceDashboardPage = () => {
         </p>
       </div>
 
-      {/* <button className="start-button" onClick={handleJobSearchButtonClick}>
-              Explore Jobs
-            </button>
-          </div>
-          <BackgroundLining className="background-lining" />
-        </div>
 
-        <div className="right-section">
-          <ZoomedImage alt="Placeholder" className="illustration" />
-        </div>
-      </main> */}
 
       {/* Quick Stats */}
       <div className="quick-stats">
@@ -526,7 +517,6 @@ const FreelanceDashboardPage = () => {
           <p>Explore available opportunities that match your skills.</p>
           <button>Browse Jobs</button>
         </div>
-
         <div
           className="card"
           onClick={() => handleNavigation("/freelancerOffers")}
@@ -535,7 +525,6 @@ const FreelanceDashboardPage = () => {
           <p>View and manage the offers.</p>
           <button>View offers</button>
         </div>
-
         <div
           className="card"
           onClick={() => {

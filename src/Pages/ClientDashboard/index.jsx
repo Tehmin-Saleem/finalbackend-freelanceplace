@@ -66,6 +66,7 @@ const ClientDashboard = () => {
           { headers: { Authorization: `Bearer ${token}` } }
         );
         setDashboardStats(statsResponse.data.data);
+        console.log("response",statsResponse.data);
       } catch (error) {
         console.error("Error fetching dashboard data:", error);
         navigate("/signin");
@@ -99,6 +100,11 @@ const ClientDashboard = () => {
             <div className="stat-item">
               <h3>Completed Jobs</h3>
               <p>{dashboardStats.totalCompletedJobs}</p>
+            </div>
+
+            <div className="stat-item">
+              <h3>Freelancers Engaged</h3>
+              <p>{dashboardStats.totalOngoingJobs}</p>
             </div>
           </div>
 
