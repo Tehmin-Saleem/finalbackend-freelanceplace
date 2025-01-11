@@ -1,5 +1,6 @@
 const Freelancer_Profile = require("../models/freelancer_profile.model");
 const { cloudinary } = require("../config/cloudinary.config");
+const fs = require('fs');
 
 exports.createOrUpdateProfile = async (req, res) => {
   try {
@@ -358,5 +359,77 @@ exports.freelancerProfileExists = async (req, res) => {
     res.status(200).json({ exists: !!profile });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
+  }
+};
+
+
+exports.checkProfileCompletion = async (req, res) => {
+  try {
+    const userId = req.params.userId;
+
+    const profile = await Freelancer_Profile.findOne({ freelancer_id: userId });
+
+    if (!profile) {
+      return res.status(200).json({
+        success: true,
+        isComplete: false,
+        message: "Profile not found"
+      });
+    }
+
+    // Define required fields and their validation criteria
+    const completionCriteria = {
+      basicInfo: !!(
+        profile.first_name &&
+        profile.last_name &&
+        profile.email &&
+        profile.title &&
+        profile.profile_overview
+      ),
+      skills: !!(profile.skills && profile.skills.length > 0),
+      experience: !!(profile.experience && Object.keys(profile.experience).length > 0),
+      availability: !!(
+        profile.availability &&
+        profile.availability.hourly_rate &&
+        (profile.availability.full_time || profile.availability.part_time)
+      ),
+      languages: !!(profile.languages && profile.languages.length > 0),
+      portfolios: !!(profile.portfolios && profile.portfolios.length > 0),
+      image: !!profile.image
+    };
+
+    // Calculate completion percentage
+    const totalCriteria = Object.keys(completionCriteria).length;
+    const completedCriteria = Object.values(completionCriteria).filter(Boolean).length;
+    const completionPercentage = Math.round((completedCriteria / totalCriteria) * 100);
+
+    // Consider profile complete if it meets minimum requirements (e.g., 80% complete)
+    const isComplete = completionPercentage >= 80;
+
+    // Prepare missing sections
+    const missingSections = Object.entries(completionCriteria)
+      .filter(([_, isComplete]) => !isComplete)
+      .map(([section]) => section);
+
+    return res.status(200).json({
+      success: true,
+      isComplete,
+      completionPercentage,
+      missingSections,
+      details: {
+        ...completionCriteria,
+      },
+      message: isComplete 
+        ? "Profile is complete" 
+        : `Profile is incomplete. Missing sections: ${missingSections.join(", ")}`
+    });
+
+  } catch (error) {
+    console.error("Error checking profile completion:", error);
+    return res.status(500).json({
+      success: false,
+      error: "Error checking profile completion",
+      details: error.message
+    });
   }
 };

@@ -72,6 +72,10 @@ router.get('/profile', authMiddleware, ClientProfile.getProfile);
 router.put('/profile/update', upload.single('image'), ClientProfile.updateProfile);
 router.get('/client-profile-exists/:id', authMiddleware, ClientProfile.profileExists);
 
+
+// In your routes file
+router.get('/profile/:userId', authMiddleware, ClientProfile.checkClientProfile);
+
 router.get('/notifications', authMiddleware, Notification.getNotifications);
 router.post('/notifications', authMiddleware, Notification.createNotification);
 router.put('/notifications/:notificationId/read', authMiddleware, Notification.updateNotification);
