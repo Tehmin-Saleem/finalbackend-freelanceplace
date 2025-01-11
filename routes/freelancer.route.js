@@ -22,6 +22,7 @@ const chatController = require('../controllers/chat.controller'); // Add this
 const  aiCoverLetter  = require('../controllers/aiCoverLetter.controller');
 const hireFreelancerController = require('../controllers/hire_freelancer.controller');
 const ClientProfile = require('../controllers/client_profile.controller')
+const paymentMethodController = require('../controllers/payment_method.controller');
 // const offerController=require("../controllers/offer_form.controller");
 
 
@@ -132,6 +133,10 @@ router.patch('/offers/:notificationId', authMiddleware, offerController.updateOf
 
 
 router.get('/searchClients',authMiddleware, usercontroller.searchClients);
+
+
+// Route to check payment method
+router.get('/checkPaymentMethod', authMiddleware, paymentMethodController.checkPaymentMethod);
 
 
 
