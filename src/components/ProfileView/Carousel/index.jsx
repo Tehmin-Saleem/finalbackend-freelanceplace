@@ -3,7 +3,7 @@ import { Carouselleft, Crouselright } from "../../../svg";
 
 import "./styles.scss";
 
-const Carousel = ({ cards }) => {
+const Carousel = ({ cards, onCardClick}) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [cardsPerView, setCardsPerView] = useState(3); // Default cards per view
 
@@ -67,6 +67,7 @@ const Carousel = ({ cards }) => {
               <div
                 key={index}
                 className="carousel-card"
+                onClick={() => onCardClick(card)}
                 style={{ width: `${100 / cardsPerView}%` }}
               >
                 <div className="card-inner">

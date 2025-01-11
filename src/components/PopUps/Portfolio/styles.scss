@@ -1,0 +1,115 @@
+// components/PortfolioModal/PortfolioModal.scss
+.portfolio-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    padding: 20px;
+  }
+  
+  .portfolio-modal-content {
+    background: white;
+    border-radius: 12px;
+    padding: 24px;
+    width: 100%;
+    max-width: 800px;
+    max-height: 90vh;
+    overflow-y: auto;
+    position: relative;
+    animation: modalFadeIn 0.3s ease-out;
+  }
+  
+  .close-button {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+    
+    &:hover {
+      opacity: 0.7;
+    }
+  }
+  
+  .portfolio-modal-body {
+    .portfolio-header {
+      margin-bottom: 24px;
+      
+      h2 {
+        font-family: 'Poppins', sans-serif;
+        font-size: 24px;
+        color: #2C3E50;
+        margin-bottom: 8px;
+      }
+      
+      .category {
+        display: inline-block;
+        padding: 4px 12px;
+        background: #4BCBEB;
+        color: white;
+        border-radius: 16px;
+        font-size: 14px;
+      }
+    }
+  
+    .portfolio-image {
+      margin-bottom: 24px;
+      
+      img {
+        width: 100%;
+        border-radius: 8px;
+        object-fit: cover;
+        max-height: 400px;
+      }
+    }
+  
+    .portfolio-details {
+      .detail-section {
+        margin-bottom: 20px;
+        
+        h3 {
+          font-family: 'Poppins', sans-serif;
+          font-size: 18px;
+          color: #2C3E50;
+          margin-bottom: 8px;
+          font-weight: 500;
+        }
+        
+        p {
+          color: #64748B;
+          line-height: 1.6;
+        }
+        
+        .project-link {
+          color: #4BCBEB;
+          text-decoration: none;
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
+          
+          &:hover {
+            text-decoration: underline;
+          }
+        }
+      }
+    }
+  }
+  
+  @keyframes modalFadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }

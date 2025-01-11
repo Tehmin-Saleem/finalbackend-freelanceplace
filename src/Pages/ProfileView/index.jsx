@@ -9,6 +9,7 @@ import {
   Header,
   Spinner,
   Carousel,
+  PortfolioModal,
 } from "../../components/index";
 import {
   Australia,
@@ -27,7 +28,18 @@ function ProfileView() {
   const [country, setCountry] = useState("");
   const [description, setdescription] = useState("");
   const [reviews, setReviews] = useState(null);
+  const [selectedPortfolio, setSelectedPortfolio] = useState(null);
   const navigate = useNavigate();
+
+  // Add this function to handle portfolio click
+  const handlePortfolioClick = (portfolio) => {
+    setSelectedPortfolio(portfolio);
+  };
+
+  // Add this function to handle modal close
+  const handleModalClose = () => {
+    setSelectedPortfolio(null);
+  };
 
   const handleClick = () => {
     navigate("/chat");
@@ -112,8 +124,6 @@ function ProfileView() {
     fetchProfileData();
     setCountry(localStorage.getItem("country") || "Not specified");
   }, []);
-
- 
 
   if (loading) return <Spinner size={100} alignCenter />;
   if (error) return <div>{error}</div>;
@@ -257,13 +267,24 @@ function ProfileView() {
               <div className="PortfolioSection">
                 <h2 className="Portfoliotitle">Portfolio</h2>
                 {profileData.portfolios && profileData.portfolios.length > 0 ? (
-                  <Carousel cards={profileData.portfolios} />
+                  <Carousel
+                    cards={profileData.portfolios}
+                    onCardClick={handlePortfolioClick}
+                  />
                 ) : (
                   <div className="text-center py-4 text-gray-500">
                     No portfolio items available
                   </div>
                 )}
               </div>
+
+              {/* Add the modal */}
+              {selectedPortfolio && (
+                <PortfolioModal
+                  portfolio={selectedPortfolio}
+                  onClose={handleModalClose}
+                />
+              )}
               <div className="review">
                 <h2 className="reviewtitle">Reviews</h2>
                 <div className="review-summary mb-6 bg-white rounded-lg p-6 shadow-sm">

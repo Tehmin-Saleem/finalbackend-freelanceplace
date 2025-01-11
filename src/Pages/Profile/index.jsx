@@ -3,14 +3,19 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import "./styles.scss";
 import { jwtDecode } from "jwt-decode";
-import { Cross, IconSearchBar, UploadIcon, PlusIcon ,ImageIcon} from "../../svg/index";
+import {
+  Cross,
+  IconSearchBar,
+  UploadIcon,
+  PlusIcon,
+  ImageIcon,
+} from "../../svg/index";
 import { Header, Spinner } from "../../components/index";
 
 import * as pdfjsLib from "pdfjs-dist";
 import pdfjsWorker from "pdfjs-dist/build/pdf.worker.entry";
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorker;
-
 
 // import { GlobalWorkerOptions } from 'pdfjs-dist';
 // import 'pdfjs-dist/build/pdf.worker.entry';
@@ -23,7 +28,6 @@ const MyProfile = () => {
   const [portfolioThumbnails, setPortfolioThumbnails] = useState({});
   const [isLoading, setIsLoading] = useState(true);
   const [filteredPopularSkills, setFilteredPopularSkills] = useState([]);
-  
 
   const popularSkills = [
     "React",
@@ -80,7 +84,6 @@ const MyProfile = () => {
   });
   const [imageFile, setImageFile] = useState(null);
 
-  
   const fetchProfileDataIfNeeded = async () => {
     try {
       const token = localStorage.getItem("token");
@@ -143,8 +146,6 @@ const MyProfile = () => {
     }
   };
 
- 
-
   // Call the function inside useEffect
   useEffect(() => {
     fetchProfileDataIfNeeded();
@@ -181,7 +182,7 @@ const MyProfile = () => {
       },
     }));
   };
-  
+
   const handleLanguageChange = (index, field, value) => {
     const updatedLanguages = [...profile.languages];
     updatedLanguages[index] = { ...updatedLanguages[index], [field]: value };
@@ -216,8 +217,6 @@ const MyProfile = () => {
       }));
     }
   };
-  
-
 
   const handleRemoveSkill = (skill) => {
     setProfile((prevProfile) => ({
@@ -225,7 +224,7 @@ const MyProfile = () => {
       skills: prevProfile.skills.filter((s) => s !== skill),
     }));
   };
-  
+
   // Handle Enter key press to add custom skill
   const handleKeyPress = (e) => {
     if (e.key === "Enter") {
@@ -243,7 +242,6 @@ const MyProfile = () => {
       )
     );
   }, [skillInput, popularSkills]);
-  
 
   // Add this new useEffect after your existing useEffects
   useEffect(() => {
@@ -457,39 +455,25 @@ const MyProfile = () => {
         formData.append("image", imageFile);
       }
 
+      // Append portfolios data and files
+      if (profile.portfolios.length > 0) {
+        formData.append("portfolios", JSON.stringify(profile.portfolios));
 
-
-      // Handle portfolios and their attachments
-      const portfoliosForUpload = profile.portfolios.map((portfolio, index) => {
-        // Create a copy without the file object
-        const portfolioData = {
-          project_title: portfolio.project_title,
-          category: portfolio.category,
-          description: portfolio.description,
-          tool_used: portfolio.tool_used,
-          url: portfolio.url,
-        };
-
-        // If there's an attachment, append it to formData
-        if (portfolio.attachment instanceof File) {
-          formData.append(
-            `portfolio_attachments`,
-            portfolio.attachment,
-            `portfolio_${index}_${portfolio.attachment.name}`
-          );
-        }
-
-        return portfolioData;
-      });
+        // Append portfolio attachments
+        profile.portfolios.forEach((portfolio, index) => {
+          if (portfolio.attachment instanceof File) {
+            formData.append("portfolio_attachments", portfolio.attachment);
+          }
+        });
+      }
 
       // Append the portfolio data without the file objects
-      formData.append("portfolios", JSON.stringify(portfoliosForUpload));
+      // formData.append("portfolios", JSON.stringify(portfoliosForUpload));
 
-
-      console.log("Portfolios being sent:", portfoliosForUpload);
-    for (let pair of formData.entries()) {
-      console.log(pair[0], pair[1]);
-    }
+      // console.log("Portfolios being sent:", portfoliosForUpload);
+      // for (let pair of formData.entries()) {
+      //   console.log(pair[0], pair[1]);
+      // }
 
       const token = localStorage.getItem("token");
       console.log("Retrieved token:", token);
@@ -518,8 +502,6 @@ const MyProfile = () => {
   if (isLoading) {
     return <Spinner alignCenter />;
   }
- 
- 
 
   return (
     <div className="my-profile">
@@ -650,29 +632,28 @@ const MyProfile = () => {
           </div>
 
           <div className="form-group availability-group">
-  <label>Availability</label>
-  <div className="checkbox-group">
-    <label>
-      <input
-        type="checkbox"
-        name="full_time"
-        checked={profile.availability.full_time}
-        onChange={handleAvailabilityChange}
-      />
-      Full Time
-    </label>
-    <label>
-      <input
-        type="checkbox"
-        name="part_time"
-        checked={profile.availability.part_time}
-        onChange={handleAvailabilityChange}
-      />
-      Part Time
-    </label>
-  </div>
-</div>
-
+            <label>Availability</label>
+            <div className="checkbox-group">
+              <label>
+                <input
+                  type="checkbox"
+                  name="full_time"
+                  checked={profile.availability.full_time}
+                  onChange={handleAvailabilityChange}
+                />
+                Full Time
+              </label>
+              <label>
+                <input
+                  type="checkbox"
+                  name="part_time"
+                  checked={profile.availability.part_time}
+                  onChange={handleAvailabilityChange}
+                />
+                Part Time
+              </label>
+            </div>
+          </div>
 
           <div className="form-group">
             <label>Profile Overview</label>
@@ -685,54 +666,54 @@ const MyProfile = () => {
           </div>
 
           <div className="form-group">
-  <label>Search Skills or add your own:</label>
-  <div className="search-bar">
-    <IconSearchBar alt="Search" />
-    <input
-      type="text"
-      value={skillInput}
-      onChange={(e) => setSkillInput(e.target.value)}
-      onKeyPress={handleKeyPress} // Prevent form submission and add skill
-      placeholder="Search skills..."
-    />
-  </div>
-</div>
+            <label>Search Skills or add your own:</label>
+            <div className="search-bar">
+              <IconSearchBar alt="Search" />
+              <input
+                type="text"
+                value={skillInput}
+                onChange={(e) => setSkillInput(e.target.value)}
+                onKeyPress={handleKeyPress} // Prevent form submission and add skill
+                placeholder="Search skills..."
+              />
+            </div>
+          </div>
 
-<div className="form-group">
-  <label>Selected Skills</label>
-  <div className="selected-skills">
-    {profile.skills.map((skill) => (
-      <div className="skill-badge" key={skill}>
-        {skill}
-        <Cross
-          alt="Remove"
-          className="remove-skill"
-          onClick={() => handleRemoveSkill(skill)} // Remove skill
-        />
-      </div>
-    ))}
-  </div>
-</div>
+          <div className="form-group">
+            <label>Selected Skills</label>
+            <div className="selected-skills">
+              {profile.skills.map((skill) => (
+                <div className="skill-badge" key={skill}>
+                  {skill}
+                  <Cross
+                    alt="Remove"
+                    className="remove-skill"
+                    onClick={() => handleRemoveSkill(skill)} // Remove skill
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
 
-<div className="form-group">
-  <label>Popular Skills</label>
-  <div className="popular-skills">
-    {filteredPopularSkills.length > 0 ? (
-      filteredPopularSkills.map((skill) => (
-        <div
-          className="skill-badge"
-          key={skill}
-          onClick={() => handleAddSkill(skill)} // Add skill
-        >
-          {skill}
-          <PlusIcon alt="Add" className="add-skill" />
-        </div>
-      ))
-    ) : (
-      <p>No matching skills found</p>
-    )}
-  </div>
-</div>
+          <div className="form-group">
+            <label>Popular Skills</label>
+            <div className="popular-skills">
+              {filteredPopularSkills.length > 0 ? (
+                filteredPopularSkills.map((skill) => (
+                  <div
+                    className="skill-badge"
+                    key={skill}
+                    onClick={() => handleAddSkill(skill)} // Add skill
+                  >
+                    {skill}
+                    <PlusIcon alt="Add" className="add-skill" />
+                  </div>
+                ))
+              ) : (
+                <p>No matching skills found</p>
+              )}
+            </div>
+          </div>
 
           <div className="form-group">
             <label>Add Your Portfolio</label>
