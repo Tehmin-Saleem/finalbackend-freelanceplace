@@ -1,27 +1,35 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { Header, ZoomedImage } from "../../components";
 import { BackgroundLining } from "../../svg";
-import { FaEnvelope } from 'react-icons/fa';
-import { useNavigate } from 'react-router-dom';
+import { FaEnvelope } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { jwtDecode } from 'jwt-decode';
+import { jwtDecode } from "jwt-decode";
 import "./styles.scss";
+import FreelancersJobsPage from "../Freelancers-Done-jobspage";
+import { useJobContext } from "../../context/JoBContext";
+// import JobCountUpdater from "../../components/JobCounterUpdator";
 
 const FreelanceDashboardPage = () => {
-  const [user, setUser] = useState({ first_name: '', email: '' });
+  const [user, setUser] = useState({ first_name: "", email: "" });
   const [quickStats, setQuickStats] = useState({
     totalJobsApplied: 0,
     ongoingJobs: 0,
     completedJobs: 0,
     clientRatings: 0,
   });
+  const [uniqueJobCount, setUniqueJobCount] = useState(0);
   const navigate = useNavigate();
 
+  const [jobs, setJobs] = useState([]);
+  const [specificjobs, setSpecificJobs] = useState([]);
+  // const [loading, setLoading] = useState(true);
 
   const [reviews, setReviews] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  const { jobCounts } = useJobContext();
   const fetchFreelancerReviews = async () => {
     try {
       const token = localStorage.getItem("token");
@@ -60,116 +68,270 @@ const FreelanceDashboardPage = () => {
     fetchFreelancerReviews();
   }, []);
 
+  // const statsResponse = await axios.get(`http://localhost:5000/api/freelancer/proposals/count/${userId}`, {
+  //   headers: { 'Authorization': `Bearer ${token}` }
+  // });
+  // setQuickStats(prevStats => ({
+  //   ...prevStats,
+  //   totalJobsApplied: statsResponse.data.totalProposals
+  // }));
+  // const responses = await axios.get(`http://localhost:5000/api/freelancer/hired-jobs/${userId}`, {
+  //   headers: { 'Authorization': `Bearer ${token}` }
+  // });
+  // setQuickStats(prevStats => ({
+  //   ...prevStats,
+  //   ongoingJobs: responses.data.count
+  // }));
+
+  // const completedresponses = await axios.get(`http://localhost:5000/api/freelancer/completed-jobs/${userId}`, {
+  //   headers: { 'Authorization': `Bearer ${token}` }
+  // });
+  // console.log("completed " , completedresponses.data.data.totalCompletedJobs)
+  // setQuickStats(prevStats => ({
+  //   ...prevStats,
+  //   completedJobs: completedresponses.data.data.totalCompletedJobs
+  // }));
+
+  // const ongoingJobsResponse = await axios.get(`http://localhost:5000/api/freelancer/hired-jobs/${userId}`, {
+  //   headers: { 'Authorization': `Bearer ${token}` }
+  // });
+  // console.log("dattaatattatatata",ongoingJobsResponse.data.count);
+  // setQuickStats(prevStats => ({
+  //   ...prevStats,
+  //   ongoingJobs: ongoingJobsResponse.data.count
+  // }));
+
+  // // Fetch stats
+  // const statsResponse = await axios.get(`http://localhost:5000/api/freelancer/proposals/count/${userId}`, {
+  //   headers: { 'Authorization': `Bearer ${token}` }
+  // });
+  // setQuickStats(statsResponse.data);
+
+  //     } catch (error) {
+  //       // navigate('/signin');
+  //     }
+  //   };
+
+  //   fetchUser();
+  // }, [navigate]);
 
   useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const token = localStorage.getItem("token");
-        if (!token) {
-          navigate('/signin');
-          return;
-        }
-
-        const decodedToken = jwtDecode(token);
-        const userId = decodedToken.userId;
-
-        const response = await axios.get(`http://localhost:5000/api/client/users/${userId}`, {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        });
-        setUser(response.data);
-
-        const statsResponse = await axios.get(`http://localhost:5000/api/freelancer/proposals/count/${userId}`, {
-          headers: { 'Authorization': `Bearer ${token}` }
-        });
-        setQuickStats(prevStats => ({
-          ...prevStats,
-          totalJobsApplied: statsResponse.data.totalProposals
-        }));
-        const responses = await axios.get(`http://localhost:5000/api/freelancer/hired-jobs/${userId}`, {
-          headers: { 'Authorization': `Bearer ${token}` }
-        });
-        setQuickStats(prevStats => ({
-          ...prevStats,
-          ongoingJobs: responses.data.count
-        }));
-
-        const completedresponses = await axios.get(`http://localhost:5000/api/freelancer/completed-jobs/${userId}`, {
-          headers: { 'Authorization': `Bearer ${token}` }
-        });
-        console.log("completed " , completedresponses.data.data.totalCompletedJobs)
-        setQuickStats(prevStats => ({
-          ...prevStats,
-          completedJobs: completedresponses.data.data.totalCompletedJobs
-        }));
-
-        const ongoingJobsResponse = await axios.get(`http://localhost:5000/api/freelancer/hired-jobs/${userId}`, {
-          headers: { 'Authorization': `Bearer ${token}` }
-        });
-        console.log("dattaatattatatata",ongoingJobsResponse.data.count);
-        setQuickStats(prevStats => ({
-          ...prevStats,
-          ongoingJobs: ongoingJobsResponse.data.count
-        }));
-
-
-
-
-
-        // // Fetch stats
-        // const statsResponse = await axios.get(`http://localhost:5000/api/freelancer/proposals/count/${userId}`, {
-        //   headers: { 'Authorization': `Bearer ${token}` }
-        // });
-        // setQuickStats(statsResponse.data);
-        
-      } catch (error) {
-        // navigate('/signin');
-      }
-    };
-
-    fetchUser();
-  }, [navigate]);
+    if (jobCounts) {
+      setQuickStats((prevStats) => ({
+        ...prevStats,
+        completedJobs: jobCounts.completedJobCount || 0,
+        ongoingJobs: jobCounts.ongoingJobCount || 0,
+        totalJobsApplied: uniqueJobCount,
+      }));
+    }
+  }, [jobCounts, uniqueJobCount]);
+  
+  useEffect(() => {
+    // Log quickStats after it updates
+    console.log("Updated quickStats:", quickStats);
+  }, [quickStats]);
 
   const handleJobSearchButtonClick = () => {
-    navigate('/matchingjobs');
+    navigate("/matchingjobs");
   };
 
   const handleProfileButtonClick = () => {
-    navigate('/profile/:userId');
+    navigate("/profile/:userId");
   };
 
   const openQueryForm = () => {
-    navigate('/QueryForm', { state: user });
+    navigate("/QueryForm", { state: user });
   };
+
+  const fetchOffersAndJobs = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      const token = localStorage.getItem("token");
+      if (!token) {
+        throw new Error("No authentication token found");
+      }
+
+      const decodedToken = jwtDecode(token);
+      const loggedInUserId = decodedToken.userId;
+
+      if (!loggedInUserId) {
+        throw new Error("Unable to decode user ID from token");
+      }
+
+      // Fetch both hired jobs and offers in parallel
+      const [hireResponse, offersResponse] = await Promise.all([
+        axios.get("http://localhost:5000/api/client/hire", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }),
+        axios.get("http://localhost:5000/api/freelancer/offers", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }),
+      ]);
+
+      // Process hired jobs
+      console.log("offers", offersResponse.data);
+      // console.log("hire response", hireResponse.data.data);
+
+      // Map offers with detailed logging
+
+      const hireStatusMap = (hireResponse.data.data || []).reduce(
+        (map, hire) => {
+          if (hire?.jobId?.id) {
+            map[hire.jobId.id] = {
+              status: hire.status,
+              freelancerId: hire.freelancerId?.id,
+              proposalId: hire.proposalId, // Add this line to include proposalId
+            };
+          }
+          return map;
+        },
+        {}
+      );
+
+      const jobToFreelancerMap = (hireResponse.data.data || []).reduce(
+        (map, hire) => {
+          if (
+            hire?.jobId?.id &&
+            hire?.freelancerId?.id &&
+            hire.freelancerId.id === loggedInUserId
+          ) {
+            map[hire.jobId.id] = hire.freelancerId.id;
+          }
+          return map;
+        },
+        {}
+      );
+
+      // Fetch job posts
+      const jobsResponse = await axios.get(
+        "http://localhost:5000/api/client/job-posts",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      // console.log("job response", jobsResponse.data);
+
+      // Process hired jobs
+      const hiredJobs = (jobsResponse.data?.jobPosts || [])
+        .filter((job) => jobToFreelancerMap[job._id])
+        .map((job) => ({
+          job_id: job._id,
+          type: job.budget_type === "fixed" ? "Fixed" : "Hourly",
+          title: job.job_title || "Untitled Job",
+          client_id: job.client_id._id,
+          // client_id: job.client.id,
+          clientName: job.client.name,
+          clientEmail: job.client.email,
+          clientCountry: job.client.country,
+          freelancer_id: hireStatusMap[job._id].freelancerId,
+          proposal_id: hireStatusMap[job._id].proposalId, // Add this line
+          rate:
+            job.budget_type === "fixed"
+              ? `$${job.fixed_price}`
+              : `$${job.hourly_rate?.from}-$${job.hourly_rate?.to}/hr`,
+          timeline: job.project_duration?.duration_of_work || "Not specified",
+          level: job.project_duration?.experience_level || "Not specified",
+          description: job.description || "No description provided",
+          tags: job.preferred_skills || [],
+          verified: job.paymentMethodStatus === "Payment method verified",
+          location: job.country || "Not specified",
+          postedTime: new Date(job.createdAt).toLocaleDateString(),
+          status: hireStatusMap[job._id].status || "pending",
+          jobStatus: job.jobstatus || "pending",
+
+          source: "hired",
+          attachment: job.attachment
+            ? {
+                fileName:
+                  job.attachment.fileName || job.attachment.originalname,
+                path: job.attachment.path,
+              }
+            : null,
+        }));
+
+      const acceptedOffers = (offersResponse.data?.offers || []).map(
+        (offer) => ({
+          // No need to filter by freelancer_id as backend already handles this
+          job_id: offer.job_id,
+          type: offer.type, // Backend already formats this
+          title: offer.title, // Backend provides formatted title
+          client_id: offer.client_id,
+          freelancer_id: offer.freelancer_id,
+          rate: offer.rate, // Backend already formats the rate string
+          description: offer.description,
+          detailed_description: offer.detailed_description,
+          tags: offer.tags,
+          location: offer.location,
+          postedTime: offer.postedTime, // Backend already formats the date
+          status: offer.status,
+          // New fields available from backend
+          clientName: offer.clientName,
+
+          clientCountry: offer.clientCountry,
+          attachment: offer.attachment,
+          // Fields that need to be added to backend response
+          due_date: offer.due_date, // Date comes formatted from backend
+          timeline: offer.estimated_timeline
+            ? `${offer.estimated_timeline.duration} ${offer.estimated_timeline.unit}`
+            : "Not specified",
+
+          verified: false, // Add to backend if needed
+          jobStatus: offer.status, // Match the status
+          source: "offer", // Add if needed for frontend differentiation
+        })
+      );
+
+      // Combine and deduplicate jobs and offers
+      const combinedJobs = [...hiredJobs, ...acceptedOffers];
+      const uniqueJobs = Array.from(
+        new Map(combinedJobs.map((item) => [item.job_id, item])).values()
+      );
+      console.log("offers fetched:", offersResponse.data);
+      // const TotalJObCount=uniqueJobs.length;
+      setUniqueJobCount(uniqueJobs.length);
+
+      setJobs(uniqueJobs);
+    } catch (error) {
+      console.error("Error in fetchOffersAndJobs:", error);
+      setError("Failed to fetch jobs and offers. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchOffersAndJobs();
+  }, []);
 
   return (
     <div className="dashboard-page">
       <Header />
       <div className="background-section mt-8">
         <h1>Welcome, {user.first_name}!</h1>
-        <p>Send proposals, Accept offers,Manage projects, and explore jobs matching your skills, all in one place.</p>
+        <p>
+          Send proposals, Accept offers,Manage projects, and explore jobs
+          matching your skills, all in one place.
+        </p>
       </div>
-
-
-
-            {/* <button className="start-button" onClick={handleJobSearchButtonClick}>
-              Explore Jobs
-            </button>
-          </div>
-          <BackgroundLining className="background-lining" />
-        </div>
-
-        <div className="right-section">
-          <ZoomedImage alt="Placeholder" className="illustration" />
-        </div>
-      </main> */}
 
       {/* Quick Stats */}
       <div className="quick-stats">
         <div className="stat-item">
+          {/* <JobCountUpdater uniqueJobCount={handleUpdateJobCount} /> */}
           <h3>Total Jobs Applied</h3>
-          <p>{quickStats.totalJobsApplied}</p>
+          <p>{uniqueJobCount}</p>
         </div>
         <div className="stat-item">
           <h3>Ongoing Jobs</h3>
@@ -187,29 +349,30 @@ const FreelanceDashboardPage = () => {
 
       <div className="summary-section">
         <p>
-          This dashboard provides an overview of your current performance, job statistics, and upcoming opportunities.
-          Stay informed and make data-driven decisions to ensure the success of your projects.
+          This dashboard provides an overview of your current performance, job
+          statistics, and upcoming opportunities. Stay informed and make
+          data-driven decisions to ensure the success of your projects.
         </p>
       </div>
 
       {/* Cards for functionality */}
       <div className="card-container">
-        <div className="card" onClick={() => navigate('/matchingjobs')}>
+        <div className="card" onClick={() => navigate("/matchingjobs")}>
           <h2>Browse Jobs</h2>
           <p>Explore available opportunities that match your skills.</p>
           <button>Browse Jobs</button>
         </div>
-        <div className="card" onClick={() => navigate('/freelancerOffers')}>
+        <div className="card" onClick={() => navigate("/freelancerOffers")}>
           <h2>offers</h2>
           <p>View and manage the offers.</p>
           <button>View offers</button>
         </div>
-        <div className="card" onClick={() => navigate('/profile/:userId')}>
+        <div className="card" onClick={() => navigate("/profile/:userId")}>
           <h2>Profile Settings</h2>
           <p>Update your profile and portfolio to attract clients.</p>
           <button>Update Profile</button>
         </div>
-        <div className="card" onClick={() => navigate('/freelancersjobpage')}>
+        <div className="card" onClick={() => navigate("/freelancersjobpage")}>
           <h2>My Jobs</h2>
           <p>Review your past jobs and client feedback.</p>
           <button>View Your Jobs</button>
