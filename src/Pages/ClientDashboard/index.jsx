@@ -3,7 +3,7 @@ import { Header, Modal } from "../../components";
 import { FaEnvelope } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import jwtDecode from "jwt-decode";
+import {jwtDecode} from "jwt-decode";
 import "./styles.scss";
 
 const ClientDashboard = () => {
@@ -66,6 +66,7 @@ const ClientDashboard = () => {
           { headers: { Authorization: `Bearer ${token}` } }
         );
         setDashboardStats(statsResponse.data.data);
+        console.log("response",statsResponse.data);
       } catch (error) {
         console.error("Error fetching dashboard data:", error);
         navigate("/signin");
@@ -99,6 +100,11 @@ const ClientDashboard = () => {
             <div className="stat-item">
               <h3>Completed Jobs</h3>
               <p>{dashboardStats.totalCompletedJobs}</p>
+            </div>
+
+            <div className="stat-item">
+              <h3>Freelancers Engaged</h3>
+              <p>{dashboardStats.totalOngoingJobs}</p>
             </div>
           </div>
 
