@@ -1589,6 +1589,7 @@ exports.getJobReview = async (req, res) => {
         }
       ]);
 
+      
       // Set job details from offer
       jobDetails = {
         _id: offer.job_id,
