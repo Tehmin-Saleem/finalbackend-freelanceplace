@@ -3,7 +3,7 @@ import { Header, Modal } from "../../components";
 import { FaEnvelope } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import jwtDecode from "jwt-decode";
+import { jwtDecode } from "jwt-decode";
 import "./styles.scss";
 
 const ClientDashboard = () => {
