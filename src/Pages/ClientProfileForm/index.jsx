@@ -6,11 +6,8 @@ import axios from "axios";
 import { Helmet } from "react-helmet";
 import { useNavigate, useLocation } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
-import { toast, ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-
-
-
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const ClientProfilePage = () => {
   const [profileData, setProfileData] = useState({
@@ -30,82 +27,78 @@ const ClientProfilePage = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-
-
-
-
   // Modify the useEffect hook in ClientProfilePage component
-useEffect(() => {
-  const checkAndFetchProfile = async () => {
-    try {
-      const token = localStorage.getItem("token");
-      if (!token) {
-        throw new Error('No authentication token found');
-      }
-
-      // First, fetch user data
-      const decodedToken = jwtDecode(token);
-      const userId = decodedToken.userId;
-
-      if (!userId) {
-        throw new Error('No user ID found in token');
-      }
-
-      // Fetch user data
-      const userResponse = await axios.get(
-        `http://localhost:5000/api/client/users/${userId}`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
+  useEffect(() => {
+    const checkAndFetchProfile = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        if (!token) {
+          throw new Error("No authentication token found");
         }
-      );
 
-      const userData = userResponse.data;
+        // First, fetch user data
+        const decodedToken = jwtDecode(token);
+        const userId = decodedToken.userId;
 
-      // Set initial profile data with user data
-      setProfileData(prevData => ({
-        ...prevData,
-        first_name: userData.first_name || "",
-        last_name: userData.last_name || "",
-        email: userData.email || "",
-        country: userData.country_name || "",
-      }));
-console.log('userdata', userData)
-      // Then check for existing profile
-      const profileResponse = await axios.get(
-        "http://localhost:5000/api/client/profile",
-        {
-          headers: { Authorization: `Bearer ${token}` },
+        if (!userId) {
+          throw new Error("No user ID found in token");
         }
-      );
-console.log('profile', profileResponse.data.data)
-      if (profileResponse.data.success && profileResponse.data.data) {
-        setIsEditMode(true);
-        const profile = profileResponse.data.data;
 
-        setProfileData(prevData => ({
+        // Fetch user data
+        const userResponse = await axios.get(
+          `http://localhost:5000/api/client/users/${userId}`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+
+        const userData = userResponse.data;
+
+        // Set initial profile data with user data
+        setProfileData((prevData) => ({
           ...prevData,
-          about: profile.about || "",
-          gender: profile.gender || "",
-          DOB: profile.DOB
-            ? new Date(profile.DOB).toISOString().split("T")[0]
-            : "",
-          languages: Array.isArray(profile.languages)
-            ? profile.languages.join(", ")
-            : "",
+          first_name: userData.first_name || "",
+          last_name: userData.last_name || "",
+          email: userData.email || "",
+          country: userData.country_name || "",
         }));
+        console.log("userdata", userData);
+        // Then check for existing profile
+        const profileResponse = await axios.get(
+          "http://localhost:5000/api/client/profile",
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+        console.log("profile", profileResponse.data.data);
+        if (profileResponse.data.success && profileResponse.data.data) {
+          setIsEditMode(true);
+          const profile = profileResponse.data.data;
 
-        if (profile.image) {
-          setProfilePicture(profile.image);
+          setProfileData((prevData) => ({
+            ...prevData,
+            about: profile.about || "",
+            gender: profile.gender || "",
+            DOB: profile.DOB
+              ? new Date(profile.DOB).toISOString().split("T")[0]
+              : "",
+            languages: Array.isArray(profile.languages)
+              ? profile.languages.join(", ")
+              : "",
+          }));
+
+          if (profile.image) {
+            setProfilePicture(profile.image);
+          }
         }
+      } catch (error) {
+        console.error("Error fetching data:", error);
+        // setError("Failed to fetch user data: " + error.message);
       }
-    } catch (error) {
-      console.error("Error fetching data:", error);
-      setError("Failed to fetch user data: " + error.message);
-    }
-  };
+    };
 
-  checkAndFetchProfile();
-}, []);
+    checkAndFetchProfile();
+  }, []);
 
   // // Check if profile exists and fetch data if it does
   // useEffect(() => {
@@ -208,7 +201,7 @@ console.log('profile', profileResponse.data.data)
 
       setIsLoading(false);
       if (isEditMode) {
-        toast.success('Profile updated successfully!', {
+        toast.success("Profile updated successfully!", {
           position: "top-right",
           autoClose: 5000,
           hideProgressBar: false,
@@ -218,7 +211,7 @@ console.log('profile', profileResponse.data.data)
           progress: undefined,
         });
       } else {
-        toast.success('Profile created successfully!', {
+        toast.success("Profile created successfully!", {
           position: "top-right",
           autoClose: 5000,
           hideProgressBar: false,
@@ -241,19 +234,27 @@ console.log('profile', profileResponse.data.data)
     }
   };
 
-
   return (
     <>
       <Helmet>
-      <title>{isEditMode ? 'Edit' : 'Create'} Client Profile</title>
-      <meta name="description" content={`${isEditMode ? 'Edit' : 'Create'} your client profile on YourApp`} />
-        <meta property="og:title" content={`${isEditMode ? 'Edit' : 'Create'} Client Profile | YourApp`} />
-        <meta property="og:description" content={`${isEditMode ? 'Edit' : 'Create'} your client profile on YourApp`} />
+        <title>{isEditMode ? "Edit" : "Create"} Client Profile</title>
+        <meta
+          name="description"
+          content={`${isEditMode ? "Edit" : "Create"} your client profile on YourApp`}
+        />
+        <meta
+          property="og:title"
+          content={`${isEditMode ? "Edit" : "Create"} Client Profile | YourApp`}
+        />
+        <meta
+          property="og:description"
+          content={`${isEditMode ? "Edit" : "Create"} your client profile on YourApp`}
+        />
         <meta property="og:type" content="profile" />
       </Helmet>
       <Header />
       <div className="client-profile-page">
-      <h1>{isEditMode ? 'Edit' : 'Create'} Your Profile</h1>
+        <h1>{isEditMode ? "Edit" : "Create"} Your Profile</h1>
         <form onSubmit={handleSubmit}>
           {/* Profile Picture Section */}
           <div className="profile-image-section">
@@ -263,27 +264,27 @@ console.log('profile', profileResponse.data.data)
               <span>Maximum Size: 5MB</span>
             </div>
             <div className="profile-image">
-            <div className="profile-image">
-              {profilePicture ? (
-                <img src={profilePicture} alt="Profile Preview" />
-              ) : (
-                <div className="empty-picture">
-                  <FaCamera className="camera-icon" />
-                </div>
-              )}
-              <label htmlFor="profilePicture" className="upload-overlay">
-                <FaCamera />
-                <span>Upload</span>
-              </label>
-              <input
-                type="file"
-                id="profilePicture"
-                accept="image/png, image/jpeg"
-                onChange={handlePictureUpload}
-                style={{ display: "none" }}
-              />
+              <div className="profile-image">
+                {profilePicture ? (
+                  <img src={profilePicture} alt="Profile Preview" />
+                ) : (
+                  <div className="empty-picture">
+                    <FaCamera className="camera-icon" />
+                  </div>
+                )}
+                <label htmlFor="profilePicture" className="upload-overlay">
+                  <FaCamera />
+                  <span>Upload</span>
+                </label>
+                <input
+                  type="file"
+                  id="profilePicture"
+                  accept="image/png, image/jpeg"
+                  onChange={handlePictureUpload}
+                  style={{ display: "none" }}
+                />
+              </div>
             </div>
-          </div>
           </div>
 
           {/* Personal Information Section */}
@@ -385,12 +386,16 @@ console.log('profile', profileResponse.data.data)
             </div>
           </div>
 
-         {/* Action Buttons */}
-         <div className="action-buttons">
+          {/* Action Buttons */}
+          <div className="action-buttons">
             <button type="submit" className="save-button" disabled={isLoading}>
-              {isLoading 
-                ? (isEditMode ? 'Updating...' : 'Creating...') 
-                : (isEditMode ? 'Update Profile' : 'Create Profile')}
+              {isLoading
+                ? isEditMode
+                  ? "Updating..."
+                  : "Creating..."
+                : isEditMode
+                  ? "Update Profile"
+                  : "Create Profile"}
             </button>
           </div>
         </form>

@@ -1,5 +1,10 @@
+<<<<<<< HEAD
 import React, { useEffect, useState, useCallback } from "react";
 import { Header, ZoomedImage } from "../../components";
+=======
+import React, { useEffect, useState } from "react";
+import { Header, ZoomedImage, Modal } from "../../components";
+>>>>>>> 7c24241b7d6fa3c6e6d5ef669ac3078a9eb307c2
 import { BackgroundLining } from "../../svg";
 import { FaEnvelope } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
@@ -20,14 +25,19 @@ const FreelanceDashboardPage = () => {
   });
   const [uniqueJobCount, setUniqueJobCount] = useState(0);
   const navigate = useNavigate();
+<<<<<<< HEAD
 
   const [jobs, setJobs] = useState([]);
   const [specificjobs, setSpecificJobs] = useState([]);
   // const [loading, setLoading] = useState(true);
 
+=======
+>>>>>>> 7c24241b7d6fa3c6e6d5ef669ac3078a9eb307c2
   const [reviews, setReviews] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [hasProfile, setHasProfile] = useState(false);
+  const [showProfileModal, setShowProfileModal] = useState(false);
 
   const { jobCounts } = useJobContext();
   const fetchFreelancerReviews = async () => {
@@ -68,6 +78,7 @@ const FreelanceDashboardPage = () => {
     fetchFreelancerReviews();
   }, []);
 
+<<<<<<< HEAD
   // const statsResponse = await axios.get(`http://localhost:5000/api/freelancer/proposals/count/${userId}`, {
   //   headers: { 'Authorization': `Bearer ${token}` }
   // });
@@ -130,6 +141,161 @@ const FreelanceDashboardPage = () => {
     // Log quickStats after it updates
     console.log("Updated quickStats:", quickStats);
   }, [quickStats]);
+=======
+  // Check if profile exists
+  const checkProfileExists = async (userId, token) => {
+    try {
+      const config = {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      };
+
+      const response = await axios.get(
+        `http://localhost:5000/api/freelancer/freelancer-profile-exists/${userId}`,
+        config
+      );
+
+      setHasProfile(response.data.exists);
+      return response.data.exists;
+    } catch (error) {
+      console.error("Error checking profile existence:", error);
+      setHasProfile(false);
+      return false;
+    }
+  };
+
+  useEffect(() => {
+    const initializeDashboard = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        if (!token) {
+          navigate("/signin");
+          return;
+        }
+
+        const decodedToken = jwtDecode(token);
+        const userId = decodedToken.userId;
+
+        // Check profile existence first
+        const profileExists = await checkProfileExists(userId, token);
+        setHasProfile(profileExists);
+
+        // If no profile, show modal immediately if they somehow reached this page
+        if (!profileExists) {
+          setShowProfileModal(true);
+        }
+
+        // Rest of your existing fetchUser code...
+      } catch (error) {
+        console.error("Error initializing dashboard:", error);
+      }
+    };
+
+    initializeDashboard();
+  }, [navigate]);
+
+  // Navigation guard function
+  const handleNavigation = async (path) => {
+    const token = localStorage.getItem("token");
+    const decodedToken = jwtDecode(token);
+    const userId = decodedToken.userId;
+
+    const profileExists = await checkProfileExists(userId, token);
+
+    if (!profileExists) {
+      setShowProfileModal(true);
+    } else {
+      navigate(path);
+    }
+  };
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        if (!token) {
+          navigate("/signin");
+          return;
+        }
+
+        const decodedToken = jwtDecode(token);
+        const userId = decodedToken.userId;
+
+        // Check profile existence
+        await checkProfileExists(userId, token);
+
+        const response = await axios.get(
+          `http://localhost:5000/api/client/users/${userId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        setUser(response.data);
+
+        const statsResponse = await axios.get(
+          `http://localhost:5000/api/freelancer/proposals/count/${userId}`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+        setQuickStats((prevStats) => ({
+          ...prevStats,
+          totalJobsApplied: statsResponse.data.totalProposals,
+        }));
+        const responses = await axios.get(
+          `http://localhost:5000/api/freelancer/hired-jobs/${userId}`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+        setQuickStats((prevStats) => ({
+          ...prevStats,
+          ongoingJobs: responses.data.count,
+        }));
+
+        const completedresponses = await axios.get(
+          `http://localhost:5000/api/freelancer/completed-jobs/${userId}`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+        console.log(
+          "completed ",
+          completedresponses.data.data.totalCompletedJobs
+        );
+        setQuickStats((prevStats) => ({
+          ...prevStats,
+          completedJobs: completedresponses.data.data.totalCompletedJobs,
+        }));
+
+        const ongoingJobsResponse = await axios.get(
+          `http://localhost:5000/api/freelancer/hired-jobs/${userId}`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+        console.log("dattaatattatatata", ongoingJobsResponse.data.count);
+        setQuickStats((prevStats) => ({
+          ...prevStats,
+          ongoingJobs: ongoingJobsResponse.data.count,
+        }));
+
+        // // Fetch stats
+        // const statsResponse = await axios.get(`http://localhost:5000/api/freelancer/proposals/count/${userId}`, {
+        //   headers: { 'Authorization': `Bearer ${token}` }
+        // });
+        // setQuickStats(statsResponse.data);
+      } catch (error) {
+        // navigate('/signin');
+      }
+    };
+
+    fetchUser();
+  }, [navigate]);
+>>>>>>> 7c24241b7d6fa3c6e6d5ef669ac3078a9eb307c2
 
   const handleJobSearchButtonClick = () => {
     navigate("/matchingjobs");
@@ -326,6 +492,21 @@ const FreelanceDashboardPage = () => {
         </p>
       </div>
 
+<<<<<<< HEAD
+=======
+      {/* <button className="start-button" onClick={handleJobSearchButtonClick}>
+              Explore Jobs
+            </button>
+          </div>
+          <BackgroundLining className="background-lining" />
+        </div>
+
+        <div className="right-section">
+          <ZoomedImage alt="Placeholder" className="illustration" />
+        </div>
+      </main> */}
+
+>>>>>>> 7c24241b7d6fa3c6e6d5ef669ac3078a9eb307c2
       {/* Quick Stats */}
       <div className="quick-stats">
         <div className="stat-item">
@@ -357,22 +538,51 @@ const FreelanceDashboardPage = () => {
 
       {/* Cards for functionality */}
       <div className="card-container">
+<<<<<<< HEAD
         <div className="card" onClick={() => navigate("/matchingjobs")}>
+=======
+        <div className="card" onClick={() => handleNavigation("/matchingjobs")}>
+>>>>>>> 7c24241b7d6fa3c6e6d5ef669ac3078a9eb307c2
           <h2>Browse Jobs</h2>
           <p>Explore available opportunities that match your skills.</p>
           <button>Browse Jobs</button>
         </div>
+<<<<<<< HEAD
         <div className="card" onClick={() => navigate("/freelancerOffers")}>
+=======
+        <div
+          className="card"
+          onClick={() => handleNavigation("/freelancerOffers")}
+        >
+>>>>>>> 7c24241b7d6fa3c6e6d5ef669ac3078a9eb307c2
           <h2>offers</h2>
           <p>View and manage the offers.</p>
           <button>View offers</button>
         </div>
+<<<<<<< HEAD
         <div className="card" onClick={() => navigate("/profile/:userId")}>
+=======
+        <div
+          className="card"
+          onClick={() => {
+            const token = localStorage.getItem("token");
+            const userId = jwtDecode(token).userId;
+            navigate(hasProfile ? `/profile/${userId}` : "/myProfile");
+          }}
+        >
+>>>>>>> 7c24241b7d6fa3c6e6d5ef669ac3078a9eb307c2
           <h2>Profile Settings</h2>
           <p>Update your profile and portfolio to attract clients.</p>
           <button>Update Profile</button>
         </div>
+<<<<<<< HEAD
         <div className="card" onClick={() => navigate("/freelancersjobpage")}>
+=======
+        <div
+          className="card"
+          onClick={() => handleNavigation("/freelancersjobpage")}
+        >
+>>>>>>> 7c24241b7d6fa3c6e6d5ef669ac3078a9eb307c2
           <h2>My Jobs</h2>
           <p>Review your past jobs and client feedback.</p>
           <button>View Your Jobs</button>
@@ -384,6 +594,33 @@ const FreelanceDashboardPage = () => {
         <FaEnvelope className="contact-icon" />
         Contact Us
       </button>
+
+      <Modal
+        isOpen={showProfileModal}
+        onClose={() => setShowProfileModal(false)}
+      >
+        <h2>Complete Your Profile</h2>
+        <p>
+          To access all features and start finding great opportunities, please
+          complete your profile first. This will help clients better understand
+          your skills and experience.
+        </p>
+        <button
+          className="create-profile-btn"
+          onClick={() => {
+            setShowProfileModal(false);
+            navigate("/myProfile");
+          }}
+        >
+          Create Profile
+        </button>
+        <button
+          className="modal-close"
+          onClick={() => setShowProfileModal(false)}
+        >
+          Close
+        </button>
+      </Modal>
     </div>
   );
 };

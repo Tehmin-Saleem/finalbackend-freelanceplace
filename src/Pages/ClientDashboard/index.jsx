@@ -1,12 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { Header } from "../../components";
-
-
-import Illustration from "../../images/Illustration.png"; // Import the image here
+import { Header, Modal } from "../../components";
 import { FaEnvelope } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import {jwtDecode} from "jwt-decode"; // Fix import statement for jwtDecode
+import jwtDecode from "jwt-decode";
 import "./styles.scss";
 
 const ClientDashboard = () => {
@@ -23,21 +20,19 @@ const ClientDashboard = () => {
   const checkClientProfile = async (userId, token) => {
     try {
       const response = await axios.get(
-        `http://localhost:5000/api/client/client-profile-exists/${userId}`, // Remove the extra ':id'
+        `http://localhost:5000/api/client/client-profile-exists/${userId}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
-      console.log("Profile check response:", response.data); // Debug log
-      return response.data.exists; // Make sure this matches your backend response
+      return response.data.exists;
     } catch (error) {
       console.error("Error checking client profile:", error);
       return false;
     }
   };
 
-const handleNavigation = (path) => {
-    console.log("Current hasProfile state:", hasProfile); // Debug log
+  const handleNavigation = (path) => {
     if (!hasProfile) {
       setShowProfileModal(true);
     } else {
@@ -56,30 +51,23 @@ const handleNavigation = (path) => {
 
         const decodedToken = jwtDecode(token);
         const userId = decodedToken.userId;
-        console.log("Decoded User ID:", userId);
 
-        // Check for profile when component mounts
         const profileExists = await checkClientProfile(userId, token);
-        console.log("Profile exists:", profileExists); // Debug log
         setHasProfile(profileExists);
 
-        // Fetch user details
         const userResponse = await axios.get(
           `http://localhost:5000/api/client/users/${userId}`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
         setUser(userResponse.data);
 
-        // Fetch combined counts
         const statsResponse = await axios.get(
           `http://localhost:5000/api/client/dashboard-stats/${userId}`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
         setDashboardStats(statsResponse.data.data);
-        console.log("Dashboard Stats Response:", statsResponse.data);
-
       } catch (error) {
-        console.error("Error fetching dashboard stats:", error);
+        console.error("Error fetching dashboard data:", error);
         navigate("/signin");
       }
     };
@@ -87,17 +75,17 @@ const handleNavigation = (path) => {
     fetchUser();
   }, [navigate]);
 
-
   return (
     <>
       <Header />
       <div className="DashBoard">
         <header className="dashboard-Header">
           <h1>Welcome, {user.first_name || "User"}!</h1>
-          <p>Manage projects, track progress, and explore freelancer profiles, all in one place.</p>
+          <p>
+            Manage projects, track progress, and explore freelancer profiles, all in one place.
+          </p>
         </header>
 
-        {/* Quick Stats and Dashboard Summary */}
         <div className="quick-stats-summary">
           <div className="quick-stats">
             <div className="stat-item">
@@ -112,28 +100,15 @@ const handleNavigation = (path) => {
               <h3>Completed Jobs</h3>
               <p>{dashboardStats.totalCompletedJobs}</p>
             </div>
-
-            <div className="stat-item">
-              <h3>Freelancers Engaged</h3>
-              <p>{dashboardStats.totalOngoingJobs}</p>
-            </div>
-
-
-
-
-
-
           </div>
 
           <div className="dashboard-summary">
             <p>
-              This dashboard provides an overview of your current performance, job statistics, and upcoming
-              opportunities. Stay informed and make data-driven decisions to ensure the success of your projects.
+              This dashboard provides an overview of your current performance, job statistics, and upcoming opportunities. Stay informed and make data-driven decisions to ensure the success of your projects.
             </p>
           </div>
         </div>
 
-        {/* Cards */}
         <div className="card-container">
           <div className="card" onClick={() => handleNavigation("/jobPosting")}>
             <h2>Post a Job</h2>
@@ -150,44 +125,28 @@ const handleNavigation = (path) => {
             <p>View proposals on your jobs.</p>
             <button>View Proposals</button>
           </div>
-          <div
-            className="card"
-            onClick={() => handleNavigation("/ManageProjectbyclient")}
-          >
+          <div className="card" onClick={() => handleNavigation("/ManageProjectbyclient")}>
             <h2>Job Progress</h2>
             <p>Track progress of ongoing jobs and milestones.</p>
             <button>View Progress</button>
           </div>
-          <div
-            className="card"
-            onClick={() => handleNavigation("/freelancercard")}
-          >
+          <div className="card" onClick={() => handleNavigation("/freelancercard")}>
             <h2>Freelancer Profiles</h2>
             <p>Explore profiles of freelancers you’ve worked with.</p>
             <button>View Freelancers</button>
           </div>
-          <div
-            className="card"
-            onClick={() => handleNavigation("/ClientOfferPage")}
-          >
+          <div className="card" onClick={() => handleNavigation("/ClientOfferPage")}>
             <h2>Consultants Offers</h2>
-            <p>Check the conusltants that you have send the request.</p>
-            <button>View Consultants </button>
+            <p>Check the consultants you have sent requests to.</p>
+            <button>View Consultants</button>
           </div>
         </div>
 
-        {/* Profile Modal */}
-        {/* <Modal
-          isOpen={showProfileModal}
-          onClose={() => setShowProfileModal(false)}
-          shouldCloseOnOverlayClick={false} // Add this prop if your Modal component supports it
-        >
+        <Modal isOpen={showProfileModal} onClose={() => setShowProfileModal(false)}>
           <div className="profile-modal-content">
             <h2>Complete Your Profile</h2>
             <p>
-              Please complete your profile before accessing this feature. A
-              complete profile helps freelancers understand your business
-              better.
+              Please complete your profile before accessing this feature. A complete profile helps freelancers understand your business better.
             </p>
             <div className="modal-buttons">
               <button
@@ -199,17 +158,13 @@ const handleNavigation = (path) => {
               >
                 Complete Profile
               </button>
-              <button
-                className="modal-close"
-                onClick={() => setShowProfileModal(false)}
-              >
+              <button className="modal-close" onClick={() => setShowProfileModal(false)}>
                 Close
               </button>
             </div>
           </div>
-        </Modal> */}
+        </Modal>
 
-        {/* Contact Button */}
         <button
           className="contact-btn-fixed"
           onClick={() => navigate("/QueryForm", { state: user })}
