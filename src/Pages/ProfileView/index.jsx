@@ -113,78 +113,7 @@ function ProfileView() {
     setCountry(localStorage.getItem("country") || "Not specified");
   }, []);
 
-  // // Inside the fetchFreelancerReviews function
-  // const fetchFreelancerReviews = async () => {
-  //   try {
-  //     const token = localStorage.getItem("token");
-  //     if (!token) {
-  //       throw new Error("No token found");
-  //     }
-
-  //     const decodedToken = jwtDecode(token);
-  //     const freelancerId = decodedToken.userId;
-
-  //     console.log("Token:", token);
-  //     console.log("freelancerId", freelancerId);
-
-  //     setLoading(true);
-  //     const response = await axios.get(
-  //       `http://localhost:5000/api/freelancer/${freelancerId}/reviews`,
-  //       {
-  //         headers: {
-  //           Authorization: `Bearer ${token}`,
-  //           "Content-Type": "application/json",
-  //         },
-  //       }
-  //     );
-
-  //     console.log("response review", response.data.data);
-
-  //     const reviewsData = response.data.data || {};
-  //     setReviews(reviewsData);
-  //     // If reviews data is available, calculate job success percentage
-  //     if (
-  //       reviewsData.reviews &&
-  //       Array.isArray(reviewsData.reviews) &&
-  //       reviewsData.reviews.length > 0
-  //     ) {
-  //       const totalReviews = reviewsData.reviews.length;
-  //       const totalRating = reviewsData.reviews.reduce(
-  //         (sum, review) => sum + review.rating,
-  //         0
-  //       );
-  //       const jobSuccessPercentage = (
-  //         (totalRating / (totalReviews * 5)) *
-  //         100
-  //       ).toFixed(2); // Assuming max rating is 5
-
-  //       // Set the job success percentage in the profile data
-  //       setProfileData((prevProfileData) => ({
-  //         ...prevProfileData,
-  //         jobSuccess: jobSuccessPercentage,
-  //       }));
-  //     } else {
-  //       // If there are no reviews, set job success to 0 or a default value
-  //       setProfileData((prevProfileData) => ({
-  //         ...prevProfileData,
-  //         jobSuccess: "0.00", // Default value for job success
-  //       }));
-  //     }
-
-  //     setError(null); // Reset error state if reviews were successfully fetched
-  //   } catch (err) {
-  //     console.error(err); // Logging the error for debugging
-  //     setError(
-  //       err.response?.data?.message || err.message || "Failed to fetch reviews"
-  //     );
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
-
-  // useEffect(() => {
-  //   fetchFreelancerReviews();
-  // }, []);
+ 
 
   if (loading) return <Spinner size={100} alignCenter />;
   if (error) return <div>{error}</div>;

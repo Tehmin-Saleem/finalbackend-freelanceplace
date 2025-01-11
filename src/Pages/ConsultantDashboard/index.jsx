@@ -8,6 +8,7 @@ import { useState,useEffect } from "react";
 import axios from "axios";
 import { Line } from "react-chartjs-2";
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend } from "chart.js";
+import {Spinner} from "../../components/index";
 
 // Register Chart.js modules
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
@@ -16,6 +17,7 @@ ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, T
 const ConsultantDashboard = () => {
   const [acceptedOffers, setAcceptedOffersCount] = useState([]);
 const [averageRating, setAverageRating] = useState(0);
+const [loading, setLoading] = useState(true);
 const renderStars = (rating) => {
   const stars = [];
   for (let i = 1; i <= 5; i++) {
@@ -62,6 +64,7 @@ const renderStars = (rating) => {
 
   useEffect(() => {
     const fetchOfferCounts = async () => {
+      setLoading(true);
       try {
         const token = localStorage.getItem("token");
   
@@ -81,6 +84,7 @@ const renderStars = (rating) => {
         });
   
         const { totalOffers, acceptedOffers, pendingOffers } = response.data.data;
+        
   
         setOfferCounts({ totalOffers, acceptedOffers, pendingOffers });
   
@@ -93,6 +97,7 @@ const renderStars = (rating) => {
             { ...prevData.datasets[2], data: [...prevData.datasets[2].data, pendingOffers] },
           ],
         }));
+        setLoading(false);
       } catch (error) {
         console.error("Error fetching offer counts:", error);
       }
@@ -140,7 +145,10 @@ const renderStars = (rating) => {
   fetchUser();
 }, [navigate]);
 
-
+// if (loading) {
+//   // **Render Spinner when loading**
+//   return <Spinner size={100} alignCenter />;
+// }
 
 
   useEffect(() => {
@@ -165,6 +173,7 @@ const renderStars = (rating) => {
             },
           }
         );
+   
         
         console.log("Accepted offers response:", response.data);
   
@@ -183,13 +192,17 @@ const renderStars = (rating) => {
         const avgRating = acceptedOffers > 0 ? totalRatings / acceptedOffers : 0;
         setAverageRating(avgRating);
   
-      } catch (error) {
+      } 
+      
+      catch (error) {
         console.error("Error fetching accepted offers:", error);
       }
     };
   
     fetchAcceptedOffers();
   }, [navigate]);
+  // if (loading) return <Spinner size={100} alignCenter />;
+  // if (error) return <div>{error}</div>;
   
 
 
