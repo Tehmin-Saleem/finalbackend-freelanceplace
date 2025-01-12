@@ -8,19 +8,30 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET
 });
 
-// Updated CloudinaryStorage configuration
 const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
   params: async (req, file) => {
-    return {
-      folder: 'uploads',  // The folder where files will be uploaded
-      allowed_formats: ['jpg', 'png', 'pdf'],  // Allowed file formats
-      resource_type: file.mimetype === 'application/pdf' ? 'raw' : 'image',  // 'raw' for non-image files (like PDF)
-      access_mode: 'public'  // Explicitly make the file public
-    };
+    try {
+      console.log("Processing file in Cloudinary storage:", file);
+      return {
+        folder: 'uploads',
+        allowed_formats: ['jpg', 'png', 'pdf'], // Corrected typo: 'allowed_formats'
+        resource_type: file.mimetype === 'application/pdf' ? 'raw' : 'image',
+        access_mode: 'public'
+      };
+    } catch (error) {
+      console.error("Cloudinary storage error:", error);
+      throw error;
+    }
   }
 });
 
-const upload = multer({ storage: storage });
+// Add error handling to multer
+const upload = multer({
+  storage: storage,
+  limits: {
+    fileSize: 10 * 1024 * 1024 // 10MB limit
+  }
+});
 
 module.exports = { upload, cloudinary };

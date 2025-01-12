@@ -156,40 +156,47 @@ const allMessages = asyncHandler(async (req, res) => {
 //@route           POST /api/Message/
 //@access          Protected
 const sendMessage = asyncHandler(async (req, res) => {
-  const { content, chatId } = req.body;
+  console.log("Request body:", req.body);
+  console.log("Request file:", req.file);
+  
+  const { chatId, content } = req.body;
+  
+  if (!chatId) {
+    return res.status(400).json({ error: "ChatId is required" });
+  }
 
-
-  // Handle file attachment
   let attachment = null;
 
-  if ((!content && !req.file) || !chatId) {
-    console.log("Invalid data passed into request");
-    
-    return res.sendStatus(400);
-  }
-
-
-  // If there's an attachment, set up its properties
+  // Handle file upload to Cloudinary
   if (req.file) {
-    attachment = {
-      fileName: req.file.originalname,
-      path: req.file.path, // This will be the Cloudinary URL
-      public_id: req.file.filename, // Cloudinary public ID
-      resource_type: req.file.resource_type,
-      description: req.body.description || ""
-    };
+    try {
+      const result = await cloudinary.uploader.upload(req.file.path, {
+        folder: "chat_attachments",
+        resource_type: "auto"
+      });
+
+      attachment = {
+        fileName: req.file.originalname,
+        path: result.secure_url,
+        public_id: result.public_id,
+        resource_type: result.resource_type
+      };
+
+      // Remove the temporary file
+      fs.unlinkSync(req.file.path);
+    } catch (error) {
+      console.error("Cloudinary upload error:", error);
+      return res.status(400).json({ error: "File upload failed" });
+    }
   }
-
-
-  var newMessage = {
-    sender: req.user.userId,
-    content: content,
-    chat: chatId,
-    attachment: attachment,  // Store the attachment object if it exists
-  };
 
   try {
-    var message = await Message.create(newMessage);
+    let message = await Message.create({
+      sender: req.user.userId,
+      content: content || "",
+      chat: chatId,
+      attachment: attachment
+    });
 
     message = await message.populate("sender", "name pic");
     message = await message.populate("chat");
@@ -198,18 +205,22 @@ const sendMessage = asyncHandler(async (req, res) => {
       select: "name pic email",
     });
 
-    await Chat.findByIdAndUpdate(req.body.chatId, { latestMessage: message });
-
+    await Chat.findByIdAndUpdate(chatId, { latestMessage: message });
     res.json(message);
   } catch (error) {
+    console.error("Database error:", error);
+    // If there was an uploaded file but database operation failed, delete from Cloudinary
     if (attachment && attachment.public_id) {
       await cloudinary.uploader.destroy(attachment.public_id);
     }
-    res.status(400);
-    throw new Error(error.message);
+    res.status(400).json({ error: error.message });
   }
-  
 });
+
+
+
+
+
 
 
 

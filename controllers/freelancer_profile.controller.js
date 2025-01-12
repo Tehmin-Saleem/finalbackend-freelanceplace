@@ -160,7 +160,7 @@ exports.getAuthenticatedProfile = async (req, res) => {
       rate: profile.availability?.hourly_rate || "Not specified",
       skills: profile.skills || [],
       totalJobs: profile.experience?.completed_projects || 0,
-      totalHours: profile.total_hours || 0,
+      totalHours: profile.hourly_rate || 0,
       experience: {
         title: profile.title || "",
         description: profile.profile_overview || "",
