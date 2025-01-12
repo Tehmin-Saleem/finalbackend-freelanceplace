@@ -4,7 +4,8 @@ const mongoose = require("mongoose");
 const jobpost = require("../models/post_job.model");
 const review = require("../models/review.model");
 const NotificationModel = require("../models/notifications.model");
-const Freelancer_Profile = require('../models/freelancer_profile.model')
+const Freelancer_Profile = require('../models/freelancer_profile.model');
+const Job = require("../models/post_job.model");
 exports.createoffer = async (req, res) => {
   console.log('Offer Controller: createoffer hit');
   console.log('Request body:', req.body);
@@ -569,126 +570,7 @@ exports.getOffersByFreelancerId = async (req, res) => {
 
 
 
-// exports.getClientAcceptedOffers = async (req, res) => {
-//   try {
-//     const clientId = req.user.userId; // Get client ID from authenticated user
-//     console.log('Fetching accepted offers for client:', clientId);
 
-//     // Find all accepted offers for the client with populated freelancer data
-//     const acceptedOffers = await Offer_Form.find({
-//       client_id: clientId,
-//       status: 'accepted'
-//     })
-//     .populate({
-//       path: 'freelancer_id',
-//       select: 'first_name last_name email profile_image country_name'
-//     })
-//     .sort({ createdAt: -1 }); // Sort by newest first
-
-//     console.log(`Found ${acceptedOffers.length} accepted offers`);
-
-//     // Get freelancer profiles and reviews for all freelancers
-//     const freelancerIds = acceptedOffers.map(offer => offer.freelancer_id._id);
-    
-//     // Get all reviews for these freelancers
-//     const freelancerReviews = await review.aggregate([
-//       {
-//         $match: {
-//           freelancer_id: { $in: freelancerIds },
-//           status: "Completed"
-//         }
-//       },
-//       {
-//         $group: {
-//           _id: '$freelancer_id',
-//           averageRating: { $avg: '$stars' },
-//           totalReviews: { $sum: 1 }
-//         }
-//       }
-//     ]);
-
-//     // Create a map of freelancer stats
-//     const freelancerStatsMap = freelancerReviews.reduce((acc, stat) => {
-//       acc[stat._id.toString()] = {
-//         averageRating: parseFloat(stat.averageRating.toFixed(1)),
-//         totalReviews: stat.totalReviews
-//       };
-//       return acc;
-//     }, {});
-
-//     // Format the response
-//     const formattedOffers = acceptedOffers.map(offer => {
-//       const freelancerId = offer.freelancer_id._id.toString();
-//       const freelancerStats = freelancerStatsMap[freelancerId] || {
-//         averageRating: 0,
-//         totalReviews: 0
-//       };
-
-//       // Format budget details
-//       let budget;
-//       if (offer.budget_type === 'hourly') {
-//         budget = {
-//           type: 'hourly',
-//           rate: {
-//             from: offer.hourly_rate.from,
-//             to: offer.hourly_rate.to
-//           }
-//         };
-//       } else {
-//         budget = {
-//           type: 'fixed',
-//           amount: offer.fixed_price
-//         };
-//       }
-
-//       return {
-//         offer_id: offer._id,
-//         job_title: offer.job_title,
-//         status: offer.status,
-//         created_at: offer.createdAt,
-//         due_date: offer.due_date,
-//         budget: budget,
-//         description: offer.description,
-//         detailed_description: offer.detailed_description,
-//         preferred_skills: offer.preferred_skills,
-//         estimated_timeline: {
-//           duration: offer.estimated_timeline.duration,
-//           unit: offer.estimated_timeline.unit
-//         },
-//         freelancer: {
-//           id: offer.freelancer_id._id,
-//           name: `${offer.freelancer_id.first_name} ${offer.freelancer_id.last_name}`,
-//           email: offer.freelancer_id.email,
-//           profile_image: offer.freelancer_id.profile_image,
-//           country: offer.freelancer_id.country_name,
-//           stats: {
-//             rating: freelancerStats.averageRating,
-//             total_reviews: freelancerStats.totalReviews
-//           }
-//         },
-//         attachment: offer.attachment ? {
-//           fileName: offer.attachment.fileName,
-//           path: offer.attachment.path,
-//           description: offer.attachment.description
-//         } : null
-//       };
-//     });
-
-//     res.status(200).json({
-//       success: true,
-//       count: formattedOffers.length,
-//       data: formattedOffers
-//     });
-
-//   } catch (error) {
-//     console.error('Error in getClientAcceptedOffers:', error);
-//     res.status(500).json({
-//       success: false,
-//       message: 'Failed to fetch accepted offers',
-//       error: error.message
-//     });
-//   }
-// };
 
 
 
@@ -765,3 +647,60 @@ exports.getClientAcceptedOffers = async (req, res) => {
     });
   }
 };
+
+
+exports.getClientAllJobAndOffersCounts = async (req, res) => {
+  try {
+    const clientId = req.user.userId; 
+    console.log('Fetching job counts for client:', clientId);
+
+    // Fetch all jobs posted by the client
+    const allJobs = await Job.find({ client_id: clientId });
+    console.log('All jobs:', allJobs.length);
+
+    // Filter jobs by status
+    const completedJobsCount = allJobs.filter(job => job.jobstatus === 'completed').length;
+    console.log("completed jobs",completedJobsCount);
+    const ongoingJobsCount = allJobs.filter(job => job.jobstatus === 'ongoing').length;
+    console.log("ongoing jobs",ongoingJobsCount);
+
+    // Fetch all offers sent by the client
+    const allOffers = await Offer_Form.find({ client_id: clientId });
+    console.log('All offers:', allOffers.length);
+
+    // Filter accepted offers
+    const acceptedOffers = allOffers.filter(offer => offer.status === 'accepted');
+    console.log('Accepted offers:', acceptedOffers.length);
+
+    // From the accepted offers, calculate ongoing and completed offers
+    const completedOffersCount = acceptedOffers.filter(offer => offer.status === 'completed').length;
+    console.log("completedoffers",completedOffersCount);
+    const ongoingOffersCount = acceptedOffers.filter(offer => offer.status === 'ongoing').length;
+    console.log("ongoingoffers",ongoingOffersCount);
+
+    // Combine counts
+    const totalCompletedJobs = completedJobsCount + completedOffersCount;
+    const totalOngoingJobs = ongoingJobsCount + acceptedOffers.length;
+
+    // Response with all counts
+    res.status(200).json({
+      success: true,
+      data: {
+        totalJobs: allJobs.length + acceptedOffers.length, // Total jobs including accepted offers
+        totalCompletedJobs,
+        totalOngoingJobs,
+      },
+    });
+  } catch (error) {
+    console.error('Error in getClientAllJobAndOffersCounts:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to fetch job counts',
+      error: error.message,
+    });
+  }
+};
+
+
+
+

@@ -153,17 +153,6 @@ exports.getClientPaymentMethods = async (req, res) => {
       .json({ message: "Internal server error", error: err.message });
   }
 };
-// exports.getClientPaymentMethods = async (req, res) => {
-//   try {
-//     const client_id = req.user._id;
-
-//     const paymentMethods = await Payment_Method.find({ client_id }).populate('freelancer_id');
-
-//     res.status(200).json({ paymentMethods });
-//   } catch (err) {
-//     res.status(500).json({ message: 'Internal server error', error: err.message });
-//   }
-// };
 
 exports.getPaymentMethodById = async (req, res) => {
   try {
@@ -242,9 +231,7 @@ exports.deletePaymentMethod = async (req, res) => {
   }
 };
 
-// ====================================
 
-// Add these new functions to your existing controller
 
 // Create PayPal Order
 exports.createPayPalOrder = async (req, res) => {
@@ -400,87 +387,6 @@ exports.getFreelancerPaymentDetails = async (req, res) => {
   }
 };
 
-// exports.processPaymentForFreelancer = async (req, res) => {
-//   try {
-//     const { freelancerId, jobId, milestoneId, amount, paymentMethod,projectId, client_id, proposal_id  } = req.body; // Fetch the freelancer's payment method
-
-//     const freelancerPaymentMethod = await Payment_Method.findOne({
-//       client_id: freelancerId,
-//     });
-
-//     if (!freelancerPaymentMethod) {
-//       return res
-//         .status(404)
-//         .json({ message: "Freelancer payment method not found" });
-//     }
-
-//     let paymentResult;
-
-//     if (
-//       freelancerPaymentMethod.billing_method === "Paypal" &&
-//       paymentMethod === "paypal"
-//     ) {
-//       // PayPal payment logic
-//       const request = new paypal.orders.OrdersCreateRequest();
-//       request.prefer("return=representation");
-//       request.requestBody({
-//         intent: "CAPTURE",
-//         purchase_units: [
-//           {
-//             amount: {
-//               currency_code: "USD",
-//               value: amount,
-//             },
-//           },
-//         ],
-//       });
-
-//       const order = await paypalClient.execute(request);
-//       paymentResult = {
-//         paymentType: "paypal",
-//         orderId: order.result.id,
-//         redirectUrl: `https://www.paypal.com/checkoutnow?token=${order.result.id}`,
-//       };
-//     } else if (
-//       freelancerPaymentMethod.billing_method === "Credit/Debit card" &&
-//       paymentMethod === "stripe"
-//     ) {
-//       // Stripe payment logic
-//       const paymentIntent = await stripe.paymentIntents.create({
-//         amount: amount * 100, // Stripe expects amount in cents
-//         currency: "usd",
-//         payment_method:
-//           freelancerPaymentMethod.card_details.stripe_payment_method_id,
-//         confirm: true,
-//       });
-
-//       paymentResult = {
-//         paymentType: "stripe",
-//         paymentIntent: paymentIntent,
-//       };
-//     } else {
-//       return res.status(400).json({
-//         message:
-//           "Invalid payment method or freelancer does not support this method",
-//       });
-//     } // Update the milestone or project status (if applicable)
-//     // You can add logic here to mark the milestone as paid in your database
-
-// // Return success response with updated project
-// res.status(200).json({
-//   success: true,
-//   message: "Payment processed successfully",
-//   // project: updatedProject,
-//   paymentResult
-// });
-
-// } catch (err) {
-//     console.error("Error processing payment:", err);
-//     res
-//       .status(500)
-//       .json({ message: "Error processing payment", error: err.message });
-//   }
-// };
 
 exports.processPaymentForFreelancer = async (req, res) => {
   try {
@@ -770,5 +676,58 @@ exports.getProjectMilestones = async (req, res) => {
     res
       .status(500)
       .json({ message: "Internal server error", error: err.message });
+  }
+};
+
+
+
+
+// controllers/payment.controller.js
+
+exports.checkPaymentMethod = async (req, res) => {
+  try {
+    // Get the user ID from the authenticated request
+    const userId = req.user.userId; // Assuming your auth middleware adds user to req
+
+    // Check if payment method exists for this user
+    const paymentMethod = await Payment_Method.findOne({
+      client_id: userId
+    });
+
+    // Log for debugging
+    console.log(`Checking payment method for user ${userId}`);
+    console.log('Payment method found:', !!paymentMethod);
+
+    // Return the response
+    res.status(200).json({
+      success: true,
+      hasPaymentMethod: !!paymentMethod, // Convert to boolean
+      paymentDetails: paymentMethod ? {
+        billing_method: paymentMethod.billing_method,
+        // If it's a credit card, include masked details
+        ...(paymentMethod.card_details && {
+          card_details: {
+            last4: paymentMethod.card_details.last4,
+            brand: paymentMethod.card_details.brand,
+            exp_month: paymentMethod.card_details.exp_month,
+            exp_year: paymentMethod.card_details.exp_year
+          }
+        }),
+        // If it's PayPal, include email
+        ...(paymentMethod.paypal_details && {
+          paypal_details: {
+            email: paymentMethod.paypal_details.email
+          }
+        })
+      } : null
+    });
+
+  } catch (error) {
+    console.error('Error in checkPaymentMethod:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to check payment method',
+      error: error.message
+    });
   }
 };

@@ -147,3 +147,26 @@ exports.profileExists = async (req, res) => {
       res.status(500).json({ success: false, error: error.message });
   }
 };
+
+// In your backend controller
+exports.checkClientProfile = async (req, res) => {
+  try {
+    const clientId = req.params.userId;
+    const profile = await Client_Profile.findOne({ client_id: clientId });
+    
+    console.log("Checking profile for client:", clientId);
+    console.log("Profile found:", !!profile);
+
+    res.status(200).json({
+      success: true,
+      exists: !!profile // Use a consistent property name
+    });
+  } catch (error) {
+    console.error("Error in checkClientProfile:", error);
+    res.status(500).json({
+      success: false,
+      message: 'Error checking client profile',
+      error: error.message
+    });
+  }
+};

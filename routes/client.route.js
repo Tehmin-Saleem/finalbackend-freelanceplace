@@ -72,6 +72,10 @@ router.get('/profile', authMiddleware, ClientProfile.getProfile);
 router.put('/profile/update', upload.single('image'), ClientProfile.updateProfile);
 router.get('/client-profile-exists/:id', authMiddleware, ClientProfile.profileExists);
 
+
+// In your routes file
+router.get('/profile/:userId', authMiddleware, ClientProfile.checkClientProfile);
+
 router.get('/notifications', authMiddleware, Notification.getNotifications);
 router.post('/notifications', authMiddleware, Notification.createNotification);
 router.put('/notifications/:notificationId/read', authMiddleware, Notification.updateNotification);
@@ -254,6 +258,8 @@ router.get('/count-job-posts/:clientId',authMiddleware, jobPostController.countJ
 // In your routes file
 router.get('/ongoing-projects', authMiddleware, hireFreelancerController.getClientOngoingProjects);
 router.get('/accepted-offers', authMiddleware, offerController.getClientAcceptedOffers);
+router.get('/dashboard-stats/:userId', authMiddleware, offerController.getClientAllJobAndOffersCounts);
+
 router.post('/send-offer-to-consultant/:consultant_id', authMiddleware, consultantProfileController.sendOfferToConsultant);
 
 router.get('/hired-freelancers-count/:clientId', hireFreelancerController.getHiredFreelancersCountByClientId);
