@@ -484,7 +484,29 @@ margin-top: 2rem;
 .chat-name {
   margin: 0;
 }
+.message-input-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px;
+}
 
+.send-button:hover {
+  background-color: #0056b3;
+}
+
+.file-preview {
+  margin-top: 8px;
+  padding: 8px;
+  background-color: #f8f9fa;
+  border-radius: 4px;
+}
+
+.preview-image {
+  max-width: 200px;
+  max-height: 200px;
+  margin-top: 8px;
+}
 /* Latest message */
 .chat-latest-message {
   font-size: 12px;

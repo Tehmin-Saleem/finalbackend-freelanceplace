@@ -11,7 +11,7 @@ import "./styles.scss";
 import FreelancersJobsPage from "../Freelancers-Done-jobspage";
 import { useJobContext } from "../../context/JoBContext";
 // import JobCountUpdater from "../../components/JobCounterUpdator";
-
+import Footer from "../../components/foote";
 const FreelanceDashboardPage = () => {
   const [user, setUser] = useState({ first_name: "", email: "" });
   const [quickStats, setQuickStats] = useState({
@@ -28,7 +28,7 @@ const FreelanceDashboardPage = () => {
   const [error, setError] = useState(null);
   const [hasProfile, setHasProfile] = useState(false);
   const [showProfileModal, setShowProfileModal] = useState(false);
-
+  const [jobs, setJobs] = useState(null);
   const { jobCounts } = useJobContext();
   const fetchFreelancerReviews = async () => {
     try {
@@ -580,6 +580,7 @@ const FreelanceDashboardPage = () => {
           Close
         </button>
       </Modal>
+      <Footer/>
     </div>
   );
 };

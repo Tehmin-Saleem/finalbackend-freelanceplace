@@ -1,15 +1,9 @@
+
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import "./styles.scss";
 import { jwtDecode } from "jwt-decode";
-import {
-  Cross,
-  IconSearchBar,
-  UploadIcon,
-  PlusIcon,
-  ImageIcon,
-} from "../../svg/index";
 import { Cross, IconSearchBar, UploadIcon, PlusIcon } from "../../svg/index";
 import { Header, Spinner } from "../../components/index";
 import PortfolioFilePreview from "./PortfolioFilePreview";
@@ -19,17 +13,6 @@ const MyProfile = () => {
   const [error, setError] = useState(null);
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(true);
-  const [filteredPopularSkills, setFilteredPopularSkills] = useState([]);
-
-  const popularSkills = [
-    "React",
-    "UI/UX Design",
-    "JavaScript",
-    "CSS",
-    "HTML",
-    "Figma",
-  ];
-
   const [profile, setProfile] = useState({
     profileId: "",
     first_name: "",
@@ -83,32 +66,34 @@ const MyProfile = () => {
       const config = {
         headers: { Authorization: `Bearer ${token}` },
       };
-
+  
       const userResponse = await axios.get(
         `http://localhost:5000/api/freelancer/users/${userId}`,
         config
       );
-
+  
       const userData = userResponse.data;
-
+  
       setProfile((prevProfile) => ({
         ...prevProfile,
         first_name: userData.first_name || "",
         last_name: userData.last_name || "",
         email: userData.email || "",
       }));
-
+  
       const existenceResponse = await axios.get(
         `http://localhost:5000/api/freelancer/freelancer-profile-exists/${userId}`,
         config
       );
-
+  
       if (existenceResponse.data.exists) {
         const profileResponse = await axios.get(
           `http://localhost:5000/api/freelancer/profile/${userId}`,
           config
         );
-
+  
+        console.log('Profile Response:', profileResponse.data.data);
+  
         if (profileResponse.data.data) {
           setProfile((prevProfile) => ({
             ...prevProfile,
@@ -118,6 +103,16 @@ const MyProfile = () => {
             last_name:
               profileResponse.data.data.last_name || prevProfile.last_name,
             email: profileResponse.data.data.email || prevProfile.email,
+            profile_overview:
+              profileResponse.data.data.experience.description || prevProfile.profile_overview,
+            experience: {
+              completed_projects: profileResponse.data.data.totalJobs || prevProfile.experience.completed_projects,
+            },
+            availability: {
+              full_time: profileResponse.data.data.availability.full_time || prevProfile.availability.full_time,
+              part_time: profileResponse.data.data.availability.part_time || prevProfile.availability.part_time,
+              hourly_rate: profileResponse.data.data.availability.hourly_rate || prevProfile.availability.hourly_rate,
+            },
           }));
         }
       }
@@ -208,64 +203,6 @@ const MyProfile = () => {
       skills: prevProfile.skills.filter((s) => s !== skill),
     }));
   };
-
-  // Handle Enter key press to add custom skill
-  const handleKeyPress = (e) => {
-    if (e.key === "Enter") {
-      e.preventDefault(); // Prevent form submission
-      if (skillInput.trim() !== "") {
-        handleAddSkill(skillInput.trim()); // Add the skill
-        setSkillInput(""); // Clear the input
-      }
-    }
-  };
-  useEffect(() => {
-    setFilteredPopularSkills(
-      popularSkills.filter((skill) =>
-        skill.toLowerCase().includes(skillInput.toLowerCase())
-      )
-    );
-  }, [skillInput, popularSkills]);
-
-  // Add this new useEffect after your existing useEffects
-  useEffect(() => {
-    const fetchUserData = async () => {
-      try {
-        const token = localStorage.getItem("token");
-        if (!token) {
-          navigate("/signin");
-          return;
-        }
-
-        const decodedToken = jwtDecode(token);
-        const userId = decodedToken.userId;
-
-        // Fetch user data
-        const response = await axios.get(
-          `http://localhost:5000/api/freelancer/users/${userId}`,
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        );
-
-        const userData = response.data;
-
-        // Update profile state with user data
-        setProfile((prevProfile) => ({
-          ...prevProfile,
-          first_name: userData.first_name || "",
-          last_name: userData.last_name || "",
-          email: userData.email || "",
-          // Add any other fields that come from user data
-        }));
-      } catch (error) {
-        console.error("Error fetching user data:", error);
-        setError("Failed to load user data");
-      }
-    };
-
-    fetchUserData();
-  }, [navigate]);
 
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
@@ -417,6 +354,15 @@ const MyProfile = () => {
   if (isLoading) {
     return <Spinner alignCenter />;
   }
+
+  const popularSkills = [
+    "React",
+    "UI/UX Design",
+    "JavaScript",
+    "CSS",
+    "HTML",
+    "Figma",
+  ];
 
   const handleKeyDown = (e) => {
     if (e.key === "Enter") {
@@ -599,7 +545,6 @@ const MyProfile = () => {
                 value={skillInput}
                 onChange={(e) => setSkillInput(e.target.value)}
                 onKeyDown={handleKeyDown}
-                onKeyPress={handleKeyPress} // Prevent form submission and add skill
                 placeholder="Search skills..."
               />
             </div>
@@ -614,7 +559,7 @@ const MyProfile = () => {
                   <Cross
                     alt="Remove"
                     className="remove-skill"
-                    onClick={() => handleRemoveSkill(skill)} // Remove skill
+                    onClick={() => handleRemoveSkill(skill)}
                   />
                 </div>
               ))}
@@ -622,59 +567,52 @@ const MyProfile = () => {
           </div>
 
           <div className="form-group">
-            <label>Popular Skills</label>
+            <label>Popular Skills for UI/UX Design</label>
             <div className="popular-skills">
-              {filteredPopularSkills.length > 0 ? (
-                filteredPopularSkills.map((skill) => (
-                  <div
-                    className="skill-badge"
-                    key={skill}
-                    onClick={() => handleAddSkill(skill)} // Add skill
-                  >
-                    {skill}
-                    <PlusIcon alt="Add" className="add-skill" />
-                  </div>
-                ))
-              ) : (
-                <p>No matching skills found</p>
-              )}
+              {popularSkills.map((skill) => (
+                <div
+                  className="skill-badge"
+                  key={skill}
+                  onClick={() => handleAddSkill(skill)}
+                >
+                  {skill}
+                  <PlusIcon alt="Add" className="add-skill" />
+                </div>
+              ))}
             </div>
           </div>
 
           <div className="form-group">
             <label>Add Your Portfolio</label>
             <div className="portfolio">
-            {profile.portfolios.map((portfolio, index) => (
-             <div className="thumbnail-preview">
-            
-            <div key={index} className="portfolio-box">
-            <div
-               className="delete-icon"
-               onClick={() => handleDeletePortfolio(index)}
-               style={{ cursor: 'pointer', position: 'absolute', top: '10px', right: '10px' }}
-             >
-               <Cross alt="Delete" />
-             </div>
-                <PortfolioFilePreview
-                  file={portfolio.attachment instanceof File ? portfolio.attachment : null}
-                  fileUrl={portfolio.attachment && portfolio.attachment instanceof File ? URL.createObjectURL(portfolio.attachment) : null}
-                />
+              {profile.portfolios.map((portfolio, index) => (
+                <div key={index} className="portfolio-box">
+                  <div className="thumbnail-preview">
+                    <PortfolioFilePreview
+                      file={portfolio.attachment instanceof File ? portfolio.attachment : null}
+                      fileUrl={portfolio.attachment && portfolio.attachment instanceof File ? URL.createObjectURL(portfolio.attachment) : null}
+                    />
+                  </div>
+                  <h3>{portfolio.project_title}</h3>
+                  <p>{portfolio.category}</p>
+                  <div
+                    className="delete-icon"
+                    onClick={() => handleDeletePortfolio(index)}
+                    style={{ cursor: 'pointer', position: 'absolute', top: '10px', right: '10px' }}
+                  >
+                    <Cross alt="Delete" />
+                  </div>
+                </div>
+              ))}
+              <div
+                className="portfolio-box add-box bg-black"
+                onClick={() => setPortfolioModalOpen(true)}
+              >
+                <PlusIcon />
+                <p>Add</p>
               </div>
-              <h3>{portfolio.project_title}</h3>
-              <p>{portfolio.category}</p>
-              
             </div>
-          ))}
-          <div
-            className="portfolio-box add-box bg-black"
-            onClick={() => setPortfolioModalOpen(true)}
-          >
-            <PlusIcon />
-            <p>Add</p>
           </div>
-        </div>
-      </div>
-
 
           <label>Email:</label>
           <div className="field-group">

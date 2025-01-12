@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Carouselleft, Crouselright } from "../../../svg";
 import "./styles.scss";
+import Footer from "../../foote";
 
 const Carousel = ({ cards }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -42,6 +43,12 @@ const Carousel = ({ cards }) => {
   const canGoPrev = currentIndex > 0;
 
   const handleFileClick = (fileUrl) => {
+    console.log("File URL:", fileUrl);
+    if (!fileUrl) {
+      console.error("File URL is null or undefined");
+      return;
+    }
+
     if (fileUrl.startsWith('data:application/pdf')) {
       const pdfDataUrl = fileUrl.startsWith('data:')
         ? fileUrl
@@ -62,6 +69,43 @@ const Carousel = ({ cards }) => {
     }
   };
 
+  const renderFilePreview = (fileUrl, fileType) => {
+    if (fileType && fileUrl) {
+      // Format the data URL properly based on file type
+      const dataUrl = fileUrl.startsWith('data:')
+        ? fileUrl
+        : `data:${fileType};base64,${fileUrl}`;
+
+      if (fileType.startsWith('image/')) {
+        return (
+          <div className="file-preview">
+            <img
+              src={dataUrl}
+              alt="Attachment Preview"
+              className="file-preview-image w-full max-h-64 object-contain"
+            />
+          </div>
+        );
+      } else if (fileType === 'application/pdf') {
+        return (
+          <div className="file-preview">
+            <iframe
+              src={dataUrl}
+              type="application/pdf"
+              className="file-preview-pdf w-full h-64"
+              title="PDF Preview"
+            />
+          </div>
+        );
+      }
+    }
+    return null;
+  };
+
+  useEffect(() => {
+    console.log("Cards data:", cards);
+  }, [cards]);
+
   return (
     <div className="carousel-wrapper">
       <div className="carousel-container">
@@ -81,38 +125,53 @@ const Carousel = ({ cards }) => {
               transition: 'transform 0.3s ease-in-out'
             }}
           >
-            {cards.map((card, index) => (
-              <div
-                key={index}
-                className="carousel-card cursor-pointer"
-                style={{ width: `${100 / cardsPerView}%` }}
-                onClick={() => handleFileClick(card.attachment)}
-              >
-                <div className="card-inner">
-                  {card.attachment && (
-                    card.attachment.toLowerCase().endsWith('.pdf') ? (
-                      <div className="pdf-container">
-                        <a
-                          href={card.attachment}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="pdf-link"
-                        >
-                          View PDF
-                        </a>
-                      </div>
-                    ) : (
-                      <img
-                        src={card.attachment}
-                        alt={card.project_title || `Portfolio item ${index + 1}`}
-                        className="card-image"
-                      />
-                    )
-                  )}
-                  <h3 className="card-title">{card.project_title}</h3>
+            {cards.map((card, index) => {
+              const fileUrl = card.attachment;
+              const fileType = fileUrl
+                ? fileUrl.startsWith('data:')
+                  ? fileUrl.split(';')[0].split(':')[1]
+                  : fileUrl.split('.').pop().toLowerCase() === 'pdf'
+                  ? 'application/pdf'
+                  : 'image/png'
+                : null;
+
+              console.log(`Card ${index + 1} - File URL:`, fileUrl);
+              console.log(`Card ${index + 1} - File Type:`, fileType);
+
+              return (
+                <div
+                  key={index}
+                  className="carousel-card cursor-pointer"
+                  style={{ width: `${100 / cardsPerView}%` }}
+                  onClick={() => handleFileClick(fileUrl)}
+                >
+                  <div className="card-inner">
+                    {fileUrl && (
+                      fileType === 'application/pdf' ? (
+                        <div className="pdf-container">
+                          <a
+                            href={fileUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="pdf-link"
+                          >
+                            View PDF
+                          </a>
+                        </div>
+                      ) : (
+                        <img
+                          src={fileUrl}
+                          alt={card.project_title || `Portfolio item ${index + 1}`}
+                          className="card-image"
+                        />
+                      )
+                    )}
+                    <h3 className="card-title">{card.project_title}</h3>
+                    {renderFilePreview(fileUrl, fileType)}
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
 

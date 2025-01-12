@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "./styles.scss";
 import axios from "axios";
+// import ChatInterface from "./ChatInterface";
 import {
   Header,
   ChatLoading,
@@ -392,46 +393,72 @@ const Chat = () => {
   });
 
   const sendMessage = async (event) => {
-    if ((event.key === "Enter" && (newMessage || attachment)) || event.type === "click") {
+    if ((event.key === "Enter" || event.type === "click") && (newMessage.trim() || attachment)) {
       socket.emit("stop typing", selectedChat._id);
-      
+  
       const token = localStorage.getItem("token");
       if (!token) {
         throw new Error("No token found");
       }
   
       try {
-        const formData = new FormData();
-        if (newMessage) {
-          formData.append("content", newMessage);
-        }
-        formData.append("chatId", selectedChat._id);
+        let response;
         
         if (attachment) {
-          formData.append("file", attachment.file);
+          const formData = new FormData();
+          
+          // Add fields in specific order
+          formData.append("chatId", selectedChat._id);
+          if (newMessage.trim()) {
+            formData.append("content", newMessage.trim());
+          }
+          formData.append("file", attachment);
+  
+          // Debug log
+          console.log("Sending FormData with:");
+          console.log("chatId:", selectedChat._id);
+          console.log(" content:", newMessage.trim());
+          console.log(" file:", attachment.name);
+  
+          response = await axios.post(
+            "http://localhost:5000/api/client/sendMessage",
+            formData,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+              // Important: Set this to handle the upload properly
+              maxBodyLength: Infinity,
+              maxContentLength: Infinity,
+            }
+          );
+        } else {
+          // Text-only message remains the same
+          response = await axios.post(
+            "http://localhost:5000/api/client/sendMessage",
+            {
+              chatId: selectedChat._id,
+              content: newMessage.trim()
+            },
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+                'Content-Type': 'application/json'
+              }
+            }
+          );
         }
   
-        const config = {
-          headers: {
-"Content-Type": "application/json",            Authorization: `Bearer ${token}`,
-            // Don't set Content-Type - let browser set it with boundary for FormData
-          },
-        };
-  
+        const { data } = response;
+        
+        // Reset form state
         setNewMessage("");
         setAttachment(null);
         setPreview(null);
   
-        const { data } = await axios.post(
-          "http://localhost:5000/api/client/sendMessage",
-          formData,
-          config
-        );
-  
+        // Update UI
         socket.emit("new message", data);
         setMessages([...messages, data]);
-  
-        // Update chats with latest message
         setChats((prevChats) =>
           prevChats.map((chat) =>
             chat._id === data.chat._id
@@ -439,13 +466,18 @@ const Chat = () => {
               : chat
           )
         );
-  
       } catch (error) {
-        setError("Failed to send the message");
-        console.log(error);
+        console.error("Error sending message:", {
+          message: error.message,
+          data: error.response?.data,
+          status: error.response?.status
+        });
+        setError(error.response?.data?.error || "Failed to send message");
       }
     }
   };
+  
+  
   const downloadFile = async (fileUrl, fileName) => {
     try {
       const response = await axios({
@@ -471,6 +503,7 @@ const Chat = () => {
     }
   };
   
+  
   // Update the ScrollableChat component to handle file attachments
   const MessageItem = ({ message }) => {
     return (
@@ -481,7 +514,7 @@ const Chat = () => {
             <div className="attachment-container">
               <div className="file-info">
                 <span>{message.attachment.fileName}</span>
-                <button 
+                <button
                   className="download-btn"
                   onClick={() => downloadFile(message.attachment.path, message.attachment.fileName)}
                 >
@@ -494,6 +527,7 @@ const Chat = () => {
       </div>
     );
   };
+  
 
   const typingHandler = (e) => {
     setNewMessage(e.target.value);
@@ -523,11 +557,11 @@ const Chat = () => {
         alert("File size exceeds 100MB limit.");
         return;
       }
-
-      setAttachment({ name: file.name, file });
-
-      // Create a preview for images
-      if (file.type.startsWith("image/")) {
+  
+      setAttachment(file);
+  
+      // Create preview for images
+      if (file.type.startsWith('image/')) {
         const reader = new FileReader();
         reader.onloadend = () => {
           setPreview(reader.result);
@@ -538,6 +572,7 @@ const Chat = () => {
       }
     }
   };
+  
 
   const deleteChat = async (chatId) => {
     try {
@@ -670,14 +705,23 @@ const Chat = () => {
                 </span>
               </div>
 
-              <div className="mainchat-box">
-                {loading ? (
-                  <div className="spinner"></div>
-                ) : (
-                  <div className="messages">
-                    <ScrollableChat messages={messages} />
-                  </div>
-                )}
+             {/* Replace this section in your existing Chat.js */}
+<div className="mainchat-box">
+  {loading ? (
+    <div className="spinner"></div>
+  ) : (
+    <div className="messages">
+      <ScrollableChat messages={messages} />
+    </div>
+  )}
+
+  {/* <ChatInterface 
+    selectedChat={selectedChat}
+    messages={messages}
+    onSendMessage={sendMessage}
+    isTyping={istyping}
+  /> */}
+
 
                 <div className="form-control">
                   {istyping && (
@@ -686,47 +730,91 @@ const Chat = () => {
                     </div>
                   )}
 
-                  <div className="message-input-container">
-                    <input
-                      type="text"
-                      id="first-name"
-                      required
-                      placeholder="Type your message..."
-                      onKeyDown={sendMessage}
-                      className="message-input"
-                      value={newMessage}
-                      onChange={typingHandler}
-                    />
+<div className="message-input-container">
+  <input
+    type="text"
+    id="first-name"
+    required
+    placeholder="Type your message..."
+    onKeyDown={sendMessage}
+    className="message-input"
+    value={newMessage}
+    onChange={typingHandler}
+  />
 
-                    <input
-                      type="file"
-                      id="fileInput"
-                      onChange={handleFileChange}
-                      accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
-                      style={{ display: 'none' }}
-                    />
-                    <label htmlFor="fileInput" className="attach-button">
-                      <Attachment />
-                    </label>
-                  </div>
+<input
+    type="file"
+    id="fileInput"
+    onChange={handleFileChange}
+    accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+    style={{ display: 'none' }}
+  />
+  <label htmlFor="fileInput" className="attach-button">
+    <Attachment />
+  </label>
 
-                  {attachment && (
-                    <div className="file-info">
-                      <div className="preview-container">
-                        <p>Attached file: {attachment.name}</p>
-                        {preview && (
-                          <img
-                            src={preview}
-                            alt="Preview"
-                            className="preview-image"
-                          />
-                        )}
-                      </div>
-                      <button className="send-button" onClick={handleSend}>
-                        Send
-                      </button>
-                    </div>
-                  )}
+  <button 
+    className="send-button"
+    onClick={sendMessage}
+    style={{
+      padding: '8px 16px',
+      backgroundColor: '#007bff',
+      color: 'white',
+      border: 'none',
+      borderRadius: '4px',
+      cursor: 'pointer',
+      marginLeft: '8px'
+    }}
+  >
+    Send
+  </button>
+</div>
+
+{attachment && (
+  <div className="file-preview" style={{ 
+    margin: '10px 0',
+    padding: '10px',
+    backgroundColor: '#f8f9fa',
+    borderRadius: '4px',
+    display: 'flex',
+    alignItems: 'center',
+    gap: '10px'
+  }}>
+    <div style={{ flex: 1 }}>
+      <p style={{ margin: 0 }}>
+        <strong>Attached:</strong> {attachment.name}
+      </p>
+      {preview && (
+        <img 
+          src={preview} 
+          alt="Preview" 
+          style={{
+            maxWidth: '200px',
+            maxHeight: '150px',
+            marginTop: '8px',
+            borderRadius: '4px'
+          }}
+        />
+      )}
+    </div>
+    <button 
+      onClick={() => {
+        setAttachment(null);
+        setPreview(null);
+      }}
+      style={{
+        padding: '4px 8px',
+        backgroundColor: '#dc3545',
+        color: 'white',
+        border: 'none',
+        borderRadius: '4px',
+        cursor: 'pointer'
+      }}
+    >
+      Remove
+    </button>
+    </div>
+)}
                 </div>
               </div>
             </>
