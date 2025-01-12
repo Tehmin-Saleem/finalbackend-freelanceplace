@@ -8,6 +8,7 @@ const Attachment = () => {
   const [description, setDescription] = useState("");
   const [attachment, setAttachment] = useState(null);
   const [preview, setPreview] = useState(null);
+  const [error, setError]= useState(null);
   const steps = [
     { number: "1", label: "Job Title", color: "#4BCBEB" },
     { number: "2", label: "Description", color: "#4BCBEB" },
@@ -34,12 +35,17 @@ const Attachment = () => {
   };
   const handleFileChange = (e) => {
     const file = e.target.files[0];
+    setError(null);
     if (file) {
       if (file.size > 100 * 1024 * 1024) {
         alert("File size exceeds 100MB limit.");
         return;
       }
-      
+         // Validate file type
+    if (!file.type.match('application/pdf|image/png')) {
+      setError("Please upload only PDF or PNG files.");
+      return;
+    }
       setAttachment({ name: file.name });
       
       // Create a preview for images
@@ -55,13 +61,21 @@ const Attachment = () => {
   
       const reader = new FileReader();
       reader.onloadend = () => {
-        const base64String = reader.result;
-        setAttachment({ name: file.name, base64: base64String });
-  
-        localStorage.setItem('jobAttachment', JSON.stringify({
-          description,
-          attachment: { fileName: file.name, base64: base64String }
-        }));
+        try {
+          const base64String = reader.result;
+          setAttachment({ name: file.name, base64: base64String });
+          
+          localStorage.setItem('jobAttachment', JSON.stringify({
+            description,
+            attachment: { fileName: file.name, base64: base64String }
+          }));
+        } catch (error) {
+          if (error.name === 'QuotaExceededError') {
+            setError("Storage quota exceeded. Try reducing file size or clearing browser data.");
+          } else {
+            setError("Error processing file. Please try again.");
+          }
+        }
       };
       reader.readAsDataURL(file);
     }
@@ -97,28 +111,44 @@ const Attachment = () => {
               />
             </div>
             <div className="attach-container">
-              <input
-                type="file"
-                id="fileInput"
-                onChange={handleFileChange}
-                accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
-                style={{ display: 'none' }}
-              />
-              <label htmlFor="fileInput" className="attach-button">
-                <svg width="16" height="16" fill="currentColor" className="bi bi-paperclip" viewBox="0 0 16 16">
-                  <path d="M8.5 0a2.5 2.5 0 0 1 2.5 2.5V5H12a2.5 2.5 0 0 1 0 5h-1.5V12a2.5 2.5 0 0 1-5 0V10H2a2.5 2.5 0 0 1 0-5h1.5V2.5A2.5 2.5 0 0 1 8.5 0zm0 1A1.5 1.5 0 0 0 7 2.5V5H4.5a1.5 1.5 0 0 0 0 3h1.5v2.5a1.5 1.5 0 0 0 3 0V8h2.5a1.5 1.5 0 0 0 0-3H9V2.5A1.5 1.5 0 0 0 8.5 1z"/>
-                </svg>
-                Attach file
-              </label>
-              {attachment && (
-                <div className="file-info">
-                  <p>Attached file: {attachment.name}</p>
-                  {preview && <img src={preview} alt="Preview" style={{ maxWidth: '200px', maxHeight: '200px' }} />}
-                </div>
-              )}
-              <p>Max file size: 100 MB</p>
-              <p>Accepted formats: PDF, DOC, DOCX, JPG, JPEG, PNG</p>
-            </div>
+  <input
+    type="file"
+    id="fileInput"
+    onChange={handleFileChange}
+    accept=".pdf,.png"
+    style={{ display: 'none' }}
+  />
+  <label htmlFor="fileInput" className="attach-button">
+    <svg width="16" height="16" fill="currentColor" className="bi bi-paperclip" viewBox="0 0 16 16">
+      <path d="M8.5 0a2.5 2.5 0 0 1 2.5 2.5V5H12a2.5 2.5 0 0 1 0 5h-1.5V12a2.5 2.5 0 0 1-5 0V10H2a2.5 2.5 0 0 1 0-5h1.5V2.5A2.5 2.5 0 0 1 8.5 0zm0 1A1.5 1.5 0 0 0 7 2.5V5H4.5a1.5 1.5 0 0 0 0 3h1.5v2.5a1.5 1.5 0 0 0 3 0V8h2.5a1.5 1.5 0 0 0 0-3H9V2.5A1.5 1.5 0 0 0 8.5 1z"/>
+    </svg>
+    Attach file
+  </label>
+  {error && (
+    <div className="error-message" style={{ color: 'red', marginTop: '8px' }}>
+      {error}
+    </div>
+  )}
+  {attachment && (
+    <div className="file-info">
+      <p>Attached file: {attachment.name}</p>
+      {preview && (
+        <img 
+          src={preview} 
+          alt="Preview" 
+          style={{ maxWidth: '200px', maxHeight: '200px', objectFit: 'contain' }} 
+        />
+      )}
+      {!preview && attachment.name.endsWith('.pdf') && (
+        <div className="pdf-preview">
+          <span>📄 PDF File</span>
+        </div>
+      )}
+    </div>
+  )}
+  <p>Max file size: 100 MB</p>
+  <p>Accepted formats: PDF, PNG</p>
+</div>
             <button className="review-button" onClick={handleReviewButtonClick}>Review job post</button>
           </div>
         </div>

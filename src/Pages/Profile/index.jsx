@@ -3,29 +3,17 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import "./styles.scss";
 import { jwtDecode } from "jwt-decode";
-import { Cross, IconSearchBar, UploadIcon, PlusIcon ,ImageIcon} from "../../svg/index";
+import { Cross, IconSearchBar, UploadIcon, PlusIcon } from "../../svg/index";
 import { Header, Spinner } from "../../components/index";
+import PortfolioFilePreview from "./PortfolioFilePreview";
 
-import * as pdfjsLib from "pdfjs-dist";
-import pdfjsWorker from "pdfjs-dist/build/pdf.worker.entry";
-
-pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorker;
-
-
-// import { GlobalWorkerOptions } from 'pdfjs-dist';
-// import 'pdfjs-dist/build/pdf.worker.entry';
-
-// GlobalWorkerOptions.workerSrc = pdfWorker;
 const MyProfile = () => {
   const [skillInput, setSkillInput] = useState("");
   const [error, setError] = useState(null);
   const navigate = useNavigate();
-  const [portfolioThumbnails, setPortfolioThumbnails] = useState({});
   const [isLoading, setIsLoading] = useState(true);
-
   const [profile, setProfile] = useState({
     profileId: "",
-
     first_name: "",
     last_name: "",
     email: "",
@@ -57,8 +45,8 @@ const MyProfile = () => {
       }));
     }
   }, [navigate]);
-  const [portfolioModalOpen, setPortfolioModalOpen] = useState(false);
 
+  const [portfolioModalOpen, setPortfolioModalOpen] = useState(false);
   const [currentPortfolio, setCurrentPortfolio] = useState({
     project_title: "",
     category: "",
@@ -69,44 +57,6 @@ const MyProfile = () => {
   });
   const [imageFile, setImageFile] = useState(null);
 
-  // ===========================================
-  // useEffect(() => {
-  //   const token = localStorage.getItem("token");
-  //   const userId = localStorage.getItem("userId");
-
-  //   if (!token) {
-  //     navigate("/signin");
-  //     return;
-  //   }
-
-  //   // Fetch the profile data if it exists
-  //   const fetchProfileData = async () => {
-  //     try {
-  //       const response = await axios.get(
-  //         `http://localhost:5000/api/freelancer/profile/${userId}`,
-  //         {
-  //           headers: { Authorization: `Bearer ${token}` },
-  //         }
-  //       );
-
-  //       if (response.data.data) {
-  //         setProfile((prevProfile) => ({
-  //           ...prevProfile,
-  //           ...response.data.data,
-  //         }));
-  //       }
-  //     } catch (error) {
-  //       console.error("Error fetching profile data:", error);
-  //       setError("Failed to load profile data.");
-  //     } finally {
-  //       setIsLoading(false);
-  //     }
-  //   };
-
-  //   fetchProfileData();
-  // }, [navigate]);
-
-  // Fetch the profile data if it exists
   const fetchProfileDataIfNeeded = async () => {
     try {
       const token = localStorage.getItem("token");
@@ -116,7 +66,6 @@ const MyProfile = () => {
         headers: { Authorization: `Bearer ${token}` },
       };
 
-      // First fetch user data
       const userResponse = await axios.get(
         `http://localhost:5000/api/freelancer/users/${userId}`,
         config
@@ -124,24 +73,18 @@ const MyProfile = () => {
 
       const userData = userResponse.data;
 
-      console.log("userdata", userData);
-
-      // Set initial profile data with user data
       setProfile((prevProfile) => ({
         ...prevProfile,
         first_name: userData.first_name || "",
         last_name: userData.last_name || "",
         email: userData.email || "",
-        // Add any other fields from user data
       }));
 
-      // Then check if profile exists
       const existenceResponse = await axios.get(
         `http://localhost:5000/api/freelancer/freelancer-profile-exists/${userId}`,
         config
       );
 
-      // If profile exists, fetch and merge profile data
       if (existenceResponse.data.exists) {
         const profileResponse = await axios.get(
           `http://localhost:5000/api/freelancer/profile/${userId}`,
@@ -152,7 +95,6 @@ const MyProfile = () => {
           setProfile((prevProfile) => ({
             ...prevProfile,
             ...profileResponse.data.data,
-            // Preserve user data if profile data is missing these fields
             first_name:
               profileResponse.data.data.first_name || prevProfile.first_name,
             last_name:
@@ -169,42 +111,9 @@ const MyProfile = () => {
     }
   };
 
-  //     // Check if the profile exists
-  //     const existenceResponse = await axios.get(
-  //       `http://localhost:5000/api/freelancer/freelancer-profile-exists/${userId}`,
-  //       config
-  //     );
-
-  //     // If profile exists, fetch the data
-  //     if (existenceResponse.data.exists) {
-  //       const response = await axios.get(
-  //         `http://localhost:5000/api/freelancer/profile/${userId}`,
-  //         config
-  //       );
-
-  //       if (response.data.data) {
-  //         setProfile((prevProfile) => ({
-  //           ...prevProfile,
-  //           ...response.data.data,
-  //         }));
-  //       }
-  //     } else {
-  //       navigate("/myProfile"); // Redirect to profile creation page if it doesn't exist
-  //     }
-  //   } catch (error) {
-  //     console.error("Error fetching profile data:", error);
-  //     setError("Failed to load profile data.");
-  //   } finally {
-  //     setIsLoading(false);
-  //   }
-  // };
-
-  // Call the function inside useEffect
   useEffect(() => {
     fetchProfileDataIfNeeded();
   }, [navigate]);
-
-  // =====================
 
   const handleProfileChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -239,7 +148,6 @@ const MyProfile = () => {
       };
     });
   };
-  
 
   const handleLanguageChange = (index, field, value) => {
     const updatedLanguages = [...profile.languages];
@@ -283,46 +191,6 @@ const MyProfile = () => {
     }));
   };
 
-  // Add this new useEffect after your existing useEffects
-  useEffect(() => {
-    const fetchUserData = async () => {
-      try {
-        const token = localStorage.getItem("token");
-        if (!token) {
-          navigate("/signin");
-          return;
-        }
-
-        const decodedToken = jwtDecode(token);
-        const userId = decodedToken.userId;
-
-        // Fetch user data
-        const response = await axios.get(
-          `http://localhost:5000/api/freelancer/users/${userId}`,
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        );
-
-        const userData = response.data;
-
-        // Update profile state with user data
-        setProfile((prevProfile) => ({
-          ...prevProfile,
-          first_name: userData.first_name || "",
-          last_name: userData.last_name || "",
-          email: userData.email || "",
-          // Add any other fields that come from user data
-        }));
-      } catch (error) {
-        console.error("Error fetching user data:", error);
-        setError("Failed to load user data");
-      }
-    };
-
-    fetchUserData();
-  }, [navigate]);
-
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -342,106 +210,43 @@ const MyProfile = () => {
     }
   };
 
-  const generateThumbnail = async (file) => {
-    try {
-      // For images (jpg, jpeg, png, gif)
-      if (file.type.startsWith("image/")) {
-        return new Promise((resolve) => {
-          const reader = new FileReader();
-          reader.onloadend = () => {
-            resolve(reader.result);
-          };
-          reader.readAsDataURL(file);
-        });
-      }
-
-      // For PDFs
-      else if (file.type === "application/pdf") {
-        const fileReader = new FileReader();
-        return new Promise((resolve, reject) => {
-          fileReader.onload = async (event) => {
-            try {
-              const typedArray = new Uint8Array(event.target.result);
-              const pdf = await pdfjsLib.getDocument(typedArray).promise;
-              const page = await pdf.getPage(1);
-              const scale = 1.5;
-              const viewport = page.getViewport({ scale });
-              const canvas = document.createElement("canvas");
-              const context = canvas.getContext("2d");
-              canvas.height = viewport.height;
-              canvas.width = viewport.width;
-              const renderContext = {
-                canvasContext: context,
-                viewport: viewport,
-              };
-              await page.render(renderContext).promise;
-              resolve(canvas.toDataURL());
-            } catch (error) {
-              reject(error);
-            }
-          };
-          fileReader.onerror = reject;
-          fileReader.readAsArrayBuffer(file);
-        });
-      }
-
-      // For other file types
-      else {
-        // Return a default thumbnail or icon based on file type
-        return "/path/to/default/file/icon.png"; // Replace with your default icon path
-      }
-    } catch (error) {
-      console.error("Error generating thumbnail:", error);
-      throw error;
-    }
-  };
-
-  const DefaultThumbnail = ({ fileType }) => {
-    // Return appropriate icon based on file type
-    return (
-      <div className="default-thumbnail">
-        {fileType === "application/pdf" && <ImageIcon />}
-        {fileType.startsWith("image/") && <ImageIcon />}
-        {/* Add more file type icons as needed */}
-      </div>
-    );
-  };
-
   const handlePortfolioChange = async (e) => {
     const { name, value, type } = e.target;
-    if (type === "file") {
-      const file = e.target.files[0];
-      if (file) {
-        if (file.size > 10 * 1024 * 1024) {
-          alert("File size exceeds 10MB limit.");
-          return;
-        }
-        setCurrentPortfolio((prev) => ({
-          ...prev,
-          attachment: file,
-        }));
+    setError(null);
 
-        try {
-          const thumbnail = await generateThumbnail(file);
-          setPortfolioThumbnails((prev) => ({
-            ...prev,
-            [currentPortfolio.project_title]: thumbnail,
-          }));
-        } catch (error) {
-          console.error("Error generating thumbnail:", error);
-          // Set a default thumbnail or handle the error appropriately
-          setPortfolioThumbnails((prev) => ({
-            ...prev,
-            [currentPortfolio.project_title]: "/path/to/default/thumbnail.png", // Replace with your default thumbnail
-          }));
-        }
+    if (type === 'file') {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      // Check file size
+      if (file.size > 10 * 1024 * 1024) {
+        setError('File size exceeds 10MB limit.');
+        return;
       }
-    } else {
-      setCurrentPortfolio((prev) => ({
+
+      // Validate file type
+      if (!file.type.match('application/pdf|image/png|image/jpeg')) {
+        setError('Please upload only PDF, PNG, or JPEG files.');
+        return;
+      }
+
+      setCurrentPortfolio(prev => ({
         ...prev,
-        [name]: value,
+        attachment: file
+      }));
+    } else {
+      setCurrentPortfolio(prev => ({
+        ...prev,
+        [name]: value
       }));
     }
+  };
+
+  const handleDeletePortfolio = (index) => {
+    setProfile(prevProfile => ({
+      ...prevProfile,
+      portfolios: prevProfile.portfolios.filter((_, i) => i !== index)
+    }));
   };
 
   const handleSavePortfolio = () => {
@@ -451,13 +256,14 @@ const MyProfile = () => {
       description: currentPortfolio.description,
       tool_used: currentPortfolio.tool_used,
       url: currentPortfolio.url,
-      attachment: currentPortfolio.attachment, // Keep the file object for later upload
-      // Don't include the attachment here as it needs special handling
+      attachment: currentPortfolio.attachment
     };
-    setProfile((prevProfile) => ({
+
+    setProfile(prevProfile => ({
       ...prevProfile,
-      portfolios: [...prevProfile.portfolios, newPortfolio],
+      portfolios: [...prevProfile.portfolios, newPortfolio]
     }));
+
     setPortfolioModalOpen(false);
     setCurrentPortfolio({
       project_title: "",
@@ -465,7 +271,7 @@ const MyProfile = () => {
       description: "",
       tool_used: "",
       url: "",
-      attachment: null,
+      attachment: null
     });
   };
 
@@ -475,31 +281,20 @@ const MyProfile = () => {
     try {
       const formData = new FormData();
 
-      // Append basic profile data
       formData.append("first_name", profile.first_name);
       formData.append("last_name", profile.last_name);
       formData.append("title", profile.title);
       formData.append("profile_overview", profile.profile_overview);
-
-      // Ensure email is included if required
-      formData.append("email", profile.email); // Include email if required by backend
-
-      // Append nested objects as JSON strings
       formData.append("experience", JSON.stringify(profile.experience));
       formData.append("availability", JSON.stringify(profile.availability));
       formData.append("languages", JSON.stringify(profile.languages));
       formData.append("skills", JSON.stringify(profile.skills));
 
-      // Append profile image if changed
       if (imageFile) {
         formData.append("image", imageFile);
       }
 
-
-
-      // Handle portfolios and their attachments
       const portfoliosForUpload = profile.portfolios.map((portfolio, index) => {
-        // Create a copy without the file object
         const portfolioData = {
           project_title: portfolio.project_title,
           category: portfolio.category,
@@ -508,7 +303,6 @@ const MyProfile = () => {
           url: portfolio.url,
         };
 
-        // If there's an attachment, append it to formData
         if (portfolio.attachment instanceof File) {
           formData.append(
             `portfolio_attachments`,
@@ -520,17 +314,10 @@ const MyProfile = () => {
         return portfolioData;
       });
 
-      // Append the portfolio data without the file objects
       formData.append("portfolios", JSON.stringify(portfoliosForUpload));
-
-
-      console.log("Portfolios being sent:", portfoliosForUpload);
-    for (let pair of formData.entries()) {
-      console.log(pair[0], pair[1]);
-    }
+      formData.append("email", profile.email);
 
       const token = localStorage.getItem("token");
-      console.log("Retrieved token:", token);
       const response = await axios.post(
         "http://localhost:5000/api/freelancer/profile",
         formData,
@@ -541,8 +328,6 @@ const MyProfile = () => {
           },
         }
       );
-
-      console.log("Profile updated successfully:", response.data);
 
       navigate("/FreelanceDashBoard");
     } catch (error) {
@@ -565,6 +350,7 @@ const MyProfile = () => {
     "HTML",
     "Figma",
   ];
+
   const handleKeyDown = (e) => {
     if (e.key === "Enter") {
       e.preventDefault();
@@ -572,6 +358,7 @@ const MyProfile = () => {
       setSkillInput("");
     }
   };
+
   return (
     <div className="my-profile">
       <Header />
@@ -605,11 +392,11 @@ const MyProfile = () => {
           <div className="profile-image-section">
             <p>Upload your profile image</p>
             <div className="img-format">
-              <span>Support Format: PNG, JPEG</span>
+              <span>Support Format: PNG, JPEG, jpg</span>
               <span> Maximum Size: 5MB</span>
             </div>
             <div className="profile-image">
-              <img src={profile.image} />
+              <img src={profile.image} alt="Profile" />
               <label htmlFor="image-upload" className="upload-overlay">
                 <UploadIcon />
                 <span className="re">Upload</span>
@@ -617,7 +404,7 @@ const MyProfile = () => {
               <input
                 id="image-upload"
                 type="file"
-                accept="image/png, image/jpeg"
+                accept="image/png, image/jpeg,image/jpg"
                 onChange={handleImageUpload}
                 style={{ display: "none" }}
               />
@@ -701,31 +488,30 @@ const MyProfile = () => {
           </div>
 
           <div className="form-group availability-group">
-  <label>Availability</label>
-  <div className="checkbox-group">
-    <label>
-      <input
-       type="checkbox"
-        name="availability_type"
-        value="full_time"
-        checked={profile.availability.full_time}
-        onChange={handleAvailabilityChange}
-      />
-      Full Time
-    </label>
-    <label>
-      <input
-       type="checkbox"
-        name="availability_type"
-        value="part_time"
-        checked={profile.availability.part_time}
-        onChange={handleAvailabilityChange}
-      />
-      Part Time
-    </label>
-  </div>
-</div>
-
+            <label>Availability</label>
+            <div className="checkbox-group">
+              <label>
+                <input
+                  type="checkbox"
+                  name="availability_type"
+                  value="full_time"
+                  checked={profile.availability.full_time}
+                  onChange={handleAvailabilityChange}
+                />
+                Full Time
+              </label>
+              <label>
+                <input
+                  type="checkbox"
+                  name="availability_type"
+                  value="part_time"
+                  checked={profile.availability.part_time}
+                  onChange={handleAvailabilityChange}
+                />
+                Part Time
+              </label>
+            </div>
+          </div>
 
           <div className="form-group">
             <label>Profile Overview</label>
@@ -786,36 +572,37 @@ const MyProfile = () => {
           <div className="form-group">
             <label>Add Your Portfolio</label>
             <div className="portfolio">
-              {profile.portfolios.map((portfolio, index) => (
-                <div key={index} className="portfolio-box">
-                  <div className="thumbnail-preview">
-                    {portfolioThumbnails[currentPortfolio.project_title] ? (
-                      <img
-                        src={
-                          portfolioThumbnails[currentPortfolio.project_title]
-                        }
-                        alt="Portfolio Thumbnail"
-                      />
-                    ) : (
-                      <DefaultThumbnail
-                        fileType={portfolio.attachment?.type || "unknown"}
-                      />
-                    )}
-                  </div>
-
-                  <h3>{portfolio.project_title}</h3>
-                  <p>{portfolio.category}</p>
-                </div>
-              ))}
-              <div
-                className="portfolio-box add-box"
-                onClick={() => setPortfolioModalOpen(true)}
-              >
-                <PlusIcon />
-                <p>Add</p>
+            {profile.portfolios.map((portfolio, index) => (
+             <div className="thumbnail-preview">
+            
+            <div key={index} className="portfolio-box">
+            <div
+               className="delete-icon"
+               onClick={() => handleDeletePortfolio(index)}
+               style={{ cursor: 'pointer', position: 'absolute', top: '10px', right: '10px' }}
+             >
+               <Cross alt="Delete" />
+             </div>
+                <PortfolioFilePreview
+                  file={portfolio.attachment instanceof File ? portfolio.attachment : null}
+                  fileUrl={portfolio.attachment && portfolio.attachment instanceof File ? URL.createObjectURL(portfolio.attachment) : null}
+                />
               </div>
+              <h3>{portfolio.project_title}</h3>
+              <p>{portfolio.category}</p>
+              
             </div>
+          ))}
+          <div
+            className="portfolio-box add-box bg-black"
+            onClick={() => setPortfolioModalOpen(true)}
+          >
+            <PlusIcon />
+            <p>Add</p>
           </div>
+        </div>
+      </div>
+
 
           <label>Email:</label>
           <div className="field-group">
@@ -828,7 +615,7 @@ const MyProfile = () => {
               }
               required
               readOnly
-              className="readonly-input" // Optional: for styling
+              className="readonly-input"
             />
           </div>
 
@@ -896,10 +683,29 @@ const MyProfile = () => {
               <input
                 type="file"
                 name="attachment"
-                accept=".pdf,.jpg,.jpeg,.png,.gif"
+                accept=".pdf,.png,.jpg,.jpeg"
                 onChange={handlePortfolioChange}
               />
+              {error && (
+                <div className="error-message" style={{ color: 'red', marginTop: '8px' }}>
+                  {error}
+                </div>
+              )}
+              {currentPortfolio.attachment && (
+                <div className="file-preview">
+                  <PortfolioFilePreview
+                    file={currentPortfolio.attachment}
+                    fileUrl={URL.createObjectURL(currentPortfolio.attachment)}
+                  />
+                </div>
+              )}
             </div>
+
+            <div className="file-requirements" style={{ marginTop: '8px', fontSize: '0.9em' }}>
+              <p>Max file size: 10 MB</p>
+              <p>Accepted formats: PDF, PNG, JPG, JPEG</p>
+            </div>
+
             <div className="portfolio-button-group">
               <button
                 className="portfolio-save-button"
@@ -920,4 +726,5 @@ const MyProfile = () => {
     </div>
   );
 };
+
 export default MyProfile;

@@ -51,7 +51,8 @@ const ManageProjectsByClient = () => {
   const [selectedProject, setSelectedProject] = useState(null);
   // Add a new state for storing freelancer payments if needed
   const [freelancerPayments, setFreelancerPayments] = useState([]);
-
+  const [fileUrl, setFileUrl] = useState(null);
+  const [fileType, setFileType] = useState(null);
   const [paymentStatus, setPaymentStatus] = useState({});
 
   // Add function to update payment status
@@ -384,6 +385,8 @@ const ProjectDetails = ({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [ProjectId, setProjectId] = useState(false);
   // Add these state variables
+  const [fileUrl, setFileUrl] = useState(null);
+  const [fileType, setFileType] = useState(null);
   const [paymentStatus, setPaymentStatus] = useState(null);
   const [paymentDetails, setPaymentDetails] = useState(null);
   const [currentProject, setCurrentProject] = useState(project);
@@ -679,6 +682,68 @@ const ProjectDetails = ({
   //     setIsSubmitting(false);
   //   }
   // };
+
+  const handleViewFile = (fileUrl, fileType) => {
+    setFileUrl(fileUrl);
+    setFileType(fileType);
+
+    if (fileType && fileUrl) {
+      if (fileType.startsWith('image/')) {
+        // For images, check if it's a URL or a Blob and handle accordingly
+        if (fileUrl.startsWith('http')) {
+          // If the fileUrl is a URL (like Cloudinary)
+          window.open(fileUrl, '_blank');
+        } else {
+          // Otherwise, open the Blob URL
+          window.open(fileUrl, '_blank');
+        }
+      } else if (fileType === 'application/pdf') {
+        // For PDF, open in a new tab
+        window.open(fileUrl, '_blank');
+      } else {
+        alert('Unsupported file type.');
+      }
+    } else {
+      alert("No file available to view.");
+    }
+  };
+
+  // File Preview
+  // const renderFilePreview = () => {
+  //   if (fileType && fileUrl) {
+  //     if (fileType.startsWith('image/')) {
+  //       return <img src={fileUrl} alt="Attachment Preview" className="file-preview-image" />;
+  //     } else if (fileType === 'application/pdf') {
+  //       return (
+  //         <embed
+  //           src={fileUrl}
+  //           type="application/pdf"
+  //           width="100%"
+  //           height="500px"
+  //           className="file-preview-pdf"
+  //         />
+  //       );
+  //     }
+  //   }
+  //   return null;
+  // };
+
+  // Helper function to get file type from file extension
+  const getFileTypeFromExtension = (fileName) => {
+    const extension = fileName.split('.').pop().toLowerCase();
+    switch (extension) {
+      case 'jpg':
+      case 'jpeg':
+      case 'png':
+      case 'gif':
+        return `image/${extension}`;
+      case 'pdf':
+        return 'application/pdf';
+      default:
+        return 'application/octet-stream';
+    }
+  };
+
 
   const handleReviewSubmit = async (ProjectId, reviewData) => {
     try {
@@ -1347,12 +1412,9 @@ const ProjectDetails = ({
   };
 
 
-  
 
 
-
-
-  
+ 
 
   const handleMessageClick = () => {
     navigate('/chat');
@@ -1521,42 +1583,50 @@ const ProjectDetails = ({
               </p>
 
               {project.attachment && (
-                <>
-                  <h4 className="section-title">Attachment:</h4>
-                  <div className="attachments">
-                    <div className="attachment-item">
-                      <div className="attachment-file">
-                        <span className="file-icon">📄</span>
-                        <span className="file-name">
-                          {project.attachment.fileName}
-                        </span>
-                      </div>
-                      <button
-                        className="view-btn"
-                        onClick={() => handleViewFile(project.attachment)}
-                      >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                          className="eye-icon"
-                          width="20"
-                          height="20"
+                  <>
+                    <h4 className="section-title">Attachment:</h4>
+                    <div className="attachments">
+                      <div className="attachment-item">
+                        <div className="attachment-file">
+                          <span className="file-icon">📄</span>
+                          <span className="file-name">
+                            {project.attachment.fileName}
+                          </span>
+                        </div>
+                        <button
+                          className="view-btn"
+                          onClick={() =>
+                            handleViewFile(
+                              project.attachment.path,
+                              project.attachment.fileType || getFileTypeFromExtension(project.attachment.fileName)
+                            )
+                          }
                         >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0zm-3 9c7 0 10-9 10-9s-3-9-10-9-10 9-10 9 3 9 10 9z"
-                          />
-                        </svg>
-                        View
-                      </button>
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                            className="eye-icon"
+                            width="20"
+                            height="20"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M15 12a3 3 0 11-6 0 3 3 0 016 0zm-3 9c7 0 10-9 10-9s-3-9-10-9-10 9-10 9 3 9 10 9z"
+                            />
+                          </svg>
+                          View
+                        </button>
+                      </div>
                     </div>
-                  </div>
-                </>
-              )}
+                    {/* <div className="file-preview">
+                      {renderFilePreview()}
+                    </div> */}
+                  </>
+                )}
 
               <h4 className="section-title">Skills and Expertise:</h4>
               <div className="skills">
@@ -1694,7 +1764,7 @@ const ProjectDetails = ({
                   </button>
                 </div>
 
-                  
+                 
                 </Card>
               </div>
             ) : (

@@ -5,14 +5,13 @@ import { Header } from "../../components";
 import { Spinner } from "../../components/index";
 import { MapPin, Briefcase, Clock, DollarSign, Paperclip, InboxIcon } from "lucide-react";
 
-
-
-
 const OfferCards = () => {
   const [offers, setOffers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [submitLoading, setSubmitLoading] = useState(false);
+  const [fileUrl, setFileUrl] = useState(null);
+  const [fileType, setFileType] = useState(null);
 
   // Function to get freelancer ID from the JWT token stored in localStorage
   const getFreelancerIdFromToken = () => {
@@ -58,7 +57,7 @@ const OfferCards = () => {
             date: o.createdAt,
           }))
         );
-
+        console.log('offers', sortedOffers)
         setOffers(sortedOffers);
       } catch (err) {
         setOffers([]);
@@ -69,6 +68,7 @@ const OfferCards = () => {
 
     fetchOffers();
   }, []); // Empty dependency array to run only once when the component mounts
+
   const handleAcceptOffer = async (offerId) => {
     try {
       const token = localStorage.getItem("token");
@@ -128,16 +128,50 @@ const OfferCards = () => {
   };
 
   const handleViewFile = (fileUrl, fileType) => {
+    setFileUrl(fileUrl);
+    setFileType(fileType);
+
     if (fileType && fileUrl) {
-      if (fileType.startsWith("image/") || fileType === "application/pdf") {
-        window.open(fileUrl, "_blank");
+      if (fileType.startsWith('image/')) {
+        // For images, check if it's a URL or a Blob and handle accordingly
+        if (fileUrl.startsWith('http')) {
+          // If the fileUrl is a URL (like Cloudinary)
+          window.open(fileUrl, '_blank');
+        } else {
+          // Otherwise, open the Blob URL
+          window.open(fileUrl, '_blank');
+        }
+      } else if (fileType === 'application/pdf') {
+        // For PDF, open in a new tab
+        window.open(fileUrl, '_blank');
       } else {
-        alert("Unsupported file type.");
+        alert('Unsupported file type.');
       }
     } else {
       alert("No file available to view.");
     }
   };
+
+  // File Preview
+  const renderFilePreview = () => {
+    if (fileType && fileUrl) {
+      if (fileType.startsWith('image/')) {
+        return <img src={fileUrl} alt="Attachment Preview" className="file-preview-image" />;
+      } else if (fileType === 'application/pdf') {
+        return (
+          <embed
+            src={fileUrl}
+            type="application/pdf"
+            width="100%"
+            height="500px"
+            className="file-preview-pdf"
+          />
+        );
+      }
+    }
+    return null;
+  };
+
   if (loading) return <Spinner size={100} alignCenter />;
   if (error) {
     return (
@@ -167,8 +201,8 @@ const OfferCards = () => {
               You haven't received any offers from clients yet. When clients send you offers, they will appear here.
             </p>
             <div className="mt-6">
-              <button 
-                onClick={() => window.location.reload()} 
+              <button
+                onClick={() => window.location.reload()}
                 className="px-6 py-2 text-sm font-medium text-white bg-sky-500 rounded-md hover:bg-sky-600 transition-colors duration-200"
               >
                 Refresh Page
@@ -176,11 +210,11 @@ const OfferCards = () => {
             </div>
           </div>
         ) : (
-          
+
           offers.map((offer) => (
-            
+
             <div key={offer._id} className="mt-8 bg-white shadow-lg rounded-lg">
-             
+
               {/* Rest of your existing offer card JSX remains the same */}
               <div className="space-y-4 p-6">
                 <div className="text-sm text-gray-500 mb-4">
@@ -295,8 +329,8 @@ const OfferCards = () => {
                     <button
                       onClick={() =>
                         handleViewFile(
-                          offer.attachment.fileUrl,
-                          offer.attachment.fileType
+                          offer.attachment.path,
+                          offer.attachment.fileType || getFileTypeFromExtension(offer.attachment.fileName)
                         )
                       }
                       className="flex items-center gap-2 text-sky-600 hover:text-sky-700"
@@ -304,6 +338,9 @@ const OfferCards = () => {
                       <span className="w-4 h-4">&#x1F441;</span>
                       View Attachment
                     </button>
+                    {/* <div className="file-preview">
+                  {renderFilePreview()}
+                </div> */}
                   </div>
                 )}
 
@@ -348,6 +385,22 @@ const OfferCards = () => {
       </main>
     </div>
   );
+};
+
+// Helper function to get file type from file extension
+const getFileTypeFromExtension = (fileName) => {
+  const extension = fileName.split('.').pop().toLowerCase();
+  switch (extension) {
+    case 'jpg':
+    case 'jpeg':
+    case 'png':
+    case 'gif':
+      return `image/${extension}`;
+    case 'pdf':
+      return 'application/pdf';
+    default:
+      return 'application/octet-stream';
+  }
 };
 
 export default OfferCards;

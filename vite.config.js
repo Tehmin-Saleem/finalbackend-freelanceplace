@@ -3,9 +3,10 @@ import react from '@vitejs/plugin-react';
 
 export default defineConfig({
   optimizeDeps: {
-    include: ['@stripe/react-stripe-js'],
+    include: ['@stripe/react-stripe-js', 'pdf-lib']
   },
   plugins: [react()],
+ 
   build: {
     rollupOptions: {
       external: ['pdfjs-dist/build/pdf.worker.entry']

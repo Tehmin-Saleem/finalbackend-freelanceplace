@@ -325,6 +325,7 @@ function ProfileView() {
                 </div>
               </div>
 
+              
               <div className="PortfolioSection">
                 <h2 className="Portfoliotitle">Portfolio</h2>
                 {profileData.portfolios && profileData.portfolios.length > 0 ? (
