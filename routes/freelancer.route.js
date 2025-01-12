@@ -109,7 +109,7 @@ router.delete('/proposals/:proposalId', proposalController.deleteProposal);
 router.post('/profile', 
   upload.fields([
     { name: 'image', maxCount: 1 },
-    { name: 'portfolios', maxCount: 5 }
+    { name: 'portfolio_attachments' }
   ]), 
   freelancerProfileController.createOrUpdateProfile
 );
