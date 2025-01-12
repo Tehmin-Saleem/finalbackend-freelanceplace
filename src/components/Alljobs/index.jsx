@@ -76,7 +76,7 @@
 
 import React from "react";
 import "./styles.scss";
-import { format } from 'date-fns'; // Import for date formatting
+import { format,isValid } from 'date-fns'; // Import for date formatting
 
 const Alljobs = ({
   jobId,
@@ -109,9 +109,15 @@ const getButtonText = () => {
       : "View Proposals";
 };
 
-const formatDate = (dateString) => {
-  return format(new Date(dateString), 'MMM dd, yyyy');
-};
+ const formatDate = (date) => {
+    if (!date || !isValid(new Date(date))) {
+      if (process.env.NODE_ENV === "development") {
+        console.warn("Invalid date encountered:", date); // Log only in development mode
+      }
+      return "N/A"; // Fallback for invalid or missing dates
+    }
+    return format(new Date(date), "yyyy-MM-dd"); // Format the valid date
+  };
 
 const getStatusClass = () => {
   switch (status) {

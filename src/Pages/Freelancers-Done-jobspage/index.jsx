@@ -10,6 +10,9 @@ import "./styles.scss";
 import { Filter, IconSearchBar } from "../../svg";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
+
+
+import { useJobContext } from "../../context/JoBContext";
 const FreelancersJobsPage = () => {
   const [jobs, setJobs] = useState([]);
   const [specificjobs, setSpecificJobs] = useState([]);
@@ -18,7 +21,11 @@ const FreelancersJobsPage = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [pageSize, setPageSize] = useState(5);
   const [currentPage, setCurrentPage] = useState(1);
-  const [statusFilter, setStatusFilter] = useState("all"); // all, ongoing, pending, completed
+  const [statusFilter, setStatusFilter] = useState("all"); 
+  const [completedJobCount, setCompletedJobCount] = useState(0);
+const [ongoingJobCount, setOngoingJobCount] = useState(0);// all, ongoing, pending, completed
+
+const { setJobCounts } = useJobContext();
 
   const fetchOffersAndJobs = async () => {
     try {
@@ -281,6 +288,37 @@ const FreelancersJobsPage = () => {
       }
     }
   };
+  
+
+  useEffect(() => {
+    const calculateJobCounts = () => {
+      const completedJobs = jobs.filter(
+        (job) =>
+          job.status === "completed" ||
+          job.jobStatus === "completed" ||
+          (job.source === "offer" && job.status === "completed")
+      );
+  
+      const ongoingJobs = jobs.filter(
+        (job) =>
+          (job.status === "hired" && job.jobStatus === "pending") ||
+          job.jobStatus === "ongoing" ||
+          (job.source === "offer" && job.status === "accepted")
+      );
+      console.log("Completed Jobs Count:", completedJobs.length);
+      console.log("Ongoing Jobs Count:", ongoingJobs.length);
+      
+      // Update context instead of local state
+      setJobCounts({
+        completedJobCount: completedJobs.length,
+        ongoingJobCount: ongoingJobs.length
+      });
+    };
+  
+    calculateJobCounts();
+  }, [jobs, setJobCounts]);
+
+  
 
   return (
     <div className="jobs-page">

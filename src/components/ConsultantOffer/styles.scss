@@ -3,8 +3,8 @@ $gray-color: #f7fafc;
 $text-color: #4a5568;
 $border-color: #e2e8f0;
 $hover-darken: 10%;
-$font-kodchasan: 'Kodchasan', sans-serif;
-$font-poppins: 'Poppins', sans-serif;
+$font-kodchasan: "Kodchasan", sans-serif;
+$font-poppins: "Poppins", sans-serif;
 $color-gray: #64748b;
 $color-dark: #2c3e50;
 $color-white: #ffffff;
@@ -12,169 +12,174 @@ $color-accent: #4bcdeb;
 $bg-color: #f7f8fa;
 
 .client-offers-page {
-    padding: 20px;
-    background-color: $bg-color;
-    font-family: $font-poppins;
-  margin-top: 5rem;
+  padding: 20px;
+  background-color: $bg-color;
+  font-family: $font-poppins;
+
+  margin-top: 7rem;
   h1 {
     font-size: 20px;
     font-weight: 600;
     color: $color-accent;
     margin-bottom: 2rem;
   }
-    .offers-container {
-      display: grid;
-      grid-template-rows: repeat(auto-fit, minmax(350px, 1fr));
-      gap: 20px;
-      max-width: 1200px;
+  .offers-container {
+    display: grid;
+    grid-template-rows: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 20px;
+    max-width: 1200px;
     //   margin: 0 auto;
     margin-left: 10rem;
+  }
+
+  .offer-card {
+    background: $color-white;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    padding: 20px;
+    transition:
+      transform 0.2s,
+      box-shadow 0.3s ease;
+
+    &:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
     }
-  
-    .offer-card {
-      background: $color-white;
-      border-radius: 10px;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-      padding: 20px;
-      transition: transform 0.2s, box-shadow 0.3s ease;
-  
-      &:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 2px solid $border-color;
+      padding-bottom: 10px;
+
+      h3 {
+        font-size: 20px;
+        font-weight: 600;
+        color: $color-accent;
       }
-  
-      .card-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        border-bottom: 2px solid $border-color;
-        padding-bottom: 10px;
-  
-        h3 {
-          font-size: 20px;
-          font-weight: 600;
-          color: $color-accent;
+
+      .status {
+        font-size: 14px;
+        font-weight: 500;
+        padding: 5px 10px;
+        border-radius: 4px;
+        text-transform: capitalize;
+
+        &.pending {
+          background-color: lighten($secondary-color, 30%);
+          color: $text-color;
         }
-  
-        .status {
-          font-size: 14px;
-          font-weight: 500;
-          padding: 5px 10px;
-          border-radius: 4px;
-          text-transform: capitalize;
-  
-          &.pending {
-            background-color: lighten($secondary-color, 30%);
-            color: $text-color;
-          }
-  
-          &.accepted {
-            background-color: lighten($color-accent, 40%);
-            color: $color-dark;
-          }
+
+        &.accepted {
+          background-color: lighten($color-accent, 40%);
+          color: $color-dark;
         }
       }
-  
-      .card-content {
-        margin-top: 15px;
-  
-        .consultant-info {
-          margin-bottom: 15px;
-  
-          h4 {
-            font-size: 16px;
-            font-weight: 600;
-            margin-bottom: 8px;
-          }
-  
-          p {
-            font-size: 14px;
-            margin: 4px 0;
-            strong {
-              font-weight: 600;
-            }
-          }
-        }
-  
-        .experience-education {
-          display: flex;
-          gap: 20px;
-  
-          div {
-            flex: 1;
-  
-            h4 {
-              font-size: 16px;
-              font-weight: 600;
-              margin-bottom: 8px;
-            }
-  
-            ul {
-              list-style: disc;
-              margin-left: 20px;
-              font-size: 14px;
-  
-              li {
-                margin: 4px 0;
-              }
-            }
-  
-            p {
-              font-size: 14px;
-              color: $secondary-color;
-            }
-          }
-        }
-      }
-  
-      .project-description {
-        margin-top: 15px;
-  
+    }
+
+    .card-content {
+      margin-top: 15px;
+
+      .consultant-info {
+        margin-bottom: 15px;
+
         h4 {
           font-size: 16px;
           font-weight: 600;
+          margin-bottom: 8px;
         }
-  
+
         p {
-          margin: 4px 0;
           font-size: 14px;
+          margin: 4px 0;
           strong {
             font-weight: 600;
           }
         }
       }
+
+      .experience-education {
+        display: flex;
+        gap: 20px;
+
+        div {
+          flex: 1;
+
+          h4 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 8px;
+          }
+
+          ul {
+            list-style: disc;
+            margin-left: 20px;
+            font-size: 14px;
+
+            li {
+              margin: 4px 0;
+            }
+          }
+
+          p {
+            font-size: 14px;
+            color: $secondary-color;
+          }
+        }
+      }
+    }
+
+    .project-description {
+      margin-top: 15px;
+
+      h4 {
+        font-size: 16px;
+        font-weight: 600;
+      }
+
+      p {
+        margin: 4px 0;
+        font-size: 14px;
+        strong {
+          font-weight: 600;
+        }
+      }
     }
   }
+}
 
-  .add-project-button {
-    position: absolute;
-    top: 10px;
-    right: 120px;
-    
-    .btn-primary {
-      background-color: #00b8d4; /* Accent color */
-      color: #fff;
-      border: none;
-      padding: 10px 20px;
-      border-radius: 5px;
-      cursor: pointer;
-      font-size: 14px;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-      transition: background-color 0.3s ease, transform 0.2s ease;
-  
-      &:hover {
-        background-color: #008ba3; /* Darker shade of accent */
-        transform: translateY(-2px);
-      }
-  
-      &:active {
-        background-color: #006c81; /* Even darker shade */
-        transform: translateY(0);
-      }
+.add-project-button {
+  position: absolute;
+  top: 10px;
+  right: 120px;
+
+  .btn-primary {
+    background-color: #00b8d4; /* Accent color */
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition:
+      background-color 0.3s ease,
+      transform 0.2s ease;
+
+    &:hover {
+      background-color: #008ba3; /* Darker shade of accent */
+      transform: translateY(-2px);
+    }
+
+    &:active {
+      background-color: #006c81; /* Even darker shade */
+      transform: translateY(0);
     }
   }
+}
 
-  /* styles.scss (for both components) */
+/* styles.scss (for both components) */
 
 /* Backdrop styling */
 //  .backdrop {
@@ -190,7 +195,6 @@ $bg-color: #f7f8fa;
 //    align-items: center;
 //  }
 
-
 .success-message {
   background-color: #4caf50;
   color: white;
@@ -199,5 +203,3 @@ $bg-color: #f7f8fa;
   margin: 10px 0;
   border-radius: 5px;
 }
-
-  

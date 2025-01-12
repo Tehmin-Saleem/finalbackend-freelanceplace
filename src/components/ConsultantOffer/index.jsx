@@ -3,6 +3,7 @@ import axios from "axios";
 import "./styles.scss";
 import { Header, Spinner } from "../../components/index"; // Assuming these are already created.
 import SendProjectDetails from "../ProjectDetailsForm";
+import { InboxIcon } from '@heroicons/react/outline'; // Make sure to install @heroicons/react if not already installed
 
 const ClientOffersPage = () => {
   const [offers, setOffers] = useState([]);
@@ -16,6 +17,34 @@ const ClientOffersPage = () => {
 
 
   const [projectSent, setProjectSent] = useState({});
+
+  const EmptyStateMessage = () => (
+    <div className="mt-8 flex flex-col items-center justify-center p-12 bg-white rounded-lg shadow-lg">
+      <div className="w-16 h-16 bg-sky-100 rounded-full flex items-center justify-center mb-4">
+        <InboxIcon className="w-8 h-8 text-sky-500" />
+      </div>
+      <h3 className="text-xl font-medium text-gray-900 mb-2">
+        No Offers Available
+      </h3>
+      <p className="text-gray-500 text-center max-w-md">
+        {statusFilter === "all" 
+          ? "You haven't sent any offers to consultants yet. When you send offers, they will appear here."
+          : `No ${statusFilter} offers found. When consultants ${
+              statusFilter === "pending" ? "respond to" : 
+              statusFilter === "Accepted" ? "accept" : "decline"
+            } your offers, they will appear here.`
+        }
+      </p>
+      <div className="mt-6">
+        <button 
+          onClick={() => window.location.reload()} 
+          className="px-6 py-2 text-sm font-medium text-white bg-sky-500 rounded-md hover:bg-sky-600 transition-colors duration-200"
+        >
+          Refresh Page
+        </button>
+      </div>
+    </div>
+  );
 
   useEffect(() => {
     const storedData = JSON.parse(localStorage.getItem("projectSent"));
@@ -94,8 +123,8 @@ const ClientOffersPage = () => {
         setOffers(sortedOffers);
         setFilteredOffers(sortedOffers);
       } catch (err) {
-        console.error("Error fetching offers:", err);
-        setError("Offers are not found for this offer status.");
+        setOffers([]); // Set empty array instead of error
+        setFilteredOffers([]); // Set empty array instead of error
       } finally {
         setLoading(false);
       }
@@ -171,6 +200,9 @@ const ClientOffersPage = () => {
     );
   }
 
+
+  
+  
   return (
     <>
       <Header />
@@ -205,7 +237,9 @@ const ClientOffersPage = () => {
           </button>
         </div>
 
-        {noOffersMessage}
+        {filteredOffers.length === 0 ? (
+          <EmptyStateMessage />
+        ) : (
 
         <div className="offers-container">
           {filteredOffers.map((offer, index) => (
@@ -367,9 +401,12 @@ const ClientOffersPage = () => {
             </div>
           ))}
         </div>
+      )}
       </div>
     </>
+   
   );
+
 };
 
 export default ClientOffersPage;

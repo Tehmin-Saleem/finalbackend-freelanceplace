@@ -77,10 +77,13 @@ function ConsultantProfileForm() {
     };
     const handleKeyDown = (e) => {
         if (e.key === "Enter" && searchTerm.trim()) {
-          handleAddSkill(searchTerm.trim());
-          setSearchTerm(""); // Clear the search input
+            const skill = searchTerm.trim();
+    
+            // Add the skill via the refactored `handleAddSkill` function
+            handleAddSkill(skill);
         }
-      };
+    };
+    
     const handleSubmit = async (e) => {
         e.preventDefault();
         console.log('Form submission started');
@@ -207,20 +210,37 @@ function ConsultantProfileForm() {
         newEducation[index][field] = value;
         setProfile((prevProfile) => ({ ...prevProfile, education: newEducation }));
     };
+
     const handleAddSkill = (skill) => {
+        // Prevent adding duplicate skills to `skills`
         if (!skills.includes(skill)) {
-          setSkills([...skills, skill]);
-          // Remove the added skill from available skills and filtered skills
-          setAvailableSkills(availableSkills.filter((s) => s !== skill));
-          setFilteredSkills(filteredSkills.filter((s) => s !== skill));
+            setSkills((prevSkills) => [...prevSkills, skill]);
         }
-      };
     
-      const handleRemoveSkill = (skill) => {
-        setSkills(skills.filter((s) => s !== skill));
-        setAvailableSkills([...availableSkills, skill]);
-        setFilteredSkills([...filteredSkills, skill]);
-      };
+        // Remove the skill from `availableSkills` if it exists there
+        if (availableSkills.includes(skill)) {
+            setAvailableSkills((prevAvailableSkills) =>
+                prevAvailableSkills.filter((s) => s !== skill)
+            );
+        }
+    
+        // Clear the search term
+        setSearchTerm("");
+    };
+    
+
+
+    const handleRemoveSkill = (skill) => {
+        // Remove the skill from selected skills
+        setSkills((prevSkills) => prevSkills.filter((s) => s !== skill));
+    
+        // Add the removed skill back to availableSkills if not already present
+        if (!availableSkills.includes(skill)) {
+            setAvailableSkills((prevAvailableSkills) => [...prevAvailableSkills, skill]);
+        }
+    };
+    
+
     // Add new education entry
     const handleAddEducation = () => {
         setProfile((prevProfile) => ({
@@ -232,98 +252,34 @@ function ConsultantProfileForm() {
         const value = e.target.value.toLowerCase();
         setSearchTerm(value);
     
-        // Filter available skills based on search input
-        const filtered = availableSkills.filter((skill) =>
-          skill.toLowerCase().includes(value)
+        // Filter only from available skills, not already added ones
+        setFilteredSkills(
+            availableSkills.filter((skill) =>
+                skill.toLowerCase().includes(value)
+            )
         );
+    };
     
-        // If the input is not empty, include previously selected skills
-        if (value) {
-          setFilteredSkills([...filtered, ...skills]);
-        } else {
-          setFilteredSkills(availableSkills);
-        }
-      };
+
+    useEffect(() => {
+    setFilteredSkills(
+        availableSkills.filter((skill) =>
+            skill.toLowerCase().includes(searchTerm.toLowerCase())
+        )
+    );
+}, [availableSkills, searchTerm]);
+
+
     // Remove education entry
     const handleRemoveEducation = (index) => {
         const newEducation = profile.education.filter((_, i) => i !== index);
         setProfile((prevProfile) => ({ ...prevProfile, education: newEducation }));
     };
 
-    // Add new skill
-    // const handleAddSkill = (skill) => {
-    //     if (skill && !profile.skills.includes(skill)) {
-    //         setProfile((prevProfile) => ({
-    //             ...prevProfile,
-    //             skills: [...prevProfile.skills, skill],
-    //         }));
-    //     }
-    // };
-
-    // Remove skill
-    // const handleRemoveSkill = (index) => {
-    //     const newSkills = profile.skills.filter((_, i) => i !== index);
-    //     setProfile((prevProfile) => ({ ...prevProfile, skills: newSkills }));
-    // };
     
-        const [skills, setSkills] = useState([]);
+     const [skills, setSkills] = useState([]);
       
-        // const handleAddSkill = (skillInput) => {
-        //     // Split the input by comma and trim each skill
-        //     const newSkills = skillInput.split(',').map(skill => skill.trim()).filter(skill => skill !== '');
-            
-        //     // Add new skills that don't already exist
-        //     const updatedSkills = [
-        //       ...skills,
-        //       ...newSkills.filter(skill => !skills.includes(skill))
-        //     ];
-          
-        //     setSkills(updatedSkills);
-        //   };
-      
-        // const handleRemoveSkill = (index) => {
-        //   setSkills(skills.filter((_, i) => i !== index)); // Remove skill by index
-        // };
-      
-    // Handle form submission
-    // const handleSubmit = async (e) => {
-    //     e.preventDefault();
-
-    //     const formData = new FormData();
-    //     for (const key in profile) {
-    //         if (key === 'experience' || key === 'education') {
-    //             profile[key].forEach((item, index) => {
-    //                 for (const subKey in item) {
-    //                     formData.append(`${key}[${index}][${subKey}]`, item[subKey]);
-    //                 }
-    //             });
-    //         } else {
-    //             formData.append(key, profile[key]);
-    //         }
-    //     }
-
-    //     const token = localStorage.getItem('token');
-    //     try {
-    //         const response = await fetch('http://localhost:5000/api/client/profile', {
-    //             method: 'POST',
-    //             headers: {
-    //                 'Authorization': `Bearer ${token}`,
-    //             },
-    //             body: formData,
-    //         });
-    
-    //         if (response.ok) {
-    //             const savedProfile = await response.json();
-    //             console.log('Profile saved:', savedProfile);
-    //             navigate('/ConsultantDash', { replace: true }); // Use navigate instead of window.location.href
-    //         } else {
-    //             const errorText = await response.text();
-    //             console.log('Error saving profile:', errorText);
-    //         }
-    //     } catch (error) {
-    //         console.log('Network or server error:', error);
-    //     }
-    // };
+     
 
     return (
         <>
@@ -471,76 +427,53 @@ function ConsultantProfileForm() {
                 </button>
             </div>
 
-            {/* <div className="form-group">
-  <label>Skills</label>
-  <div className="skills-input">
+
+            
+            <label htmlFor="search">Search skills or add your own</label>
+  <div className="search-bar">
     <input
+      id="search"
       type="text"
-      placeholder="Add skills (comma-separated)"
-      onKeyDown={(e) => {
-        if (e.key === 'Enter') {
-          e.preventDefault();
-          handleAddSkill(e.target.value);
-          e.target.value = ''; // Clear the input field
-        }
-      }}
+      placeholder="Search skills or add your own"
+      value={searchTerm}
+      onChange={handleSearchChange}
+      onKeyDown={handleKeyDown}
     />
-    {skills.map((skill, index) => (
-      <span key={index} className="skill-tag">
-        {skill}
-        <button type="button" onClick={() => handleRemoveSkill(index)}>
-          &times;
-        </button>
-      </span>
-    ))}
+    <SearchIcon />
   </div>
-</div> */}
 
-          <label htmlFor="search">Search skills or add your own</label>
-          <div className="search-bar">
-            <input
-              id="search"
-              type="text"
-              placeholder="Search skills or add your own"
-              value={searchTerm}
-              onChange={handleSearchChange} // Search handler
-              onKeyDown={handleKeyDown} // Handle Enter key
-            />
-            <SearchIcon />
-          </div>
+  <div className="skills-section">
+    <h3>Selected Skills</h3>
+    <div className="skills-list">
+      {skills.map((skill, index) => (
+        <button
+          key={index}
+          onClick={() => handleRemoveSkill(skill)}
+          className="skill-button"
+        >
+          {skill}
+          <CrossIcon />
+        </button>
+      ))}
+    </div>
+  </div>
 
-          <div className="skills-section">
-            <h3>Selected Skills</h3>
-            <div className="skills-list">
-              {skills.map((skill) => (
-                <button
-                  key={skill}
-                  onClick={() => handleRemoveSkill(skill)}
-                  className="skill-button"
-                >
-                  {skill}
-                  <CrossIcon />
-                </button>
-              ))}
-            </div>
-          </div>
+  <div className="skills-section">
+    <h3>Available Skills</h3>
+    <div className="skills-list">
+      {filteredSkills.map((skill, index) => (
+        <button
+          key={index}
+          onClick={() => handleAddSkill(skill)}
+          className="skill-button"
+        >
+          {skill}
+          <PlusIcon />
+        </button>
+      ))}
+    </div>
+  </div>
 
-          <div className="skills-section">
-            <h3>Skills </h3>
-            <div className="skills-list">
-              {filteredSkills.map((skill) => (
-                <button
-                  key={skill}
-                  onClick={() => handleAddSkill(skill)}
-                  className="skill-button"
-                  placeholder="Add skills and press enter"
-                >
-                  {skill}
-                  <PlusIcon />
-                </button>
-              ))}
-            </div>
-          </div>
 
             <div className="form-group">
                 <label>Certifications</label>

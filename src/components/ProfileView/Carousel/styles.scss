@@ -78,6 +78,15 @@
   transition: all 0.2s;
   z-index: 1;
 
+  &.left{
+    width: 25%;
+  }
+
+
+  &.right{
+    width: 25%;
+  }
+
   &:hover {
     background: #f7fafc;
   }

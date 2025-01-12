@@ -18,6 +18,7 @@ const OfferForm = () => {
   const [dueDate, setDueDate] = useState("");
   const [timelineDuration, setTimelineDuration] = useState("");
   const [timelineUnit, setTimelineUnit] = useState("days"); // default to days
+  const [fileError, setFileError] = useState(""); // New state for file error
 
   const [popularSkills, setPopularSkills] = useState([
     "HTML",
@@ -81,8 +82,19 @@ const OfferForm = () => {
   const [error, setError] = useState("");
 
   const handleFileAttach = (event) => {
-    setAttachedFile(event.target.files[0]);
+    const file = event.target.files[0];
+    if (file) {
+      const allowedTypes = ["application/pdf", "image/jpeg", "image/jpg"];
+      if (!allowedTypes.includes(file.type)) {
+        setFileError("Only PDF, JPG, and JPEG files are allowed. Please upload a valid file.");
+        setAttachedFile(null);
+      } else {
+        setFileError(""); // Clear error if the file is valid
+        setAttachedFile(file);
+      }
+    }
   };
+  
 
   const handleFileRemove = () => {
     setAttachedFile(null);
@@ -434,24 +446,25 @@ const OfferForm = () => {
                 </div>
 
                 <div className="field">
-                  <label className="attachButton">
-                    <span className="icon">📎</span>
-                    ATTACH
-                    <input
-                      type="file"
-                      style={{ display: 'none' }}
-                      onChange={handleFileAttach}
-                    />
-                  </label>
-                  {attachedFile && (
-                    <div className="attachedFile">
-                      <span>{attachedFile.name}</span>
-                      <button type="button" onClick={handleFileRemove}>
-                        <span className="icon">✖</span>
-                      </button>
-                    </div>
-                  )}
-                </div>
+                <label className="attachButton">
+    <span className="icon">📎</span>
+    ATTACH (Allowed formats: PDF, JPG, JPEG)
+    <input
+      type="file"
+      style={{ display: 'none' }}
+      onChange={handleFileAttach}
+    />
+  </label>
+  {fileError && <div className="error-message">{fileError}</div>} {/* Display error */}
+  {attachedFile && (
+    <div className="attachedFile">
+      <span>{attachedFile.name}</span>
+      <button type="button" onClick={handleFileRemove}>
+        <span className="icon">✖</span>
+      </button>
+    </div>
+  )}
+  </div>
 
                 <div className="field">
                   {error && <div className="error-message">{error}</div>}

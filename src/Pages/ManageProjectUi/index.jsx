@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from "react";
 import "./styles.scss";
-import { jwtDecode } from "jwt-decode";
+// import { jwtDecode } from "jwt-decode";
 import Header from "../../components/Commoncomponents/Header";
 import { Chat } from "../../svg/index";
 import axios from "axios";
 import { useParams } from "react-router-dom";
 import ReviewModal from "../../components/ReviewsModal";
 import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js";
-
+import { jwtDecode } from "jwt-decode";
 import {
   ReloadOutlined,
   CheckCircleOutlined,
@@ -350,7 +350,7 @@ const ProjectCard = ({ project, onClick, isSelected }) => {
 
       <div className="project-footer">
         <div className="deadline">
-        <ClockCircleOutlined />
+          <ClockCircleOutlined />
           <span>
             Due:{" "}
             {project.deadline
@@ -532,6 +532,8 @@ const ProjectDetails = ({
   // };
 
   const fetchProgress = async () => {
+    const token = localStorage.getItem("token");
+    const decodedToken = jwtDecode(token);
     setLoading(true);
     try {
       const token = localStorage.getItem("token");
@@ -631,7 +633,7 @@ const ProjectDetails = ({
     } finally {
       setLoading(false);
     }
-    return <div>{decodedToken?.clientId}</div>;
+   
   };
 
   useEffect(() => {
@@ -860,6 +862,7 @@ const ProjectDetails = ({
 
   const renderMilestonesContent = () => {
     if (loading) return <Spinner />;
+
     if (error)
       return (
         <Alert message="Error" description={error} type="error" showIcon />
@@ -1116,23 +1119,32 @@ const ProjectDetails = ({
 
           {/* Mark as Complete Button - Show only when progress is 100% */}
           {progressData.progressData.overallProgress === 100 && (
-            <Button
-              type="primary"
-              className="mark-complete-btn"
-              onClick={handleMarkAsComplete}
-              style={{ marginTop: 16 }}
-            >
-              Mark as Completed
-            </Button>
-          )}
-          <Button
+  <div style={{ marginTop: 16 }}>
+    <Button
+      type="primary"
+      className="mark-complete-btn"
+      onClick={handleMarkAsComplete}
+      style={{ marginRight: 8 }} // Add spacing between buttons
+    >
+      Mark as Completed
+    </Button>
+    <Button
+      type="primary"
+      className="mark-complete-btn"
+      onClick={handleHireConsultant}
+    >
+      Hire Consultant
+    </Button>
+  </div>
+)}
+          {/* <Button
             type="primary"
             className="hire-consulatnt-btn"
             onClick={handleHireConsultant}
             style={{ marginTop: 16 }}
           >
             Hire Consultant
-          </Button>
+          </Button> */}
         </div>
       );
     }
@@ -1411,13 +1423,8 @@ const ProjectDetails = ({
     }
   };
 
-
-
-
- 
-
   const handleMessageClick = () => {
-    navigate('/chat');
+    navigate("/chat");
   };
 
   return (
@@ -1482,7 +1489,7 @@ const ProjectDetails = ({
           </div>
         )} */}
       </div>
-
+{/* 
       {paymentStatus === "paid" && paymentDetails && (
         <div className="payment-status-container">
           <div className="payment-status-header">
@@ -1496,7 +1503,9 @@ const ProjectDetails = ({
                   </p>
                   <p>
                     <strong>Amount Paid:</strong> $
-                    {paymentDetails.amount.toFixed(2)}
+                    {typeof paymentDetails.amount === "number"
+                      ? paymentDetails.amount.toFixed(2)
+                      : parseFloat(paymentDetails.amount || 0).toFixed(2)}
                   </p>
                   <p>
                     <strong>Payment Date:</strong>{" "}
@@ -1524,7 +1533,7 @@ const ProjectDetails = ({
             </Button>
           </div>
         </div>
-      )}
+      )} */}
 
       <div className="tab-content">
         {activeTab === "overview" && (
@@ -1641,6 +1650,52 @@ const ProjectDetails = ({
                 )}
               </div>
             </div>
+            {paymentStatus === "paid" && paymentDetails && (
+            <div className="payment-status-container">
+              <div className="payment-status-header">
+                <Alert
+                  message="Payment Successfully Completed"
+                  description={
+                    <div className="payment-details">
+                      <p>
+                        <strong>Transaction ID:</strong>{" "}
+                        {paymentDetails.transactionId}
+                      </p>
+                      <p>
+                        <strong>Amount Paid:</strong> $
+                        {typeof paymentDetails.amount === "number"
+                          ? paymentDetails.amount.toFixed(2)
+                          : parseFloat(paymentDetails.amount || 0).toFixed(2)}
+                      </p>
+                      <p>
+                        <strong>Payment Date:</strong>{" "}
+                        {new Date(
+                          paymentDetails.paymentDate
+                        ).toLocaleDateString()}
+                      </p>
+                      <p>
+                        <strong>Payment Method:</strong>{" "}
+                        {paymentDetails.paymentMethod.charAt(0).toUpperCase() +
+                          paymentDetails.paymentMethod.slice(1)}
+                      </p>
+                    </div>
+                  }
+                  type="success"
+                  showIcon
+                  className="payment-alert"
+                />
+                <Button
+                  type="primary"
+                  icon={<ReloadOutlined />}
+                  onClick={refreshPaymentStatus}
+                  loading={isPaymentLoading}
+                  className="refresh-button"
+                >
+                  Refresh Status
+                </Button>
+              </div>
+            </div>
+          )}
           </div>
         )}
 
@@ -1751,20 +1806,21 @@ const ProjectDetails = ({
                   <Divider />
 
                   <div className="proposal-actions">
-                  <button className="message-btn" onClick={handleMessageClick}>
-                    <svg
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
+                    <button
+                      className="message-btn"
+                      onClick={handleMessageClick}
                     >
-                      <path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                    </svg>
-                    Message Freelancer
-                  </button>
-                </div>
-
-                 
+                      <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                      >
+                        <path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                      </svg>
+                      Message Freelancer
+                    </button>
+                  </div>
                 </Card>
               </div>
             ) : (
@@ -1885,7 +1941,7 @@ const ProjectDetails = ({
           </div>
         )}
 
-        {activeTab === "Remarks" && (
+        {/* {activeTab === "Remarks" && (
           <div className="remarks-section">
             <h2>Remarks for {project.job_title}</h2>
             {remarks.length > 0 ? (
@@ -1906,7 +1962,7 @@ const ProjectDetails = ({
               <p>No remarks available for this job title.</p>
             )}
           </div>
-        )}
+        )} */}
       </div>
 
       {/* Add ReviewModal here */}
@@ -1925,7 +1981,8 @@ const ProjectDetails = ({
 };
 
 const PayPalPaymentButton = ({
-  amount,
+  amount: initialAmount, // Rename to initialAmount
+  // amount,
   freelancerPayments, // Add this prop
   project,
   milestoneId,
@@ -1933,6 +1990,23 @@ const PayPalPaymentButton = ({
   onError,
 }) => {
   const [loading, setLoading] = useState(false);
+  const [customAmount, setCustomAmount] = useState(initialAmount);
+  const [showPayPalButtons, setShowPayPalButtons] = useState(false);
+
+  const handleAmountChange = (e) => {
+    const value = parseFloat(e.target.value);
+    if (value >= 0) {
+      setCustomAmount(value);
+    }
+  };
+
+  const handleProceed = () => {
+    if (customAmount > 0) {
+      setShowPayPalButtons(true);
+    } else {
+      onError("Please enter a valid amount");
+    }
+  };
 
   // Add validation with meaningful error messages
   if (!project) {
@@ -1940,7 +2014,7 @@ const PayPalPaymentButton = ({
     return null;
   }
 
-  if (!amount || isNaN(amount)) {
+  if (!customAmount || isNaN(customAmount)) {
     console.warn("Valid amount is required for PayPalPaymentButton");
     return null;
   }
@@ -2005,7 +2079,7 @@ const PayPalPaymentButton = ({
         {
           amount: {
             currency_code: "USD",
-            value: amount.toFixed(2),
+            value: customAmount.toFixed(2), // Use customAmount instead of amount
           },
           payee: {
             email_address: paypalEmail, // Freelancer's PayPal email
@@ -2044,7 +2118,7 @@ const PayPalPaymentButton = ({
       const paymentData = {
         freelancerId,
         milestoneId,
-        amount,
+        amount: customAmount,
         paymentMethod: "paypal",
         orderId: order.id,
         projectId: project._id || project.projectId, // Try both _id and projectId
@@ -2072,12 +2146,14 @@ const PayPalPaymentButton = ({
           type: project.budget_type,
           transactionId: order.id,
           paymentDate: new Date().toISOString(),
-          amount: amount,
+          amount: customAmount,
           paymentMethod: "paypal",
 
           // status: project.status
         },
       };
+
+      console.log("Payment Data being sent:", paymentData);
 
       // console.log("Sending payment data to backend:", paymentData);
 
@@ -2102,7 +2178,10 @@ const PayPalPaymentButton = ({
         onSuccess({
           ...paymentResponse.data.project,
           paymentStatus: "paid",
-          paymentDetails: paymentResponse.data.project.paymentDetails,
+          paymentDetails: {
+            ...paymentResponse.data.project.paymentDetails,
+            amount: customAmount,
+          },
         });
       }
       // }
@@ -2115,7 +2194,7 @@ const PayPalPaymentButton = ({
   };
 
   // Validate required data before rendering PayPal buttons
-  if (!amount || amount <= 0) {
+  if (!customAmount || customAmount <= 0) {
     console.error("Invalid amount for PayPal payment:", amount);
     return null;
   }
@@ -2127,7 +2206,8 @@ const PayPalPaymentButton = ({
   return (
     <div className="paypal-button-container">
       {loading && <div className="payment-loading">Processing payment...</div>}
-      <PayPalButtons
+
+      {/* <PayPalButtons
         style={{
           layout: "horizontal",
           color: "gold",
@@ -2142,6 +2222,59 @@ const PayPalPaymentButton = ({
         }}
         disabled={loading}
       />
+    </div>
+  ); */}
+
+      {!showPayPalButtons ? (
+        <div className="custom-amount-section">
+          <div className="amount-input-wrapper">
+            <label htmlFor="payment-amount">Enter Payment Amount ($)</label>
+            <input
+              type="number"
+              id="payment-amount"
+              value={customAmount}
+              onChange={handleAmountChange}
+              min="0"
+              step="0.01"
+              className="payment-amount-input"
+            />
+          </div>
+          <button
+            onClick={handleProceed}
+            className="proceed-button"
+            disabled={!customAmount || customAmount <= 0}
+          >
+            Proceed to Payment
+          </button>
+        </div>
+      ) : (
+        <div>
+          <div className="amount-display">
+            Amount to pay: ${customAmount.toFixed(2)}
+          </div>
+          <button
+            onClick={() => setShowPayPalButtons(false)}
+            className="edit-amount-button"
+          >
+            Edit Amount
+          </button>
+          <PayPalButtons
+            style={{
+              layout: "horizontal",
+              color: "gold",
+              shape: "rect",
+              label: "pay",
+            }}
+            createOrder={createOrder}
+            onApprove={(data, actions) => handleApprove(data, actions)}
+            onError={(err) => {
+              console.error("PayPal error:", err);
+              onError(err.message || "Payment failed");
+            }}
+            disabled={loading}
+          />
+        </div>
+      )}
     </div>
   );
 };

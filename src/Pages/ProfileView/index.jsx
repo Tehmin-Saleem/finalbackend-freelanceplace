@@ -9,6 +9,7 @@ import {
   Header,
   Spinner,
   Carousel,
+  PortfolioModal,
 } from "../../components/index";
 import {
   Australia,
@@ -27,7 +28,18 @@ function ProfileView() {
   const [country, setCountry] = useState("");
   const [description, setdescription] = useState("");
   const [reviews, setReviews] = useState(null);
+  const [selectedPortfolio, setSelectedPortfolio] = useState(null);
   const navigate = useNavigate();
+
+  // Add this function to handle portfolio click
+  const handlePortfolioClick = (portfolio) => {
+    setSelectedPortfolio(portfolio);
+  };
+
+  // Add this function to handle modal close
+  const handleModalClose = () => {
+    setSelectedPortfolio(null);
+  };
 
   const handleClick = () => {
     navigate("/chat");
@@ -112,79 +124,6 @@ function ProfileView() {
     fetchProfileData();
     setCountry(localStorage.getItem("country") || "Not specified");
   }, []);
-
-  // // Inside the fetchFreelancerReviews function
-  // const fetchFreelancerReviews = async () => {
-  //   try {
-  //     const token = localStorage.getItem("token");
-  //     if (!token) {
-  //       throw new Error("No token found");
-  //     }
-
-  //     const decodedToken = jwtDecode(token);
-  //     const freelancerId = decodedToken.userId;
-
-  //     console.log("Token:", token);
-  //     console.log("freelancerId", freelancerId);
-
-  //     setLoading(true);
-  //     const response = await axios.get(
-  //       `http://localhost:5000/api/freelancer/${freelancerId}/reviews`,
-  //       {
-  //         headers: {
-  //           Authorization: `Bearer ${token}`,
-  //           "Content-Type": "application/json",
-  //         },
-  //       }
-  //     );
-
-  //     console.log("response review", response.data.data);
-
-  //     const reviewsData = response.data.data || {};
-  //     setReviews(reviewsData);
-  //     // If reviews data is available, calculate job success percentage
-  //     if (
-  //       reviewsData.reviews &&
-  //       Array.isArray(reviewsData.reviews) &&
-  //       reviewsData.reviews.length > 0
-  //     ) {
-  //       const totalReviews = reviewsData.reviews.length;
-  //       const totalRating = reviewsData.reviews.reduce(
-  //         (sum, review) => sum + review.rating,
-  //         0
-  //       );
-  //       const jobSuccessPercentage = (
-  //         (totalRating / (totalReviews * 5)) *
-  //         100
-  //       ).toFixed(2); // Assuming max rating is 5
-
-  //       // Set the job success percentage in the profile data
-  //       setProfileData((prevProfileData) => ({
-  //         ...prevProfileData,
-  //         jobSuccess: jobSuccessPercentage,
-  //       }));
-  //     } else {
-  //       // If there are no reviews, set job success to 0 or a default value
-  //       setProfileData((prevProfileData) => ({
-  //         ...prevProfileData,
-  //         jobSuccess: "0.00", // Default value for job success
-  //       }));
-  //     }
-
-  //     setError(null); // Reset error state if reviews were successfully fetched
-  //   } catch (err) {
-  //     console.error(err); // Logging the error for debugging
-  //     setError(
-  //       err.response?.data?.message || err.message || "Failed to fetch reviews"
-  //     );
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
-
-  // useEffect(() => {
-  //   fetchFreelancerReviews();
-  // }, []);
 
   if (loading) return <Spinner size={100} alignCenter />;
   if (error) return <div>{error}</div>;
@@ -329,13 +268,24 @@ function ProfileView() {
               <div className="PortfolioSection">
                 <h2 className="Portfoliotitle">Portfolio</h2>
                 {profileData.portfolios && profileData.portfolios.length > 0 ? (
-                  <Carousel cards={profileData.portfolios} />
+                  <Carousel
+                    cards={profileData.portfolios}
+                    onCardClick={handlePortfolioClick}
+                  />
                 ) : (
                   <div className="text-center py-4 text-gray-500">
                     No portfolio items available
                   </div>
                 )}
               </div>
+
+              {/* Add the modal */}
+              {selectedPortfolio && (
+                <PortfolioModal
+                  portfolio={selectedPortfolio}
+                  onClose={handleModalClose}
+                />
+              )}
               <div className="review">
                 <h2 className="reviewtitle">Reviews</h2>
                 <div className="review-summary mb-6 bg-white rounded-lg p-6 shadow-sm">

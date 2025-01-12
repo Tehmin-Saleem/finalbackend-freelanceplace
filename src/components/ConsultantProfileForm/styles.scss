@@ -22,7 +22,7 @@ $bg-color: #f7f8fa;
 
 .consultant-profile-form {
     max-width: 800px;
-    margin-top: 4rem; // Optional, adjust as needed
+    margin-top: 9rem; // Optional, adjust as needed
     padding: 2.5rem;
     background-color: $gray-color;
     border-radius: 8px;
@@ -81,9 +81,11 @@ margin-left: 300px;
       }
 
       .skills-list {
-        display: flex;
-        flex-wrap: wrap;
-        font-family: $font-poppins;
+        display: flex; // Or grid
+        flex-wrap: wrap; // Ensure skills don't overlap and wrap to the next line
+        max-height: none; // Ensure no height restrictions
+        overflow: visible; // Prevent hidden skills
+      
 
         .skill-button {
           display: flex;

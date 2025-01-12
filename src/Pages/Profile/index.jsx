@@ -3,6 +3,13 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import "./styles.scss";
 import { jwtDecode } from "jwt-decode";
+import {
+  Cross,
+  IconSearchBar,
+  UploadIcon,
+  PlusIcon,
+  ImageIcon,
+} from "../../svg/index";
 import { Cross, IconSearchBar, UploadIcon, PlusIcon } from "../../svg/index";
 import { Header, Spinner } from "../../components/index";
 import PortfolioFilePreview from "./PortfolioFilePreview";
@@ -12,6 +19,17 @@ const MyProfile = () => {
   const [error, setError] = useState(null);
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(true);
+  const [filteredPopularSkills, setFilteredPopularSkills] = useState([]);
+
+  const popularSkills = [
+    "React",
+    "UI/UX Design",
+    "JavaScript",
+    "CSS",
+    "HTML",
+    "Figma",
+  ];
+
   const [profile, setProfile] = useState({
     profileId: "",
     first_name: "",
@@ -191,6 +209,64 @@ const MyProfile = () => {
     }));
   };
 
+  // Handle Enter key press to add custom skill
+  const handleKeyPress = (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault(); // Prevent form submission
+      if (skillInput.trim() !== "") {
+        handleAddSkill(skillInput.trim()); // Add the skill
+        setSkillInput(""); // Clear the input
+      }
+    }
+  };
+  useEffect(() => {
+    setFilteredPopularSkills(
+      popularSkills.filter((skill) =>
+        skill.toLowerCase().includes(skillInput.toLowerCase())
+      )
+    );
+  }, [skillInput, popularSkills]);
+
+  // Add this new useEffect after your existing useEffects
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        if (!token) {
+          navigate("/signin");
+          return;
+        }
+
+        const decodedToken = jwtDecode(token);
+        const userId = decodedToken.userId;
+
+        // Fetch user data
+        const response = await axios.get(
+          `http://localhost:5000/api/freelancer/users/${userId}`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+
+        const userData = response.data;
+
+        // Update profile state with user data
+        setProfile((prevProfile) => ({
+          ...prevProfile,
+          first_name: userData.first_name || "",
+          last_name: userData.last_name || "",
+          email: userData.email || "",
+          // Add any other fields that come from user data
+        }));
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+        setError("Failed to load user data");
+      }
+    };
+
+    fetchUserData();
+  }, [navigate]);
+
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -341,15 +417,6 @@ const MyProfile = () => {
   if (isLoading) {
     return <Spinner alignCenter />;
   }
-
-  const popularSkills = [
-    "React",
-    "UI/UX Design",
-    "JavaScript",
-    "CSS",
-    "HTML",
-    "Figma",
-  ];
 
   const handleKeyDown = (e) => {
     if (e.key === "Enter") {
@@ -532,6 +599,7 @@ const MyProfile = () => {
                 value={skillInput}
                 onChange={(e) => setSkillInput(e.target.value)}
                 onKeyDown={handleKeyDown}
+                onKeyPress={handleKeyPress} // Prevent form submission and add skill
                 placeholder="Search skills..."
               />
             </div>
@@ -546,7 +614,7 @@ const MyProfile = () => {
                   <Cross
                     alt="Remove"
                     className="remove-skill"
-                    onClick={() => handleRemoveSkill(skill)}
+                    onClick={() => handleRemoveSkill(skill)} // Remove skill
                   />
                 </div>
               ))}
@@ -554,18 +622,22 @@ const MyProfile = () => {
           </div>
 
           <div className="form-group">
-            <label>Popular Skills for UI/UX Design</label>
+            <label>Popular Skills</label>
             <div className="popular-skills">
-              {popularSkills.map((skill) => (
-                <div
-                  className="skill-badge"
-                  key={skill}
-                  onClick={() => handleAddSkill(skill)}
-                >
-                  {skill}
-                  <PlusIcon alt="Add" className="add-skill" />
-                </div>
-              ))}
+              {filteredPopularSkills.length > 0 ? (
+                filteredPopularSkills.map((skill) => (
+                  <div
+                    className="skill-badge"
+                    key={skill}
+                    onClick={() => handleAddSkill(skill)} // Add skill
+                  >
+                    {skill}
+                    <PlusIcon alt="Add" className="add-skill" />
+                  </div>
+                ))
+              ) : (
+                <p>No matching skills found</p>
+              )}
             </div>
           </div>
 

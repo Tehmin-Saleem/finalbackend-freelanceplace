@@ -18,6 +18,8 @@ import Spinner from "./chatcomponents/Spinner/index.jsx"
 import UserListItems from "./chatcomponents/UserListItems/index.jsx";
 import CoverLetter from "./CoverLetter/index.jsx";
 import StatusBadge from "./StatusBadge/index.jsx";
+import Modal from "./PopUps/Prompts"
+import PortfolioModal from "./PopUps/Portfolio/index.jsx";
 
 export {default as CommonButton} from "./Commoncomponents/CommonButton"
 export {default as TextField} from "./Commoncomponents/Textfield"
@@ -39,5 +41,7 @@ export {default as Spinner} from "./chatcomponents/Spinner"
 export {default as UserListItems} from "./chatcomponents/UserListItems"
 export {default as CoverLetter} from "./CoverLetter"
 export {default as StatusBadge} from "./StatusBadge"
+export {default as Modal} from "./PopUps/Prompts"
+export {default as PortfolioModal} from "./PopUps/Portfolio"
 
 

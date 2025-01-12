@@ -1,5 +1,6 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { JobProvider } from "./context/JoBContext";
 // import "./App.css";
 import {
   ProfileView,
@@ -62,6 +63,7 @@ import ClientOffersPage from "./components/ConsultantOffer";
 import ConsultantOffers from "./components/ConsultantoffersFetch";
 import SendProjectDetails from "./components/ProjectDetailsForm";
 import ProjectDetailsModal from "./components/PopUps/SeeProjectDetails";
+// import { JobProvider } from "./context/JoBContext";
 // import PaymentMethod from './components/PaymentMethod';
 
 const freelancers = [
@@ -149,7 +151,7 @@ function App() {
 
           <Route path="/alljobs" element={<AllJobsPage />} />
           <Route path="/matchingjobs" element={<JobsPage />} />
-          <Route
+          {/* <Route
             path="/freelancersjobpage"
             element={<FreelancersDoneJobsPage />}
           />
@@ -157,11 +159,12 @@ function App() {
           <Route
             path="/freelancedashboard"
             element={<FreelanceDashboardPage />}
-          />
+          /> */}
           <Route path="/applyjob" element={<ApplyJob />} />
           <Route path="/applyjob/:jobPostId" element={<ApplyJob />} />
           <Route path="/profile/:userId" element={<ProfileView />} />
           <Route path="/profile/:userId" element={<ProfileView />} />
+          <Route path="/offerform" element={<OfferForm />} />
 
           <Route
             path="/freelancercard"
@@ -231,6 +234,25 @@ function App() {
               </JobStatusProvider>
             }
           />
+
+          <Route
+            path="/freelancersjobpage"
+            element={
+              <JobProvider>
+            <FreelancersDoneJobsPage />
+            </JobProvider>}
+          />
+          
+          <Route
+            path="/freelancedashboard"
+            element={
+              <JobProvider>
+            <FreelanceDashboardPage />
+            </JobProvider>
+            }
+          />
+
+        
 
           {/* Fallback Route */}
           <Route path="*" element={<ErrorPage />} />
