@@ -197,8 +197,8 @@ const OfferForm = () => {
       for (let pair of formData.entries()) {
         console.log(pair[0] + ': ' + pair[1]);
       }
-
-      const response = await axios.post(`${process.env.REACT_APP_LOCAL_BASE_URL}/api/client/offerform`, formData, {
+      const BASE_URL = import.meta.env.VITE_LOCAL_BASE_URL
+      const response = await axios.post(`${BASE_URL}/api/client/offerform`, formData, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'multipart/form-data'

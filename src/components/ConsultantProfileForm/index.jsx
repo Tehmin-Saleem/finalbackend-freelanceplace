@@ -125,12 +125,12 @@ function ConsultantProfileForm() {
         for (let [key, value] of formData.entries()) {
             console.log(key, value);
         }
-        
+        const BASE_URL = import.meta.env.VITE_LOCAL_BASE_URL
         const token = localStorage.getItem('token');
         if (token) {
             try {
                 console.log('Sending request to server');
-                const response = await fetch(`${process.env.REACT_APP_LOCAL_BASE_URL}/api/client/Constprofile`, {
+                const response = await fetch(`${BASE_URL}/api/client/Constprofile`, {
                     method: 'POST',
                     headers: {
                         'Authorization': `Bearer ${token}`,

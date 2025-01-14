@@ -36,7 +36,7 @@ const OfferCards = () => {
       try {
         const token = localStorage.getItem("token");
         const response = await axios.get(
-          `${process.env.REACT_APP_LOCAL_BASE_URL}/api/freelancer/offer/${freelancerId}`,
+          `${BASE_URL}/api/freelancer/offer/${freelancerId}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -73,7 +73,7 @@ const OfferCards = () => {
     try {
       const token = localStorage.getItem("token");
       await axios.patch(
-        `${process.env.REACT_APP_LOCAL_BASE_URL}/api/freelancer/offers/${offerId}`,
+        `${BASE_URL}/api/freelancer/offers/${offerId}`,
         { status: "accepted" },
         {
           headers: {
@@ -100,9 +100,10 @@ const OfferCards = () => {
 
   const handleDeclineOffer = async (offerId) => {
     try {
+      const BASE_URL = import.meta.env.VITE_LOCAL_BASE_URL
       const token = localStorage.getItem("token");
       await axios.patch(
-        `${process.env.REACT_APP_LOCAL_BASE_URL}/api/freelancer/offers/${offerId}`,
+        `${BASE_URL}/api/freelancer/offers/${offerId}`,
         { status: "declined" },
         {
           headers: {

@@ -17,7 +17,7 @@ import io from "socket.io-client";
 import animationData from "../../animations/typing.json";
 import { jwtDecode } from "jwt-decode";
 
-//const ENDPOINT = process.env.REACT_APP_LOCAL_BASE_URL; // "https://talk-a-tive.herokuapp.com"; -> After deployment
+//const ENDPOINT = BASE_URL; // "https://talk-a-tive.herokuapp.com"; -> After deployment
 var socket, selectedChatCompare;
 const ENDPOINT = 'http://13.61.176.80:5000';
 const Chat = () => {
@@ -162,11 +162,12 @@ const Chat = () => {
       // Define search route based on user role
       let route;
       if (userRole === "client") {
+        const BASE_URL = import.meta.env.VITE_LOCAL_BASE_URL
         // Clients should search for freelancers
-        route = `${process.env.REACT_APP_LOCAL_BASE_URL}/api/client/searchFreelancers?search=${search}`;
+        route = `${BASE_URL}/api/client/searchFreelancers?search=${search}`;
       } else if (userRole === "freelancer") {
         // Freelancers should search for clients
-        route = `${process.env.REACT_APP_LOCAL_BASE_URL}/api/freelancer/searchClients?search=${search}`;
+        route = `${BASE_URL}/api/freelancer/searchClients?search=${search}`;
       } else {
         setError("Invalid user role. Please log in again.");
         setLoading(false);
@@ -246,7 +247,7 @@ const Chat = () => {
         },
       };
       const { data } = await axios.post(
-        `${process.env.REACT_APP_LOCAL_BASE_URL}/api/client/accesschats`,
+        `${BASE_URL}/api/client/accesschats`,
         { userId },
         config
       );
@@ -281,9 +282,9 @@ const Chat = () => {
           Authorization: `Bearer ${token}`,
         },
       };
-
+      const BASE_URL = import.meta.env.VITE_LOCAL_BASE_URL
       const { data } = await axios.get(
-        `${process.env.REACT_APP_LOCAL_BASE_URL}/api/client/fetchchats`,
+        `${BASE_URL}/api/client/fetchchats`,
         config
       );
 
@@ -322,9 +323,9 @@ const Chat = () => {
       };
 
       setLoading(true);
-
+      const BASE_URL = import.meta.env.VITE_LOCAL_BASE_URL
       const { data } = await axios.get(
-        `${process.env.REACT_APP_LOCAL_BASE_URL}/api/client/allMessages/${selectedChat._id}`,
+        `${BASE_URL}/api/client/allMessages/${selectedChat._id}`,
         config
       );
       setMessages(data);
@@ -421,7 +422,7 @@ const Chat = () => {
           console.log("attachment:", attachment.name);
   
           response = await axios.post(
-            `${process.env.REACT_APP_LOCAL_BASE_URL}/api/client/sendMessage`,
+            `${BASE_URL}/api/client/sendMessage`,
             formData,
             {
               headers: {
@@ -435,7 +436,7 @@ const Chat = () => {
         } else {
           // Text-only message remains the same
           response = await axios.post(
-            `${process.env.REACT_APP_LOCAL_BASE_URL}/api/client/sendMessage`,
+            `${BASE_URL}/api/client/sendMessage`,
             {
               chatId: selectedChat._id,
               content: newMessage.trim()
@@ -487,7 +488,7 @@ const Chat = () => {
   const downloadFile = async (fileUrl, fileName) => {
     try {
       const response = await axios({
-        url: `${process.env.REACT_APP_LOCAL_BASE_URL}${fileUrl}`,
+        url: `${BASE_URL}${fileUrl}`,
         method: 'GET',
         responseType: 'blob',
         headers: {
@@ -605,10 +606,10 @@ const Chat = () => {
       let route;
       if (userRole === "client") {
         // Clients use this route to delete chats
-        route = `${process.env.REACT_APP_LOCAL_BASE_URL}/api/client/deletechat/${chatId}`;
+        route = `${BASE_URL}/api/client/deletechat/${chatId}`;
       } else if (userRole === "freelancer") {
         // Freelancers use this route to delete chats
-        route = `${process.env.REACT_APP_LOCAL_BASE_URL}/api/freelancer/deletechat/${chatId}`;
+        route = `${BASE_URL}/api/freelancer/deletechat/${chatId}`;
       } else {
         console.error("Invalid user role.");
         setError("Invalid user role. Please log in again.");

@@ -415,17 +415,17 @@ function ProfileView() {
         if (!token) {
           throw new Error("No token found");
         }
-
+        const BASE_URL = import.meta.env.VITE_LOCAL_BASE_URL
         const decodedToken = jwtDecode(token);
         const userId = decodedToken.userId;
         const headers = {
           Authorization: `Bearer ${token}`,
         };
         const [response, userResponse] = await Promise.all([
-          axios.get(`${process.env.REACT_APP_LOCAL_BASE_URL}/api/freelancer/profile/${userId}`, {
+          axios.get(`${BASE_URL}/api/freelancer/profile/${userId}`, {
             headers,
           }),
-          axios.get(`${process.env.REACT_APP_LOCAL_BASE_URL}/api/client/users`, { headers }),
+          axios.get(`${BASE_URL}/api/client/users`, { headers }),
         ]);
 
         setProfileData(response.data.data);
@@ -435,7 +435,7 @@ function ProfileView() {
 
         // Fetch reviews
         const reviewsResponse = await axios.get(
-          `${process.env.REACT_APP_LOCAL_BASE_URL}/api/freelancer/${userId}/reviews`,
+          `${BASE_URL}/api/freelancer/${userId}/reviews`,
           {
             headers: {
               Authorization: `Bearer ${token}`,

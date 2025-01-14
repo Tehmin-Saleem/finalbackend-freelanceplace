@@ -42,9 +42,9 @@ const PaymentMethod = () => {
 
       const decodedToken = jwtDecode(token);
       const userId = decodedToken.userId;
-
+      const BASE_URL = import.meta.env.VITE_LOCAL_BASE_URL
       const response = await axios.post(
-        `${process.env.REACT_APP_LOCAL_BASE_URL}/api/client/payment-methods`,
+        `${BASE_URL}/api/client/payment-methods`,
         {
           type: "paypal",
           email,

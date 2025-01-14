@@ -153,9 +153,10 @@ const JobDetails = () => {
           jobData.attachment.detailed_description || ""
         );
       }
+      const BASE_URL = import.meta.env.VITE_LOCAL_BASE_URL
   console.log('file',jobData.attachment)
       const response = await axios.post(
-        `${process.env.REACT_APP_LOCAL_BASE_URL}/api/client/jobpost`,
+        `${BASE_URL}/api/client/jobpost`,
         formData,
         {
           headers: {

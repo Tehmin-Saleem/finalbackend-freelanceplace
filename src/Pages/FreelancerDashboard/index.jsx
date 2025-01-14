@@ -41,11 +41,11 @@ const FreelanceDashboardPage = () => {
       const freelancerId = decodedToken.userId;
 
       console.log("Token:", token);
-
+      const BASE_URL = import.meta.env.VITE_LOCAL_BASE_URL
       console.log("freelancerid", freelancerId);
       setLoading(true);
       const response = await axios.get(
-        `${process.env.REACT_APP_LOCAL_BASE_URL}/api/freelancer/${freelancerId}/reviews`,
+        `${BASE_URL}/api/freelancer/${freelancerId}/reviews`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -140,7 +140,7 @@ const FreelanceDashboardPage = () => {
       };
 
       const response = await axios.get(
-        `${process.env.REACT_APP_LOCAL_BASE_URL}/api/freelancer/freelancer-profile-exists/${userId}`,
+        `${BASE_URL}/api/freelancer/freelancer-profile-exists/${userId}`,
         config
       );
 
@@ -214,7 +214,7 @@ const FreelanceDashboardPage = () => {
         await checkProfileExists(userId, token);
 
         const response = await axios.get(
-          `${process.env.REACT_APP_LOCAL_BASE_URL}/api/client/users/${userId}`,
+          `${BASE_URL}/api/client/users/${userId}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -315,13 +315,13 @@ const FreelanceDashboardPage = () => {
 
       // Fetch both hired jobs and offers in parallel
       const [hireResponse, offersResponse] = await Promise.all([
-        axios.get(`${process.env.REACT_APP_LOCAL_BASE_URL}/api/client/hire`, {
+        axios.get(`${BASE_URL}/api/client/hire`, {
           headers: {
             Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
           },
         }),
-        axios.get(`${process.env.REACT_APP_LOCAL_BASE_URL}/api/freelancer/offers`, {
+        axios.get(`${BASE_URL}/api/freelancer/offers`, {
           headers: {
             Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
@@ -365,7 +365,7 @@ const FreelanceDashboardPage = () => {
 
       // Fetch job posts
       const jobsResponse = await axios.get(
-        `${process.env.REACT_APP_LOCAL_BASE_URL}/api/client/job-posts`,
+        `${BASE_URL}/api/client/job-posts`,
         {
           headers: {
             Authorization: `Bearer ${token}`,

@@ -30,8 +30,9 @@ const AllJobsPage = () => {
 
     try {
       setLoading(true);
+      const BASE_URL = import.meta.env.VITE_LOCAL_BASE_URL
       const response = await axios.get(
-        `${process.env.REACT_APP_LOCAL_BASE_URL}/api/client/filtered-jobs?filter=${selectedFilter}`,
+        `${BASE_URL}/api/client/filtered-jobs?filter=${selectedFilter}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,

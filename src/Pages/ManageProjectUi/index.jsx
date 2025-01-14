@@ -71,17 +71,17 @@ const ManageProjectsByClient = () => {
         if (!token) {
           throw new Error("No authentication token found");
         }
-
+        const BASE_URL = import.meta.env.VITE_LOCAL_BASE_URL
         // Fetch client profile and ongoing projects in parallel
         const [profileResponse, projectsResponse, offersResponse] =
           await Promise.all([
-            axios.get(`${process.env.REACT_APP_LOCAL_BASE_URL}/api/client/profile`, {
+            axios.get(`${BASE_URL}/api/client/profile`, {
               headers: { Authorization: `Bearer ${token}` },
             }),
-            axios.get(`${process.env.REACT_APP_LOCAL_BASE_URL}/api/client/ongoing-projects`, {
+            axios.get(`${BASE_URL}/api/client/ongoing-projects`, {
               headers: { Authorization: `Bearer ${token}` },
             }),
-            axios.get(`${process.env.REACT_APP_LOCAL_BASE_URL}/api/client/accepted-offers`, {
+            axios.get(`${BASE_URL}/api/client/accepted-offers`, {
               headers: { Authorization: `Bearer ${token}` },
             }),
           ]);
@@ -159,9 +159,9 @@ const ManageProjectsByClient = () => {
     try {
       const token = localStorage.getItem("token");
       // console.log("Fetching payment details for freelancer ID:", freelancerId);
-
+      const BASE_URL = import.meta.env.VITE_LOCAL_BASE_URL
       const response = await axios.get(
-        `${process.env.REACT_APP_LOCAL_BASE_URL}/api/client/payment-method/${freelancerId}`, // Changed to freelancer endpoint
+        `${BASE_URL}/api/client/payment-method/${freelancerId}`, // Changed to freelancer endpoint
         {
           headers: { Authorization: `Bearer ${token}` },
         }
@@ -545,7 +545,7 @@ const ProjectDetails = ({
       if (project.type === "offer") {
         // Fetch progress for offers
         response = await axios.get(
-          `${process.env.REACT_APP_LOCAL_BASE_URL}/api/client/offer-progress`,
+          `${BASE_URL}/api/client/offer-progress`,
           {
             params: {
               client_id: userId,
@@ -584,7 +584,7 @@ const ProjectDetails = ({
         // Fetch progress for regular projects
         const id = project.proposalDetails.Proposal_id._id;
         response = await axios.get(
-          `${process.env.REACT_APP_LOCAL_BASE_URL}/api/client/project-progress/${id}?client_id=${userId}`,
+          `${BASE_URL}/api/client/project-progress/${id}?client_id=${userId}`,
           {
             headers: { Authorization: `Bearer ${token}` },
           }
@@ -773,12 +773,12 @@ const ProjectDetails = ({
         stars: reviewData.rating,
         message: reviewData.review,
       };
-
+      const BASE_URL = import.meta.env.VITE_LOCAL_BASE_URL
       // Choose the appropriate endpoint based on project type
       const endpoint =
         project.type === "offer"
-          ? `${process.env.REACT_APP_LOCAL_BASE_URL}/api/client/complete-offer/${actualProjectId}`
-          : `${process.env.REACT_APP_LOCAL_BASE_URL}/api/client/complete-project/${ProjectId}`;
+          ? `${BASE_URL}/api/client/complete-offer/${actualProjectId}`
+          : `${BASE_URL}/api/client/complete-project/${ProjectId}`;
 
       const response = await axios.post(endpoint, requestData, {
         headers: {
@@ -1399,7 +1399,7 @@ const ProjectDetails = ({
 
       // Send the job_title (project name) and clientId as query parameters in the URL
       const response = await fetch(
-        `${process.env.REACT_APP_LOCAL_BASE_URL}/api/client/getRemarksByProjectAndClient/${project.job_title}/${clientId}`,
+        `${BASE_URL}/api/client/getRemarksByProjectAndClient/${project.job_title}/${clientId}`,
         {
           method: "GET",
           headers: {
@@ -2163,7 +2163,7 @@ const PayPalPaymentButton = ({
 
       // Process payment on the backend
       const paymentResponse = await axios.post(
-        `${process.env.REACT_APP_LOCAL_BASE_URL}/api/client/process-payment`,
+        `${BASE_URL}/api/client/process-payment`,
         paymentData,
         {
           headers: {

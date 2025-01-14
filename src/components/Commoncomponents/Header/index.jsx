@@ -47,9 +47,9 @@ const Header = () => {
 
         const decodedToken = jwtDecode(token);
         const userId = decodedToken.userId;
-
+        const BASE_URL = import.meta.env.VITE_LOCAL_BASE_URL
         const response = await axios.get(
-          `${process.env.REACT_APP_LOCAL_BASE_URL}/api/client/users/${userId}`,
+          `${BASE_URL}/api/client/users/${userId}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -63,11 +63,12 @@ const Header = () => {
       }
       const fetchUnreadNotificationsCount = async () => {
         try {
+          const BASE_URL = import.meta.env.VITE_LOCAL_BASE_URL
           const token = localStorage.getItem("token");
           if (!token) return;
-
+          
           const response = await axios.get(
-            `${process.env.REACT_APP_LOCAL_BASE_URL}/api/freelancer/notifications/unread-count`,
+            `${BASE_URL}/api/freelancer/notifications/unread-count`,
             {
               headers: { Authorization: `Bearer ${token}` },
             }
@@ -149,22 +150,23 @@ const Header = () => {
       };
   
       try {
+        const BASE_URL = import.meta.env.VITE_LOCAL_BASE_URL
         if (snap.user.role === "client") {
           const response = await axios.get(
-            `${process.env.REACT_APP_LOCAL_BASE_URL}/api/client/client-profile-exists/${userId}`,
+            `${BASE_URL}/api/client/client-profile-exists/${userId}`,
             config
           );
           navigate(response.data.exists ? "/ClientProfile" : "/ClientProfileForm");
         } else if (snap.user.role === "freelancer") {
           const response = await axios.get(
-            `${process.env.REACT_APP_LOCAL_BASE_URL}/api/freelancer/freelancer-profile-exists/${userId}`,
+            `${BASE_URL}/api/freelancer/freelancer-profile-exists/${userId}`,
             config
           );
           navigate(response.data.exists ? `/profile/${userId}` : "/myProfile");
         } else if (snap.user.role === "consultant") {
           try {
             const response = await axios.get(
-              `${process.env.REACT_APP_LOCAL_BASE_URL}/api/client/Constprofile/${userId}`, // Correct route
+              `${BASE_URL}/api/client/Constprofile/${userId}`, // Correct route
               config
             );
             console.log("Response data for consultant profile:", response.data);

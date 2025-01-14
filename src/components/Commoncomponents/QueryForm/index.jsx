@@ -38,7 +38,7 @@ const QueryForm = () => {
             // navigate('/signin'); // Uncomment if you want to redirect to signin
             return;
         }
-
+        const BASE_URL = import.meta.env.VITE_LOCAL_BASE_URL
         const decodedToken = jwtDecode(token);
         const userId = decodedToken.userId;
         const userRole = decodedToken.role;
@@ -66,9 +66,9 @@ const QueryForm = () => {
         // Define the route based on the user role
         let route;
         if (userRole === "client") {
-            route = `${process.env.REACT_APP_LOCAL_BASE_URL}/api/client/query`;
+            route = `${BASE_URL}/api/client/query`;
         } else if (userRole === "freelancer") {
-            route = `${process.env.REACT_APP_LOCAL_BASE_URL}/api/freelancer/query`;
+            route = `${BASE_URL}/api/freelancer/query`;
         } else {
             return;
         }

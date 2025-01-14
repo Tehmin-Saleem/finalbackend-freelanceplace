@@ -43,15 +43,15 @@ const ClientProfilePage = () => {
         if (!userId) {
           throw new Error("No user ID found in token");
         }
-
+        const BASE_URL = import.meta.env.VITE_LOCAL_BASE_URL
         // Fetch user data
         const userResponse = await axios.get(
-          `${process.env.REACT_APP_LOCAL_BASE_URL}/api/client/users/${userId}`,
+          `${BASE_URL}/api/client/users/${userId}`,
           {
             headers: { Authorization: `Bearer ${token}` },
           }
         );
-
+        
         const userData = userResponse.data;
 
         // Set initial profile data with user data
@@ -65,7 +65,7 @@ const ClientProfilePage = () => {
         console.log("userdata", userData);
         // Then check for existing profile
         const profileResponse = await axios.get(
-          `${process.env.REACT_APP_LOCAL_BASE_URL}/api/client/profile`,
+          `${BASE_URL}/api/client/profile`,
           {
             headers: { Authorization: `Bearer ${token}` },
           }
@@ -184,8 +184,8 @@ const ClientProfilePage = () => {
 
       // Choose the appropriate endpoint based on whether we're creating or updating
       const endpoint = isEditMode
-        ? `${process.env.REACT_APP_LOCAL_BASE_URL}/api/client/profile/update`
-        : `${process.env.REACT_APP_LOCAL_BASE_URL}/api/client/clientprofile`;
+        ? `${BASE_URL}/api/client/profile/update`
+        : `${BASE_URL}/api/client/clientprofile`;
 
       const method = isEditMode ? "put" : "post";
 

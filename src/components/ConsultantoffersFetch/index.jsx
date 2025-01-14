@@ -35,7 +35,7 @@ const ConsultantOffers = () => {
         
 
         const response = await axios.get(
-          `${process.env.REACT_APP_LOCAL_BASE_URL}/api/client/offer/${consultantId}`,
+          `${BASE_URL}/api/client/offer/${consultantId}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -70,7 +70,7 @@ const ConsultantOffers = () => {
     try {
       const token = localStorage.getItem("token");
       await axios.put(
-        `${process.env.REACT_APP_LOCAL_BASE_URL}/api/client/offer/${offerId}`,
+        `${BASE_URL}/api/client/offer/${offerId}`,
         { status: action },
         {
           headers: {
@@ -119,10 +119,10 @@ const ConsultantOffers = () => {
           alert("You are not authorized. Please log in first.");
           return;
         }
-    
+        const BASE_URL = import.meta.env.VITE_LOCAL_BASE_URL
         // Fetch project details from the backend
         const response = await axios.get(
-          `${process.env.REACT_APP_LOCAL_BASE_URL}/api/client/project-details/${offerId}`,
+          `${BASE_URL}/api/client/project-details/${offerId}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,

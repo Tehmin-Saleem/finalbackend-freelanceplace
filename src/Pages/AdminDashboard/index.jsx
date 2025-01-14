@@ -99,8 +99,8 @@ const AdminDashboard = () => {
             console.error('Token has expired');
             return;
           }
-
-          const queryResponse = await fetch(`${process.env.REACT_APP_LOCAL_BASE_URL}/api/freelancer/queries`, {
+          const BASE_URL = import.meta.env.VITE_LOCAL_BASE_URL
+          const queryResponse = await fetch(`${BASE_URL}/api/freelancer/queries`, {
             method: 'GET',
             headers: {
               'Content-Type': 'application/json',
@@ -115,7 +115,7 @@ const AdminDashboard = () => {
           const queryData = await queryResponse.json();
           setQueries(queryData);
 
-          const freelancerResponse = await fetch(`${process.env.REACT_APP_LOCAL_BASE_URL}/api/freelancer/count`, {
+          const freelancerResponse = await fetch(`${BASE_URL}/api/freelancer/count`, {
             method: 'GET',
             headers: {
               'Authorization': `Bearer ${token}`,
@@ -129,7 +129,7 @@ const AdminDashboard = () => {
           const freelancerData = await freelancerResponse.json();
           setFreelancerCount(freelancerData.count);
 
-          const clientResponse = await fetch(`${process.env.REACT_APP_LOCAL_BASE_URL}/api/client/count`, {
+          const clientResponse = await fetch(`${BASE_URL}/api/client/count`, {
             method: 'GET',
             headers: {
               'Authorization': `Bearer ${token}`,
@@ -152,7 +152,7 @@ const AdminDashboard = () => {
       fetchData();
     }, [fetchNotifications]);
     const handleResolveClick = async (queryId) => {
-      const response = await fetch(`${process.env.REACT_APP_LOCAL_BASE_URL}/api/freelancer/queries/${queryId}`, {
+      const response = await fetch(`${BASE_URL}/api/freelancer/queries/${queryId}`, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`,
@@ -175,7 +175,7 @@ const AdminDashboard = () => {
 
     const handleConfirmResolve = async (queryId) => {
       try {
-          const response = await fetch(`${process.env.REACT_APP_LOCAL_BASE_URL}/api/freelancer/queries/${queryId}`, {
+          const response = await fetch(`${BASE_URL}/api/freelancer/queries/${queryId}`, {
               method: 'PATCH',
               headers: {
                   'Content-Type': 'application/json',

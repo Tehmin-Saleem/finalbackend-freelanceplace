@@ -15,8 +15,9 @@ class SocketManager {
       const decodedToken = jwtDecode(token);
       this.userId = decodedToken?.userId;
       this.userRole = decodedToken?.role;
+      const BASE_URL = import.meta.env.VITE_LOCAL_BASE_URL
       this.userEmail = decodedToken?.email;
-      this.socket = io(`${process.env.REACT_APP_LOCAL_BASE_URL}`, {
+      this.socket = io(`${BASE_URL}`, {
         auth: {
           token,
           userId: this.userId,

@@ -80,7 +80,7 @@ const ProjectDetailsModal = () => {
       }
   
       const response = await axios.get(
-        `${process.env.REACT_APP_LOCAL_BASE_URL}/api/client/${offerId}/${consultantId}`,
+        `${BASE_URL}/api/client/${offerId}/${consultantId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -108,7 +108,7 @@ const ProjectDetailsModal = () => {
       }
 
       const response = await axios.post(
-        `${process.env.REACT_APP_LOCAL_BASE_URL}/api/client/add`,
+        `${BASE_URL}/api/client/add`,
         {
           offerId,
           remark: newRemark,
@@ -145,11 +145,11 @@ const ProjectDetailsModal = () => {
 
     setShowModal(true);
     setLoading(true);
-
+    const BASE_URL = import.meta.env.VITE_LOCAL_BASE_URL
 
     try {
       const response3 = await axios.get(
-        `${process.env.REACT_APP_LOCAL_BASE_URL}/api/client/project-details/${offerId}`,
+        `${BASE_URL}/api/client/project-details/${offerId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,

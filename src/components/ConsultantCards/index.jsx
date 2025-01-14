@@ -79,7 +79,7 @@ const { TextArea } = Input;
       };
   
       const response = await fetch(
-        `${process.env.REACT_APP_LOCAL_BASE_URL}/api/client/send-offer-to-consultant/${selectedConsultant.consultant_id}`,
+        `${BASE_URL}/api/client/send-offer-to-consultant/${selectedConsultant.consultant_id}`,
         {
           method: 'POST',
           headers: {
@@ -108,9 +108,9 @@ const { TextArea } = Input;
   useEffect(() => {
     const fetchConsultants = async () => {
       const token = localStorage.getItem('token');
-
+      const BASE_URL = import.meta.env.VITE_LOCAL_BASE_URL
       try {
-        const response = await fetch(`${process.env.REACT_APP_LOCAL_BASE_URL}/api/client/Consultantsprofiles`, {
+        const response = await fetch(`${BASE_URL}/api/client/Consultantsprofiles`, {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${token}`,

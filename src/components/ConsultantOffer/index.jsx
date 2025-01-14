@@ -87,9 +87,9 @@ const ClientOffersPage = () => {
         const token = localStorage.getItem("token");
         const statusQueryParam =
           statusFilter === "all" ? undefined : statusFilter;
-
+          const BASE_URL = import.meta.env.VITE_LOCAL_BASE_URL
         const response = await axios.get(
-          `${process.env.REACT_APP_LOCAL_BASE_URL}/api/client/consultantoffers/${clientId}`,
+          `${BASE_URL}/api/client/consultantoffers/${clientId}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,

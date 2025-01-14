@@ -15,7 +15,7 @@ const ClientList = () => {
           throw new Error('No token found');
         }
 
-        const response = await fetch(`${process.env.REACT_APP_LOCAL_BASE_URL}/api/client/clientslist`, {
+        const response = await fetch(`${BASE_URL}/api/client/clientslist`, {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -45,7 +45,7 @@ const ClientList = () => {
         throw new Error('No token found');
       }
 
-      const response = await fetch(`${process.env.REACT_APP_LOCAL_BASE_URL}/api/client/softban/${id}`, {
+      const response = await fetch(`${BASE_URL}/api/client/softban/${id}`, {
         method: 'PATCH',
         headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
       });
@@ -64,13 +64,13 @@ const ClientList = () => {
   const handleBan = async (id) => {
     const confirmBan = window.confirm("Are you sure you want to ban and remove this client?");
     if (!confirmBan) return;
-
+    const BASE_URL = import.meta.env.VITE_LOCAL_BASE_URL
     try {
       const token = localStorage.getItem('token');
       if (!token) {
         throw new Error('No token found');
       }
-      const response = await fetch(`${process.env.REACT_APP_LOCAL_BASE_URL}/api/client/ban/${id}`, {
+      const response = await fetch(`${BASE_URL}/api/client/ban/${id}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
       });

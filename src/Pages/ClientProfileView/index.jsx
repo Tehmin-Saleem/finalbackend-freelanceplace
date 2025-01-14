@@ -79,12 +79,12 @@ const ClientProfile = () => {
         const decodedToken = jwtDecode(token);
         const userId = decodedToken.userId;
         console.log(userId);
-
+        const BASE_URL = import.meta.env.VITE_LOCAL_BASE_URL
         const [profileResponse, jobPostsResponse] = await Promise.all([
-          axios.get(`${process.env.REACT_APP_LOCAL_BASE_URL}/api/client/profile`, {
+          axios.get(`${BASE_URL}/api/client/profile`, {
             headers: { Authorization: `Bearer ${token}` },
           }),
-          axios.get(`${process.env.REACT_APP_LOCAL_BASE_URL}/api/client/job-posts`, {
+          axios.get(`${BASE_URL}/api/client/job-posts`, {
             headers: { Authorization: `Bearer ${token}` },
           }),
         ]);
