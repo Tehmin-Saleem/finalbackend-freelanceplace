@@ -23,9 +23,9 @@ jobs:
     runs-on: self-hosted 
     steps:
       - name: Pull image from docker hub
-        run: docker pull tehmina13/finalbackend-freelanceplace:latest 
+        run: sudo docker pull tehmina13/finalbackend-freelanceplace:latest 
       - name: Delete old container
-        run: docker rm -f finalbackend-freelanceplace-container  
+        run: sudo docker rm -f finalbackend-freelanceplace-container  
       - name: Run Docker Container
-        run: docker run -d -p 5000:5000 --name finalbackend-freelanceplace-container -e MONGO_PASSWORD='${{ secrets.MONGO_PASSWORD }}' tehmina13/finalbackend-freelanceplace
+        run: sudo docker run -d -p 5000:5000 --name finalbackend-freelanceplace-container -e MONGO_PASSWORD='${{ secrets.MONGO_PASSWORD }}' tehmina13/finalbackend-freelanceplace
         
