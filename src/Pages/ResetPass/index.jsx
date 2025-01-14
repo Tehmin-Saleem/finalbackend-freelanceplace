@@ -33,7 +33,7 @@ function ForgotPassword() {
 
     setIsLoading(true);
     try {
-      const response = await fetch("http://localhost:5000/api/client/ForgotPass", {
+      const response = await fetch(`${process.env.REACT_APP_LOCAL_BASE_URL}/api/client/ForgotPass`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }),

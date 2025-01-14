@@ -46,13 +46,13 @@ const { setJobCounts } = useJobContext();
 
       // Fetch both hired jobs and offers in parallel
       const [hireResponse, offersResponse] = await Promise.all([
-        axios.get("http://localhost:5000/api/client/hire", {
+        axios.get(`${process.env.REACT_APP_LOCAL_BASE_URL}/api/client/hire`, {
           headers: {
             Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
           },
         }),
-        axios.get("http://localhost:5000/api/freelancer/offers", {
+        axios.get(`${process.env.REACT_APP_LOCAL_BASE_URL}/api/freelancer/offers`, {
           headers: {
             Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",

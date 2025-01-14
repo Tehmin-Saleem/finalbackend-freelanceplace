@@ -120,7 +120,7 @@ function Signup() {
       //   }
       // );
 
-      const response = await fetch("http://localhost:5000/api/client/signup", {
+      const response = await fetch(`${process.env.REACT_APP_LOCAL_BASE_URL}/api/client/signup`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

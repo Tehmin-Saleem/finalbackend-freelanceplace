@@ -34,10 +34,10 @@ const FreelancerCard = ({ heading, freelancer }) => {
 
           // Fetch freelancers and user countries concurrently
           const [freelancerResponse, usersResponse] = await Promise.all([
-            axios.get("http://localhost:5000/api/freelancer/profile", {
+            axios.get(`${process.env.REACT_APP_LOCAL_BASE_URL}/api/freelancer/profile`, {
               headers,
             }),
-            axios.get("http://localhost:5000/api/client/users", { headers }),
+            axios.get(`${process.env.REACT_APP_LOCAL_BASE_URL}/api/client/users`, { headers }),
           ]);
 
           const freelancers = freelancerResponse.data.data;
@@ -53,7 +53,7 @@ const FreelancerCard = ({ heading, freelancer }) => {
           setUserCountryMap(userCountryMap);
           const completedJobsPromises = freelancers.map(async (freelancer) => {
             const response = await axios.get(
-              `http://localhost:5000/api/freelancer/completed-jobs/${freelancer.freelancer_id}`,
+              `${process.env.REACT_APP_LOCAL_BASE_URL}/api/freelancer/completed-jobs/${freelancer.freelancer_id}`,
               { headers }
             );
             return {

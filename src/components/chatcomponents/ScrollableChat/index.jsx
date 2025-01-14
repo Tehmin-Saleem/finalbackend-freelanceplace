@@ -15,7 +15,7 @@ import "./styles.scss";
 import io from "socket.io-client";
 
 
-const ENDPOINT = "http://localhost:5000";
+const ENDPOINT = "http://13.61.176.80:5000";
 var socket;
 
 
@@ -82,7 +82,7 @@ const ScrollableChat = () => {
         let response;
         if (userRole === "client") {
           response = await axios.get(
-            `http://localhost:5000/api/freelancer/profilebyfreelancerid/${selectedFreelancer}`,
+            `${process.env.REACT_APP_LOCAL_BASE_URL}/api/freelancer/profilebyfreelancerid/${selectedFreelancer}`,
             { headers }
           );
           console.log("Freelancer data fetched successfully:", response.data);
@@ -234,9 +234,9 @@ const ScrollableChat = () => {
   
       let route;
       if (userRole === "client") {
-        route = `http://localhost:5000/api/client/Message/${messageId}`;
+        route = `${process.env.REACT_APP_LOCAL_BASE_URL}/api/client/Message/${messageId}`;
       } else if (userRole === "freelancer") {
-        route = `http://localhost:5000/api/freelancer/Message/${messageId}`;
+        route = `${process.env.REACT_APP_LOCAL_BASE_URL}/api/freelancer/Message/${messageId}`;
       } else {
         console.error("Invalid user role.");
         setError("Invalid user role. Please log in again.");

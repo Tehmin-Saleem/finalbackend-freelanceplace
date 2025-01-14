@@ -18,7 +18,7 @@ const ApplyJob = () => {
     try {
       const token = localStorage.getItem("token");
       const response = await fetch(
-        "http://localhost:5000/api/freelancer/checkPaymentMethod",
+        `${process.env.REACT_APP_LOCAL_BASE_URL}/api/freelancer/checkPaymentMethod`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -67,7 +67,7 @@ const handleApplyNow = async () => {
     const fetchJobPost = async () => {
       try {
         const response = await fetch(
-          `http://localhost:5000/api/client/job-posts/${jobPostId}`,
+          `${process.env.REACT_APP_LOCAL_BASE_URL}/api/client/job-posts/${jobPostId}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,

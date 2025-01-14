@@ -79,7 +79,7 @@ const { TextArea } = Input;
       };
   
       const response = await fetch(
-        `http://localhost:5000/api/client/send-offer-to-consultant/${selectedConsultant.consultant_id}`,
+        `${process.env.REACT_APP_LOCAL_BASE_URL}/api/client/send-offer-to-consultant/${selectedConsultant.consultant_id}`,
         {
           method: 'POST',
           headers: {
@@ -110,7 +110,7 @@ const { TextArea } = Input;
       const token = localStorage.getItem('token');
 
       try {
-        const response = await fetch('http://localhost:5000/api/client/Consultantsprofiles', {
+        const response = await fetch(`${process.env.REACT_APP_LOCAL_BASE_URL}/api/client/Consultantsprofiles`, {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${token}`,

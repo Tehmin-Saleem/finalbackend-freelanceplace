@@ -89,7 +89,7 @@ const ClientOffersPage = () => {
           statusFilter === "all" ? undefined : statusFilter;
 
         const response = await axios.get(
-          `http://localhost:5000/api/client/consultantoffers/${clientId}`,
+          `${process.env.REACT_APP_LOCAL_BASE_URL}/api/client/consultantoffers/${clientId}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,

@@ -48,7 +48,7 @@ function SignIn() {
     const checkTokenValidity = async () => {
       if (token && location.pathname === "/signin") {
         try {
-          const response = await fetch("http://localhost:5000/api/client/validate-token", {
+          const response = await fetch(`${process.env.REACT_APP_LOCAL_BASE_URL}/api/client/validate-token`, {
             method: "GET",
             headers: {
               "Authorization": `Bearer ${token}`,
@@ -128,7 +128,7 @@ function SignIn() {
     }
 
     try {
-      const response = await fetch("http://localhost:5000/api/client/login", {
+      const response = await fetch(`${process.env.REACT_APP_LOCAL_BASE_URL}/api/client/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

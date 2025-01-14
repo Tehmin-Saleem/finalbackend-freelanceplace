@@ -12,7 +12,7 @@ export const NotificationProvider = ({ children }) => {
         try {
             const token = localStorage.getItem('token');
             console.log('Fetching notifications with token:', token);
-            const response = await axios.get('http://localhost:5000/api/freelancer/notifications', {
+            const response = await axios.get(`${process.env.REACT_APP_LOCAL_BASE_URL}/api/freelancer/notifications`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             console.log('NotificationContext: Fetched notifications:', response.data);
@@ -35,7 +35,7 @@ export const NotificationProvider = ({ children }) => {
     const fetchUnreadCount = useCallback(async () => {
         try {
             const token = localStorage.getItem('token');
-            const response = await axios.get('http://localhost:5000/api/freelancer/notifications/unread-count', {
+            const response = await axios.get(`${process.env.REACT_APP_LOCAL_BASE_URL}/api/freelancer/notifications/unread-count`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             console.log('NotificationContext: Fetched unread count:', response.data.count);
@@ -86,7 +86,7 @@ export const NotificationProvider = ({ children }) => {
     const markAsRead = async (notificationId) => {
         try {
             const token = localStorage.getItem('token');
-            await axios.put(`http://localhost:5000/api/freelancer/notifications/${notificationId}/read`, {}, {
+            await axios.put(`${process.env.REACT_APP_LOCAL_BASE_URL}/api/freelancer/notifications/${notificationId}/read`, {}, {
                 headers: { Authorization: `Bearer ${token}` }
             });
            

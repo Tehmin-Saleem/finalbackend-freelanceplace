@@ -20,7 +20,7 @@ const ClientDashboard = () => {
   const checkClientProfile = async (userId, token) => {
     try {
       const response = await axios.get(
-        `http://localhost:5000/api/client/client-profile-exists/${userId}`,
+        `${process.env.REACT_APP_LOCAL_BASE_URL}/api/client/client-profile-exists/${userId}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }
@@ -56,13 +56,13 @@ const ClientDashboard = () => {
         setHasProfile(profileExists);
 
         const userResponse = await axios.get(
-          `http://localhost:5000/api/client/users/${userId}`,
+          `${process.env.REACT_APP_LOCAL_BASE_URL}/api/client/users/${userId}`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
         setUser(userResponse.data);
 
         const statsResponse = await axios.get(
-          `http://localhost:5000/api/client/dashboard-stats/${userId}`,
+          `${process.env.REACT_APP_LOCAL_BASE_URL}/api/client/dashboard-stats/${userId}`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
         setDashboardStats(statsResponse.data.data);

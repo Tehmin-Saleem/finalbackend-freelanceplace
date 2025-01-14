@@ -40,14 +40,14 @@ const ChatProvider = ({ children }) => {
   
       if (userRole === 'freelancer') {
         // If the user is a freelancer, fetch freelancer profile details
-        const response = await axios.get(`http://localhost:5000/api/freelancer/profile/${userId}`, {
+        const response = await axios.get(`${process.env.REACT_APP_LOCAL_BASE_URL}/api/freelancer/profile/${userId}`, {
           headers,
         });
         userData = response.data;
         setUser(userData); // Set profile data specifically for freelancers
       } else if (userRole === 'client') {
         // If the user is a client, fetch client-specific data
-        const response = await axios.get(`http://localhost:5000/api/client/users/${userId}`, {
+        const response = await axios.get(`${process.env.REACT_APP_LOCAL_BASE_URL}/api/client/users/${userId}`, {
           headers,
         });
         userData = response.data;

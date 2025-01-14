@@ -155,7 +155,7 @@ const JobDetails = () => {
       }
   console.log('file',jobData.attachment)
       const response = await axios.post(
-        "http://localhost:5000/api/client/jobpost",
+        `${process.env.REACT_APP_LOCAL_BASE_URL}/api/client/jobpost`,
         formData,
         {
           headers: {

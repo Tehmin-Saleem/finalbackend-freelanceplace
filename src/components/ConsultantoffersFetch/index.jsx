@@ -35,7 +35,7 @@ const ConsultantOffers = () => {
         
 
         const response = await axios.get(
-          `http://localhost:5000/api/client/offer/${consultantId}`,
+          `${process.env.REACT_APP_LOCAL_BASE_URL}/api/client/offer/${consultantId}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -70,7 +70,7 @@ const ConsultantOffers = () => {
     try {
       const token = localStorage.getItem("token");
       await axios.put(
-        `http://localhost:5000/api/client/offer/${offerId}`,
+        `${process.env.REACT_APP_LOCAL_BASE_URL}/api/client/offer/${offerId}`,
         { status: action },
         {
           headers: {
@@ -122,7 +122,7 @@ const ConsultantOffers = () => {
     
         // Fetch project details from the backend
         const response = await axios.get(
-          `http://localhost:5000/api/client/project-details/${offerId}`,
+          `${process.env.REACT_APP_LOCAL_BASE_URL}/api/client/project-details/${offerId}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,

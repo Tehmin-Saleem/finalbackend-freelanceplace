@@ -101,10 +101,10 @@ const EditableProjectCard = ({ project, onSave, onComplete }) => {
         let url;
         if (isOffer) {
           // For offers, use projectName
-          url = `http://localhost:5000/api/client/project-progress/null?client_id=${userId}&projectName=${encodeURIComponent(project.projectName)}`;
+          url = `${process.env.REACT_APP_LOCAL_BASE_URL}/api/client/project-progress/null?client_id=${userId}&projectName=${encodeURIComponent(project.projectName)}`;
         } else {
           // For normal jobs
-          url =  `http://localhost:5000/api/client/project-progress/${project.proposal_id}?client_id=${project.client_id}`;
+          url =  `${process.env.REACT_APP_LOCAL_BASE_URL}/api/client/project-progress/${project.proposal_id}?client_id=${project.client_id}`;
         }
     
         const response = await axios.get(url, {
@@ -325,7 +325,7 @@ const EditableProjectCard = ({ project, onSave, onComplete }) => {
 
       const response = await axios({
         method: "POST",
-        url: "http://localhost:5000/api/freelancer/manageproj",
+        url: `${process.env.REACT_APP_LOCAL_BASE_URL}/api/freelancer/manageproj`,
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",

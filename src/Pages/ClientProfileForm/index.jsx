@@ -46,7 +46,7 @@ const ClientProfilePage = () => {
 
         // Fetch user data
         const userResponse = await axios.get(
-          `http://localhost:5000/api/client/users/${userId}`,
+          `${process.env.REACT_APP_LOCAL_BASE_URL}/api/client/users/${userId}`,
           {
             headers: { Authorization: `Bearer ${token}` },
           }
@@ -65,7 +65,7 @@ const ClientProfilePage = () => {
         console.log("userdata", userData);
         // Then check for existing profile
         const profileResponse = await axios.get(
-          "http://localhost:5000/api/client/profile",
+          `${process.env.REACT_APP_LOCAL_BASE_URL}/api/client/profile`,
           {
             headers: { Authorization: `Bearer ${token}` },
           }
@@ -184,8 +184,8 @@ const ClientProfilePage = () => {
 
       // Choose the appropriate endpoint based on whether we're creating or updating
       const endpoint = isEditMode
-        ? "http://localhost:5000/api/client/profile/update"
-        : "http://localhost:5000/api/client/clientprofile";
+        ? `${process.env.REACT_APP_LOCAL_BASE_URL}/api/client/profile/update`
+        : `${process.env.REACT_APP_LOCAL_BASE_URL}/api/client/clientprofile`;
 
       const method = isEditMode ? "put" : "post";
 

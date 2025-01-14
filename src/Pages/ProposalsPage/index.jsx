@@ -40,10 +40,10 @@ const IndexPage = () => {
 
         const [proposalsResponse, userResponse] = await Promise.all([
           axios.get(
-            `http://localhost:5000/api/freelancer/getproposals?jobId=${jobId}`,
+            `${process.env.REACT_APP_LOCAL_BASE_URL}/api/freelancer/getproposals?jobId=${jobId}`,
             { headers }
           ),
-          axios.get(`http://localhost:5000/api/client/users`, { headers }),
+          axios.get(`${process.env.REACT_APP_LOCAL_BASE_URL}/api/client/users`, { headers }),
           
         ]);
 

@@ -44,7 +44,7 @@ const PaymentMethod = () => {
       const userId = decodedToken.userId;
 
       const response = await axios.post(
-        "http://localhost:5000/api/client/payment-methods",
+        `${process.env.REACT_APP_LOCAL_BASE_URL}/api/client/payment-methods`,
         {
           type: "paypal",
           email,

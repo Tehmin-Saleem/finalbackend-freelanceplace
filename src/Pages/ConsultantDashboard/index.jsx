@@ -76,7 +76,7 @@ const renderStars = (rating) => {
         const decodedToken = jwtDecode(token);
         const consultantId = decodedToken.userId;
   
-        const response = await axios.get(`http://localhost:5000/api/client/offers/count/${consultantId}`, {
+        const response = await axios.get(`${process.env.REACT_APP_LOCAL_BASE_URL}/api/client/offers/count/${consultantId}`, {
           headers: {
             Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
@@ -126,7 +126,7 @@ const renderStars = (rating) => {
       console.log("Decoded User ID:", userId);
 
       const response = await axios.get(
-        `http://localhost:5000/api/client/users/${userId}`,
+        `${process.env.REACT_APP_LOCAL_BASE_URL}/api/client/users/${userId}`,
        {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -165,7 +165,7 @@ const renderStars = (rating) => {
         const consultantId = decodedToken.userId;
   
         const response = await axios.get(
-          `http://localhost:5000/api/client/offers/count/${consultantId}`, // Adjust to your API endpoint
+          `${process.env.REACT_APP_LOCAL_BASE_URL}/api/client/offers/count/${consultantId}`, // Adjust to your API endpoint
           {
             headers: {
               Authorization: `Bearer ${token}`,

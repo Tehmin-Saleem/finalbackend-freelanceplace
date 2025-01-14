@@ -130,7 +130,7 @@ function ConsultantProfileForm() {
         if (token) {
             try {
                 console.log('Sending request to server');
-                const response = await fetch('http://localhost:5000/api/client/Constprofile', {
+                const response = await fetch(`${process.env.REACT_APP_LOCAL_BASE_URL}/api/client/Constprofile`, {
                     method: 'POST',
                     headers: {
                         'Authorization': `Bearer ${token}`,

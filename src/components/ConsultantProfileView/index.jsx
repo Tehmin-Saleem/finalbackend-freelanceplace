@@ -25,7 +25,7 @@ const ConsultantProfileView = () => {
           throw new Error('No consultant ID found in token');
         }
   
-        const response = await fetch(`http://localhost:5000/api/client/Constprofile/${consultantId}`, {
+        const response = await fetch(`${process.env.REACT_APP_LOCAL_BASE_URL}/api/client/Constprofile/${consultantId}`, {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -48,7 +48,7 @@ const ConsultantProfileView = () => {
         // Handle profile picture and name
         const profilePicture = data.profile?.profilePicture || '/default-profile.png';
         setUserPicture(profilePicture);
-        const response1 = await fetch(`http://localhost:5000/api/client/users/${consultantId}`, {
+        const response1 = await fetch(`${process.env.REACT_APP_LOCAL_BASE_URL}/api/client/users/${consultantId}`, {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${token}`,

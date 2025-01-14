@@ -80,7 +80,7 @@ const ProjectDetailsModal = () => {
       }
   
       const response = await axios.get(
-        `http://localhost:5000/api/client/${offerId}/${consultantId}`,
+        `${process.env.REACT_APP_LOCAL_BASE_URL}/api/client/${offerId}/${consultantId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -108,7 +108,7 @@ const ProjectDetailsModal = () => {
       }
 
       const response = await axios.post(
-        'http://localhost:5000/api/client/add',
+        `${process.env.REACT_APP_LOCAL_BASE_URL}/api/client/add`,
         {
           offerId,
           remark: newRemark,
@@ -149,7 +149,7 @@ const ProjectDetailsModal = () => {
 
     try {
       const response3 = await axios.get(
-        `http://localhost:5000/api/client/project-details/${offerId}`,
+        `${process.env.REACT_APP_LOCAL_BASE_URL}/api/client/project-details/${offerId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,

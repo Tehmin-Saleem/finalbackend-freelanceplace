@@ -31,7 +31,7 @@ const AllJobsPage = () => {
     try {
       setLoading(true);
       const response = await axios.get(
-        `http://localhost:5000/api/client/filtered-jobs?filter=${selectedFilter}`,
+        `${process.env.REACT_APP_LOCAL_BASE_URL}/api/client/filtered-jobs?filter=${selectedFilter}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,

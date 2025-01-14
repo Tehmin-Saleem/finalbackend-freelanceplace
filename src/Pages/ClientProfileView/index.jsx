@@ -81,10 +81,10 @@ const ClientProfile = () => {
         console.log(userId);
 
         const [profileResponse, jobPostsResponse] = await Promise.all([
-          axios.get("http://localhost:5000/api/client/profile", {
+          axios.get(`${process.env.REACT_APP_LOCAL_BASE_URL}/api/client/profile`, {
             headers: { Authorization: `Bearer ${token}` },
           }),
-          axios.get("http://localhost:5000/api/client/job-posts", {
+          axios.get(`${process.env.REACT_APP_LOCAL_BASE_URL}/api/client/job-posts`, {
             headers: { Authorization: `Bearer ${token}` },
           }),
         ]);

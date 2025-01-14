@@ -422,10 +422,10 @@ function ProfileView() {
           Authorization: `Bearer ${token}`,
         };
         const [response, userResponse] = await Promise.all([
-          axios.get(`http://localhost:5000/api/freelancer/profile/${userId}`, {
+          axios.get(`${process.env.REACT_APP_LOCAL_BASE_URL}/api/freelancer/profile/${userId}`, {
             headers,
           }),
-          axios.get(`http://localhost:5000/api/client/users`, { headers }),
+          axios.get(`${process.env.REACT_APP_LOCAL_BASE_URL}/api/client/users`, { headers }),
         ]);
 
         setProfileData(response.data.data);
@@ -435,7 +435,7 @@ function ProfileView() {
 
         // Fetch reviews
         const reviewsResponse = await axios.get(
-          `http://localhost:5000/api/freelancer/${userId}/reviews`,
+          `${process.env.REACT_APP_LOCAL_BASE_URL}/api/freelancer/${userId}/reviews`,
           {
             headers: {
               Authorization: `Bearer ${token}`,

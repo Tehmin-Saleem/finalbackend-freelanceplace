@@ -49,7 +49,7 @@ const Header = () => {
         const userId = decodedToken.userId;
 
         const response = await axios.get(
-          `http://localhost:5000/api/client/users/${userId}`,
+          `${process.env.REACT_APP_LOCAL_BASE_URL}/api/client/users/${userId}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -67,7 +67,7 @@ const Header = () => {
           if (!token) return;
 
           const response = await axios.get(
-            "http://localhost:5000/api/freelancer/notifications/unread-count",
+            `${process.env.REACT_APP_LOCAL_BASE_URL}/api/freelancer/notifications/unread-count`,
             {
               headers: { Authorization: `Bearer ${token}` },
             }
@@ -151,20 +151,20 @@ const Header = () => {
       try {
         if (snap.user.role === "client") {
           const response = await axios.get(
-            `http://localhost:5000/api/client/client-profile-exists/${userId}`,
+            `${process.env.REACT_APP_LOCAL_BASE_URL}/api/client/client-profile-exists/${userId}`,
             config
           );
           navigate(response.data.exists ? "/ClientProfile" : "/ClientProfileForm");
         } else if (snap.user.role === "freelancer") {
           const response = await axios.get(
-            `http://localhost:5000/api/freelancer/freelancer-profile-exists/${userId}`,
+            `${process.env.REACT_APP_LOCAL_BASE_URL}/api/freelancer/freelancer-profile-exists/${userId}`,
             config
           );
           navigate(response.data.exists ? `/profile/${userId}` : "/myProfile");
         } else if (snap.user.role === "consultant") {
           try {
             const response = await axios.get(
-              `http://localhost:5000/api/client/Constprofile/${userId}`, // Correct route
+              `${process.env.REACT_APP_LOCAL_BASE_URL}/api/client/Constprofile/${userId}`, // Correct route
               config
             );
             console.log("Response data for consultant profile:", response.data);

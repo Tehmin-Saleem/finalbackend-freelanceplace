@@ -39,7 +39,7 @@ const SendProjectDetails = ({ consultantId, onProjectSent, onClose, clientId }) 
       });
       console.log("Sending deadline:", formData.deadline);
       const response = await axios.post(
-        `http://localhost:5000/api/client/sendProjectDetails/${consultantId}`,
+        `${process.env.REACT_APP_LOCAL_BASE_URL}/api/client/sendProjectDetails/${consultantId}`,
         {
           githubUrl: formData.githubUrl,
           deadline: formData.deadline,

@@ -173,7 +173,7 @@ const SubmitProposal = () => {
         const userId = decodedToken.userId; // Adjust this based on your token structure
 
         const response = await fetch(
-          "http://localhost:5000/api/freelancer/profile",
+          `${process.env.REACT_APP_LOCAL_BASE_URL}/api/freelancer/profile`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -218,7 +218,7 @@ const SubmitProposal = () => {
         return;
       }
       const response = await fetch(
-        `http://localhost:5000/api/client/job-posts/${jobPostId}`,
+        `${process.env.REACT_APP_LOCAL_BASE_URL}/api/client/job-posts/${jobPostId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -342,7 +342,7 @@ const SubmitProposal = () => {
       // Removed: formDataToSend.append('freelancer_id', userId);
 
       const response = await fetch(
-        `http://localhost:5000/api/freelancer/proposal/${jobPostId}`,
+        `${process.env.REACT_APP_LOCAL_BASE_URL}/api/freelancer/proposal/${jobPostId}`,
         {
           method: "POST",
           headers: {
@@ -392,7 +392,7 @@ const SubmitProposal = () => {
       }
 
       const response = await axios.post(
-        "http://localhost:5000/api/freelancer/generate-cover-letter",
+        `${process.env.REACT_APP_LOCAL_BASE_URL}/api/freelancer/generate-cover-letter`,
         {
           jobPostId,
           freelancerId,

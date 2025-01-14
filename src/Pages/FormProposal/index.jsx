@@ -198,7 +198,7 @@ const OfferForm = () => {
         console.log(pair[0] + ': ' + pair[1]);
       }
 
-      const response = await axios.post('http://localhost:5000/api/client/offerform', formData, {
+      const response = await axios.post(`${process.env.REACT_APP_LOCAL_BASE_URL}/api/client/offerform`, formData, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'multipart/form-data'

@@ -16,7 +16,7 @@ class SocketManager {
       this.userId = decodedToken?.userId;
       this.userRole = decodedToken?.role;
       this.userEmail = decodedToken?.email;
-      this.socket = io('http://localhost:5000', {
+      this.socket = io(`${process.env.REACT_APP_LOCAL_BASE_URL}`, {
         auth: {
           token,
           userId: this.userId,

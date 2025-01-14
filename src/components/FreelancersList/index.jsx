@@ -20,7 +20,7 @@ const FreelancerList = () => {
           throw new Error('No token found');
         }
   
-        const response = await fetch('http://localhost:5000/api/freelancer/freelancerslist', {
+        const response = await fetch(`${process.env.REACT_APP_LOCAL_BASE_URL}/api/freelancer/freelancerslist`, {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -53,7 +53,7 @@ const FreelancerList = () => {
           throw new Error('No token found');
         }
 
-      const response = await fetch(`http://localhost:5000/api/freelancer/softban/${id}`, {
+      const response = await fetch(`${process.env.REACT_APP_LOCAL_BASE_URL}/api/freelancer/softban/${id}`, {
 
         method: 'PATCH',
         headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
@@ -88,7 +88,7 @@ const FreelancerList = () => {
         if (!token) {
           throw new Error('No token found');
         }
-      const response = await fetch(`http://localhost:5000/api/freelancer/ban/${id}`, {
+      const response = await fetch(`${process.env.REACT_APP_LOCAL_BASE_URL}/api/freelancer/ban/${id}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
       });

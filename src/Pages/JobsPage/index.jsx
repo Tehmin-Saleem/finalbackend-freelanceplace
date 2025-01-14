@@ -56,11 +56,11 @@ const JobsPage = () => {
         // Fetch jobs, user data, and payment methods concurrently
         const [jobsResponse, userResponse, paymentMethodsResponse] =
           await Promise.all([
-            axios.get("http://localhost:5000/api/client/job-posts", {
+            axios.get(`${process.env.REACT_APP_LOCAL_BASE_URL}/api/client/job-posts`, {
               headers,
             }),
-            axios.get(`http://localhost:5000/api/client/users`, { headers }),
-            axios.get("http://localhost:5000/api/client/payment-methods", {
+            axios.get(`${process.env.REACT_APP_LOCAL_BASE_URL}/api/client/users`, { headers }),
+            axios.get(`${process.env.REACT_APP_LOCAL_BASE_URL}/api/client/payment-methods`, {
               headers,
             }),
           ]);

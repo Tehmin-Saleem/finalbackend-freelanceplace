@@ -15,7 +15,7 @@ const ClientList = () => {
           throw new Error('No token found');
         }
 
-        const response = await fetch('http://localhost:5000/api/client/clientslist', {
+        const response = await fetch(`${process.env.REACT_APP_LOCAL_BASE_URL}/api/client/clientslist`, {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -45,7 +45,7 @@ const ClientList = () => {
         throw new Error('No token found');
       }
 
-      const response = await fetch(`http://localhost:5000/api/client/softban/${id}`, {
+      const response = await fetch(`${process.env.REACT_APP_LOCAL_BASE_URL}/api/client/softban/${id}`, {
         method: 'PATCH',
         headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
       });
@@ -70,7 +70,7 @@ const ClientList = () => {
       if (!token) {
         throw new Error('No token found');
       }
-      const response = await fetch(`http://localhost:5000/api/client/ban/${id}`, {
+      const response = await fetch(`${process.env.REACT_APP_LOCAL_BASE_URL}/api/client/ban/${id}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
       });

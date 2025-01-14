@@ -97,10 +97,10 @@ const JobsCard = ({
       let url;
       if (source === "offer") {
         // For offers, use projectName
-        url = `http://localhost:5000/api/client/project-progress/null?client_id=${client_id}&projectName=${encodeURIComponent(title)}`;
+        url = `${process.env.REACT_APP_LOCAL_BASE_URL}/api/client/project-progress/null?client_id=${client_id}&projectName=${encodeURIComponent(title)}`;
       } else {
         // For normal jobs
-        url = `http://localhost:5000/api/client/project-progress/${proposal_id}?client_id=${client_id}`;
+        url = `${process.env.REACT_APP_LOCAL_BASE_URL}/api/client/project-progress/${proposal_id}?client_id=${client_id}`;
       }
 
       const response = await axios.get(url, {
@@ -139,7 +139,7 @@ const JobsCard = ({
         window.open(path, "_blank");
       } else {
         // If it's a relative path, prepend your backend URL
-        window.open(`http://localhost:5000/${path}`, "_blank");
+        window.open(`${process.env.REACT_APP_LOCAL_BASE_URL}/${path}`, "_blank");
       }
     }
   };
@@ -169,7 +169,7 @@ const JobsCard = ({
         });
 
         const response = await axios.get(
-          `http://localhost:5000/api/freelancer/job-review/${reviewId}${source === 'offer' ? '?source=offer' : ''}`,
+          `${process.env.REACT_APP_LOCAL_BASE_URL}/api/freelancer/job-review/${reviewId}${source === 'offer' ? '?source=offer' : ''}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -278,7 +278,7 @@ const JobsCard = ({
 
       // Fetch specific proposal data
       const response = await axios.get(
-        `http://localhost:5000/api/freelancer/getproposals?jobId=${job_id}`, // Fixed template literal
+        `${process.env.REACT_APP_LOCAL_BASE_URL}/api/freelancer/getproposals?jobId=${job_id}`, // Fixed template literal
         { headers }
       );
       // console.log("Fetched job_id:", job_id); // Debug log

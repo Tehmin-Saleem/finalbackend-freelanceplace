@@ -66,9 +66,9 @@ const QueryForm = () => {
         // Define the route based on the user role
         let route;
         if (userRole === "client") {
-            route = `http://localhost:5000/api/client/query`;
+            route = `${process.env.REACT_APP_LOCAL_BASE_URL}/api/client/query`;
         } else if (userRole === "freelancer") {
-            route = `http://localhost:5000/api/freelancer/query`;
+            route = `${process.env.REACT_APP_LOCAL_BASE_URL}/api/freelancer/query`;
         } else {
             return;
         }

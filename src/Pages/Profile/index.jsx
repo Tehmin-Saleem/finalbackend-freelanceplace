@@ -68,7 +68,7 @@ const MyProfile = () => {
       };
   
       const userResponse = await axios.get(
-        `http://localhost:5000/api/freelancer/users/${userId}`,
+        `${process.env.REACT_APP_LOCAL_BASE_URL}/api/freelancer/users/${userId}`,
         config
       );
   
@@ -82,13 +82,13 @@ const MyProfile = () => {
       }));
   
       const existenceResponse = await axios.get(
-        `http://localhost:5000/api/freelancer/freelancer-profile-exists/${userId}`,
+        `${process.env.REACT_APP_LOCAL_BASE_URL}/api/freelancer/freelancer-profile-exists/${userId}`,
         config
       );
   
       if (existenceResponse.data.exists) {
         const profileResponse = await axios.get(
-          `http://localhost:5000/api/freelancer/profile/${userId}`,
+          `${process.env.REACT_APP_LOCAL_BASE_URL}/api/freelancer/profile/${userId}`,
           config
         );
   
@@ -332,7 +332,7 @@ const MyProfile = () => {
 
       const token = localStorage.getItem("token");
       const response = await axios.post(
-        "http://localhost:5000/api/freelancer/profile",
+        `${process.env.REACT_APP_LOCAL_BASE_URL}/api/freelancer/profile`,
         formData,
         {
           headers: {
