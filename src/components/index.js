@@ -1,5 +1,5 @@
 import CommonButton from "./Commoncomponents/CommonButton";
-import TextField from "./Commoncomponents/Textfield";
+import TextField from "./Commoncomponents/TextField";
 
 import Carousel from "./ProfileView/Carousel";
 import StarRating from "./ProfileView/starrating";
@@ -22,7 +22,7 @@ import Modal from "./PopUps/Prompts"
 import PortfolioModal from "./PopUps/Portfolio/index.jsx";
 
 export {default as CommonButton} from "./Commoncomponents/CommonButton"
-export {default as TextField} from "./Commoncomponents/Textfield"
+export {default as TextField} from "./Commoncomponents/TextField"
 
 export {default as Header} from "./Commoncomponents/Header"
 export {default as Carousel} from "./ProfileView/Carousel"
