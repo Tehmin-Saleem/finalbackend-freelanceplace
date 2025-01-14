@@ -135,7 +135,7 @@ function Signup() {
           country_name: country,
         }),
       });
-
+console.log('api',process.env.REACT_APP_LOCAL_BASE_URL )
       const data = await response.json();
       console.log("data at signup", data);
 

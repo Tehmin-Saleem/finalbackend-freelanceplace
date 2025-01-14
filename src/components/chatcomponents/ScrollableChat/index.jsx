@@ -15,7 +15,8 @@ import "./styles.scss";
 import io from "socket.io-client";
 
 
-const ENDPOINT = "http://13.61.176.80:5000";
+// const ENDPOINT = process.env.REACT_APP_LOCAL_BASE_URL;
+const ENDPOINT = 'http://13.61.176.80:5000';
 var socket;
 
 

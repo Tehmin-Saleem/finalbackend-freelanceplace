@@ -17,9 +17,9 @@ import io from "socket.io-client";
 import animationData from "../../animations/typing.json";
 import { jwtDecode } from "jwt-decode";
 
-const ENDPOINT = `${process.env.REACT_APP_LOCAL_BASE_URL}`; // "https://talk-a-tive.herokuapp.com"; -> After deployment
+//const ENDPOINT = process.env.REACT_APP_LOCAL_BASE_URL; // "https://talk-a-tive.herokuapp.com"; -> After deployment
 var socket, selectedChatCompare;
-
+const ENDPOINT = 'http://13.61.176.80:5000';
 const Chat = () => {
   const [search, setSearch] = useState("");
   const [isDrawerOpen, setIsDrawerOpen] = useState(false); // State to control drawer
