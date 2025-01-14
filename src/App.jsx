@@ -66,6 +66,7 @@ import ProjectDetailsModal from "./components/PopUps/SeeProjectDetails";
 // import { JobProvider } from "./context/JoBContext";
 // import PaymentMethod from './components/PaymentMethod';
 
+
 const freelancers = [
   {
     name: "Usman Shahid",
