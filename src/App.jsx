@@ -40,7 +40,7 @@ import ReviewPopup from "./components/PopUps/ReviewPopup";
 import JobPostedPopup from "./components/PopUps/JobPosted";
 import ForgotPassword from "./Pages/ResetPass";
 import ChangePassword from "./Pages/ForgotPass";
-import ChatProvider from "./context/ChatProvider.jsX";
+import ChatProvider from "./context/ChatProvider";
 import { NotificationProvider } from "./Pages/Notifications/NotificationContext";
 import { JobStatusProvider } from "./context/JobStatus";
 
