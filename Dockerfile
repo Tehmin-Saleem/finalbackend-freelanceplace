@@ -15,6 +15,7 @@ RUN npm install > /dev/null 2>&1
 COPY . .
 RUN npm run build
 
+
 # Serve with Nginx
 FROM nginx:1.23-alpine
 WORKDIR /usr/share/nginx/html
