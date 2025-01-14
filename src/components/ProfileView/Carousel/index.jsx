@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Carouselleft, Crouselright } from "../../../svg";
 import "./styles.scss";
-import Footer from "../../foote";
+import Footer from "../../footer/foote";
 
 const Carousel = ({ cards }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
