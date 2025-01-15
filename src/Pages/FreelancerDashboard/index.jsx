@@ -138,7 +138,7 @@ const FreelanceDashboardPage = () => {
           Authorization: `Bearer ${token}`,
         },
       };
-
+      const BASE_URL = import.meta.env.VITE_LOCAL_BASE_URL
       const response = await axios.get(
         `${BASE_URL}/api/freelancer/freelancer-profile-exists/${userId}`,
         config
@@ -312,7 +312,7 @@ const FreelanceDashboardPage = () => {
       if (!loggedInUserId) {
         throw new Error("Unable to decode user ID from token");
       }
-
+      const BASE_URL = import.meta.env.VITE_LOCAL_BASE_URL
       // Fetch both hired jobs and offers in parallel
       const [hireResponse, offersResponse] = await Promise.all([
         axios.get(`${BASE_URL}/api/client/hire`, {

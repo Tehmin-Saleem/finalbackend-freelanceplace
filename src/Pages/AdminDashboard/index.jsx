@@ -114,7 +114,7 @@ const AdminDashboard = () => {
 
           const queryData = await queryResponse.json();
           setQueries(queryData);
-
+       
           const freelancerResponse = await fetch(`${BASE_URL}/api/freelancer/count`, {
             method: 'GET',
             headers: {
@@ -152,6 +152,7 @@ const AdminDashboard = () => {
       fetchData();
     }, [fetchNotifications]);
     const handleResolveClick = async (queryId) => {
+     const BASE_URL = import.meta.env.VITE_LOCAL_BASE_URL
       const response = await fetch(`${BASE_URL}/api/freelancer/queries/${queryId}`, {
         method: 'GET',
         headers: {
@@ -175,6 +176,7 @@ const AdminDashboard = () => {
 
     const handleConfirmResolve = async (queryId) => {
       try {
+       const BASE_URL = import.meta.env.VITE_LOCAL_BASE_URL
           const response = await fetch(`${BASE_URL}/api/freelancer/queries/${queryId}`, {
               method: 'PATCH',
               headers: {
@@ -268,7 +270,7 @@ const AdminDashboard = () => {
 
     return (
       <>
-      <Header/>
+      {/* <Header/> */}
       <div className="admin-dashboard">
         <aside className={isSidebarOpen ? 'sidebar open' : 'sidebar closed'}>
           <div className="logo">Admin Panel</div>

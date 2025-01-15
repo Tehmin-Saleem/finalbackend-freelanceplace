@@ -17,9 +17,9 @@ import io from "socket.io-client";
 import animationData from "../../animations/typing.json";
 import { jwtDecode } from "jwt-decode";
 
-//const ENDPOINT = BASE_URL; // "https://talk-a-tive.herokuapp.com"; -> After deployment
+const ENDPOINT = "http://localhost:5000"; // "https://talk-a-tive.herokuapp.com"; -> After deployment
 var socket, selectedChatCompare;
-const ENDPOINT = 'http://13.61.176.80:5000';
+
 const Chat = () => {
   const [search, setSearch] = useState("");
   const [isDrawerOpen, setIsDrawerOpen] = useState(false); // State to control drawer
@@ -161,8 +161,7 @@ const Chat = () => {
 
       // Define search route based on user role
       let route;
-      if (userRole === "client") {
-        const BASE_URL = import.meta.env.VITE_LOCAL_BASE_URL
+      if (userRole === "client") { const BASE_URL = import.meta.env.VITE_LOCAL_BASE_URL
         // Clients should search for freelancers
         route = `${BASE_URL}/api/client/searchFreelancers?search=${search}`;
       } else if (userRole === "freelancer") {
@@ -282,6 +281,7 @@ const Chat = () => {
           Authorization: `Bearer ${token}`,
         },
       };
+
       const BASE_URL = import.meta.env.VITE_LOCAL_BASE_URL
       const { data } = await axios.get(
         `${BASE_URL}/api/client/fetchchats`,
@@ -404,22 +404,23 @@ const Chat = () => {
   
       try {
         let response;
-  
+        
         if (attachment) {
           const formData = new FormData();
-  
+          
           // Add fields in specific order
           formData.append("chatId", selectedChat._id);
           if (newMessage.trim()) {
             formData.append("content", newMessage.trim());
           }
-          formData.append("attachment", attachment); // Ensure the key matches the backend expectation
+          formData.append("file", attachment);
   
           // Debug log
           console.log("Sending FormData with:");
           console.log("chatId:", selectedChat._id);
-          console.log("content:", newMessage.trim());
-          console.log("attachment:", attachment.name);
+          console.log(" content:", newMessage.trim());
+          console.log(" file:", attachment.name);
+  
           const BASE_URL = import.meta.env.VITE_LOCAL_BASE_URL
           response = await axios.post(
             `${BASE_URL}/api/client/sendMessage`,
@@ -427,17 +428,17 @@ const Chat = () => {
             {
               headers: {
                 Authorization: `Bearer ${token}`,
-                // Do not set 'Content-Type' manually for FormData
               },
+              // Important: Set this to handle the upload properly
               maxBodyLength: Infinity,
               maxContentLength: Infinity,
             }
           );
         } else {
-          // Text-only message remains the same
-          const BASE_URL = import.meta.env.VITE_LOCAL_BASE_URL
+          // Text-only message remains the same 
+           const BASE_URL = import.meta.env.VITE_LOCAL_BASE_URL
           response = await axios.post(
-            `${BASE_URL}/api/client/sendMessage`,
+           `${BASE_URL}/api/client/sendMessage`,
             {
               chatId: selectedChat._id,
               content: newMessage.trim()
@@ -452,7 +453,7 @@ const Chat = () => {
         }
   
         const { data } = response;
-  
+        
         // Reset form state
         setNewMessage("");
         setAttachment(null);
@@ -472,18 +473,12 @@ const Chat = () => {
         console.error("Error sending message:", {
           message: error.message,
           data: error.response?.data,
-          status: error.response?.status,
+          status: error.response?.status
         });
         setError(error.response?.data?.error || "Failed to send message");
       }
     }
   };
-  
-  
-  
-  
-  
-  
   
   
   const downloadFile = async (fileUrl, fileName) => {
@@ -520,26 +515,16 @@ const Chat = () => {
           {message.content && <p>{message.content}</p>}
           {message.attachment && (
             <div className="attachment-container">
-                {message.attachment.resource_type === 'image' ? (
-                <img 
-                  src={message.attachment.path} 
-                  alt="attachment" 
-                  style={{ maxWidth: '200px', maxHeight: '200px' }}
-                />
-              ) : (
-                <div className="file-info">
+              <div className="file-info">
                 <span>{message.attachment.fileName}</span>
-                <a 
-                  href={message.attachment.path}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="download-link"
+                <button
+                  className="download-btn"
+                  onClick={() => downloadFile(message.attachment.path, message.attachment.fileName)}
                 >
                   Download
-                </a>
+                </button>
               </div>
-            )}
-          </div>
+            </div>
           )}
         </div>
       </div>
@@ -570,14 +555,14 @@ const Chat = () => {
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      // Check file size (10MB limit)
-      if (file.size > 10 * 1024 * 1024) {
-        setError("File size must be less than 10MB");
+      if (file.size > 100 * 1024 * 1024) {
+        // 100MB limit
+        alert("File size exceeds 100MB limit.");
         return;
       }
-
+  
       setAttachment(file);
-
+  
       // Create preview for images
       if (file.type.startsWith('image/')) {
         const reader = new FileReader();
@@ -606,7 +591,7 @@ const Chat = () => {
 
       let route;
       if (userRole === "client") {
-        // Clients use this route to delete chats
+        const BASE_URL = import.meta.env.VITE_LOCAL_BASE_URL
         route = `${BASE_URL}/api/client/deletechat/${chatId}`;
       } else if (userRole === "freelancer") {
         // Freelancers use this route to delete chats
@@ -694,6 +679,7 @@ const Chat = () => {
               ) : (
                 <ChatLoading />
               )}
+
               {contextMenu.visible && (
                 <div
                   className="context-menu"
