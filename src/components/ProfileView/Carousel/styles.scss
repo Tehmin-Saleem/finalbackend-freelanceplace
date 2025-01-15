@@ -1,7 +1,7 @@
+
 .carousel-wrapper {
   width: 100%;
   padding: 20px 0;
-  background-color: #ffffff;
 }
 
 .carousel-container {
@@ -9,14 +9,12 @@
   width: 100%;
   display: flex;
   align-items: center;
-  background-color: #ffffff;
 }
 
 .carousel-viewport {
   width: 100%;
   overflow: hidden;
   margin: 0 40px;
-  background-color: #ccc;
 }
 
 .carousel-track {
@@ -27,33 +25,34 @@
 .carousel-card {
   flex-shrink: 0;
   padding: 0 10px;
-  margin: 0 10px;
-  transition: transform 0.3s ease-in-out;
-
-  &:hover {
-    transform: scale(1.05);
-  }
 }
 
 .card-inner {
   border: 1px solid #e2e8f0;
   border-radius: 8px;
   overflow: hidden;
-  background: rgb(255, 255, 255);
+  background: white;
   height: 100%;
-  // box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
 }
 
 .card-image {
   width: 100%;
   height: 200px;
   object-fit: cover;
-  border-bottom: 1px solid #e2e8f0;
+}
+
+.pdf-container {
+  width: 100%;
+  height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f7fafc;
+}
+
+.pdf-link {
+  color: #4299e1;
+  text-decoration: underline;
 }
 
 .card-title {
@@ -61,8 +60,6 @@
   font-size: 16px;
   font-weight: 500;
   color: #2d3748;
-  width: 100%;
-  text-align: center;
 }
 
 .carousel-arrow {
@@ -94,28 +91,11 @@
   &.disabled {
     opacity: 0.5;
     cursor: not-allowed;
-
+    
     &:hover {
       background: white;
     }
   }
-}
-
-.pdf-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 200px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  background-color: #f9f9f9;
-  width: 100%;
-}
-
-.pdf-link {
-  text-decoration: none;
-  color: #007bff;
-  font-size: 16px;
 }
 
 // Responsive styles
@@ -129,8 +109,9 @@
   .carousel-card {
     width: 100%;
   }
-
+  
   .carousel-viewport {
     margin: 0 20px;
   }
 }
+

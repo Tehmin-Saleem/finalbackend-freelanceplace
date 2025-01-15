@@ -302,7 +302,7 @@ const FreelancerCard = ({ heading, freelancer }) => {
         </div>
 
         {/* Location Filter */}
-        <div
+        {/* <div
           className="filter-item"
           onClick={() => handleDropdownClick("Location")}
         >
@@ -321,7 +321,7 @@ const FreelancerCard = ({ heading, freelancer }) => {
               ))}
             </div>
           )}
-        </div>
+        </div> */}
       </div>
 
       {/* No freelancer found */}

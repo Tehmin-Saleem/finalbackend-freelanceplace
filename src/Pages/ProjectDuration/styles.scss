@@ -4,153 +4,141 @@ $gray-color: #f7fafc;
 $text-color: #4a5568;
 $border-color: #e2e8f0;
 $hover-darken: 10%;
-$font-kodchasan: 'Kodchasan', sans-serif;
-$font-poppins: 'Poppins', sans-serif;
+$font-kodchasan: "Kodchasan", sans-serif;
+$font-poppins: "Poppins", sans-serif;
 $color-gray: #64748b;
 $color-dark: #2c3e50;
 $color-white: #ffffff;
 $color-accent: #4bcdeb;
 $bg-color: #f7f8fa;
 
-
-
 .project-duration-container {
-    // padding: 20px 40px;
-  margin-top:8rem;
-    .content {
-      background-color: #fff;
-      border-radius: 8px;
-      // padding: 10px;
-      margin: 20px auto;
-      max-width: 1100px;
-      
-  
-      .content-body {
-        display: flex;
-        justify-content: space-between;
-        gap: 2rem;
-        margin-left: 4rem;
-  
-        .left-section {
-          flex: 1;
-  
-          h4 {
-            
-            // margin-bottom: 8px;
-            font-size: 1.2rem;
-        font-weight: 500;
-        
-        // margin-left: 1rem;
-  font-family: $font-poppins;
-        
-  color: #718096;
-          }
-  
-          h1 {
-            
-            margin-bottom: 20px;
-            
-            font-size: 1.7rem;
-            font-weight: 600;
-          
-            font-family: $font-kodchasan;
-            color: $color-dark;
-          }
-  
-          p {
-            margin-bottom: 80px;
-            font-family:$font-poppins;
-            color: #718096;// Create space for the 'Back' button
-          }
-  
-          .back-button {
-            padding: 5px 8px;
-            border: 1px solid $color-accent; // Use your accent color
-            background-color: transparent;
-            color: $color-accent;
-            border-radius: 10px;
-            cursor: pointer;
-            width: 100px;
-            margin-top: 4rem;
+  // padding: 20px 40px;
+  margin-top: 10rem;
+  .content {
+    background-color: #fff;
+    border-radius: 8px;
+    // padding: 10px;
+    margin: 20px auto;
+    max-width: 1100px;
+
+    .content-body {
+      display: flex;
+      justify-content: space-between;
+      gap: 2rem;
+      margin-left: 4rem;
+
+      .left-section {
+        flex: 1;
+
+        h4 {
+          // margin-bottom: 8px;
+          font-size: 1.2rem;
+          font-weight: 500;
+
+          // margin-left: 1rem;
+          font-family: $font-poppins;
+
+          color: #718096;
+        }
+
+        h1 {
+          margin-bottom: 20px;
+
+          font-size: 1.7rem;
+          font-weight: 600;
+
+          font-family: $font-kodchasan;
+          color: $color-dark;
+        }
+
+        p {
+          margin-bottom: 80px;
+          font-family: $font-poppins;
+          color: #718096; // Create space for the 'Back' button
+        }
+
+        .back-button {
+          padding: 5px 8px;
+          border: 1px solid $color-accent; // Use your accent color
+          background-color: transparent;
+          color: $color-accent;
+          border-radius: 10px;
+          cursor: pointer;
+          width: 100px;
+          margin-top: 4rem;
+        }
+      }
+
+      .right-section {
+        flex: 1;
+
+        .size-options {
+          display: flex;
+          justify-content: space-between;
+          margin-bottom: 20px;
+          font-family: $font-poppins;
+
+          .size-box {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+            flex: 1;
+            margin-right: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+            &:last-child {
+              margin-right: 0;
+            }
+
+            input[type="radio"] {
+              margin-left: 10px;
+              cursor: pointer;
+              border-color: $color-accent;
+              color: $color-accent;
+            }
           }
         }
-  
-        .right-section {
-          flex: 1;
-  
-          .size-options {
+
+        h2 {
+          margin-bottom: 10px;
+          font-family: $font-poppins;
+          font-size: medium;
+          font-weight: 600;
+        }
+
+        .work-duration-options,
+        .experience-options {
+          margin-bottom: 20px;
+          color: #718096;
+          font-family: $font-poppins;
+
+          label {
             display: flex;
-            justify-content: space-between;
-            margin-bottom: 20px;
-            font-family: $font-poppins;
-  
-            .size-box {
-             
-              border: 1px solid #ddd;
-              border-radius: 8px;
-              padding: 15px;
-              text-align: center;
-              flex: 1;
-              margin-right: 10px;
-              box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  
-              &:last-child {
-                margin-right: 0;
-              }
-  
-              input[type='radio'] {
-                margin-left: 10px;
-                cursor: pointer;
-                border-color: $color-accent;
-                color: $color-accent;
-                
-              }
-            }
-          }
-  
-          h2 {
+
+            align-items: center;
             margin-bottom: 10px;
             font-family: $font-poppins;
-            font-size: medium;
-            font-weight: 600;
-            
-          }
-  
-          .work-duration-options,
-          .experience-options {
-            margin-bottom: 20px;
-            color: #718096;
-            font-family:$font-poppins;
-  
-            label {
-              display: flex;
-              
-              align-items: center;
-              margin-bottom: 10px;
-              font-family: $font-poppins;
-  
-              input[type='radio'] {
-                margin-right: 10px;
-                cursor: pointer;
-              }
+
+            input[type="radio"] {
+              margin-right: 10px;
+              cursor: pointer;
             }
           }
-  
-          .next-button {
-           
+        }
 
-
-            margin-left: 14rem;
-            padding: 0.75rem 1.5rem;
-            background-color: $color-accent;
-            color: #fff;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            width: 200px;
-          }
+        .next-button {
+          margin-left: 14rem;
+          padding: 0.75rem 1.5rem;
+          background-color: $color-accent;
+          color: #fff;
+          border: none;
+          border-radius: 5px;
+          cursor: pointer;
+          width: 200px;
         }
       }
     }
   }
-  
+}

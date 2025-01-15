@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom"; // Import useNavigate
 import CHARACTER from "../../images/CHARACTER.png";
 import Group from "../../images/Group.png";
 import { signInWithGoogle } from "../../Firebase";
+import { Link } from "react-router-dom";
 
 import { CommonButton, TextField } from "../../components/index";
 import {
@@ -44,6 +45,7 @@ function Signup() {
   const [country, setCountry] = useState(""); // State for country
   const [isChecked, setIsChecked] = useState(false);
   const [checkboxError, setCheckboxError] = useState("");
+  const [showCustomInput, setShowCustomInput] = useState(false);
 
   const navigate = useNavigate(); // Initialize useNavigate
 
@@ -292,30 +294,54 @@ function Signup() {
             </div>
 
             <div className="relative">
-  <div className="flex mb-4 shadow border rounded-xl w-full py-3 px-3 bg-[#ECF0F1] font-Poppins">
-    <div className="pr-3">
-      <Location />
-    </div>
-    <select
-      id="country"
-      name="country"
-      className="text-[#94A3B8] bg-[#ECF0F1] text-[14px] flex-1 appearance-none outline-none"
-      onChange={(e) => setCountry(e.target.value)}
-      value={country}
-    >
-      <option value="" disabled>
-        Select your country
-      </option>
-      <option value="Pakistan">United States</option>
-      <option value="United Kingdom">United Kingdom</option>
-      <option value="Canada">Canada</option>
-      <option value="Australia">Australia</option>
-      <option value="India">India</option>
-      {/* Add more countries as needed */}
-    </select>
-  </div>
-</div>
-
+              <div className="flex mb-4 shadow border rounded-xl w-full py-3 px-3 bg-[#ECF0F1] font-Poppins">
+                <div className="pr-3">
+                  <Location />
+                </div>
+                {!showCustomInput ? (
+                  <select
+                    id="country"
+                    name="country"
+                    className="text-[#94A3B8] bg-[#ECF0F1] text-[14px] flex-1 appearance-none outline-none"
+                    onChange={(e) => {
+                      if (e.target.value === "other") {
+                        setShowCustomInput(true);
+                        setCountry("");
+                      } else {
+                        setCountry(e.target.value);
+                      }
+                    }}
+                    value={country || ""}
+                  >
+                    <option value="" disabled>
+                      Select your country
+                    </option>
+                    <option value="United States">United States</option>
+                    <option value="United Kingdom">United Kingdom</option>
+                    <option value="Canada">Canada</option>
+                    <option value="Australia">Australia</option>
+                    <option value="India">India</option>
+                    <option value="other">Other</option>
+                  </select>
+                ) : (
+                  <div className="flex flex-1 items-center">
+                    <input
+                      type="text"
+                      placeholder="Enter your country"
+                      className="text-[#94A3B8] bg-[#ECF0F1] text-[14px] flex-1 outline-none"
+                      value={country}
+                      onChange={(e) => setCountry(e.target.value)}
+                    />
+                    <button
+                      onClick={() => setShowCustomInput(false)}
+                      className="ml-2 text-[#94A3B8] hover:text-gray-600"
+                    >
+                      ←
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
 
             <div className="mb-4 flex items-center">
               <input
@@ -330,13 +356,20 @@ function Signup() {
                 htmlFor="terms"
                 className="text-[12px] font-Poppins text-[#64748B] mt-3"
               >
-                By creating an account means you agree to the
-                <strong>
-                  Terms <br />
-                  and Conditions
-                </strong>
-                and our
-                <strong> Privacy Policy</strong>
+                By creating an account means you agree to the{" "}
+                <Link
+                  to="/terms-conditions"
+                  className="text-[#4BCBEB] font-semibold hover:underline cursor-pointer"
+                >
+                  Terms and Conditions
+                </Link>{" "}
+                and our{" "}
+                <Link
+                  to="/privacy-policy"
+                  className="text-[#4BCBEB] font-semibold hover:underline cursor-pointer"
+                >
+                  Privacy Policy
+                </Link>
               </label>
             </div>
 
@@ -352,7 +385,7 @@ function Signup() {
               <div className="text-red-500 text-xs mt-2">{signupError}</div>
             )}
 
-            <div className="mt-8 mx-[10%] font-Poppins text-[14px] text-[#0F172A] items-center md:text-left">
+            <div className="mt-8 mb-6 mx-[13%] font-Poppins text-[14px] text-[#0F172A] items-center md:text-left">
               Already have an account?
               <span>
                 <a

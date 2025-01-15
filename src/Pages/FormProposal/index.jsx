@@ -231,7 +231,7 @@ const OfferForm = () => {
                 <div className="inputWrapper">
                   <input
                     type="text"
-                    placeholder="UI/UX Designer"
+                    placeholder="UI/UX Designer..."
                     className="roundedInput"
                     value={jobTitle}
                     onChange={(e) => setJobTitle(e.target.value)}

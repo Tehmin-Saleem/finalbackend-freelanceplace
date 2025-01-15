@@ -1,6 +1,8 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { JobProvider } from "./context/JoBContext";
+import TermsConditions from './components/TermsConditions';
+import PrivacyPolicy from './components/PrivacyPolicy';
 // import "./App.css";
 import {
   ProfileView,
@@ -197,6 +199,9 @@ function App() {
           <Route path="/signin" element={<SignIn />} />
           <Route path="/signup" element={<Signup />} />
 
+          <Route path="/terms-conditions" element={<TermsConditions />} />
+          <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+
           {/* Chat Route with ChatProvider */}
           <Route
             path="/chat"
@@ -240,20 +245,19 @@ function App() {
             path="/freelancersjobpage"
             element={
               <JobProvider>
-            <FreelancersDoneJobsPage />
-            </JobProvider>}
+                <FreelancersDoneJobsPage />
+              </JobProvider>
+            }
           />
-          
+
           <Route
             path="/freelancedashboard"
             element={
               <JobProvider>
-            <FreelanceDashboardPage />
-            </JobProvider>
+                <FreelanceDashboardPage />
+              </JobProvider>
             }
           />
-
-        
 
           {/* Fallback Route */}
           <Route path="*" element={<ErrorPage />} />
