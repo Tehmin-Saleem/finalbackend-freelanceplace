@@ -31,6 +31,7 @@ const OfferDetails = () => {
     const fetchOfferDetails = async () => {
       try {
         const token = localStorage.getItem("token");
+        const BASE_URL = import.meta.env.VITE_LOCAL_BASE_URL
         const response = await axios.get(
           `${BASE_URL}/api/freelancer/offers/${notificationId}`,
           {

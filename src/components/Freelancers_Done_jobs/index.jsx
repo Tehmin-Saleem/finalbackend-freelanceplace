@@ -93,7 +93,7 @@ const JobsCard = ({
       setLoadingProgress(true);
       const token = localStorage.getItem("token");
       if (!token) throw new Error("No authentication token found");
-
+      const BASE_URL = import.meta.env.VITE_LOCAL_BASE_URL
       let url;
       if (source === "offer") {
         // For offers, use projectName
@@ -167,7 +167,7 @@ const JobsCard = ({
           job_id,
           _id,
         });
-
+        const BASE_URL = import.meta.env.VITE_LOCAL_BASE_URL
         const response = await axios.get(
           `${BASE_URL}/api/freelancer/job-review/${reviewId}${source === 'offer' ? '?source=offer' : ''}`,
           {
