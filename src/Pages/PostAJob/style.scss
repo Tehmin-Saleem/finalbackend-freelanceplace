@@ -5,8 +5,8 @@ $gray-color: #f7fafc;
 $text-color: #4a5568;
 $border-color: #e2e8f0;
 $hover-darken: 10%;
-$font-kodchasan: 'Kodchasan', sans-serif;
-$font-poppins: 'Poppins', sans-serif;
+$font-kodchasan: "Kodchasan", sans-serif;
+$font-poppins: "Poppins", sans-serif;
 $color-gray: #64748b;
 $color-dark: #2c3e50;
 $color-white: #ffffff;
@@ -53,7 +53,8 @@ $bg-color: #f7f8fa;
 // Styles
 .post-job {
   min-height: 100vh;
-margin-top: 8rem;
+  
+  margin-top: 10rem;
   .Jobcontainer {
     // margin: 0 auto;
     padding-left: 9rem; // Padding for the left
@@ -75,7 +76,7 @@ margin-top: 8rem;
         .title {
           font-size: 1.5rem;
           font-weight: 500;
-          font-family:$font-poppins ;
+          font-family: $font-poppins;
         }
       }
 
@@ -144,7 +145,7 @@ margin-top: 8rem;
         margin-bottom: 1rem; // Adjusted margin
         margin-left: 4rem;
         margin-top: 2rem; // Ensure space above the title
-        color:#718096;
+        color: #718096;
       }
 
       .content {
@@ -161,13 +162,13 @@ margin-top: 8rem;
             font-weight: 600;
             margin-left: 4rem;
             font-family: $font-kodchasan;
-            color:$color-dark;
+            color: $color-dark;
           }
 
           .description {
             color: #718096;
             margin-top: 0.5rem;
-            font-family:$font-poppins ;
+            font-family: $font-poppins;
           }
         }
 
@@ -175,13 +176,13 @@ margin-top: 8rem;
           // Ensures that the label is positioned above the input field
           display: flex;
           flex-direction: column;
-        
+
           .label {
             color: $color-dark;
             font-family: $font-poppins;
             margin-bottom: 0.5rem; // Adds space between the label and the input field
           }
-        
+
           .input {
             margin-top: 0.5rem;
             padding: 0.5rem;
@@ -191,63 +192,57 @@ margin-top: 8rem;
             max-width: 400px; // Optional: Set a maximum width to avoid the field becoming too large
           }
         }
-        
 
-          .examples {
-            margin-top: 0.5rem;
-            color: #718096;
+        .examples {
+          margin-top: 0.5rem;
+          color: #718096;
 
-            strong {
-              font-weight: 600;
-            }
+          strong {
+            font-weight: 600;
+          }
 
-            .list {
-              list-style-type: disc;
-              padding-left: 1.25rem;
-              margin-top: 0.25rem;
-            }
+          .list {
+            list-style-type: disc;
+            padding-left: 1.25rem;
+            margin-top: 0.25rem;
           }
         }
       }
+    }
 
-      .actions {
-        margin-top: 1rem;
-        margin-left: 4rem;
-        display: flex;
-        justify-content: space-between;
-        .btn {
-          padding: 0.5rem 1rem;
-          border-radius: 0.75rem; // Make sure this matches the desired corner radius
-          color: #4BCBEB; // Text color
-          border: 1px solid #4BCBEB; // Border color
-          background-color: #ffffff; // Button background color
-          @include box-shadow(0, 0.1);
-      
-          &.back-btn {
-            border-color: #4BCBEB;
-            padding: 4px 5px;
-           
-            cursor: pointer;
-            width: 100px;
-            
-             
-            // Border color for back button
-      
-           
-          }
-      
-          &.next-btn {
-            margin-left: 20rem;
+    .actions {
+      margin-top: 1rem;
+      margin-left: 4rem;
+      display: flex;
+      justify-content: space-between;
+      .btn {
+        padding: 0.5rem 1rem;
+        border-radius: 0.75rem; // Make sure this matches the desired corner radius
+        color: #4bcbeb; // Text color
+        border: 1px solid #4bcbeb; // Border color
+        background-color: #ffffff; // Button background color
+        @include box-shadow(0, 0.1);
+
+        &.back-btn {
+          border-color: #4bcbeb;
+          padding: 4px 5px;
+
+          cursor: pointer;
+          width: 100px;
+
+          // Border color for back button
+        }
+
+        &.next-btn {
+          margin-left: 20rem;
           padding: 0.75rem 1.5rem;
           background-color: $color-accent;
           color: #fff;
           border: none;
           border-radius: 5px;
           cursor: pointer;
-      
-          }
         }
       }
     }
   }
-
+}

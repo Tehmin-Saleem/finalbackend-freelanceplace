@@ -26,6 +26,7 @@ const ClientProfilePage = () => {
   const [isEditMode, setIsEditMode] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
+  const [showCustomInput, setShowCustomInput] = useState(false);
 
   // Modify the useEffect hook in ClientProfilePage component
   useEffect(() => {
@@ -336,22 +337,44 @@ const ClientProfilePage = () => {
                 onChange={handleInputChange}
               />
             </div>
+
             <div className="form-group">
               <label htmlFor="country">Country</label>
-              <select
-                id="country"
-                name="country"
-                value={profileData.country}
-                onChange={handleInputChange}
-              >
-                <option value="">Select Country</option>
-                <option value="USA">USA</option>
-                <option value="Canada">Canada</option>
-                <option value="UK">UK</option>
-                <option value="Germany">Germany</option>
-                <option value="Pakistan">Pakistan</option>
-                <option value="India">India</option>
-              </select>
+              {!showCustomInput ? (
+                <select
+                  id="country"
+                  name="country"
+                  value={profileData.country}
+                  onChange={(e) => {
+                    if (e.target.value === "other") {
+                      setShowCustomInput(true);
+                      setProfileData({ ...profileData, country: "" });
+                    } else {
+                      handleInputChange(e);
+                    }
+                  }}
+                >
+                  <option value="">Select Country</option>
+                  <option value="USA">USA</option>
+                  <option value="Canada">Canada</option>
+                  <option value="UK">UK</option>
+                  <option value="Germany">Germany</option>
+                  <option value="Pakistan">Pakistan</option>
+                  <option value="India">India</option>
+                  <option value="other">Other</option>
+                </select>
+              ) : (
+                <div style={{ display: "flex" }}>
+                  <input
+                    type="text"
+                    name="country"
+                    placeholder="Enter your country"
+                    value={profileData.country}
+                    onChange={handleInputChange}
+                  />
+                  <button onClick={() => setShowCustomInput(false)}>←</button>
+                </div>
+              )}
             </div>
           </div>
 
