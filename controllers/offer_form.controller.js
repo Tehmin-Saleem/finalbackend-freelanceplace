@@ -316,6 +316,86 @@ exports.getOfferById = async (req, res) => {
   }
 };
 
+exports.getOffers = async (req, res) => {
+  try {
+    const loggedInUserId = req.user.userId;
+    console.log('Logged-in user ID:', loggedInUserId);
+
+    if (!loggedInUserId) {
+      return res.status(400).json({ message: 'User not authenticated' });
+    }
+
+    // Find all offers for the logged-in freelancer
+    const offers = await Offer_Form.find({
+      freelancer_id: loggedInUserId,
+      status: { $in: ['accepted', 'completed'] }  // Get both accepted and completed offers
+    }).populate('client_id', 'first_name last_name country_name');
+
+    console.log('Raw offers data:', offers);
+
+    if (!offers || offers.length === 0) {
+      return res.status(200).json({
+        message: 'No accepted offers found',
+        offers: []
+      });
+    }
+
+    // Format the offers to match frontend expectations
+    const formattedOffers = offers.map(offer => ({
+      _id: offer._id,
+      job_id: offer.job_id,
+      type: offer.budget_type === "fixed" ? "Fixed" : 
+            offer.budget_type === "hourly" ? "Hourly" : "Unknown",
+      title: offer.job_title || "Untitled Job",
+      client_id: offer.client_id?._id || null,
+      freelancer_id: offer.freelancer_id,
+      rate: offer.budget_type === "fixed"
+        ? `$${offer.fixed_price}`
+        : offer.budget_type === "hourly" && offer.hourly_rate
+          ? `$${offer.hourly_rate.from}-$${offer.hourly_rate.to}/hr`
+          : "Rate not available",
+      description: offer.description || "No description provided",
+      detailed_description: offer.detailed_description || "No detailed description provided",
+      tags: offer.preferred_skills || [],
+      location: offer.location || "Not specified",
+      postedTime: new Date(offer.createdAt).toLocaleDateString(),
+      status: offer.status, // Use the actual status from the offer
+      jobStatus: offer.status, // Match the status for consistency
+      due_date: offer.due_date ? new Date(offer.due_date).toLocaleDateString() : "Not specified",
+      estimated_timeline: offer.estimated_timeline ? {
+        duration: offer.estimated_timeline.duration,
+        unit: offer.estimated_timeline.unit
+      } : {
+        duration: 0,
+        unit: "Not specified"
+      },
+      clientName: offer.client_id 
+        ? `${offer.client_id.first_name} ${offer.client_id.last_name}`
+        : "Unknown Client",
+      clientCountry: offer.client_id?.country_name || "Not specified",
+      source: 'offer', // Add this to identify offer type
+      attachment: offer.attachment ? {
+        fileName: offer.attachment.fileName,
+        path: offer.attachment.path,
+        description: offer.attachment.description
+      } : null
+    }));
+
+    console.log('Formatted offers:', formattedOffers);
+
+    res.status(200).json({
+      message: 'Offers retrieved successfully',
+      offers: formattedOffers
+    });
+
+  } catch (error) {
+    console.error('Error in getOffers:', error);
+    res.status(500).json({
+      message: 'Error fetching offer details',
+      error: error.message
+    });
+  }
+};
 
 exports.getOfferById = async (req, res) => {
   try {
