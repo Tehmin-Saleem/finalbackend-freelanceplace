@@ -157,14 +157,174 @@ exports.getOfferById = async (req, res) => {
     console.log('offerId type:', typeof offerId);
     console.log('offerId length:', offerId.length);
 
-    // Ensure the ID is exactly 24 characters and contains valid hex characters
-    const validHexRegex = /^[0-9a-fA-F]{24}$/;
-    if (!offerId || !validHexRegex.test(offerId)) {
+    // Create a new ObjectId instance
+    let objectId;
+    try {
+      objectId = new mongoose.Types.ObjectId(offerId);
+    } catch (err) {
       return res.status(400).json({
-        message: 'Invalid Offer ID format',
-        details: `ID must be a 24-character hexadecimal string. Received: ${offerId}`
+        message: 'Invalid MongoDB ObjectId',
+        details: err.message
       });
     }
+
+    // Find offer using the created ObjectId
+    const offer = await Offer_Form.findById(objectId)
+      .populate('client_id', 'first_name last_name country_name');
+
+    if (!offer) {
+      return res.status(404).json({
+        message: 'Offer not found',
+        details: `No offer found with ID: ${offerId}`
+      });
+    }
+
+    console.log('Found offer in database:', offer);
+
+    // Handle status update if provided
+    const { status } = req.body;
+    if (status && ['accepted', 'declined'].includes(status)) {
+      console.log('Updating offer status to:', status);
+      offer.status = status;
+      await offer.save();
+      console.log('Offer status updated in database');
+
+      const notificationMessage = status === 'accepted'
+        ? `Your offer for "${offer.job_title}" has been accepted`
+        : `Your offer for "${offer.job_title}" has been declined`;
+
+      const notificationData = {
+        client_id: offer.client_id._id,
+        freelancer_id: offer.freelancer_id,
+        job_id: offerId,
+        type: `offer_${status}`,
+        message: notificationMessage
+      };
+
+      console.log('Creating notification with data:', notificationData);
+      await Notification.createNotification(notificationData);
+    }
+
+    // Get client's reviews
+    const clientReviews = await review.aggregate([
+      {
+        $match: {
+          client_id: offer.client_id._id,
+          status: "Completed"
+        }
+      },
+      {
+        $lookup: {
+          from: 'users',
+          localField: 'freelancer_id',
+          foreignField: '_id',
+          as: 'reviewer'
+        }
+      },
+      {
+        $unwind: '$reviewer'
+      },
+      {
+        $group: {
+          _id: null,
+          averageRating: { $avg: "$stars" },
+          totalReviews: { $sum: 1 },
+          reviews: {
+            $push: {
+              stars: "$stars",
+              message: "$message",
+              reviewerName: {
+                $concat: ['$reviewer.first_name', ' ', '$reviewer.last_name']
+              }
+            }
+          }
+        }
+      }
+    ]);
+
+    // Get client's completed jobs count
+    const completedJobsCount = await jobpost.countDocuments({
+      client_id: offer.client_id._id,
+      jobstatus: 'completed'
+    });
+
+    let budgetDetails;
+    if (offer.budget_type === 'hourly' && offer.hourly_rate) {
+      budgetDetails = {
+        budget_type: 'hourly',
+        hourly_rate: {
+          from: offer.hourly_rate.from,
+          to: offer.hourly_rate.to
+        }
+      };
+    } else if (offer.budget_type === 'fixed' && offer.fixed_price) {
+      budgetDetails = {
+        budget_type: 'fixed',
+        fixed_price: offer.fixed_price
+      };
+    } else {
+      budgetDetails = {
+        budget_type: 'unknown',
+        message: 'Budget details are not available'
+      };
+    }
+
+    const clientStats = clientReviews[0] || {
+      averageRating: 0,
+      totalReviews: 0,
+      reviews: []
+    };
+
+    const formattedOffer = {
+      _id: offer._id,
+      status: offer.status,
+      clientFirstName: offer.client_id.first_name,
+      clientLastName: offer.client_id.last_name,
+      clientCountry: offer.client_id.country_name,
+      clientStats: {
+        rating: parseFloat(clientStats.averageRating.toFixed(1)),
+        totalReviews: clientStats.totalReviews,
+        completedJobs: completedJobsCount,
+        recentReviews: clientStats.reviews.slice(0, 5) // Get last 5 reviews
+      },
+      due_date: offer.due_date,
+      estimated_timeline: {
+        duration: offer.estimated_timeline.duration,
+        unit: offer.estimated_timeline.unit
+      },
+      location: offer.location,
+      job_title: offer.job_title,
+      ...budgetDetails,
+      description: offer.description,
+      detailed_description: offer.detailed_description,
+      preferred_skills: offer.preferred_skills,
+      attachment: offer.attachment ? {
+        fileName: offer.attachment.fileName,
+        path: offer.attachment.path
+      } : null
+    };
+
+    console.log('Sending formatted offer:', formattedOffer);
+    res.status(200).json(formattedOffer);
+  } catch (error) {
+    console.error('Error in getOfferById:', error);
+    res.status(500).json({
+      message: 'Error fetching offer details',
+      error: error.message,
+      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+    });
+  }
+};
+
+
+exports.getOfferById = async (req, res) => {
+  try {
+    const { userId } = req.user;
+    const offerId = req.params.offerId;
+
+    console.log('Raw offerId received:', offerId);
+    console.log('offerId type:', typeof offerId);
+    console.log('offerId length:', offerId.length);
 
     // Create a new ObjectId instance
     let objectId;
@@ -324,86 +484,7 @@ exports.getOfferById = async (req, res) => {
     });
   }
 };
-exports.getOffers = async (req, res) => {
-  try {
-    const loggedInUserId = req.user.userId;
-    console.log('Logged-in user ID:', loggedInUserId);
 
-    if (!loggedInUserId) {
-      return res.status(400).json({ message: 'User not authenticated' });
-    }
-
-    // Find all offers for the logged-in freelancer
-    const offers = await Offer_Form.find({
-      freelancer_id: loggedInUserId,
-      status: { $in: ['accepted', 'completed'] }  // Get both accepted and completed offers
-    }).populate('client_id', 'first_name last_name country_name');
-
-    console.log('Raw offers data:', offers);
-
-    if (!offers || offers.length === 0) {
-      return res.status(200).json({
-        message: 'No accepted offers found',
-        offers: []
-      });
-    }
-
-    // Format the offers to match frontend expectations
-    const formattedOffers = offers.map(offer => ({
-      _id: offer._id,
-      job_id: offer.job_id,
-      type: offer.budget_type === "fixed" ? "Fixed" : 
-            offer.budget_type === "hourly" ? "Hourly" : "Unknown",
-      title: offer.job_title || "Untitled Job",
-      client_id: offer.client_id?._id || null,
-      freelancer_id: offer.freelancer_id,
-      rate: offer.budget_type === "fixed"
-        ? `$${offer.fixed_price}`
-        : offer.budget_type === "hourly" && offer.hourly_rate
-          ? `$${offer.hourly_rate.from}-$${offer.hourly_rate.to}/hr`
-          : "Rate not available",
-      description: offer.description || "No description provided",
-      detailed_description: offer.detailed_description || "No detailed description provided",
-      tags: offer.preferred_skills || [],
-      location: offer.location || "Not specified",
-      postedTime: new Date(offer.createdAt).toLocaleDateString(),
-      status: offer.status, // Use the actual status from the offer
-      jobStatus: offer.status, // Match the status for consistency
-      due_date: offer.due_date ? new Date(offer.due_date).toLocaleDateString() : "Not specified",
-      estimated_timeline: offer.estimated_timeline ? {
-        duration: offer.estimated_timeline.duration,
-        unit: offer.estimated_timeline.unit
-      } : {
-        duration: 0,
-        unit: "Not specified"
-      },
-      clientName: offer.client_id 
-        ? `${offer.client_id.first_name} ${offer.client_id.last_name}`
-        : "Unknown Client",
-      clientCountry: offer.client_id?.country_name || "Not specified",
-      source: 'offer', // Add this to identify offer type
-      attachment: offer.attachment ? {
-        fileName: offer.attachment.fileName,
-        path: offer.attachment.path,
-        description: offer.attachment.description
-      } : null
-    }));
-
-    console.log('Formatted offers:', formattedOffers);
-
-    res.status(200).json({
-      message: 'Offers retrieved successfully',
-      offers: formattedOffers
-    });
-
-  } catch (error) {
-    console.error('Error in getOffers:', error);
-    res.status(500).json({
-      message: 'Error fetching offer details',
-      error: error.message
-    });
-  }
-};
 
 
 
