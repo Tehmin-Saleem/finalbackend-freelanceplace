@@ -124,6 +124,7 @@ const AdminDashboard = () => {
           }
         );
 
+<<<<<<< HEAD
         if (!queryResponse.ok) {
           throw new Error(`Error: ${queryResponse.statusText}`);
         }
@@ -131,6 +132,11 @@ const AdminDashboard = () => {
         const queryData = await queryResponse.json();
         setQueries(queryData);
 
+=======
+          const queryData = await queryResponse.json();
+          setQueries(queryData);
+       
+>>>>>>> e6e32456f45e1984da6c6b734b20c3187844cc7f
           const freelancerResponse = await fetch(`${BASE_URL}/api/freelancer/count`, {
             method: 'GET',
             headers: {
@@ -170,6 +176,7 @@ const AdminDashboard = () => {
       fetchData();
     }, [fetchNotifications]);
     const handleResolveClick = async (queryId) => {
+     const BASE_URL = import.meta.env.VITE_LOCAL_BASE_URL
       const response = await fetch(`${BASE_URL}/api/freelancer/queries/${queryId}`, {
         method: 'GET',
         headers: {
@@ -194,6 +201,7 @@ const AdminDashboard = () => {
 
     const handleConfirmResolve = async (queryId) => {
       try {
+       const BASE_URL = import.meta.env.VITE_LOCAL_BASE_URL
           const response = await fetch(`${BASE_URL}/api/freelancer/queries/${queryId}`, {
               method: 'PATCH',
               headers: {
@@ -287,9 +295,36 @@ const AdminDashboard = () => {
     return groups;
   };
 
+<<<<<<< HEAD
   return (
     <>
       <Header />
+=======
+      notifications.forEach(notification => {
+        const notificationDate = new Date(notification.timestamp).toDateString();
+        if (notificationDate === today) {
+          groups['Today'].push(notification);
+        } else if (notificationDate === yesterday) {
+          groups['Yesterday'].push(notification);
+        } else {
+          groups['Earlier'].push(notification);
+        }
+      });
+
+      // Remove empty groups
+      Object.keys(groups).forEach(key => {
+        if (groups[key].length === 0) {
+          delete groups[key];
+        }
+      });
+
+      return groups;
+    };
+
+    return (
+      <>
+      {/* <Header/> */}
+>>>>>>> e6e32456f45e1984da6c6b734b20c3187844cc7f
       <div className="admin-dashboard">
         <aside className={isSidebarOpen ? "sidebar open" : "sidebar closed"}>
           <div className="logo">Admin Panel</div>

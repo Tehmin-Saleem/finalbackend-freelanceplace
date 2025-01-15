@@ -66,7 +66,7 @@ const MyProfile = () => {
       const config = {
         headers: { Authorization: `Bearer ${token}` },
       };
-  
+      const BASE_URL = import.meta.env.VITE_LOCAL_BASE_URL
       const userResponse = await axios.get(
         `${BASE_URL}/api/freelancer/users/${userId}`,
         config
@@ -162,6 +162,7 @@ const MyProfile = () => {
     });
   };
 
+
   const handleLanguageChange = (index, field, value) => {
     const updatedLanguages = [...profile.languages];
     updatedLanguages[index] = { ...updatedLanguages[index], [field]: value };
@@ -170,7 +171,20 @@ const MyProfile = () => {
       languages: updatedLanguages,
     }));
   };
-
+  const handleHourlyRateChange = (e) => {
+    const { value } = e.target;
+    setProfile((prevProfile) => {
+      const newAvailability = {
+        ...prevProfile.availability,
+        hourly_rate: value,
+      };
+      return {
+        ...prevProfile,
+        availability: newAvailability,
+      };
+    });
+  };
+  
   const addLanguage = () => {
     setProfile((prevProfile) => ({
       ...prevProfile,
@@ -445,19 +459,20 @@ const MyProfile = () => {
             />
           </div>
 
-          <div className="field-group">
-            <label>Enter hourly rate</label>
-            <div className="input-with-icon">
-              <span className="icon">$</span>
-              <input
-                type="number"
-                name="hourly_rate"
-                value={profile.availability.hourly_rate}
-                onChange={handleAvailabilityChange}
-                placeholder="120.00/hour"
-              />
-            </div>
-          </div>
+        <div className="field-group">
+  <label>Enter hourly rate</label>
+  <div className="input-with-icon">
+    <span className="icon">$</span>
+    <input
+      type="number"
+      name="hourly_rate"
+      value={profile.availability.hourly_rate}
+      onChange={handleHourlyRateChange}
+      placeholder="120.00/hour"
+    />
+  </div>
+</div>
+
           <div className="form-group languages-group">
             <label>Languages</label>
             {profile.languages.map((lang, index) => (

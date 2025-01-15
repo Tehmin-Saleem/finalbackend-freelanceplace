@@ -105,7 +105,11 @@ const ConsultantDashboard = () => {
           navigate("/signin");
           return;
         }
+<<<<<<< HEAD
 
+=======
+        const BASE_URL = import.meta.env.VITE_LOCAL_BASE_URL
+>>>>>>> e6e32456f45e1984da6c6b734b20c3187844cc7f
         const decodedToken = jwtDecode(token);
         const consultantId = decodedToken.userId;
   
@@ -152,6 +156,7 @@ const ConsultantDashboard = () => {
 
   const [user, setUser] = useState({ first_name: "", email: "" });
 
+<<<<<<< HEAD
   useEffect(() => {
     const fetchUser = async () => {
       try {
@@ -161,6 +166,17 @@ const ConsultantDashboard = () => {
           navigate("/signin");
           return;
         }
+=======
+ useEffect(() => {
+  const fetchUser = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const BASE_URL = import.meta.env.VITE_LOCAL_BASE_URL
+      if (!token) {
+        navigate("/signin");
+        return;
+      }
+>>>>>>> e6e32456f45e1984da6c6b734b20c3187844cc7f
 
         const decodedToken = jwtDecode(token);
         const userId = decodedToken.userId;

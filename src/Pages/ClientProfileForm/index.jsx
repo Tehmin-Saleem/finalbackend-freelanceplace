@@ -65,6 +65,7 @@ const ClientProfilePage = () => {
         }));
         console.log("userdata", userData);
         // Then check for existing profile
+        
         const profileResponse = await axios.get(
           `${BASE_URL}/api/client/profile`,
           {
@@ -182,7 +183,7 @@ const ClientProfilePage = () => {
 
     try {
       const token = localStorage.getItem("token");
-
+      const BASE_URL = import.meta.env.VITE_LOCAL_BASE_URL
       // Choose the appropriate endpoint based on whether we're creating or updating
       const endpoint = isEditMode
         ? `${BASE_URL}/api/client/profile/update`

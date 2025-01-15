@@ -32,7 +32,7 @@ const ConsultantOffers = () => {
         const token = localStorage.getItem("token");
         const consultantId = JSON.parse(atob(token.split(".")[1])).userId;
         console.log("split conusltnatid",consultantId);
-        
+        const BASE_URL = import.meta.env.VITE_LOCAL_BASE_URL
 
         const response = await axios.get(
           `${BASE_URL}/api/client/offer/${consultantId}`,
@@ -69,6 +69,7 @@ const ConsultantOffers = () => {
   const handleAction = async (offerId, action) => {
     try {
       const token = localStorage.getItem("token");
+      const BASE_URL = import.meta.env.VITE_LOCAL_BASE_URL
       await axios.put(
         `${BASE_URL}/api/client/offer/${offerId}`,
         { status: action },

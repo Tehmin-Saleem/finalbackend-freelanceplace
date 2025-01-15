@@ -122,7 +122,7 @@ function Signup() {
       //   }
       // );
       const BASE_URL = import.meta.env.VITE_LOCAL_BASE_URL
-      cnsole.log('base', BASE_URL)
+      // cnsole.log('base', BASE_URL)
       const response = await fetch(`${BASE_URL}/api/client/signup`, {
         method: "POST",
         headers: {
