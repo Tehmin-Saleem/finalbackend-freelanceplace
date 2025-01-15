@@ -1,3 +1,4 @@
+# Stage 1: Build the application
 FROM node:18-alpine3.18 as build
 
 # Declare build time environment variables
@@ -15,8 +16,7 @@ RUN npm install > /dev/null 2>&1
 COPY . .
 RUN npm run build
 
-
-# Serve with Nginx
+# Stage 2: Serve with Nginx
 FROM nginx:1.23-alpine
 WORKDIR /usr/share/nginx/html
 RUN rm -rf *
