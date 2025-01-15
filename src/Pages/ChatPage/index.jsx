@@ -420,7 +420,7 @@ const Chat = () => {
           console.log("chatId:", selectedChat._id);
           console.log("content:", newMessage.trim());
           console.log("attachment:", attachment.name);
-  
+          const BASE_URL = import.meta.env.VITE_LOCAL_BASE_URL
           response = await axios.post(
             `${BASE_URL}/api/client/sendMessage`,
             formData,
@@ -435,6 +435,7 @@ const Chat = () => {
           );
         } else {
           // Text-only message remains the same
+          const BASE_URL = import.meta.env.VITE_LOCAL_BASE_URL
           response = await axios.post(
             `${BASE_URL}/api/client/sendMessage`,
             {
