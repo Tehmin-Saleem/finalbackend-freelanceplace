@@ -46,8 +46,10 @@ function SignIn() {
 
     // Function to validate token
     const checkTokenValidity = async () => {
+    
       if (token && location.pathname === "/signin") {
         try {
+          const BASE_URL = import.meta.env.VITE_LOCAL_BASE_URL
           const response = await fetch(`${BASE_URL}/api/client/validate-token`, {
             method: "GET",
             headers: {

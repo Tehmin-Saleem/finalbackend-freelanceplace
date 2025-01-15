@@ -72,7 +72,7 @@ const renderStars = (rating) => {
           navigate("/signin");
           return;
         }
-  
+        const BASE_URL = import.meta.env.VITE_LOCAL_BASE_URL
         const decodedToken = jwtDecode(token);
         const consultantId = decodedToken.userId;
   
@@ -115,7 +115,7 @@ const renderStars = (rating) => {
   const fetchUser = async () => {
     try {
       const token = localStorage.getItem("token");
-
+      const BASE_URL = import.meta.env.VITE_LOCAL_BASE_URL
       if (!token) {
         navigate("/signin");
         return;
