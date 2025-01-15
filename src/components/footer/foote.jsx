@@ -131,8 +131,8 @@ const Footer = () => {
       links: [
         // { name: 'Help & Support', path: '/support' },
         // { name: 'Trust & Safety', path: '/trust' },
-        { name: 'Privacy Policy', path: '/privacy' },
-        { name: 'Terms of Service', path: '/terms' }
+        { name: 'Privacy Policy', path: '/privacy-policy' },
+        { name: 'Terms of Service', path: '/terms-conditions' }
       ]
     },
     // browse: {
@@ -151,10 +151,20 @@ const Footer = () => {
     { name: 'Twitter', icon: '🐦', url: '#' },
     { name: 'Facebook', icon: '📘', url: '#' },
     { name: 'Instagram', icon: '📸', url: '#' }
+
+
+
+
   ];
 
+
+
+
+  // "/terms-conditions" element={<TermsConditions />} />
+  //         <Route path="/privacy-policy
+
   return (
-    <footer className="footer">
+    <footer className="footer bg-[#4BCBEB] bg-opacity-10 mt-6">
       <div className="footer-content">
         <div className="footer-logo">
           <Logo width="150" height="60" />

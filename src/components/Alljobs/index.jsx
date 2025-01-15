@@ -207,10 +207,10 @@ const getStatusClass = () => {
               <i className="icon-proposal"></i>
               {proposalCount} Proposals
             </span>
-            <span className="stat-item">
+            {/* <span className="stat-item">
               <i className="icon-message"></i>
               {messages} Messages
-            </span>
+            </span> */}
           </div>
           
           {attachment?.path && (

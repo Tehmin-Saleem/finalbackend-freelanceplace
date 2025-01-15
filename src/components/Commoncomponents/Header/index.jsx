@@ -117,6 +117,8 @@ const Header = () => {
       navigate("/alljobs");
     } else if (option === "Add Payment") {
       navigate("/payment");
+    }else if (option === "Privacy Policy") {
+      navigate("/privacy-policy");
     }
   };
 

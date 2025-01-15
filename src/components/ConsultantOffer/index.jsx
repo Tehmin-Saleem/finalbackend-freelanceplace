@@ -209,6 +209,9 @@ const ClientOffersPage = () => {
       <div className="client-offers-page">
         <h1>All Offers You Sent</h1>
 
+
+      
+
         <div className="status-filter-container mb-4 flex justify-center space-x-4">
           <button
             className={`px-4 py-2 rounded ${statusFilter === "all" ? "bg-sky-400 text-white" : "bg-gray-200"}`}
