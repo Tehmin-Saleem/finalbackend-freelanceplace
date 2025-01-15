@@ -150,22 +150,48 @@ exports.createoffer = async (req, res) => {
 
 exports.getOfferById = async (req, res) => {
   try {
-    const { notificationId } = req.params;
-    const { status } = req.body;
-    console.log('Getting offer details - notificationId:', notificationId);
+    const { userId } = req.user;
+    const offerId = req.params.offerId;
 
-    if (!mongoose.Types.ObjectId.isValid(notificationId)) {
-      return res.status(400).json({ message: 'Invalid Offer ID format' });
+    console.log('Raw offerId received:', offerId);
+    console.log('offerId type:', typeof offerId);
+    console.log('offerId length:', offerId.length);
+
+    // Ensure the ID is exactly 24 characters and contains valid hex characters
+    const validHexRegex = /^[0-9a-fA-F]{24}$/;
+    if (!offerId || !validHexRegex.test(offerId)) {
+      return res.status(400).json({
+        message: 'Invalid Offer ID format',
+        details: `ID must be a 24-character hexadecimal string. Received: ${offerId}`
+      });
     }
 
-    let offer = await Offer_Form.findById(notificationId).populate('client_id', 'first_name last_name country_name');
-    console.log('Found offer in database:', offer);
+    // Create a new ObjectId instance
+    let objectId;
+    try {
+      objectId = new mongoose.Types.ObjectId(offerId);
+    } catch (err) {
+      return res.status(400).json({
+        message: 'Invalid MongoDB ObjectId',
+        details: err.message
+      });
+    }
+
+    // Find offer using the created ObjectId
+    const offer = await Offer_Form.findById(objectId)
+      .populate('client_id', 'first_name last_name country_name');
 
     if (!offer) {
-      return res.status(404).json({ message: 'Offer not found' });
+      return res.status(404).json({
+        message: 'Offer not found',
+        details: `No offer found with ID: ${offerId}`
+      });
     }
 
-    // If status is provided in query params, update the offer status
+    console.log('Found offer in database:', offer);
+
+    // Handle status update if provided
+    const { status } = req.body;
     if (status && ['accepted', 'declined'].includes(status)) {
       console.log('Updating offer status to:', status);
       offer.status = status;
@@ -179,7 +205,7 @@ exports.getOfferById = async (req, res) => {
       const notificationData = {
         client_id: offer.client_id._id,
         freelancer_id: offer.freelancer_id,
-        job_id: notificationId,
+        job_id: offerId,
         type: `offer_${status}`,
         message: notificationMessage
       };
@@ -293,7 +319,8 @@ exports.getOfferById = async (req, res) => {
     console.error('Error in getOfferById:', error);
     res.status(500).json({
       message: 'Error fetching offer details',
-      error: error.message
+      error: error.message,
+      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
     });
   }
 };

@@ -254,7 +254,7 @@ const forgotPassword = async (req, res) => {
     }
 
     const token = jwt.sign({ email: user.email, id: user._id }, JWT_SECRET, { expiresIn: "10m" });
-    const link = `http://localhost:5173/ChangePass/${user._id}/${token}`;
+    const link = `http://13.61.176.80:5173/ChangePass/${user._id}/${token}`;
     
     await sendEmail(user.email, 'Password Reset Request', link);
     return res.status(200).json({ message: "Password reset link generated and sent to your email.", link });
