@@ -124,12 +124,8 @@ const AdminDashboard = () => {
           }
         );
 
-        if (!queryResponse.ok) {
-          throw new Error(`Error: ${queryResponse.statusText}`);
-        }
-
-        const queryData = await queryResponse.json();
-        setQueries(queryData);
+          const queryData = await queryResponse.json();
+          setQueries(queryData);
        
           const freelancerResponse = await fetch(`${BASE_URL}/api/freelancer/count`, {
             method: 'GET',
@@ -288,6 +284,9 @@ const AdminDashboard = () => {
 
     return groups;
   };
+
+     
+  
 
     return (
       <>

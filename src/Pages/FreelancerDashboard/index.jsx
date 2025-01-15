@@ -212,6 +212,7 @@ const FreelanceDashboardPage = () => {
 
         // Check profile existence
         await checkProfileExists(userId, token);
+        const BASE_URL = import.meta.env.VITE_LOCAL_BASE_URL
 
         const response = await axios.get(
           `${BASE_URL}/api/client/users/${userId}`,

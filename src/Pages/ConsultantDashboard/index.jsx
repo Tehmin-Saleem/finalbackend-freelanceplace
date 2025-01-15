@@ -152,6 +152,7 @@ const ConsultantDashboard = () => {
 
   const [user, setUser] = useState({ first_name: "", email: "" });
 
+ 
  useEffect(() => {
   const fetchUser = async () => {
     try {
