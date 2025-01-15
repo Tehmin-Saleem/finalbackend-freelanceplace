@@ -182,18 +182,18 @@ router.delete("/Message/:id", authMiddleware, chatController.deleteMessage);
 // message-related routes
 
 router.get("/allMessages/:chatId", authMiddleware, chatController.allMessages);
-router.post("/sendMessage",
-  authMiddleware,
-  // upload.single('file'),
-  upload.fields([
-    { name: "image", maxCount: 1 },
-    { name: "portfolio_attachments", maxCount: 10 }, // Changed from 'portfolios' to 'portfolio_attachments'
-  ]),
-  chatController.sendMessage
-);
+// router.post("/sendMessage",
+//   authMiddleware,
+//   // upload.single('file'),
+//   upload.fields([
+//     { name: "image", maxCount: 1 },
+//     { name: "portfolio_attachments", maxCount: 10 }, // Changed from 'portfolios' to 'portfolio_attachments'
+//   ]),
+//   chatController.sendMessage
+// );
 
 
-
+router.post('/sendMessage', upload.single('attachment'), chatController.sendMessage);
 
 router.post("/ForgotPass", usercontroller.forgotPassword);
 router.get("/ChangePass/:id/:token", usercontroller.ChangePass);

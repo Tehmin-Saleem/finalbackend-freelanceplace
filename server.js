@@ -84,7 +84,7 @@ app.use("/api/freelancer", freelancerRoutes);
 // Socket.io Implementation
 io.on("connection", (socket) => {
   socket.on("setup", (userData) => {
-     console.log("userdata in server", userData);
+    //  console.log("userdata in server", userData);
 
     // Check if userData is valid
     if (!userData) {
