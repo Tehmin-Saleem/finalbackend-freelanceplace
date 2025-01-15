@@ -14,7 +14,7 @@ const ClientList = () => {
         if (!token) {
           throw new Error('No token found');
         }
-
+        const BASE_URL = import.meta.env.VITE_LOCAL_BASE_URL
         const response = await fetch(`${BASE_URL}/api/client/clientslist`, {
           method: 'GET',
           headers: {
