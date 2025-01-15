@@ -17,7 +17,9 @@ const ApplyJob = () => {
   const checkPaymentMethod = async () => {
     try {
       const token = localStorage.getItem("token");
+      const BASE_URL = import.meta.env.VITE_LOCAL_BASE_URL
       const response = await fetch(
+        
         `${BASE_URL}/api/freelancer/checkPaymentMethod`,
         {
           headers: {
