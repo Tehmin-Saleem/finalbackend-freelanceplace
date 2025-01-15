@@ -108,17 +108,15 @@ const AdminDashboard = () => {
           return;
         }
 
-        const decodedToken = jwtDecode(token);
-        const isTokenExpired = decodedToken.exp * 1000 < Date.now();
-        if (isTokenExpired) {
-          console.error("Token has expired");
-          return;
-        }
-
-        const queryResponse = await fetch(
-          "http://localhost:5000/api/freelancer/queries",
-          {
-            method: "GET",
+          const decodedToken = jwtDecode(token);
+          const isTokenExpired = decodedToken.exp * 1000 < Date.now();
+          if (isTokenExpired) {
+            console.error('Token has expired');
+            return;
+          }
+          const BASE_URL = import.meta.env.VITE_LOCAL_BASE_URL
+          const queryResponse = await fetch(`${BASE_URL}/api/freelancer/queries`, {
+            method: 'GET',
             headers: {
               "Content-Type": "application/json",
               Authorization: `Bearer ${token}`,
@@ -133,10 +131,8 @@ const AdminDashboard = () => {
         const queryData = await queryResponse.json();
         setQueries(queryData);
 
-        const freelancerResponse = await fetch(
-          "http://localhost:5000/api/freelancer/count",
-          {
-            method: "GET",
+          const freelancerResponse = await fetch(`${BASE_URL}/api/freelancer/count`, {
+            method: 'GET',
             headers: {
               Authorization: `Bearer ${token}`,
             },
@@ -150,10 +146,8 @@ const AdminDashboard = () => {
         const freelancerData = await freelancerResponse.json();
         setFreelancerCount(freelancerData.count);
 
-        const clientResponse = await fetch(
-          "http://localhost:5000/api/client/count",
-          {
-            method: "GET",
+          const clientResponse = await fetch(`${BASE_URL}/api/client/count`, {
+            method: 'GET',
             headers: {
               Authorization: `Bearer ${token}`,
             },
@@ -173,13 +167,11 @@ const AdminDashboard = () => {
       }
     };
 
-    fetchData();
-  }, [fetchNotifications]);
-  const handleResolveClick = async (queryId) => {
-    const response = await fetch(
-      `http://localhost:5000/api/freelancer/queries/${queryId}`,
-      {
-        method: "GET",
+      fetchData();
+    }, [fetchNotifications]);
+    const handleResolveClick = async (queryId) => {
+      const response = await fetch(`${BASE_URL}/api/freelancer/queries/${queryId}`, {
+        method: 'GET',
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
@@ -200,19 +192,16 @@ const AdminDashboard = () => {
     setSelectedQuery(null);
   };
 
-  const handleConfirmResolve = async (queryId) => {
-    try {
-      const response = await fetch(
-        `http://localhost:5000/api/freelancer/queries/${queryId}`,
-        {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-          body: JSON.stringify({ status: "Resolved" }), // Send the updated status
-        }
-      );
+    const handleConfirmResolve = async (queryId) => {
+      try {
+          const response = await fetch(`${BASE_URL}/api/freelancer/queries/${queryId}`, {
+              method: 'PATCH',
+              headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': `Bearer ${localStorage.getItem('token')}`,
+              },
+              body: JSON.stringify({ status: 'Resolved' }),  // Send the updated status
+          });
 
       if (!response.ok) {
         throw new Error("Failed to update query status");

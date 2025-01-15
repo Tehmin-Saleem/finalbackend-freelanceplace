@@ -30,10 +30,10 @@ function ForgotPassword() {
       setErrorMessage("Please enter a valid email before submitting.");
       return;
     }
-
+    const BASE_URL = import.meta.env.VITE_LOCAL_BASE_URL
     setIsLoading(true);
     try {
-      const response = await fetch("http://localhost:5000/api/client/ForgotPass", {
+      const response = await fetch(`${BASE_URL}/api/client/ForgotPass`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }),

@@ -6,7 +6,13 @@ export default defineConfig({
     include: ['@stripe/react-stripe-js', 'pdf-lib']
   },
   plugins: [react()],
- 
+  proxy: {
+    '/api': {
+      target: 'http://13.61.176.80:5000',
+      changeOrigin: true,
+      secure: false,
+    },
+  },
   build: {
     rollupOptions: {
       external: ['pdfjs-dist/build/pdf.worker.entry']

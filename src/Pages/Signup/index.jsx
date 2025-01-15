@@ -121,12 +121,12 @@ function Signup() {
       //     country_name: country,
       //   }
       // );
-
-      const response = await fetch("http://localhost:5000/api/client/signup", {
+      const BASE_URL = import.meta.env.VITE_LOCAL_BASE_URL
+      cnsole.log('base', BASE_URL)
+      const response = await fetch(`${BASE_URL}/api/client/signup`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          // Authorization: `Bearer ${token}`
         },
         body: JSON.stringify({
           email,
@@ -137,17 +137,15 @@ function Signup() {
           country_name: country,
         }),
       });
-
+  
+      // console.log('api', BASE_URL);
       const data = await response.json();
       console.log("data at signup", data);
-
+  
       console.log("Signup response:", response);
       if (response.status === 201) {
         console.log("Signup successful");
-
-        // localStorage.setItem("userInfo", JSON.stringify(data.user));
-        // console.log("user data", data.user);
-
+  
         // Storing the user info and token in localStorage
         localStorage.setItem(
           "userInfo",
@@ -156,10 +154,9 @@ function Signup() {
             token: data.token, // token from server
           })
         );
-
+  
         console.log("User info stored in localStorage:", data.user);
         console.log("Token stored in localStorage:", data.token);
-
         navigate("/signin");
         console.log("Signup successful");
 
@@ -176,8 +173,6 @@ function Signup() {
       } else if (error.request) {
         console.error("Error request:", error.request);
         setSignupError("No response received from server");
-      } else if (response.status === 403) {
-        setSignupError(data.message);
       } else {
         console.error("Error message:", error.message);
         setSignupError("Error setting up the request");

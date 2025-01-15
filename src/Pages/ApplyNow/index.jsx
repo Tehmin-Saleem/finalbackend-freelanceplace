@@ -18,7 +18,7 @@ const ApplyJob = () => {
     try {
       const token = localStorage.getItem("token");
       const response = await fetch(
-        "http://localhost:5000/api/freelancer/checkPaymentMethod",
+        `${BASE_URL}/api/freelancer/checkPaymentMethod`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -66,8 +66,9 @@ const handleApplyNow = async () => {
 
     const fetchJobPost = async () => {
       try {
+        const BASE_URL = import.meta.env.VITE_LOCAL_BASE_URL
         const response = await fetch(
-          `http://localhost:5000/api/client/job-posts/${jobPostId}`,
+          `${BASE_URL}/api/client/job-posts/${jobPostId}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,

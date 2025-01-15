@@ -28,7 +28,7 @@ const SendProjectDetails = ({ consultantId, onProjectSent, onClose, clientId }) 
 
     try {
       const token = localStorage.getItem("token");
-
+      const BASE_URL = import.meta.env.VITE_LOCAL_BASE_URL
       console.log('Sending project details with:', {
         consultantId,
         deadline,
@@ -39,7 +39,7 @@ const SendProjectDetails = ({ consultantId, onProjectSent, onClose, clientId }) 
       });
       console.log("Sending deadline:", formData.deadline);
       const response = await axios.post(
-        `http://localhost:5000/api/client/sendProjectDetails/${consultantId}`,
+        `${BASE_URL}/api/client/sendProjectDetails/${consultantId}`,
         {
           githubUrl: formData.githubUrl,
           deadline: formData.deadline,

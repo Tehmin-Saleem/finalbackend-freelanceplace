@@ -52,15 +52,15 @@ const JobsPage = () => {
         const headers = {
           Authorization: `Bearer ${token}`,
         };
-
+        const BASE_URL = import.meta.env.VITE_LOCAL_BASE_URL
         // Fetch jobs, user data, and payment methods concurrently
         const [jobsResponse, userResponse, paymentMethodsResponse] =
           await Promise.all([
-            axios.get("http://localhost:5000/api/client/job-posts", {
+            axios.get(`${BASE_URL}/api/client/job-posts`, {
               headers,
             }),
-            axios.get(`http://localhost:5000/api/client/users`, { headers }),
-            axios.get("http://localhost:5000/api/client/payment-methods", {
+            axios.get(`${BASE_URL}/api/client/users`, { headers }),
+            axios.get(`${BASE_URL}/api/client/payment-methods`, {
               headers,
             }),
           ]);

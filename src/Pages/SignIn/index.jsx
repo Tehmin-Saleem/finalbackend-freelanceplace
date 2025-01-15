@@ -48,7 +48,7 @@ function SignIn() {
     const checkTokenValidity = async () => {
       if (token && location.pathname === "/signin") {
         try {
-          const response = await fetch("http://localhost:5000/api/client/validate-token", {
+          const response = await fetch(`${BASE_URL}/api/client/validate-token`, {
             method: "GET",
             headers: {
               "Authorization": `Bearer ${token}`,
@@ -126,9 +126,9 @@ function SignIn() {
       Cookies.remove("savedEmail");
       Cookies.remove("savedPassword");
     }
-
+    const BASE_URL = import.meta.env.VITE_LOCAL_BASE_URL
     try {
-      const response = await fetch("http://localhost:5000/api/client/login", {
+      const response = await fetch(`${BASE_URL}/api/client/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

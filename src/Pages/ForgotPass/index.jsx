@@ -68,9 +68,9 @@ function ChangePassword() {
       // Clear previous messages
       setErrorMessage("");
       setSuccessMessage("Submitting...");
-  
+      const BASE_URL = import.meta.env.VITE_LOCAL_BASE_URL
       // API call to change the password
-      const response = await fetch(`http://localhost:5000/api/client/ChangePass/${id}/${token}`, {
+      const response = await fetch(`${BASE_URL}/api/client/ChangePass/${id}/${token}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

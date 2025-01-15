@@ -15,7 +15,8 @@ import "./styles.scss";
 import io from "socket.io-client";
 
 
-const ENDPOINT = "http://localhost:5000";
+// const ENDPOINT = BASE_URL;
+const ENDPOINT = 'http://13.61.176.80:5000';
 var socket;
 
 
@@ -80,16 +81,17 @@ const ScrollableChat = () => {
 
         const headers = { Authorization: `Bearer ${token}` };
         let response;
+        const BASE_URL = import.meta.env.VITE_LOCAL_BASE_URL
         if (userRole === "client") {
           response = await axios.get(
-            `http://localhost:5000/api/freelancer/profilebyfreelancerid/${selectedFreelancer}`,
+            `${BASE_URL}/api/freelancer/profilebyfreelancerid/${selectedFreelancer}`,
             { headers }
           );
           console.log("Freelancer data fetched successfully:", response.data);
           setuserData(response.data);
         } else if (userRole === "freelancer") {
           response = await axios.get(
-            `http://localhost:5000/api/client/users/${selectedFreelancer}`,
+            `${BASE_URL}/api/client/users/${selectedFreelancer}`,
             { headers }
           );
           console.log("Client data fetched successfully:", response.data);
@@ -234,9 +236,9 @@ const ScrollableChat = () => {
   
       let route;
       if (userRole === "client") {
-        route = `http://localhost:5000/api/client/Message/${messageId}`;
+        route = `${BASE_URL}/api/client/Message/${messageId}`;
       } else if (userRole === "freelancer") {
-        route = `http://localhost:5000/api/freelancer/Message/${messageId}`;
+        route = `${BASE_URL}/api/freelancer/Message/${messageId}`;
       } else {
         console.error("Invalid user role.");
         setError("Invalid user role. Please log in again.");

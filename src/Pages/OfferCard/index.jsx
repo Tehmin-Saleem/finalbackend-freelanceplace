@@ -32,7 +32,7 @@ const OfferDetails = () => {
       try {
         const token = localStorage.getItem("token");
         const response = await axios.get(
-          `http://localhost:5000/api/freelancer/offers/${notificationId}`,
+          `${BASE_URL}/api/freelancer/offers/${notificationId}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -82,9 +82,9 @@ const OfferDetails = () => {
       setSubmitLoading(true);
       console.log("Accepting offer:", notificationId);
       const token = localStorage.getItem("token");
-
+      const BASE_URL = import.meta.env.VITE_LOCAL_BASE_URL
       const updateResponse = await axios.patch(
-        `http://localhost:5000/api/freelancer/offers/${notificationId}`,
+        `${BASE_URL}/api/freelancer/offers/${notificationId}`,
         { status: "accepted" },
         {
           headers: {
@@ -129,7 +129,7 @@ const OfferDetails = () => {
       const token = localStorage.getItem("token");
 
       const updateResponse = await axios.patch(
-        `http://localhost:5000/api/freelancer/offers/${notificationId}`,
+        `${BASE_URL}/api/freelancer/offers/${notificationId}`,
         { status: "declined" },
         {
           headers: {

@@ -63,7 +63,7 @@ const ProposalCard = ({
           return;
         }
 
-        const completedresponses = await axios.get(`http://localhost:5000/api/client/completed-jobs/${freelancerId}`, {
+        const completedresponses = await axios.get(`${BASE_URL}/api/client/completed-jobs/${freelancerId}`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         console.log("completed " , completedresponses.data.data.totalCompletedJobs)
@@ -93,7 +93,7 @@ const ProposalCard = ({
       setLoading(true);
 
       const response = await axios.get(
-        `http://localhost:5000/api/freelancer/${freelancerId}/reviews`,
+        `${BASE_URL}/api/freelancer/${freelancerId}/reviews`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -140,7 +140,7 @@ const ProposalCard = ({
       }
 
       const response = await axios.get(
-        `http://localhost:5000/api/client/hire/${ProposalID}`,
+        `${BASE_URL}/api/client/hire/${ProposalID}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -197,7 +197,7 @@ const ProposalCard = ({
     try {
       const token = localStorage.getItem("token");
       const response = await axios.post(
-        `http://localhost:5000/api/client/hire/${ProposalID}`,
+        `${BASE_URL}/api/client/hire/${ProposalID}`,
         { status: "hired" }, // Send the status in the request body
         {
           headers: {
@@ -233,9 +233,10 @@ const ProposalCard = ({
     }
 
     try {
+      const BASE_URL = import.meta.env.VITE_LOCAL_BASE_URL
       const token = localStorage.getItem("token");
       const response = await axios.get(
-        `http://localhost:5000/api/client/proposal/${ProposalID}`,
+        `${BASE_URL}/api/client/proposal/${ProposalID}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,

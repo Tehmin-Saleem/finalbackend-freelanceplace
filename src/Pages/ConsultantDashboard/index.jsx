@@ -108,20 +108,17 @@ const ConsultantDashboard = () => {
 
         const decodedToken = jwtDecode(token);
         const consultantId = decodedToken.userId;
-
-        const response = await axios.get(
-          `http://localhost:5000/api/client/offers/count/${consultantId}`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-              "Content-Type": "application/json",
-            },
-          }
-        );
-
-        const { totalOffers, acceptedOffers, pendingOffers } =
-          response.data.data;
-
+  
+        const response = await axios.get(`${BASE_URL}/api/client/offers/count/${consultantId}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        });
+  
+        const { totalOffers, acceptedOffers, pendingOffers } = response.data.data;
+        
+  
         setOfferCounts({ totalOffers, acceptedOffers, pendingOffers });
 
         // Update chart data
@@ -169,15 +166,15 @@ const ConsultantDashboard = () => {
         const userId = decodedToken.userId;
         console.log("Decoded User ID:", userId);
 
-        const response = await axios.get(
-          `http://localhost:5000/api/client/users/${userId}`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-              "Content-Type": "application/json",
-            },
-          }
-        );
+      const response = await axios.get(
+        `${BASE_URL}/api/client/users/${userId}`,
+       {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      }
+      );
 
         setUser(response.data);
       } catch (error) {
@@ -203,12 +200,12 @@ const ConsultantDashboard = () => {
           navigate("/signin");
           return;
         }
-
+        const BASE_URL = import.meta.env.VITE_LOCAL_BASE_URL
         const decodedToken = jwtDecode(token);
         const consultantId = decodedToken.userId;
 
         const response = await axios.get(
-          `http://localhost:5000/api/client/offers/count/${consultantId}`, // Adjust to your API endpoint
+          `${BASE_URL}/api/client/offers/count/${consultantId}`, // Adjust to your API endpoint
           {
             headers: {
               Authorization: `Bearer ${token}`,

@@ -37,13 +37,14 @@ const IndexPage = () => {
         const headers = {
           Authorization: `Bearer ${token}`,
         };
+        const BASE_URL = import.meta.env.VITE_LOCAL_BASE_URL
 
         const [proposalsResponse, userResponse] = await Promise.all([
           axios.get(
-            `http://localhost:5000/api/freelancer/getproposals?jobId=${jobId}`,
+            `${BASE_URL}/api/freelancer/getproposals?jobId=${jobId}`,
             { headers }
           ),
-          axios.get(`http://localhost:5000/api/client/users`, { headers }),
+          axios.get(`${BASE_URL}/api/client/users`, { headers }),
           
         ]);
 
