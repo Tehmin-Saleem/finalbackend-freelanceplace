@@ -1,5 +1,5 @@
 const Offer_Form = require("../models/offer_form.model");
-const Notification = require("../controllers/notifications.controller");
+const Notification = require("../models/notifications.model");
 const mongoose = require("mongoose");
 const jobpost = require("../models/post_job.model");
 const review = require("../models/review.model");
@@ -397,6 +397,7 @@ exports.getOffers = async (req, res) => {
   }
 };
 
+
 exports.getOfferById = async (req, res) => {
   try {
     const { userId } = req.user;
@@ -451,7 +452,15 @@ exports.getOfferById = async (req, res) => {
       };
 
       console.log('Creating notification with data:', notificationData);
-      await Notification.createNotification(notificationData);
+      try {
+        await Notification.createNotification(notificationData);
+      } catch (notificationError) {
+        console.error('Error creating notification:', notificationError);
+        return res.status(500).json({
+          message: 'Error creating notification',
+          error: notificationError.message
+        });
+      }
     }
 
     // Get client's reviews
@@ -570,53 +579,78 @@ exports.getOfferById = async (req, res) => {
 
 
 
+
 exports.updateOfferStatus = async (req, res) => {
   try {
-      const { notificationId } = req.params;  // Changed from offerId to notificationId
-      const { status } = req.body;
-      console.log('Updating offer status - ID:', notificationId, 'Status:', status);
+    const  offerId = req.params.notificationId;  // Ensure the correct parameter name
+    const { status } = req.body;
+    console.log('Updating offer status - ID:', offerId, 'Status:', status);
 
-      if (!['accepted', 'declined'].includes(status)) {
-          return res.status(400).json({ message: 'Invalid status' });
-      }
+    if (!['accepted', 'declined'].includes(status)) {
+      return res.status(400).json({ message: 'Invalid status' });
+    }
 
-      const offer = await Offer_Form.findById(notificationId);
-      console.log('Found offer for status update:', offer);
-
-      if (!offer) {
-          return res.status(404).json({ message: 'Offer not found' });
-      }
-
-      // Update status
-      offer.status = status;
-      const updatedOffer = await offer.save();
-      console.log('Offer status updated to:', updatedOffer.status);
-
-      // Create notification for the client
-      const notificationMessage = status === 'accepted'
-          ? `Your offer for "${offer.job_title}" has been accepted`
-          : `Your offer for "${offer.job_title}" has been declined`;
-
-      const notificationData = {
-          client_id: offer.client_id,
-          freelancer_id: offer.freelancer_id,
-          job_id: offer._id,
-          receiver_id:offer.client_id,
-          senderId: offer.freelancer_id,
-          type: `offer_${status}`,
-          message: notificationMessage
-      };
-
-      console.log('Creating notification:', notificationData);
-      await Notification.createNotification(notificationData);
-
-      res.status(200).json({ 
-          message: `Offer ${status} successfully`,
-          offer: updatedOffer 
+    // Convert offerId to Mongoose ObjectId
+    let objectId;
+    try {
+      objectId = new mongoose.Types.ObjectId(offerId);
+    } catch (err) {
+      return res.status(400).json({
+        message: 'Invalid MongoDB ObjectId',
+        details: err.message
       });
+    }
+
+    // Find offer using the created ObjectId
+    const offer = await Offer_Form.findById(objectId)
+      .populate('client_id', 'first_name last_name country_name');
+
+    if (!offer) {
+      return res.status(404).json({ message: 'Offer not found' });
+    }
+
+    console.log('Found offer for status update:', offer);
+
+    // Update status
+    offer.status = status;
+    const updatedOffer = await offer.save();
+    console.log('Offer status updated to:', updatedOffer.status);
+
+    // Create notification for the client
+    const notificationMessage = status === 'accepted'
+      ? `Your offer for "${offer.job_title}" has been accepted`
+      : `Your offer for "${offer.job_title}" has been declined`;
+
+    const notificationData = {
+      client_id: offer.client_id._id,
+      freelancer_id: offer.freelancer_id,
+      job_id: offer._id,
+      receiver_id: offer.client_id._id,
+      senderId: offer.freelancer_id,
+      type: `offer_${status}`,
+      message: notificationMessage
+    };
+
+    console.log('Creating notification:', notificationData);
+
+    // Validate the notification type
+    const validTypes = ['hired', 'new_proposal', 'new_offer', 'milestone_completed', 'payment_received', 'new_query', 'offer_accepted', 'offer_declined'];
+    if (!validTypes.includes(notificationData.type)) {
+      return res.status(400).json({
+        message: 'Invalid notification type',
+        details: `Type ${notificationData.type} is not a valid enum value`
+      });
+    }
+
+    await Notification.create(notificationData);
+
+    res.status(200).json({
+      message: `Offer ${status} successfully`,
+      offer: updatedOffer
+    });
   } catch (error) {
-      console.error('Error updating offer status:', error);
-      res.status(500).json({ message: 'Error updating offer status', error: error.message });
+    console.error('Error updating offer status:', error);
+    res.status(500).json({ message: 'Error updating offer status', error: error.message });
   }
 };
 exports.getOffersByFreelancerId = async (req, res) => {
