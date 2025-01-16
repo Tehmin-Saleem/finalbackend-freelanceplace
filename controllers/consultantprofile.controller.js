@@ -152,16 +152,18 @@ exports.sendOfferToConsultant = async (req, res) => {
       path: 'client_id',
       select: 'first_name last_name'
     });
-
-    // Prepare review details for sending with complete information
+    
     const formattedReviews = clientReviews.map(review => ({
       clientName: `${review.client_id.first_name} ${review.client_id.last_name}`,
-      freelancerName: `${review.freelancer_id.first_name} ${review.freelancer_id.last_name}`,
-      projectTitle: review.job_id.title,
+      freelancerName: review.freelancer_id
+        ? `${review.freelancer_id.first_name} ${review.freelancer_id.last_name}`
+        : 'N/A',
+      projectTitle: review.job_id ? review.job_id.title : 'N/A', // Safe access
       rating: review.stars,
       message: review.message,
       date: review.createdAt
     }));
+    
 
     // Calculate review statistics
     const reviewStats = {
