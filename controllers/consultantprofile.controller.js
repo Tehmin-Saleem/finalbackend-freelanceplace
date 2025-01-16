@@ -457,6 +457,117 @@ exports.getConsultantProfiles = async (req, res) => {
     }
   };
   
+  exports.updateProfile = async (req, res) => {
+    try {
+      const consultant_id = req.user && (req.user.userId || req.user.id);
+      const updateData = req.body;
+  
+      // Handle skills array
+      const skills = Array.isArray(req.body.skills)
+        ? req.body.skills
+        : JSON.parse(req.body.skills || "[]");
+  
+      if (!Array.isArray(skills)) {
+        throw new Error("Invalid skills format. Expected an array.");
+      }
+      updateData.skills = skills;
+  
+      // Handle profile picture update if new file is uploaded
+      if (req.file) {
+        updateData.profilePicture = req.file.path;
+      }
+  
+      // Find the existing profile
+      const existingProfile = await ConsultantProfile.findOne({ consultant_id });
+  
+      if (!existingProfile) {
+        return res.status(404).json({
+          message: 'Profile not found',
+          toast: {
+            type: 'error',
+            message: 'Profile not found. Please create a profile first.',
+          },
+        });
+      }
+  
+      // Validate that the user owns this profile
+      if (existingProfile.consultant_id.toString() !== consultant_id.toString()) {
+        return res.status(403).json({
+          message: 'Unauthorized access',
+          toast: {
+            type: 'error',
+            message: 'You are not authorized to update this profile.',
+          },
+        });
+      }
+  
+      // Update specific fields
+      const allowedUpdates = [
+        'firstName',
+        'lastName',
+        'title',
+        'bio',
+        'skills',
+        'experience',
+        'education',
+        'certifications',
+        'hourlyRate',
+        'availability',
+        'location',
+        'languages',
+        'profilePicture',
+        'portfolio',
+        'socialLinks'
+      ];
+  
+      // Filter out undefined values and only include allowed fields
+      const filteredUpdates = Object.keys(updateData)
+        .filter(key => allowedUpdates.includes(key) && updateData[key] !== undefined)
+        .reduce((obj, key) => {
+          obj[key] = updateData[key];
+          return obj;
+        }, {});
+  
+      // Update the profile
+      const updatedProfile = await ConsultantProfile.findOneAndUpdate(
+        { consultant_id },
+        { $set: filteredUpdates },
+        { 
+          new: true, 
+          runValidators: true,
+          context: 'query' 
+        }
+      );
+  
+      // Create notification for profile update
+      await createNotification({
+        userId: consultant_id,
+        type: 'PROFILE_UPDATE',
+        message: 'Your profile has been successfully updated',
+        data: { profileId: updatedProfile._id }
+      });
+  
+      res.status(200).json({
+        message: 'Profile updated successfully',
+        profile: updatedProfile,
+        toast: {
+          type: 'success',
+          message: 'Your profile has been updated successfully!',
+        },
+      });
+  
+    } catch (error) {
+      console.error('Error in updateProfile:', error);
+      res.status(500).json({
+        message: 'Error updating profile',
+        error: error.message,
+        toast: {
+          type: 'error',
+          message: 'Failed to update profile. Please try again.',
+        },
+      });
+    }
+  };
   
 
 

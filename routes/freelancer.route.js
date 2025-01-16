@@ -147,6 +147,7 @@ router.get(
   authMiddleware,
   freelancerProfileController.getProfileByFreelancerId
 );
+router.get('/profile/:id', authMiddleware, freelancerProfileController.getFreelancerProfile);
 router.get(
   "/freelancer-profile-exists/:id",
   freelancerProfileController.freelancerProfileExists

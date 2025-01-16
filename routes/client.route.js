@@ -170,7 +170,12 @@ router.put('/hire/:hireRequestId', hireFreelancerController.updateHireRequest);
 
 
 router.delete('/hire/:hireRequestId', hireFreelancerController.deleteHireRequest);
-
+router.put(
+  '/update-profile',
+  authMiddleware,
+  upload.single('profilePicture'), // If you're handling file uploads
+  consultantProfileController.updateProfile
+);
 
 // route for getting freelancer details for specific proposal id
 router.get("/proposal/:proposalId", proposalController.getProposalById);

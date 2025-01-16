@@ -128,9 +128,9 @@ exports.getHireRequestById = async (req, res) => {
 // Create hire request
 exports.hireFreelancer = async (req, res) => {
   try {
-    const  proposalId  = req.params.proposalId;
+    const { proposalId } = req.params;
     const clientId = req.user.userId;
-console.log('proposal', proposalId)
+
     // Find and validate proposal
     const proposal = await Proposal.findById(proposalId)
       .populate("job_id")
@@ -197,10 +197,6 @@ console.log('proposal', proposalId)
     const notification =
       await notificationController.createNotification(notificationData);
 
-    console.log("Hire request saved:", hireRequest);
-    console.log("Proposal updated:", proposal);
-    console.log("Notification created:", notification);
-
     res.status(200).json({
       message: "Freelancer hired successfully",
       status: "hired",
@@ -218,7 +214,6 @@ console.log('proposal', proposalId)
     });
   }
 };
-
 
 exports.getAllHireData = async (req, res) => {
   try {

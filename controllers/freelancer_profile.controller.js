@@ -188,18 +188,15 @@ function calculateJobSuccess(profile) {
   // Implement your logic here. For now, returning a random number between 80 and 100
   return Math.floor(Math.random() * (100 - 80 + 1)) + 80;
 }
-
+// Keep existing getProfileByUserId for user's own profile
 exports.getProfileByUserId = async (req, res) => {
   console.log("Starting getProfileByUserId function");
   try {
     const userId = req.user.userId || req.user;
-    // console.log('Fetching profile for user ID:', userId);
 
     const profile = await Freelancer_Profile.findOne({
       freelancer_id: userId,
     }).select("-__v -createdAt -updatedAt");
-
-    // console.log('Found profile:', profile);
 
     if (!profile) {
       console.log("No profile found for user ID:", userId);
@@ -208,7 +205,6 @@ exports.getProfileByUserId = async (req, res) => {
         .json({ success: false, message: "Profile not found" });
     }
 
-    // Constructing the formatcdted profile
     const formattedProfile = {
       freelancer_id: profile.freelancer_id,
       name: `${profile.first_name} ${profile.last_name}`.trim() || "No Name",
@@ -233,17 +229,177 @@ exports.getProfileByUserId = async (req, res) => {
               : `https://res.cloudinary.com/dwqcs228h/raw/upload/v1728108804/uploads/${portfolio.attachment}`
             : null,
         })) || [],
-
       image: profile.image || null,
     };
-
-    console.log("profile image:", formattedProfile.image);
-    console.log("Formatted profile data:", formattedProfile);
 
     res.status(200).json({ success: true, data: formattedProfile });
   } catch (err) {
     console.error("Error in getProfileByUserId:", err);
     res.status(500).json({ success: false, error: err.message });
+  }
+};
+
+// New controller for viewing other freelancer profiles
+exports.getFreelancerProfile = async (req, res) => {
+  console.log("Starting getProfileByUserId function");
+  try {
+    const userId = req.user.userId || req.user;
+    
+    // Special handling for admin user
+    if (userId === 'admin') {
+      const freelancerId = req.params.id; // Get the freelancer ID from params
+      if (!freelancerId || !/^[0-9a-fA-F]{24}$/.test(freelancerId)) {
+        return res.status(400).json({
+          success: false,
+          message: "Invalid freelancer ID format"
+        });
+      }
+
+      const profile = await Freelancer_Profile.findOne({
+        freelancer_id: freelancerId,
+      }).select("-__v -createdAt -updatedAt");
+
+      if (!profile) {
+        console.log("No profile found for freelancer ID:", freelancerId);
+        return res.status(404).json({
+          success: false,
+          message: "Profile not found"
+        });
+      }
+
+      const formattedProfile = {
+        freelancer_id: profile.freelancer_id,
+        name: `${profile.first_name} ${profile.last_name}`.trim() || "No Name",
+        jobSuccess: calculateJobSuccess(profile),
+        rate: profile.availability?.hourly_rate || "Not specified",
+        skills: profile.skills || [],
+        totalJobs: profile.experience?.completed_projects || 0,
+        totalHours: profile.total_hours || 0,
+        title: profile.title || "",
+        experience: {
+          description: profile.profile_overview || "No description available",
+          title: profile.title || "",
+        },
+        availability: profile.availability || {},
+        languages: profile.languages || [],
+        portfolios: profile.portfolios?.map((portfolio) => ({
+          ...portfolio.toObject(),
+          attachment: portfolio.attachment
+            ? portfolio.attachment.startsWith("http")
+              ? portfolio.attachment
+              : `https://res.cloudinary.com/dwqcs228h/raw/upload/v1728108804/uploads/${portfolio.attachment}`
+            : null,
+        })) || [],
+        image: profile.image || null,
+      };
+
+      return res.status(200).json({ success: true, data: formattedProfile });
+    }
+
+    // Regular user flow remains unchanged
+    const profile = await Freelancer_Profile.findOne({
+      freelancer_id: userId,
+    }).select("-__v -createdAt -updatedAt");
+
+    if (!profile) {
+      console.log("No profile found for user ID:", userId);
+      return res.status(404).json({
+        success: false,
+        message: "Profile not found"
+      });
+    }
+
+    const formattedProfile = {
+      freelancer_id: profile.freelancer_id,
+      name: `${profile.first_name} ${profile.last_name}`.trim() || "No Name",
+      jobSuccess: calculateJobSuccess(profile),
+      rate: profile.availability?.hourly_rate || "Not specified",
+      skills: profile.skills || [],
+      totalJobs: profile.experience?.completed_projects || 0,
+      totalHours: profile.total_hours || 0,
+      title: profile.title || "",
+      experience: {
+        description: profile.profile_overview || "No description available",
+        title: profile.title || "",
+      },
+      availability: profile.availability || {},
+      languages: profile.languages || [],
+      portfolios: profile.portfolios?.map((portfolio) => ({
+        ...portfolio.toObject(),
+        attachment: portfolio.attachment
+          ? portfolio.attachment.startsWith("http")
+            ? portfolio.attachment
+            : `https://res.cloudinary.com/dwqcs228h/raw/upload/v1728108804/uploads/${portfolio.attachment}`
+          : null,
+      })) || [],
+      image: profile.image || null,
+    };
+
+    res.status(200).json({ success: true, data: formattedProfile });
+  } catch (err) {
+    console.error("Error in getProfileByUserId:", err);
+    res.status(500).json({ success: false, error: err.message });
+  }
+};
+exports.getProfileByUserId = async (req, res) => {
+  console.log("Starting getProfileByUserId function");
+  try {
+    const userId = req.params.freelancerId || req.user.userId;
+    
+    // Validate that userId is a valid MongoDB ObjectId
+    if (!userId || !/^[0-9a-fA-F]{24}$/.test(userId)) {
+      return res.status(400).json({ 
+        success: false, 
+        message: "Invalid user ID format" 
+      });
+    }
+
+    const profile = await Freelancer_Profile.findOne({
+      freelancer_id: userId
+    }).select("-__v -createdAt -updatedAt");
+
+    if (!profile) {
+      console.log("No profile found for user ID:", userId);
+      return res.status(404).json({ 
+        success: false, 
+        message: "Profile not found" 
+      });
+    }
+
+    // Rest of your formatting logic remains the same...
+    const formattedProfile = {
+      freelancer_id: profile.freelancer_id,
+      name: `${profile.first_name} ${profile.last_name}`.trim() || "No Name",
+      jobSuccess: calculateJobSuccess(profile),
+      rate: profile.availability?.hourly_rate || "Not specified",
+      skills: profile.skills || [],
+      totalJobs: profile.experience?.completed_projects || 0,
+      totalHours: profile.total_hours || 0,
+      title: profile.title || "",
+      experience: {
+        description: profile.profile_overview || "No description available",
+        title: profile.title || "",
+      },
+      availability: profile.availability || {},
+      languages: profile.languages || [],
+      portfolios: profile.portfolios?.map((portfolio) => ({
+        ...portfolio.toObject(),
+        attachment: portfolio.attachment
+          ? portfolio.attachment.startsWith("http")
+            ? portfolio.attachment
+            : `https://res.cloudinary.com/dwqcs228h/raw/upload/v1728108804/uploads/${portfolio.attachment}`
+          : null,
+      })) || [],
+      image: profile.image || null,
+    };
+
+    res.status(200).json({ success: true, data: formattedProfile });
+  } catch (err) {
+    console.error("Error in getProfileByUserId:", err);
+    res.status(500).json({ 
+      success: false, 
+      error: "An error occurred while fetching the profile" 
+    });
   }
 };
 
